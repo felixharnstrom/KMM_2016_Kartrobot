@@ -1,0 +1,109 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{array}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{mathptmx}% Times Roman font
+\usepackage{helvet}% Helvetica, served as a model for arial
+\usepackage{anyfontsize}
+
+\usepackage[tocgraduated]{tocstyle}
+\usetocstyle{allwithdot}
+
+\usepackage{fancyhdr}
+\fancypagestyle{intro}{%
+  \fancyhf{}
+  \fancyhead[C]{\LIPSprojekttitel}
+  \fancyhead[R]{\today} 
+  \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+  \fancyfoot[C]{\phantom{text}\Roman{page}}
+  \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0.4pt}}
+\pagestyle{intro}
+\fancypagestyle{content}{%
+  \fancyhf{}
+  \fancyhead[C]{\LIPSprojekttitel}
+  \fancyhead[R]{\today} 
+  \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+  \fancyfoot[C]{\phantom{text}\thepage}
+  \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0.4pt}}
+\pagestyle{content}
+
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\sffamily\Large\bfseries}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\sffamily\Large\bfseries}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\sffamily\Large\bfseries}
+  {\thesubsubsection}{1em}{}
+
+\newcommand{\LIPSartaltermin}{2016/HT}
+\newcommand{\LIPSkursnamn}{TSEA29}
+\newcommand{\LIPSprojekttitel}{Kartrobot}
+\newcommand{\LIPSprojektgrupp}{Grupp 1}
+\newcommand{\LIPSgruppepost}{\href{mailto:kmm_2016_grupp1@liuonline.onmicrosoft.com}{kmm\_2016\_grupp1@liuonline.onmicrosoft.com}}
+\newcommand{\LIPSgrupphemsida}{}
+\newcommand{\LIPSkund}{MAI, Linköpings universitet, 581\,83 Linköping}
+\newcommand{\LIPSkundkontakt}{Hans Lundmark, 013-281475, halun@mai.liu.se}
+\newcommand{\LIPSkursansvarig}{Hans Lundmark, 013-281475, halun@mai.liu.se}
+\newcommand{\LIPShandledare}{Hans Lundmark, 013-281475, halun@mai.liu.se}
+\newcommand{\LIPSdokumenttyp}{Kravspecifikation}
+\newcommand{\LIPSredaktor}{Felix Härnström}
+\newcommand{\LIPSversion}{0.1}
+\newcommand{\LIPSgranskare}{N Itisk}
+\newcommand{\LIPSgranskatdatum}{2004-xx-xx}
+\newcommand{\LIPSgodkannare}{}
+\newcommand{\LIPSgodkantdatum}{}
+
+\input{LIPS.tex}
+\begin{document}
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+  \LIPSgruppmedlem{Hannes Haglund}{}{hanha265@student.liu.se}
+  \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+  \LIPSgruppmedlem{Jani Jokinen}{}{janjo273@student.liu.se}
+  \LIPSgruppmedlem{Silas Lenz}{}{sille914@student.liu.se}
+  \LIPSgruppmedlem{Daniel Månsso}{}{danma344@student.liu.se}
+  \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+\clearpage
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\tableofcontents
+\renewcommand{\familydefault}{\rmdefault}	%Sans-serif
+\normalfont
+\clearpage
+\begin{LIPSdokumenthistorik}
+	\LIPSversionsinfo{0.1}{2016-09-05}{Första utkastet}{FH}{FH}
+\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+\section{Inledning}
+\section{Översikt av systemet}
+\section{Delsystem 1}
+\section{Delsystem 2}
+\section{Prestandakrav}
+\section{Krav på vidareutveckling}
+\section{Tillförlitlighet}
+\section{Ekonomi}
+\section{Krav på säkerhet}
+\section{Leveranskrav och delleveranser}
+\section{Dokumentation}
+\section{Kvalitetskrav}
+\section{Underhållsbarhet}
+\end{document}
