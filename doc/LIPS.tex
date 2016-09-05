@@ -104,3 +104,13 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 }
 \newcommand{\LIPSkrav}[3]{\hline\stepcounter{LIPSkravnummer}\textbf{\arabic{LIPSkravnummer}} & \textbf{{#1}} & {#2} & \textbf{{#3}} \\}
 \newcommand{\LIPSunderkrav}[3]{\hline\stepcounter{LIPSunderkravnummer}\textbf{\arabic{LIPSkravnummer}\Alph{LIPSunderkravnummer}} & \textbf{{#1}} & {#2} & \textbf{{#3}} \\}
+
+
+\newenvironment{LIPSleveranslista}{
+	\begin{tabular}{|p{25mm}|p{25mm}|p{55mm}|p{25mm}|p{5mm}|} 
+	}
+	{
+		\hline
+	\end{tabular}
+}
+\newcommand{\LIPSleverans}[4]{ \hline\stepcounter{LIPSkravnummer}\textbf{Krav nr \arabic{LIPSkravnummer}}&\textbf{{#1}}&{#2}&\textbf{{#3}}&\textbf{{#4}}\\}
