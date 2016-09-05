@@ -94,6 +94,39 @@
 \setcounter{page}{1}
 \pagestyle{content}
 \section{Inledning}
+% TODO: Figure
+% TODO: Systemet i dess omgivning. 
+
+
+I detta dokument kommer kravlistor formateras enligt följande figur: 
+
+\begin{LIPSkravlista}
+	\LIPSkravDemo{Förändring}{Kravtext för krav X}{Prioritet}
+\end{LIPSkravlista}
+
+Kravnummer i första kolumnen är formaterade löpande utefter sektion och undersektion. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskrivet kravets prioritet. Kravnivåerna är som följande:
+
+\begin{itemize}
+	\item Prioritetsnivå 1 – Kravet ska uppfyllas
+	\item Prioritetsnivå 2 – Kravet ska uppfyllas om tid finns
+	\item Prioritetsnivå 3 – Kravet ska uppfyllas efter att alla krav med nivå 2 uppfyllts 
+\end{itemize}
+\subsection{Parter}
+Beställare: Mattias Krysander \\
+Leverantör: Grupp 1 \\
+Handledare: xxx 
+
+\subsection{Syfte och mål}
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt appendix A, och samtidigt rita upp en karta över området.  
+\subsection{Användning}
+Roboten ska ha två lägen, ett för manuell fjärrstyrning, och ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Det ska även finnas en startknapp på roboten. 
+\subsubsection{Manuell styrning}
+Vid manuell styrning så ska roboten reagera på följande kommandon som skickas via Blåtand: fram, fram vänster, fram höger, back, stopp, rotera vänster, rotera höger. 
+\subsubsection{Autonom styrning}
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt appendix A. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
+\subsection{Bakgrundsinformation}
+\subsection{Definitioner}
+
 \section{Översikt av systemet}
 \section{Delsystem 1}
 \section{Delsystem 2}
