@@ -4,7 +4,11 @@
 \usepackage[swedish]{babel}
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
 \usepackage{hyperref}
+
 \usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 \usepackage[yyyymmdd,hhmmss]{datetime}
 \renewcommand{\dateseparator}{-}
@@ -98,14 +102,16 @@
 % TODO: Systemet i dess omgivning. 
 
 
-I detta dokument kommer kravlistor formateras enligt följande figur: 
-
+I detta dokument kommer kravlistor formateras enligt figur \ref{fig:lipskrav_exempel}.
+\begin{figure}[h!]
 \begin{LIPSkravlista}
 	\LIPSkravDemo{Förändring}{Kravtext för krav X}{Prioritet}
 \end{LIPSkravlista}
+\caption{Formatering för kravlista.}
+\label{fig:lipskrav_exempel}
+\end{figure}
 
-Kravnummer i första kolumnen är formaterade löpande utefter sektion och undersektion. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskrivet kravets prioritet. Kravnivåerna är som följande:
-
+Kravnummer i första kolumnen är formaterade löpande genom hela dokumentet. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskrivet kravets prioritet. Kravnivåerna är som följande:
 \begin{itemize}
 	\item Prioritetsnivå 1 – Kravet ska uppfyllas
 	\item Prioritetsnivå 2 – Kravet ska uppfyllas om tid finns
@@ -113,7 +119,7 @@ Kravnummer i första kolumnen är formaterade löpande utefter sektion och under
 \end{itemize}
 \subsection{Parter}
 Beställare: Mattias Krysander \\
-Leverantör: Grupp 1 \\
+Leverantör: \LIPSprojektgrupp \\
 Handledare: xxx 
 
 \subsection{Syfte och mål}
