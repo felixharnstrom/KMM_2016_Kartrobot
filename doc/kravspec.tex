@@ -133,14 +133,204 @@ I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt appen
 \subsection{Bakgrundsinformation}
 \subsection{Definitioner}
 
+
 \section{Översikt av systemet}
-\section{Delsystem 1}
-\section{Delsystem 2}
+
+\subsection{Grov beskrivning av produkten}
+Vår produkt är en robot som kan navigera genom en 6x6m bana och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs med hjälp av Bluetooth, ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status dvs data från sensorer, robotens läge etc. 
+
+\subsection{Produktkomponenter}
+Kartrobot med mjukvara till roboten samt för tillhörande dator, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
+
+\subsection{Beroenden till andra system }
+Beroenden till andra system 
+
+\subsection{Ingående delsystem}
+De moduler som ingår i konstruktionen är:
+\begin{itemize}
+	\item Sensorenhet (avläsning) 
+	\item Styrenhet (styrning av motorer) 
+	\item Kommunikations och kontrollenhet (Blåtand, beräkningar av rutt)  uppfyllts 
+\end{itemize}
+
+\subsection{Avgränsningar}
+Behöver endast klara av banor utformade enligt appendix A. 
+% TODO: vill vi ha Designfilosofi?
+
+\subsection{Generella krav på hela systemet}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Roboten ska kunna bestämma avstånd till väggar.}{1}
+	\LIPSkrav{Original}{Roboten ska kunna förflytta sig.}{1}
+	\LIPSkrav{Original}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Bluetooth)}{1}
+	\LIPSkrav{Original}{Roboten ska kunna styras autonomt.}{1}
+	\LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man kan välja mellan autonom och manuell styrning. }{1}
+	\LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man startar den.}{1}
+	\LIPSkrav{Original}{Roboten ska kunna kommunicera trådlöst med en bärbar dator.}{1}
+	\LIPSkrav{Original}{Roboten ska skicka kartdata till en bärbar dator.}{1}
+	\LIPSkrav{Original}{Roboten ska skicka styrdata till en bärbar dator.}{1}
+	\LIPSkrav{Original}{Roboten ska skicka sensordata till en bärbar dator.}{1}
+	\LIPSkrav{Original}{Roboten ska skicka motordata till en bärbar dator}{1} % TODO: Vad är skillnaden mot den två steg upp?
+	\LIPSkrav{Original}{Roboten ska vara uppbyggd av utbytbara moduler.}{1}
+	\LIPSkrav{Original}{I konstruktionen ska det ingå: kommunikationsmodul, styrenhet, samt sensorenhet.}{1}
+	\LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen efter kartläggning.}{1}
+	\LIPSkrav{Original}{Roboten ska uppfylla kraven i appendix A.}{1}
+	\LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt.}{1}
+	\LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på den bärbara datorn.}{1}
+	\LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i appendix A.}{1}
+\end{LIPSkravlista}
+
+
+\section{Delsystem 1 - Sensorenhet}
+%TODO: Bild av delsystem
+
+
+\subsection{Inledande beskrivning av delsystem 1}
+Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till styrenheten, delsystem 3.\\
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Det ska sitta sensorer på robotens sidor för kollisionsdetektering.}{2} %TODO: 2?
+	\LIPSkrav{Original}{1 sensor ska sitta på toppen av roboten för avläsning av rummet. Denna sensor ska rotera för att avläsa hela omgivningen}{1}
+	\LIPSkrav{Original}{}{1}
+	\LIPSkrav{Original}{1 sensor ska användas för kalibrering av graderna på den sensor som roterar för avläsning av rummet.}{2}
+	\LIPSkrav{Original}{Roboten ska vara utrustad med ett gyro som håller reda på vilken riktning som roboten pekar.}{1}
+\end{LIPSkravlista}
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Sensoreneheten ska ta emot data från robotens sensorer}{1}
+	\LIPSkrav{Original}{Sensorenheten ska, efter eventuell kalibrering, skicka vidare processerad sensordata till kontrolleneheten}{1}
+	\LIPSkrav{Original}{Sensorenheten ska indikera vilken sensor informationen kommer från.}{1}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Sensorenheten ska arbeta med sex stycken avståndssensorer.}{1}
+	\LIPSkrav{Original}{Sensorenheten ska vara skriven i C/C++.}{1}
+	\LIPSkrav{Original}{Sensorenheten ska innehålla minst en processor.}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Enheten ska leverera data enligt givet protokoll.}{1}
+	\LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från sensorerna xxx}{1}
+\end{LIPSkravlista}
+
+\section{Delsystem 2 - Styrenhet}
+%TODO: Bild av delsystem
+
+\subsection{Inledande beskrivning av delsystem 2}
+Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning. Styrenheten är länken mellan alla styrkommandon och motorerna, dvs att den ingående data måste följa ett givet protokoll. Den enda enhet som styrenhet kommunicerar med är kommunikations enheten.
+% TODO: Ingen kravlista?
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Styrenheten ska styra alla motorer i konstruktionen.}{1}
+	\LIPSkrav{Original}{Enheten ska kunna ta emot instruktioner på ett väldefinierat format via en gemensam buss.}{1}
+	\LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis "hastighet n rakt fram" och "sväng 10 grader åt höger" till motorsignaler.}{2}
+	\LIPSkrav{Original}{När styrenheten översätter högnivåinstruktioner till motorsignaler ska dessa rapporteras tillbaka via en enskild buss.}{2}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Styrenheten ska arbeta med servmotorerna xxx}{1}
+	\LIPSkrav{Original}{Styrenheten ska vara skriven i C/C++.}{1}
+	\LIPSkrav{Original}{Styrenheten ska innehålla minst en processor.}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Enheten ska ta emot data enligt givet protokoll.}{1}
+	\LIPSkrav{Original}{Enheten ska styra servmotorerna xxx}{1}
+\end{LIPSkravlista}
+
+\section{Delsystem 3 - Kommunikations och kontrollenhet }
+%TODO: Bild av delsystem
+
+\subsection{Inledande beskrivning av delsystem 3}
+Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PCn. I samma hårdvarumodul ingår också kontrollenheten, som gör beräkningar relaterat tilll det autonoma läget.
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Tar emot data via en buss från sensorenheten.}{1}
+	\LIPSkrav{Original}{Skicka vidare motorinstruktioner till styrenheten via dess gemensamma buss.}{1}
+	\LIPSkrav{Original}{Enheten tar emot information om motorernas utstyrning från styrenheten, när denne själv avgjort detta.}{2}
+	\LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Bluetooth.}{1}
+	\LIPSkrav{Original}{Enheten skickar sensor och motordata till PCn via Bluetooh.}{1}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+	\LIPSkrav{Original}{arg2}{1}
+\end{LIPSkravlista}
+
+
+\section{Delsystem 4 - Mjukvara på PC}
+%TODO: Bild av delsystem
+
+\subsection{Inledande beskrivning av delsystem 4}
+För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Bluetooth ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Bluetooth. 
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Mjukvaran ska skicka kommandon för navigering som roboten kan avläsa och utföra.}{1}
+	\LIPSkrav{Original}{Kommandon för navigering ska skickas över Bluetooth.}{1}
+	\LIPSkrav{Original}{Sensorernas värden och robotens status ska skickas tas emot över Bluetooth och presenteras för navigeraren.}{1}
+	\LIPSkrav{Original}{Den karta som är genererad av roboten ska kunna ritas ut i denna mjukvara.}{1}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Bluetooth.}{1}
+	\LIPSkrav{Original}{Datan för att hämta karta samt skicka kommandon sker över samma protokoll.}{2}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Mjukvaran ska rita ut kartan som en tydlig grid, med bara raka linjer och 90 graders kanter.}{2}
+	\LIPSkrav{Original}{Robotens och sensorernas status samt den hittils genererade kartan presenteras uppdateras kontinuerligt i mjukvaran.}{2}
+\end{LIPSkravlista}
+
 \section{Prestandakrav}
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i appendix A på under 20 minuter}{1}
+	\LIPSkrav{Original}{Roboten ska kunna skanna rummet medan den rör sig, det vill säga den behöver inte stanna för att söka efter väggar omkring sig.}{2}
+\end{LIPSkravlista}
+
+
 \section{Krav på vidareutveckling}
+
+
 \section{Tillförlitlighet}
+
+
 \section{Ekonomi}
+
+\begin{LIPSkravlista}
+	\LIPSkrav{Original}{Gruppen ska ha arbetat sammanlagt 960 timmar vid leverans.}{1}
+\end{LIPSkravlista}
+
+
 \section{Krav på säkerhet}
+% TODO: Vill vi ha? Tomas gråade ut den.
+
 \section{Leveranskrav och delleveranser}
 \begin{LIPSleveranslista}	
 	\LIPSleverans{Original}{Kravspecifikation}{2016-09-13}{1}
@@ -158,6 +348,12 @@ I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt appen
 \end{LIPSleveranslista}
 
 \section{Dokumentation}
-\section{Kvalitetskrav}
-\section{Underhållsbarhet}
+\begin{LIPSdokumentlista}
+	\LIPSdokument{Teknisk dokumentation}{SV}{Beskrivning av konstruktionen för framtida underhåll, felsökning och konstruktionsunderlag}{Ingenjörer}{PDF}
+	\LIPSdokument{Användarhandledning}{SV}{Beskrivning av hur produkten installeras och används}{Användare}{Wiki}
+\end{LIPSdokumentlista}
+
+% TODO: appendix
+
+
 \end{document}

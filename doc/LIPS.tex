@@ -123,3 +123,21 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 \normalfont
 }
 \newcommand{\LIPSleverans}[4]{ \hline\stepcounter{LIPSkravnummer}\textbf{Krav nr \arabic{LIPSkravnummer}}&\textbf{{#1}}&{#2}&\textbf{{#3}}&\textbf{{#4}}\\}
+
+
+\newenvironment{LIPSdokumentlista}{%
+	\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+	\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{| L{40mm} | L{13mm} | L{50mm} | L{19mm} | L{14mm} |} 
+		
+		\hline
+		\textbf{Dokument} & \textbf{Språk} & \textbf{Syfte/Innehåll} & \textbf{Målgrupp} & \textbf{Format} \\
+	}%
+	{%
+		\hline
+	\end{tabular}
+	\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+	\normalfont
+}
+\newcommand{\LIPSdokument}[5]{\hline {#1} & {#2} & {#3} & {#4} & {#5}\\}
