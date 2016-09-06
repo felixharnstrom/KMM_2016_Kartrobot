@@ -13,8 +13,8 @@
 \usepackage[yyyymmdd,hhmmss]{datetime}
 \renewcommand{\dateseparator}{-}
 
-\usepackage{mathptmx}% Times Roman font
-\usepackage{helvet}% Helvetica, served as a model for arial
+\usepackage{mathptmx}    %Times Roman font
+\usepackage{helvet}    %Helvetica, served as a model for arial
 \usepackage{anyfontsize}
 
 \usepackage[tocgraduated]{tocstyle}
@@ -186,7 +186,8 @@ Behöver endast klara av banor utformade enligt bilaga A.
 \subsection{Inledande beskrivning av delsystem 1}
 Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till styrenheten, delsystem 3.\\
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Det ska sitta sensorer på robotens sidor för kollisionsdetektering.}{2} %TODO: 2?
+    \LIPSkrav{Original}{Det ska sitta avståndssensorer på robotens sidor.}{1}
+    \LIPSkrav{Original}{Det ska finnas nödstoppsfunktionalitet.}{2}
     \LIPSkrav{Original}{1 sensor ska sitta på toppen av roboten för avläsning av rummet. Denna sensor ska rotera för att avläsa hela omgivningen}{1}
     \LIPSkrav{Original}{}{1}
     \LIPSkrav{Original}{1 sensor ska användas för kalibrering av graderna på den sensor som roterar för avläsning av rummet.}{2}
@@ -198,6 +199,7 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
     \LIPSkrav{Original}{Sensoreneheten ska ta emot data från robotens sensorer}{1}
     \LIPSkrav{Original}{Sensorenheten ska, efter eventuell kalibrering, skicka vidare processerad sensordata till kontrolleneheten}{1}
     \LIPSkrav{Original}{Sensorenheten ska indikera vilken sensor informationen kommer från.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska kunnna skicka en nödstoppssignal.}{2}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
@@ -226,6 +228,7 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
     \LIPSkrav{Original}{Enheten ska kunna ta emot instruktioner på ett väldefinierat format via en gemensam buss.}{1}
     \LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis "hastighet n rakt fram" och "sväng 10 grader åt höger" till motorsignaler.}{2}
     \LIPSkrav{Original}{När styrenheten översätter högnivåinstruktioner till motorsignaler ska dessa rapporteras tillbaka via en enskild buss.}{2}
+    \LIPSkrav{Original}{Sensorenheten ska kunnna ta emot en nödstoppssignal.}{2}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
