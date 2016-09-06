@@ -126,13 +126,13 @@ Leverantör: \LIPSprojektgrupp \\
 Handledare: xxx 
 
 \subsection{Syfte och mål}
-Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt bilaga A, och samtidigt rita upp en karta över området.  
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt bilaga \ref{sec:courseSpecification}, och samtidigt rita upp en karta över området.  
 \subsection{Användning}
 Roboten ska ha två lägen, ett för manuell fjärrstyrning, och ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Det ska även finnas en startknapp på roboten. 
 \subsubsection{Manuell styrning}
 Vid manuell styrning så ska roboten reagera på följande kommandon som skickas via Blåtand: fram, fram vänster, fram höger, back, stopp, rotera vänster, rotera höger. 
 \subsubsection{Autonom styrning}
-I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga A. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga \ref{sec:courseSpecification}. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
 \subsection{Bakgrundsinformation}
 \subsection{Definitioner}
 
@@ -157,7 +157,7 @@ De moduler som ingår i konstruktionen är:
 \end{itemize}
 
 \subsection{Avgränsningar}
-Behöver endast klara av banor utformade enligt bilaga A. 
+Behöver endast klara av banor utformade enligt bilaga \ref{sec:courseSpecification}. 
 % TODO: vill vi ha Designfilosofi?
 
 \subsection{Generella krav på hela systemet}
@@ -176,10 +176,10 @@ Behöver endast klara av banor utformade enligt bilaga A.
     \LIPSkrav{Original}{Roboten ska vara uppbyggd av utbytbara moduler.}{1}
     \LIPSkrav{Original}{I konstruktionen ska det ingå: kommunikationsmodul, styrenhet, samt sensorenhet.}{1}
     \LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen efter kartläggning.}{1}
-    \LIPSkrav{Original}{Roboten ska uppfylla kraven i bilaga A.}{1}
+    \LIPSkrav{Original}{Roboten ska uppfylla kraven i bilaga \ref{sec:courseSpecification}.}{1}
     \LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt.}{1}
     \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på den bärbara datorn.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga A.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga \ref{sec:courseSpecification}.}{1}
 \end{LIPSkravlista}
 
 \newpage
@@ -320,7 +320,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 
 \section{Prestandakrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga A på under 20 minuter}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga \ref{sec:courseSpecification} på under 20 minuter}{1}
     \LIPSkrav{Original}{Roboten ska kunna skanna rummet medan den rör sig, det vill säga den behöver inte stanna för att söka efter väggar omkring sig.}{2}
 \end{LIPSkravlista}
 
@@ -362,8 +362,63 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \clearpage
 
 \begin{appendices}
-\section{Banspecifikation}
-%TODO Copy from drive doc
+
+%TODO Appendix A and B are not at their final version. Update them as the original document updates.
+\section{Banspecifikation} \label{sec:courseSpecification}
+
+\subsection{Enligt projektdirektiv}
+\begin{itemize}
+    \item Banan som roboten ska utforska är uppbyggd av kartongväggar, hädanefter kallat väggar, max 6x6 meter från vägg till vägg.
+    \item Kartongväggarna skall ha längder som är multipler av 40 cm.
+    \item Det skall ej vara möjligt att kartlägga kartongvärlden genom att endast följa en vägg.
+    \item Alla hörn ska ha en vinkel av 90 grader.
+    \item Exakt en köksö skall förekomma.
+    \item Den sida på köksön som är närmast ytterväggen ska ha ett avstånd till ytterväggen på max 80 cm.
+\end{itemize}
+
+\subsection{Tillägg}
+\begin{LIPSAppendixKravlista}
+    \LIPSAppendixKrav{Original}{Startpunkten ska definieras som ett ''garage'': en ruta i rutnätet med väggar på tre sidor, 40x40 centimeter.}
+    \LIPSAppendixKrav{Original}{Målet ska vara densamma som startpunkten.}
+    \LIPSAppendixKrav{Original}{Roboten ska få starta och sluta roterad i valfri riktning.}
+    \LIPSAppendixKrav{Original}{''Garaget'' ska vara placerat i ytterväggen (inte i köksön).}
+    \LIPSAppendixKrav{Original}{Ytan av ''garaget'' ska inkluderas i de 6x6 meter som utgör banan.}
+    \LIPSAppendixKrav{Original}{Alla kartongväggar ska vara delar i ''väggceller'' som upptar en avskärmad yta på 40x40 centimeter. Kartongväggar inuti oåtkomliga områden (ur robotens perspektiv) krävs ej.}
+    \LIPSAppendixKrav{Original}{Köksöns väggceller ska ej vara förskjutna i rutnätet som bildas av rummets alla celler.}
+    \LIPSAppendixKrav{Original}{''Diagonaler'' ska vara tillåtna, det vill säga väggceller som endast delar ett gemensamt hörn.}
+    \LIPSAppendixKrav{Original}{Golvet ska utgöras av laminatgolv à LiU-standard.}
+\end{LIPSAppendixKravlista}
+
+\section{Tävlingsregler} \label{sec:competitionRules}
+
+\subsection{Tävlingsupplägg}
+\begin{LIPSAppendixKravlista}
+    \LIPSAppendixKrav{Original}{Varje robot ska köra två heat.}
+    \LIPSAppendixKrav{Original}{Det bästa av de två heaten ska räknas.}
+    \LIPSAppendixKrav{Original}{Båda heaten ska köras på samma bana.}
+    \LIPSAppendixKrav{Original}{Roboten ska autonomt köra sitt heat utan yttre påverkan från gruppens medlemmar.}
+    \LIPSAppendixKrav{Original}{Mellan heaten ska grupperna få chans att laga sin robot vid uppenbara skador, men det ges ej möjlighet att förbättra roboten från dess utförande vid leverans, t.ex. förändra kod, förändra konfiguration eller bygga på fler komponenter.}
+    \LIPSAppendixKrav{Original}{Tid tas under tävling, och klockan ska stoppas då roboten har läst in ett sammanhängande rum och återvänt till “Garaget”, mer precist då alla fyra hjulen befinner sig i den cellen. Ett sammanhängande rum ska definieras som en yta helt innesluten i väggar.}
+    \LIPSAppendixKrav{Original}{Ett heat ska avslutas då klockan stoppas..}
+    \LIPSAppendixKrav{Original}{Resultatet ska vara på formen av ett rutnät . Varje cell ska representera en 40x40 centimeter cell i tävlingsområdet, och ska antingen vara definierad som omsluten av väggar eller öppen.}
+\end{LIPSAppendixKravlista}
+
+\subsection{Diskvalifikation}
+\begin{LIPSAppendixKravlista}
+    \LIPSAppendixKrav{Original}{Om robotens höjd överstiger väggarnas höjd ska roboten diskvalificeras från det pågående heatet.}
+    \LIPSAppendixKrav{Original}{Om roboten överskrider maxtiden XX minuter ska roboten diskvalificeras från det pågående heatet.}
+    \LIPSAppendixKrav{Original}{Om gruppens system inte har visat en karta då roboten nått målet ska roboten diskvalificeras från det pågående heatet.}
+    \LIPSAppendixKrav{Original}{Om en gruppmedlem intar banan eller vidrör en robot innan det pågående heatet är slut så ska gruppens robot diskvalificeras från det pågående heatet.}
+\end{LIPSAppendixKravlista}
+
+\subsection{Tidspålägg}
+\begin{LIPSAppendixKravlista}
+    \LIPSAppendixKrav{Original}{Tidspålägg fås därefter vid någon eller fler av följande händelser. Specificerade antal sekunder i tidspålägg bestäms av beställarna.}
+    \LIPSAppendixKrav{Original}{Vidrörning av vägg ska ge ett tidspålägg på XX sekunder. Endast de vertikala bitarna av kartongväggarna ska räknas som en vägg.}
+    \LIPSAppendixKrav{Original}{Utritning av felaktig karta. Tidspålägg ska ges per felaktigt ritat block, à XX sekunder. Vid fler än tre felaktiga block ska det istället för att ges tidspålägg per block ges ett enda tidspålägg på XX sekunder.}
+\end{LIPSAppendixKravlista}
+
+
 \end{appendices}
 
 
