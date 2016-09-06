@@ -354,8 +354,34 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \clearpage
 
 \begin{appendices}
+
+%TODO Appendix A and B are not at their final version. Update them as the original document updates.
 \section{Banspecifikation}
-%TODO Copy from drive doc
+
+\subsection{Enligt projektdirektiv}
+\begin{itemize}
+    \item Banan som roboten ska utforska är uppbyggd av kartongväggar, hädanefter kallat väggar, max 6x6 meter från vägg till vägg.
+    \item Kartongväggarna skall ha längder som är multipler av 40 cm.
+    \item Det skall ej vara möjligt att kartlägga kartongvärlden genom att endast följa en vägg.
+    \item Alla hörn ska ha en vinkel av 90 grader.
+    \item Exakt en köksö skall förekomma.
+    \item Den sida på köksön som är närmast ytterväggen ska ha ett avstånd till ytterväggen på max 80 cm.
+\end{itemize}
+
+\subsection{Tillägg}
+\begin{LIPSAppendixKravlista}
+    \LIPSAppendixKrav{Original}{Startpunkten ska definieras som ett ''garage'': en ruta i rutnätet med väggar på tre sidor, 40x40 centimeter.}
+    \LIPSAppendixKrav{Original}{Målet ska vara densamma som startpunkten.}
+    \LIPSAppendixKrav{Original}{Roboten ska få starta och sluta roterad i valfri riktning.}
+    \LIPSAppendixKrav{Original}{''Garaget'' ska vara placerat i ytterväggen (inte i köksön).}
+    \LIPSAppendixKrav{Original}{Ytan av ''garaget'' ska inkluderas i de 6x6 meter som utgör banan.}
+    \LIPSAppendixKrav{Original}{Alla kartongväggar ska vara delar i ''väggceller'' som upptar en avskärmad yta på 40x40 centimeter. Kartongväggar inuti oåtkomliga områden (ur robotens perspektiv) krävs ej.}
+    \LIPSAppendixKrav{Original}{Köksöns väggceller ska ej vara förskjutna i rutnätet som bildas av rummets alla celler.}
+    \LIPSAppendixKrav{Original}{''Diagonaler'' ska vara tillåtna, det vill säga väggceller som endast delar ett gemensamt hörn.}
+    \LIPSAppendixKrav{Original}{Golvet ska utgöras av laminatgolv à LiU-standard.}
+\end{LIPSAppendixKravlista}
+
+
 \end{appendices}
 
 
