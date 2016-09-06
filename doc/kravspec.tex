@@ -4,6 +4,7 @@
 \usepackage[swedish]{babel}
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
 \usepackage{hyperref}
+\usepackage{graphicx}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -178,10 +179,14 @@ Behöver endast klara av banor utformade enligt bilaga A.
     \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga A.}{1}
 \end{LIPSkravlista}
 
+\newpage
 
 \section{Delsystem 1 - Sensorenhet}
-%TODO: Bild av delsystem
-
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1]{sensorenhet.png}
+\caption{Översiktligt blockschema för sensorenheten.}
+\end{figure}
 
 \subsection{Inledande beskrivning av delsystem 1}
 Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till styrenheten, delsystem 3.\\
@@ -216,7 +221,12 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 \end{LIPSkravlista}
 
 \section{Delsystem 2 - Styrenhet}
-%TODO: Bild av delsystem
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1]{styrenhet.png}
+\caption{Översiktligt blockschema för styrenheten.}
+\end{figure}
+
 
 \subsection{Inledande beskrivning av delsystem 2}
 Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning. Styrenheten är länken mellan alla styrkommandon och motorerna, dvs att den ingående data måste följa ett givet protokoll. Den enda enhet som styrenhet kommunicerar med är kommunikations enheten.
