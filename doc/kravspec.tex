@@ -287,8 +287,13 @@ Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC
 
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
-	\LIPSkrav{Original}{Kontrollenheten ska bestämma en lämplig färdväg.}{1}
-    \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna konstruera en mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna bestämma en kollisionsfri färdväg genom dess mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom det fysiska rummet utan kollisioner med väggar.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskade så ska kontrollenheten kunna bestämma vägar till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskat ska kontrollenheten skicka styrinstruktioner för att navigera till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då roboten stannar på en punkt som tillåter den att skanna outforskade delar av rummet ska den kunna göra detta, och uppdatera sin mjukvarurepresenation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Då roboten inte längre kan nå outforskade delar av det fysiska rummet så ska kontrollenheten skicka instruktioner som resulterar i att roboten återvänder till sin startpunkt.}{1}
 \end{LIPSkravlista}
 
 
