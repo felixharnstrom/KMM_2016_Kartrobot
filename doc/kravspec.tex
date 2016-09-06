@@ -239,7 +239,6 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
     \LIPSkrav{Original}{Styrenheten ska styra alla motorer i konstruktionen.}{1}
     \LIPSkrav{Original}{Enheten ska kunna ta emot styrinstruktioner på ett väldefinierat format.}{1}
     \LIPSkrav{Original}{Styrenheten ska kunna rapportera styrdata.}{1}
-    \LIPSkrav{Original}{När styrenheten översätter högnivåinstruktioner till motorsignaler ska dessa rapporteras tillbaka via en enskild buss.}{2}	%TODO redundant? är ju redan ett prio-1 krav att rapportera styrdata till kontrollenheten
     \LIPSkrav{Original}{Sensorenheten ska kunna ta emot en nödstoppssignal.}{2}
 \end{LIPSkravlista}
 
@@ -258,7 +257,12 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 \end{LIPSkravlista}
 
 \section{Delsystem 3 - Kommunikations och kontrollenhet }
-%TODO: Bild av delsystem
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1]{brain.png} %TODO Ska blåtandsenheten ritas inuti enkortsdatorn?
+    \caption{Översiktligt blockschema för kommunikations och kontrollenheten.}
+\end{figure}
+
 
 \subsection{Inledande beskrivning av delsystem 3}
 Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC:n. I samma hårdvarumodul ingår också kontrollenheten, som gör beräkningar relaterat till det autonoma läget.
@@ -287,8 +291,13 @@ Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC
 
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
-	\LIPSkrav{Original}{Kontrollenheten ska bestämma en lämplig färdväg.}{1}
-    \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna konstruera en mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna bestämma en kollisionsfri färdväg genom dess mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom det fysiska rummet utan kollisioner med väggar.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskade så ska kontrollenheten kunna bestämma vägar till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskat ska kontrollenheten skicka styrinstruktioner för att navigera till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då roboten stannar på en punkt som tillåter den att skanna outforskade delar av rummet ska den kunna göra detta, och uppdatera sin mjukvarurepresenation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Då roboten inte längre kan nå outforskade delar av det fysiska rummet så ska kontrollenheten skicka instruktioner som resulterar i att roboten återvänder till sin startpunkt.}{1}
 \end{LIPSkravlista}
 
 
