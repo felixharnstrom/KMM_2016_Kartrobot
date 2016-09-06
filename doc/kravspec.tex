@@ -126,13 +126,13 @@ Leverantör: \LIPSprojektgrupp \\
 Handledare: xxx 
 
 \subsection{Syfte och mål}
-Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt bilaga A, och samtidigt rita upp en karta över området.  
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt bilaga \ref{sec:courseSpecification}, och samtidigt rita upp en karta över området.  
 \subsection{Användning}
 Roboten ska ha två lägen, ett för manuell fjärrstyrning, och ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Det ska även finnas en startknapp på roboten. 
 \subsubsection{Manuell styrning}
 Vid manuell styrning så ska roboten reagera på följande kommandon som skickas via Blåtand: fram, fram vänster, fram höger, back, stopp, rotera vänster, rotera höger. 
 \subsubsection{Autonom styrning}
-I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga A. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga \ref{sec:courseSpecification}. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
 \subsection{Bakgrundsinformation}
 \subsection{Definitioner}
 
@@ -157,7 +157,7 @@ De moduler som ingår i konstruktionen är:
 \end{itemize}
 
 \subsection{Avgränsningar}
-Behöver endast klara av banor utformade enligt bilaga A. 
+Behöver endast klara av banor utformade enligt bilaga \ref{sec:courseSpecification}. 
 % TODO: vill vi ha Designfilosofi?
 
 \subsection{Generella krav på hela systemet}
@@ -175,10 +175,10 @@ Behöver endast klara av banor utformade enligt bilaga A.
     \LIPSkrav{Original}{Roboten ska vara uppbyggd av utbytbara moduler.}{1}
     \LIPSkrav{Original}{I konstruktionen ska det ingå: kommunikationsmodul, styrenhet, samt sensorenhet.}{1}
     \LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen efter kartläggning.}{1}
-    \LIPSkrav{Original}{Roboten ska uppfylla kraven i bilaga A.}{1}
+    \LIPSkrav{Original}{Roboten ska uppfylla kraven i bilaga \ref{sec:courseSpecification}.}{1}
     \LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt.}{1}
     \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på den bärbara datorn.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga A.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga \ref{sec:courseSpecification}.}{1}
 \end{LIPSkravlista}
 
 \newpage
@@ -324,7 +324,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 
 \section{Prestandakrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga A på under 20 minuter}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga \ref{sec:courseSpecification} på under 20 minuter}{1}
     \LIPSkrav{Original}{Roboten ska kunna skanna rummet medan den rör sig, det vill säga den behöver inte stanna för att söka efter väggar omkring sig.}{2}
 \end{LIPSkravlista}
 
@@ -368,7 +368,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \begin{appendices}
 
 %TODO Appendix A and B are not at their final version. Update them as the original document updates.
-\section{Banspecifikation}
+\section{Banspecifikation} \label{sec:courseSpecification}
 
 \subsection{Enligt projektdirektiv}
 \begin{itemize}
@@ -393,7 +393,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
     \LIPSAppendixKrav{Original}{Golvet ska utgöras av laminatgolv à LiU-standard.}
 \end{LIPSAppendixKravlista}
 
-\section{Tävlingsregler}
+\section{Tävlingsregler} \label{sec:competitionRules}
 
 \subsection{Tävlingsupplägg}
 \begin{LIPSAppendixKravlista}
