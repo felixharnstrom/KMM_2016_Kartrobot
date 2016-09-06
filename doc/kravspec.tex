@@ -364,7 +364,9 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \begin{appendices}
 
 %TODO Appendix A and B are not at their final version. Update them as the original document updates.
-\section{Banspecifikation} \label{sec:courseSpecification}
+\section{Specifikation för bana och tävling}
+
+\subsection{Banspecifikation} \label{sec:courseSpecification}
 
 \begin{figure}[h!]
 \centering
@@ -372,7 +374,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \caption{Ett exempel på en tillåten bana.}
 \end{figure}
 
-\subsection{Enligt projektdirektiv}
+\subsubsection{Enligt projektdirektiv}
 \begin{itemize}
     \item Banan som roboten ska utforska är uppbyggd av kartongväggar, hädanefter kallat väggar, max 6x6 meter från vägg till vägg.
     \item Kartongväggarna skall ha längder som är multipler av 40 cm.
@@ -382,7 +384,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
     \item Den sida på köksön som är närmast ytterväggen ska ha ett avstånd till ytterväggen på max 80 cm.
 \end{itemize}
 
-\subsection{Tillägg}
+\subsubsection{Tillägg}
 \begin{LIPSAppendixKravlista}
     \LIPSAppendixKrav{Original}{Startpunkten ska definieras som ett ''garage'': en ruta i rutnätet med väggar på tre sidor, 40x40 centimeter.}
     \LIPSAppendixKrav{Original}{Målet ska vara densamma som startpunkten.}
@@ -396,9 +398,9 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 \end{LIPSAppendixKravlista}
 
 
-\section{Tävlingsregler} \label{sec:competitionRules}
+\subsection{Tävlingsregler}
 
-\subsection{Tävlingsupplägg}
+\subsubsection{Tävlingsupplägg}
 \begin{LIPSAppendixKravlista}
     \LIPSAppendixKrav{Original}{Varje robot ska köra två heat.}
     \LIPSAppendixKrav{Original}{Det bästa av de två heaten ska räknas.}
@@ -410,7 +412,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
     \LIPSAppendixKrav{Original}{Resultatet ska vara på formen av ett rutnät . Varje cell ska representera en 40x40 centimeter cell i tävlingsområdet, och ska antingen vara definierad som omsluten av väggar eller öppen.}
 \end{LIPSAppendixKravlista}
 
-\subsection{Diskvalifikation}
+\subsubsection{Diskvalifikation}
 \begin{LIPSAppendixKravlista}
     \LIPSAppendixKrav{Original}{Om robotens höjd överstiger väggarnas höjd ska roboten diskvalificeras från det pågående heatet.}
     \LIPSAppendixKrav{Original}{Om roboten överskrider maxtiden XX minuter ska roboten diskvalificeras från det pågående heatet.}
@@ -418,7 +420,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
     \LIPSAppendixKrav{Original}{Om en gruppmedlem intar banan eller vidrör en robot innan det pågående heatet är slut så ska gruppens robot diskvalificeras från det pågående heatet.}
 \end{LIPSAppendixKravlista}
 
-\subsection{Tidspålägg}
+\subsubsection{Tidspålägg}
 \begin{LIPSAppendixKravlista}
     \LIPSAppendixKrav{Original}{Tidspålägg fås därefter vid någon eller fler av följande händelser. Specificerade antal sekunder i tidspålägg bestäms av beställarna.}
     \LIPSAppendixKrav{Original}{Vidrörning av vägg ska ge ett tidspålägg på XX sekunder. Endast de vertikala bitarna av kartongväggarna ska räknas som en vägg.}
