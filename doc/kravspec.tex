@@ -137,7 +137,7 @@ I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilag
 \section{Översikt av systemet}
 
 \subsection{Grov beskrivning av produkten}
-Vår produkt är en robot som kan navigera genom en 6$ \times $6m bana och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs med hjälp av Bluetooth, ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status dvs data från sensorer, robotens läge etc. 
+Vår produkt är en robot som kan navigera genom en 6$ \times $6m bana och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs med hjälp av Blåtand, ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status dvs data från sensorer, robotens läge etc. 
 
 \subsection{Produktkomponenter}
 Kartrobot med mjukvara till roboten samt för tillhörande dator, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
@@ -161,7 +161,7 @@ Behöver endast klara av banor utformade enligt bilaga A.
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Roboten ska kunna bestämma avstånd till väggar.}{1}
     \LIPSkrav{Original}{Roboten ska kunna förflytta sig.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Bluetooth)}{1}
+    \LIPSkrav{Original}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Blåtand)}{1}
     \LIPSkrav{Original}{Roboten ska kunna styras autonomt.}{1}
     \LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man kan välja mellan autonom och manuell styrning. }{1}
     \LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man startar den.}{1}
@@ -252,8 +252,8 @@ Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC
     \LIPSkrav{Original}{Tar emot data via en buss från sensorenheten.}{1}
     \LIPSkrav{Original}{Skicka vidare motorinstruktioner till styrenheten via dess gemensamma buss.}{1}
     \LIPSkrav{Original}{Enheten tar emot information om motorernas utstyrning från styrenheten, när denne själv avgjort detta.}{2}
-    \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Bluetooth.}{1}
-    \LIPSkrav{Original}{Enheten skickar sensor och motordata till PCn via Bluetooh.}{1}
+    \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}{1}
+    \LIPSkrav{Original}{Enheten skickar sensor och motordata till PCn via Blåtand.}{1}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
@@ -285,19 +285,19 @@ Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC
 %TODO: Bild av delsystem
 
 \subsection{Inledande beskrivning av delsystem 4}
-För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Bluetooth ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Bluetooth. 
+För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Blåtand ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Blåtand. 
 
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Mjukvaran ska skicka kommandon för navigering som roboten kan avläsa och utföra.}{1}
-    \LIPSkrav{Original}{Kommandon för navigering ska skickas över Bluetooth.}{1}
-    \LIPSkrav{Original}{Sensorernas värden och robotens status ska skickas tas emot över Bluetooth och presenteras för navigeraren.}{1}
+    \LIPSkrav{Original}{Kommandon för navigering ska skickas över Blåtand.}{1}
+    \LIPSkrav{Original}{Sensorernas värden och robotens status ska skickas tas emot över Blåtand och presenteras för navigeraren.}{1}
     \LIPSkrav{Original}{Den karta som är genererad av roboten ska kunna ritas ut i denna mjukvara.}{1}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Bluetooth.}{1}
+    \LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Blåtand.}{1}
     \LIPSkrav{Original}{Datan för att hämta karta samt skicka kommandon sker över samma protokoll.}{2}
 \end{LIPSkravlista}
 
