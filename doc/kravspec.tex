@@ -114,7 +114,7 @@ I detta dokument kommer kravlistor formateras enligt figur \ref{fig:lipskrav_exe
 \label{fig:lipskrav_exempel}
 \end{figure}
 
-Kravnummer i första kolumnen är formaterade löpande genom hela dokumentet. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskrivet kravets prioritet. Kravnivåerna är som följande:
+Kravnummer i första kolumnen är formaterade löpande genom hela dokumentet. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskriver kravets prioritet. Prioritetsnivåerna är följande:
 \begin{itemize}
     \item Prioritetsnivå 1 – Kravet ska uppfyllas
     \item Prioritetsnivå 2 – Kravet ska uppfyllas om tid finns
@@ -126,13 +126,13 @@ Leverantör: \LIPSprojektgrupp \\
 Handledare: xxx 
 
 \subsection{Syfte och mål}
-Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt kan navigera en bana, uppbyggd enligt bilaga \ref{sec:courseSpecification}, och samtidigt rita upp en karta över området.  
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt navigera en bana uppbyggd enligt bilaga \ref{sec:courseSpecification} och samtidigt rita upp en karta över området.  
 \subsection{Användning}
-Roboten ska ha två lägen, ett för manuell fjärrstyrning, och ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Det ska även finnas en startknapp på roboten. 
+Roboten ska ha två lägen varav det första är manuell fjärrstyrning och det andra ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Även en på- och avstängningsknapp kommer att finnas på roboten.
 \subsubsection{Manuell styrning}
 Vid manuell styrning så ska roboten reagera på följande kommandon som skickas via Blåtand: fram, fram vänster, fram höger, back, stopp, rotera vänster, rotera höger. 
 \subsubsection{Autonom styrning}
-I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga \ref{sec:courseSpecification}. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten returnera till startområdet. 
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilaga \ref{sec:courseSpecification}. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten återvända till startområdet. 
 \subsection{Bakgrundsinformation}
 \subsection{Definitioner}
 
@@ -140,12 +140,13 @@ I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt bilag
 \section{Översikt av systemet}
 
 \subsection{Grov beskrivning av produkten}
-Vår produkt är en robot som kan navigera genom en 6$ \times $6 m bana och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs med hjälp av Blåtand, ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status dvs data från sensorer, robotens läge etc. 
+Vår produkt är en robot som kan navigera genom en 6$ \times $6 m bana och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Blåtand och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
 
 \subsection{Produktkomponenter}
-Kartrobot med mjukvara till roboten samt för tillhörande dator, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
+Kartrobot med stöd för Blåtand, mjukvara med stöd för manuell styrning och robotdiagnostik via Blåtand, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
 
 \subsection{Beroenden till andra system }
+%TODO Vad ska vi skriva här?
 Beroenden till andra system 
 
 \subsection{Ingående delsystem}
@@ -178,7 +179,7 @@ Behöver endast klara av banor utformade enligt bilaga \ref{sec:courseSpecificat
     \LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen efter kartläggning.}{1}
     \LIPSkrav{Original}{Roboten ska uppfylla kraven i bilaga \ref{sec:courseSpecification}.}{1}
     \LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt.}{1}
-    \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på den bärbara datorn.}{1}
+    \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på en bärbar dator.}{1}
     \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i bilaga \ref{sec:courseSpecification}.}{1}
 \end{LIPSkravlista}
 
@@ -192,18 +193,18 @@ Behöver endast klara av banor utformade enligt bilaga \ref{sec:courseSpecificat
 \end{figure}
 
 \subsection{Inledande beskrivning av delsystem 1}
-Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till styrenheten, delsystem 3.\\
+Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till styrenheten, delsystem 3.\\ %TODO Vad menas här?
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Det ska sitta avståndssensorer på robotens sidor.}{1}
-    \LIPSkrav{Original}{Det ska finnas nödstoppsfunktionalitet.}{2}
-    \LIPSkrav{Original}{En sensor ska sitta på toppen av roboten för avläsning av rummet. Denna sensor ska rotera för att avläsa hela omgivningen}{1}
-    \LIPSkrav{Original}{En sensor ska användas för kalibrering av graderna på den sensor som roterar för avläsning av rummet.}{2}
+    \LIPSkrav{Original}{Det ska finnas nödstopps-funktionalitet.}{2}
+    \LIPSkrav{Original}{En sensor ska sitta på toppen av roboten för avläsning av rummet. Denna sensor ska rotera för att avläsa hela omgivningen.}{1}
+    \LIPSkrav{Original}{En sensor ska användas för kalibrering av graderna på den sensor som roterar för avläsning av rummet.}{2} %TODO Behövs verkligen det eller ska vi använda ett gyro?
     \LIPSkrav{Original}{Roboten ska vara utrustad med ett gyro som håller reda på vilken riktning som roboten pekar.}{1}
 \end{LIPSkravlista}
 
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Sensoreneheten ska ta emot data från robotens sensorer}{1}
+    \LIPSkrav{Original}{Sensorenheten ska ta emot data från robotens sensorer.}{1}
     \LIPSkrav{Original}{Sensorenheten ska, efter eventuell kalibrering, rapportera behandlad sensordata.}{1}
     \LIPSkrav{Original}{Sensorenheten ska indikera vilken sensor informationen kommer från.}{1}
     \LIPSkrav{Original}{Sensorenheten ska kunna skicka en nödstoppssignal.}{2}
@@ -218,8 +219,8 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Enheten ska leverera data enligt givet protokoll.}{1}
-    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från sensorerna xxx}{1}
+    \LIPSkrav{Original}{Sensorenheten ska leverera data enligt givet protokoll.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna och gyrot.}{1} %TODO Plural?
 \end{LIPSkravlista}
 
 \section{Delsystem 2 - Styrenhet}
@@ -237,23 +238,23 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Styrenheten ska styra alla motorer i konstruktionen.}{1}
-    \LIPSkrav{Original}{Enheten ska kunna ta emot styrinstruktioner på ett väldefinierat format.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna ta emot styrinstruktioner på ett väldefinierat format.}{1}
     \LIPSkrav{Original}{Styrenheten ska kunna rapportera styrdata.}{1}
-    \LIPSkrav{Original}{Sensorenheten ska kunna ta emot en nödstoppssignal.}{2}
+    \LIPSkrav{Original}{Styrenheten ska kunna ta emot en nödstoppssignal.}{2}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Styrenheten ska arbeta med servomotorerna xxx}{1}
-    \LIPSkrav{Original}{Styrenheten ska vara skriven i C/C++.}{1}
+    \LIPSkrav{Original}{Styrenheten ska arbeta med servomotorerna xxx.}{1}
+    \LIPSkrav{Original}{Styrenhetens mjukvara ska vara skriven i C/C++.}{1}
     \LIPSkrav{Original}{Styrenheten ska innehålla minst en processor.}{1}
 \end{LIPSkravlista}
 
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Enheten ska ta emot data enligt givet protokoll.}{1}
-    \LIPSkrav{Original}{Enheten ska styra servomotorerna xxx}{1}
-    \LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis ''hastighet n rakt fram'' och ''sväng 10 grader åt höger'' till motorsignaler.}{2}
+    \LIPSkrav{Original}{Styrenheten ska ta emot data enligt givet protokoll.}{1}
+    \LIPSkrav{Original}{Styrenheten ska styra servomotorerna xxx.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis ''hastighet n rakt fram'' och ''sväng 10 grader åt höger'' till motorsignaler.}{2} %TODO Borde inte detta vara prio 1?
 \end{LIPSkravlista}
 
 \section{Delsystem 3 - Kommunikations och kontrollenhet }
@@ -265,22 +266,22 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 
 
 \subsection{Inledande beskrivning av delsystem 3}
-Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC:n. I samma hårdvarumodul ingår också kontrollenheten, som gör beräkningar relaterat till det autonoma läget.
+Kommunikationsenheten kommunicerar med de andra modulerna på roboten samt med den bärbara datorn. I denna modul ingår också kontrollenheten, som gör beräkningar relaterat till både de manuella och det autonoma läget.
 
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Ska ta emot data sensordata.}{1}
+    \LIPSkrav{Original}{Ska ta emot sensordata.}{1}
     \LIPSkrav{Original}{Ska kunna skicka motorinstruktioner.}{1}
-    \LIPSkrav{Original}{Enheten ska kunna skicka motorinstruktioner på hög nivå, t.ex. ''hastighet n rakt fram'' och ''sväng 10 grader åt höger''. }{2}
+    \LIPSkrav{Original}{Enheten ska kunna skicka motorinstruktioner på hög nivå, t.ex. ''hastighet n rakt fram'' och ''sväng 10 grader åt höger''. }{2} %TODO borde inte den här prioriteten vara omvänd? (Det borde vara enklare att hantera det omvända fallet?)
     \LIPSkrav{Original}{Enheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}{2}
     \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}{1}
-    \LIPSkrav{Original}{Enheten ska skicka sensor- och motordata till PC:n via Blåtand.}{1}
+    \LIPSkrav{Original}{Enheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}{1}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{arg2}{1}
-    \LIPSkrav{Original}{arg2}{1}
+    \LIPSkrav{Original}{Kontrollenhetens mjukvara ska vara skriven i Python.}{1}
+    \LIPSkrav{Original}{Enheten ska vara baserad på enkortsdatorn Raspberry Pi 3.}{1}
     \LIPSkrav{Original}{arg2}{1}
     \LIPSkrav{Original}{arg2}{1}
     \LIPSkrav{Original}{arg2}{1}
@@ -296,7 +297,7 @@ Kommunikationsenheten kommunicerar med modulerna på själva roboten, och med PC
     \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom det fysiska rummet utan kollisioner med väggar.}{1}
     \LIPSkrav{Original}{Då delar av rummet är outforskade så ska kontrollenheten kunna bestämma vägar till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
     \LIPSkrav{Original}{Då delar av rummet är outforskat ska kontrollenheten skicka styrinstruktioner för att navigera till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
-    \LIPSkrav{Original}{Då roboten stannar på en punkt som tillåter den att skanna outforskade delar av rummet ska den kunna göra detta, och uppdatera sin mjukvarurepresenation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Då roboten stannar på en punkt som tillåter den att skanna outforskade delar av rummet ska den kunna göra detta, och uppdatera sin mjukvarurepresentation av det fysiska rummet.}{1}
     \LIPSkrav{Original}{Då roboten inte längre kan nå outforskade delar av det fysiska rummet så ska kontrollenheten skicka instruktioner som resulterar i att roboten återvänder till sin startpunkt.}{1}
 \end{LIPSkravlista}
 
@@ -321,6 +322,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
+    \LIPSkrav{Original}{Mjukvaran ska vara skriven i Python.}{1}
     \LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Blåtand.}{1}
     \LIPSkrav{Original}{Datan för att hämta karta samt skicka kommandon sker över samma protokoll.}{2}
 \end{LIPSkravlista}
