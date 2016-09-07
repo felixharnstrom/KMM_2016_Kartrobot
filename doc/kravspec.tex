@@ -230,7 +230,6 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 
 \subsection{Inledande beskrivning av delsystem 2}
 Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning. Styrenheten är länken mellan alla styrkommandon och motorerna, dvs att den ingående data måste följa ett givet protokoll. Den enda enhet som styrenhet kommunicerar med är kommunikations enheten.
-% TODO: Ingen kravlista?
 
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
@@ -256,7 +255,7 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 \section{Delsystem 3 - Kommunikations- och kontrollenhet }
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=1]{brain.png} %TODO Ska blåtandsenheten ritas inuti enkortsdatorn?
+    \includegraphics[scale=1]{brain.png} 
     \caption{Översiktligt blockschema för kommunikations och kontrollenheten.}
 \end{figure}
 
@@ -270,7 +269,7 @@ Kommunikationsenheten kommunicerar med de andra modulerna på roboten samt med d
     \LIPSkrav{Original}{Ska kunna skicka motorinstruktioner.}{1}
     \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}{1}
     \LIPSkrav{Original}{Enheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}{1}
-    \LIPSkrav{Original}{Enheten ska kunna skicka motorinstruktioner på hög nivå, t.ex. ''hastighet $n/max$ rakt fram'' och ''sväng $n$ grader åt höger''. }{1} %TODO borde inte den här prioriteten vara omvänd? (Det borde vara enklare att hantera det omvända fallet?)
+    \LIPSkrav{Original}{Enheten ska kunna skicka motorinstruktioner på hög nivå, t.ex. ''hastighet $n/max$ rakt fram'' och ''sväng $n$ grader åt höger''. }{1} 
     \LIPSkrav{Original}{Enheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}{2}
 \end{LIPSkravlista}
 
