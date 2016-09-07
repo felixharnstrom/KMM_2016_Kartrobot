@@ -216,7 +216,7 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Sensorenheten ska leverera data enligt givet protokoll.}{1}
-    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna}{1} %TODO Plural?
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna}{1} 
     \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från gyro(n).}{2}
 \end{LIPSkravlista}
 
@@ -242,7 +242,6 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Styrenheten ska arbeta med servomotorerna xxx.}{1}
     \LIPSkrav{Original}{Styrenhetens mjukvara ska vara skriven i C/C++.}{1}
     \LIPSkrav{Original}{Styrenheten ska innehålla minst en processor.}{1}
 \end{LIPSkravlista}
@@ -250,8 +249,8 @@ Styrenheten är ansvarig för all logik och funktionalitet av robotens styrning.
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Styrenheten ska ta emot data enligt givet protokoll.}{1}
-    \LIPSkrav{Original}{Styrenheten ska styra servomotorerna xxx.}{1}
-    \LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis ''hastighet n rakt fram'' och ''sväng 10 grader åt höger'' till motorsignaler.}{2} %TODO Borde inte detta vara prio 1?
+    \LIPSkrav{Original}{Styrenheten ska kontrollera alla servomotorer i konstruktionen.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna översätta högnivåinstruktioner som exempelvis ''hastighet $n/max$ rakt fram'' och ''sväng $n$ grader åt höger'' till motorsignaler.}{1}
 \end{LIPSkravlista}
 
 \section{Delsystem 3 - Kommunikations och kontrollenhet }
