@@ -424,7 +424,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -436,7 +436,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:96.17582703px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="106.52578"
+       x="103.07131"
        y="477.04132"
        id="text5111"
        sodipodi:linespacing="125%"
@@ -444,10 +444,10 @@
        inkscape:export-ydpi="300"
        transform="scale(0.95604754,1.0459731)"><tspan
          sodipodi:role="line"
-         x="106.52578"
+         x="103.07131"
          y="477.04132"
          style="font-size:19.1209507px"
-         id="tspan4305">Kommunikations och kontrollenhet</tspan></text>
+         id="tspan4305">Kommunikations- och kontrollenhet</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16.25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
