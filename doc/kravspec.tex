@@ -193,9 +193,9 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Det ska sitta avståndssensorer på robotens sidor.}{1}
     \LIPSkrav{Original}{En sensor ska sitta på toppen av roboten för avläsning av rummet. Denna sensor ska rotera för att avläsa hela omgivningen.}{1}
-    \LIPSkrav{Original}{Roboten ska vara utrustad med ett gyro som håller reda på vilken riktning som roboten pekar.}{1}
-    \LIPSkrav{Original}{En sensor ska användas för kalibrering den sensor som roterar för avläsning av rummet.}{2} %TODO Behövs verkligen det eller ska vi använda ett gyro?
-    \LIPSkrav{Original}{Det ska finnas nödstopps-funktionalitet.}{2}
+    \LIPSkrav{Original}Det ska finnas kalibreringsmöjlighet för den sensor som roterar för avläsning av rummet.}{1}
+    \LIPSkrav{Original}{Roboten ska vara utrustad med ett gyro som håller reda på vilken riktning som roboten pekar.}{2}
+    \LIPSkrav{Original}{Det ska finnas nödstoppsfunktionalitet.}{2}
 \end{LIPSkravlista}
 
 \subsection{Gränssnitt}
@@ -208,7 +208,7 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Sensorenheten ska arbeta med sex stycken avståndssensorer.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska arbeta med ett flertal avståndssensorer.}{1}
     \LIPSkrav{Original}{Sensorenheten ska vara skriven i C/C++.}{1}
     \LIPSkrav{Original}{Sensorenheten ska innehålla minst en processor.}{1}
 \end{LIPSkravlista}
@@ -216,7 +216,8 @@ Sensorenheten behandlar data från olika sensorer, för att sedan föra den vida
 \subsection{Funktionella krav}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Sensorenheten ska leverera data enligt givet protokoll.}{1}
-    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna och gyrot.}{1} %TODO Plural?
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna}{1} %TODO Plural?
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från gyro(n).}{2}
 \end{LIPSkravlista}
 
 \section{Delsystem 2 - Styrenhet}
