@@ -74,6 +74,7 @@
 
 %TODO replace with a link to only finished version. This links to the WIP document, which might contain unfinished changes.
 \newcommand{\CourseSpecUrl}{https://docs.google.com/document/d/1hnHsI6WGyKorMat25x1FAQ9RA_gEzG-Wgb9o5-Dw_AI/edit?usp=sharing}
+\newcommand{\CourseSpecRef}{\href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}}
 
 \input{LIPS.tex}
 \begin{document}
@@ -134,7 +135,7 @@ Leverantör: \LIPSprojektgrupp \\
 %Handledare: xxx 
 
 \subsection{Syfte och mål}
-Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt navigera en bana uppbyggd enligt \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen} och samtidigt rita upp en karta över området.  
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt navigera en bana uppbyggd enligt \CourseSpecRef och samtidigt rita upp en karta över området.  
 
 \subsection{Användning}
 Roboten ska ha två lägen varav det första är manuell fjärrstyrning och det andra ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Även en på- och avstängningsknapp kommer att finnas på roboten.
@@ -143,10 +144,10 @@ Roboten ska ha två lägen varav det första är manuell fjärrstyrning och det 
 Vid manuell styrning så ska roboten reagera på styrkommandon som skickas via Blåtand. 
 
 \subsubsection{Autonom styrning}
-I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten återvända till startområdet. 
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt \CourseSpecRef. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten återvända till startområdet. 
 
 \section{Översikt av systemet}
-Vår produkt är en robot som kan navigera genom en rum som är specificerat i \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen} och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Blåtand och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
+Vår produkt är en robot som kan navigera genom en rum som är specificerat i \CourseSpecRef och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Blåtand och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
 
 \subsection{Produktkomponenter}
 Kartrobot med stöd för Blåtand, mjukvara med stöd för manuell styrning och robotdiagnostik via Blåtand, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
@@ -170,7 +171,7 @@ Hur dessa ska konstrueras och stå i relation till varandra kan ses i figur \ref
 \end{figure}
 
 \subsection{Avgränsningar}
-Behöver endast klara av banor utformade enligt \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}. 
+Behöver endast klara av banor utformade enligt \CourseSpecRef. 
 
 \subsection{Generella krav på hela systemet}
 \begin{LIPSkravlista}
@@ -189,13 +190,13 @@ Behöver endast klara av banor utformade enligt \href{\CourseSpecUrl}{Ban- och t
     \LIPSkrav{Original}{Roboten ska vara uppbyggd av utbytbara moduler.}{1}
     \LIPSkrav{Original}{I konstruktionen ska det ingå: kommunikations- och kontrollenhet, styrenhet, samt sensorenhet.}{1}
     \LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen och stanna efter kartläggning.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna ställa upp i  en tävling som definieras via \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna ställa upp i  en tävling som definieras via \CourseSpecRef.}{1}
     \LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt fortlöpande under körning.}{1}
     \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på en bärbar dator.}{1}
     \LIPSkrav{Original}{Styrdata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
     \LIPSkrav{Original}{Sensordata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
     \LIPSkrav{Original}{Positionsdata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i \CourseSpecRef.}{1}
 \end{LIPSkravlista}
 
 \newpage
@@ -361,7 +362,7 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
 
 \section{Tillförlitlighet}
 \begin{LIPSkravlista}
-    \LIPSkrav{Original}{Roboten ska klara tre på varandra följande rumsskanningar enligt reglerna speficerat i \href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen} utan tidstillägg.}{1}
+    \LIPSkrav{Original}{Roboten ska klara tre på varandra följande rumsskanningar enligt reglerna speficerat i \CourseSpecRef utan tidstillägg.}{1}
 \end{LIPSkravlista}
 
 \section{Ekonomi}
