@@ -1,0 +1,417 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{mathptmx}    %Times Roman font
+\usepackage{helvet}    %Helvetica, served as a model for arial
+\usepackage{anyfontsize}
+
+\usepackage[tocgraduated]{tocstyle}
+\usetocstyle{allwithdot}
+
+\usepackage[titletoc,title]{appendix}
+
+\usepackage{fancyhdr}
+\fancypagestyle{intro}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\roman{page}}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+\fancypagestyle{content}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\thepage}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+
+\usepackage{titlesec}
+\titleformat{\section}
+    {\normalfont\sffamily\Large\bfseries}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\sffamily\large\bfseries}
+    {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+    {\normalfont\sffamily\bfseries}
+    {\thesubsubsection}{1em}{}
+
+\newcommand{\LIPSartaltermin}{2016/HT}
+\newcommand{\LIPSkursnamn}{TSEA29}
+\newcommand{\LIPSprojekttitel}{Kartrobot}
+\newcommand{\LIPSprojektgrupp}{Grupp 1}
+\newcommand{\LIPSgruppepost}{\href{mailto:kmm_2016_grupp1@liuonline.onmicrosoft.com}{{\small kmm\_2016\_grupp1@liuonline.onmicrosoft.com}}}
+\newcommand{\LIPSgrupphemsida}{}
+\newcommand{\LIPSkund}{ISY, Linköpings universitet, 581\,83 Linköping}
+\newcommand{\LIPSkundkontakt}{Mattias Krysander, 013-282198, matkr@isy.liu.se}
+\newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
+\newcommand{\LIPShandledare}{}
+\newcommand{\LIPSdokumenttyp}{Kravspecifikation}
+\newcommand{\LIPSredaktor}{Felix Härnström}
+\newcommand{\LIPSversion}{1.0}
+\newcommand{\LIPSgranskare}{Felix Härnström}
+\newcommand{\LIPSgranskatdatum}{2016-09-12}
+\newcommand{\LIPSgodkannare}{}
+\newcommand{\LIPSgodkantdatum}{}
+
+%TODO replace with a link to only finished version. This links to the WIP document, which might contain unfinished changes.
+\newcommand{\CourseSpecUrl}{https://drive.google.com/file/d/0B6PzdGWZLymjaGZWdHlGeDNfaWs/view?usp=sharing}
+\newcommand{\CourseSpecRef}{\href{\CourseSpecUrl}{Ban- och tävlingsspecifikationen}}
+
+\input{LIPS.tex}
+\begin{document}
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+    \LIPSgruppmedlem{Hannes Haglund}{}{hanha265@student.liu.se}
+    \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+    \LIPSgruppmedlem{Jani Jokinen}{}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{}{danma344@student.liu.se}
+    \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+\clearpage
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\tableofcontents
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\clearpage
+\begin{LIPSdokumenthistorik}
+    \LIPSversionsinfo{1.0}{2016-09-12}{Upphöjt till version 1.0}{FH}{DM}
+    \LIPSversionsinfo{0.2}{2016-09-08}{Andra utkastet}{FH,SL}{EN}
+    \LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{Alla}{FH}
+\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+
+\section{Inledning}
+I detta dokument specificeras kraven för en robot som ska kartlägga ett rum av okänd layout. I figur \ref{fig:overview} illustreras roboten i dess omgivning. Användaren ska kunna välja mellan att låta roboten kartlägga området autonomt, eller att själv styra roboten via en dator. Roboten ska i projektets slutfas kunna ställa upp i en tävling mot andra robotar som har konstruerats oberoende av denna.
+
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{overview.png}}
+    \caption{Systemet i dess omgivning.}
+    \label{fig:overview}
+\end{figure}
+
+I detta dokument kommer kravlistor formateras enligt tabell \ref{tab:lipskrav_exempel}.
+\begin{table}[h!]
+\begin{LIPSkravlista}
+    \LIPSkravDemo{Förändring}{Kravtext för krav X}{Prioritet}
+\end{LIPSkravlista}
+\caption{Formatering för kravlista.}
+\label{tab:lipskrav_exempel}
+\end{table}
+
+Kravnummer i första kolumnen är formaterade löpande genom hela dokumentet. Andra kolumnen anger om det är ett originalkrav eller om kravet har reviderats. Den tredje kolumnen beskrivet kravet i text. Den fjärde kolumnen beskriver kravets prioritet. Prioritetsnivåerna är följande:
+\begin{itemize}
+    \item Prioritetsnivå 1 – Kravet ska uppfyllas
+    \item Prioritetsnivå 2 – Kravet ska uppfyllas om tid finns
+    \item Prioritetsnivå 3 – Kravet ska uppfyllas efter att alla krav med nivå 2 uppfyllts 
+\end{itemize}
+
+\subsection{Parter}
+Beställare: Mattias Krysander \\
+Leverantör: \LIPSprojektgrupp \\
+%Handledare: xxx 
+
+\subsection{Syfte och mål}
+Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt navigera en bana uppbyggd enligt \CourseSpecRef och samtidigt rita upp en karta över området.  
+
+\subsection{Användning}
+Roboten ska ha två lägen varav det första är manuell fjärrstyrning och det andra ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Även en på- och avstängningsknapp kommer att finnas på roboten.
+
+\subsubsection{Manuell styrning}
+Vid manuell styrning så ska roboten reagera på styrkommandon som skickas via Blåtand. 
+
+\subsubsection{Autonom styrning}
+I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt \CourseSpecRef. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten återvända till startområdet. 
+
+\section{Översikt av systemet}
+Vår produkt är en robot som kan navigera genom en rum som är specificerat i \CourseSpecRef och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Blåtand och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
+
+\subsection{Produktkomponenter}
+Kartrobot med stöd för Blåtand, mjukvara med stöd för manuell styrning och robotdiagnostik via Blåtand, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
+
+\subsection{Ingående delsystem}
+De moduler som ingår i konstruktionen är:
+\begin{itemize}
+    \item Sensorenhet (avläsning) 
+    \item Styrenhet (styrning av motorer) 
+    \item Kommunikations- och kontrollenhet (Blåtand, beräkningar av rutt) 
+\end{itemize}
+Hur dessa ska konstrueras och stå i relation till varandra kan ses i figur \ref{fig:all_subsystems}.
+
+\newpage
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1]{modules.png}
+    \caption{Översiktligt blockschema för ingående delsystem.}
+    \label{fig:all_subsystems}
+\end{figure}
+
+\subsection{Avgränsningar}
+Behöver endast klara av banor utformade enligt \CourseSpecRef. 
+
+\subsection{Generella krav på hela systemet}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Roboten ska kunna bestämma avstånd till väggar.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna förflytta sig.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Blåtand).}{1}
+    \LIPSkrav{Original}{Roboten ska kunna styras autonomt.}{1}
+    \LIPSkrav{Original}{Roboten ska undvika kollisioner i autonomt läge.}{1}
+    \LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man kan välja mellan autonom och manuell styrning. }{1}
+    \LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man startar den.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kommunicera trådlöst med en bärbar dator.}{1}
+    \LIPSkrav{Original}{Roboten ska skicka kartdata till en bärbar dator.}{1}
+    \LIPSkrav{Original}{Roboten ska skicka positionsdata till en bärbar dator.}{1}
+    \LIPSkrav{Original}{Roboten ska skicka styrdata till en bärbar dator.}{1}
+    \LIPSkrav{Original}{Roboten ska skicka sensordata till en bärbar dator.}{1}
+    \LIPSkrav{Original}{Roboten ska vara uppbyggd av utbytbara moduler.}{1}
+    \LIPSkrav{Original}{I konstruktionen ska det ingå: kommunikations- och kontrollenhet, styrenhet, samt sensorenhet.}{1}
+    \LIPSkrav{Original}{Roboten ska återvända till ursprungspositionen och stanna efter kartläggning.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna ställa upp i  en tävling som definieras via \CourseSpecRef.}{1}
+    \LIPSkrav{Original}{Rummet som roboten kartlagt ska presenteras digitalt fortlöpande under körning.}{1}
+    \LIPSkrav{Original}{Den diagnostiska datan från roboten ska presenteras digitalt på en bärbar dator.}{1}
+    \LIPSkrav{Original}{Styrdata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
+    \LIPSkrav{Original}{Sensordata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
+    \LIPSkrav{Original}{Positionsdata från roboten ska presenteras digitalt på en bärbar dator fortlöpande under körning.}{1}
+    \LIPSkrav{Original}{Roboten ska kunna kartlägga ett rum som specificerat i \CourseSpecRef.}{1}
+\end{LIPSkravlista}
+
+\newpage
+
+\section{Delsystem 1 - Sensorenhet}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1]{sensorenhet.png}
+\caption{Översiktligt blockschema för sensorenheten.}
+\end{figure}
+
+\subsection{Inledande beskrivning av delsystem 1}
+Sensorenheten behandlar data från olika sensorer, för att sedan föra den vidare på ett läsligt format till kontrollenheten.\\
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Det ska sitta avståndssensorer på robotens sidor.}{1}
+    \LIPSkrav{Original}{Alla sensorer ska vara kopplade till sensormodulen.}{1}
+    \LIPSkrav{Original}{En roterande avståndssensor ska sitta på toppen av roboten.}{1}
+    \LIPSkrav{Original}{Det ska finnas kalibreringsfunktionalitet för sensorerna vid behov.}{1}
+    \LIPSkrav{Original}{Roboten ska vara utrustad med ett gyro som håller reda på vilken riktning som roboten pekar.}{2}
+    \LIPSkrav{Original}{Det ska finnas nödstoppsfunktionalitet.}{2}
+\end{LIPSkravlista}
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Sensorenheten ska ta emot data från robotens sensorer.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska, efter eventuell kalibrering, rapportera behandlad sensordata.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska indikera vilken sensor informationen kommer från.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska kunna skicka en nödstoppssignal.}{2}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Sensorenheten ska arbeta med ett flertal avståndssensorer.}{1}
+    \LIPSkrav{Original}{Sensorenhetens mjukvara ska vara skriven i C/C++.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska innehålla minst en processor.}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Sensorenheten ska leverera data enligt givet protokoll.}{1}
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från avståndssensorerna.}{1} 
+    \LIPSkrav{Original}{Sensorenheten ska ta emot sensordata från gyro(n).}{2}
+\end{LIPSkravlista}
+
+\section{Delsystem 2 - Styrenhet}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1]{styrenhet.png}
+\caption{Översiktligt blockschema för styrenheten.}
+\end{figure}
+
+
+\subsection{Inledande beskrivning av delsystem 2}
+Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorerna, dvs att den ingående data måste följa ett givet protokoll.
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Styrenheten ska skicka signaler till alla motorer i konstruktionen.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna ta emot styrinstruktioner på ett väldefinierat format.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna rapportera styrdata.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna ta emot en nödstoppssignal.}{2}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Styrenhetens mjukvara ska vara skriven i C/C++.}{1}
+    \LIPSkrav{Original}{Styrenheten ska innehålla minst en processor.}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Styrenheten ska ta emot data enligt givet protokoll.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kontrollera alla servomotorer i konstruktionen.}{1}
+    \LIPSkrav{Original}{Styrenheten ska kunna översätta givna instruktioner till motorsignaler.}{1}
+\end{LIPSkravlista}
+
+\section{Delsystem 3 - Kommunikations- och kontrollenhet }
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1]{brain.png} 
+    \caption{Översiktligt blockschema för kommunikations och kontrollenheten.}
+\end{figure}
+
+
+\subsection{Inledande beskrivning av delsystem 3}
+Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med den bärbara datorn. I denna modul ingår också kontrollenheten, som gör beräkningar relaterat till både det manuella och det autonoma läget.
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Kontrollenheten ska ta emot sensordata.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna skicka motorinstruktioner.}{1}
+    \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för på- och avstängning.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för att växla mellan autonomt och manuellt läge.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}{2}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Kontrollenhetens mjukvara ska vara skriven i Python 3.}{1}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna konstruera en mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna bestämma en kollisionsfri färdväg genom dess mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska bestämma lämpliga styrinstruktioner för att navigera genom det fysiska rummet utan kollisioner med väggar.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskade så ska kontrollenheten kunna bestämma vägar till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då delar av rummet är outforskat ska kontrollenheten skicka styrinstruktioner för att navigera till punkter som tillåter roboten att skanna outforskade delar av rummet.}{1}
+    \LIPSkrav{Original}{Då roboten stannar på en punkt som tillåter den att skanna outforskade delar av rummet ska den kunna göra detta, och uppdatera sin mjukvarurepresentation av det fysiska rummet.}{1}
+    \LIPSkrav{Original}{Då roboten inte längre kan nå outforskade delar av det fysiska rummet så ska kontrollenheten skicka instruktioner som resulterar i att roboten återvänder till sin startpunkt.}{1}
+    \LIPSkrav{Original}{Kontrollenheten ska kunna växla mellan autonomt och manuellt läge.}{1}
+\end{LIPSkravlista}
+
+\section{Delsystem 4 - Mjukvara på PC}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1]{PC.png} 
+    \caption{Översiktligt blockschema över PC-mjukvaran.}
+\end{figure}
+
+\subsection{Inledande beskrivning av delsystem 4}
+För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Blåtand ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Blåtand. 
+
+\subsection{Gränssnitt}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Mjukvaran ska skicka kommandon för navigering som roboten kan avläsa och utföra: åk framåt/bakåt, sväng vänster/höger, stanna.}{1}
+    \LIPSkrav{Original}{Mjukvaran ska skicka kommandon för att genomföra en avståndsskanning.}{1}
+    \LIPSkrav{Original}{Mjukvaran ska kunna skicka ett kommando för att växla mellan autonomt och manuellt läge.}{1}
+    \LIPSkrav{Original}{Kommandon för navigering ska skickas över Blåtand.}{1}
+    \LIPSkrav{Original}{Sensorernas värden och robotens status ska skickas tas emot över Blåtand och presenteras för användaren.}{1}
+    \LIPSkrav{Original}{Den karta som är genererad av roboten ska kunna ritas ut i denna mjukvara.}{1}
+\end{LIPSkravlista}
+
+\subsection{Designkrav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Mjukvaran ska vara skriven i Python 3.}{1}
+    \LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Blåtand.}{1}
+    \LIPSkrav{Original}{Datan för att hämta karta samt skicka kommandon sker över samma protokoll.}{2}
+\end{LIPSkravlista}
+
+\subsection{Funktionella krav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Mjukvaran ska rita ut kartan som ett tydlig rutnät i storlek 17 $\times$ 17, där varje cell är antingen en vägg eller öppen yta och ska representera en 40 $\times$ 40 centimeters verklig yta.}{1}
+    \LIPSkrav{Original}{Mjukvaran ska rita ut robotens position i rummet.}{1}
+    \LIPSkrav{Original}{Robotens och sensorernas status samt den hitintills genererade kartan presenteras, samt uppdateras kontinuerligt i mjukvaran.}{1}
+    \LIPSkrav{Original}{Utforskning ska fortlöpa även om Blåtandslänken bryts.}{1}
+    \LIPSkrav{Original}{Vid återuppkoppling ska det gå att få ut nuvarande karta.}{2}
+\end{LIPSkravlista}
+
+\section{Prestandakrav}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Roboten ska kunna skanna rummet medan den rör sig.}{2}
+\end{LIPSkravlista}
+
+
+\section{Krav på vidareutveckling}
+
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Modulerna ska inte vara beroende av andra moduler för att kunna fungera.}{1}
+\end{LIPSkravlista}
+
+\section{Tillförlitlighet}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Roboten ska klara tre på varandra följande rumsskanningar enligt reglerna speficerat i \CourseSpecRef utan tidstillägg.}{1}
+\end{LIPSkravlista}
+
+\section{Ekonomi}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Gruppen ska efter BP2 arbeta 160 timmar per person.}{1}
+\end{LIPSkravlista}
+
+\section{Leveranskrav och delleveranser}
+\begin{flushleft}
+\begin{LIPSleveranslista}
+    \LIPSleverans{Original}{Kravspecifikation.}{2016-09-13}{1}
+    \LIPSleverans{Original}{Första versionen av projektplan, tidplan och systemskiss.}{2016-09-22}{1}
+    \LIPSleverans{Original}{Slutgiltig version av projektplan, tidplan och systemskiss.}{2016-09-30}{1}
+    \LIPSleverans{Original}{Första versionen av designspecifikationen.}{2016-11-01}{1}
+    \LIPSleverans{Original}{Slutgiltig version av designspecifikation.}{2016-11-04}{1}
+    \LIPSleverans{Original}{Teknisk dokumentation och användarhandledning}{3 arbetsdagar före redovisning.}{1}
+    \LIPSleverans{Original}{Verifiering av kraven (BP5).}{Senast dagen innan redovisning.}{1}
+    \LIPSleverans{Original}{Redovisning och demonstration.}{Vecka 51}{1}
+    \LIPSleverans{Original}{Slutpresentation.}{2016-12-19}{1}
+    \LIPSleverans{Original}{Tävlingsdeltagande.}{2016-12-20}{1}
+    \LIPSleverans{Original}{Efterstudie samt inlämning av källkod.}{2016-12-21}{1}
+    \LIPSleverans{Original}{Tidrapporter.}{31/10, 7/11, 14/11, 21/11, 28/11, 5/12, 12/12, 19/12}{1}
+\end{LIPSleveranslista}
+\end{flushleft}
+\begin{flushleft}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Projektet ska bedrivas enligt LIPS-modellen.}{1}
+\end{LIPSkravlista}
+\end{flushleft}
+
+\section{Dokumentation}
+\begin{flushleft}
+\begin{LIPSdokumentlista}
+    \LIPSdokument{Teknisk dokumentation}{SV}{Beskrivning av konstruktionen för framtida underhåll, felsökning och konstruktionsunderlag.}{Ingenjörer}{PDF}
+    \LIPSdokument{Användarhandledning}{SV}{Beskrivning av hur produkten installeras och används.}{Användare}{PDF}
+\end{LIPSdokumentlista}
+\begin{flushleft}
+\begin{LIPSkravlista}
+    \LIPSkrav{Original}{Projektet ska dokumenteras enligt LIPS-mallen.}{1}
+\end{LIPSkravlista}
+\end{flushleft}
+
+\end{flushleft}
+\clearpage
+
+\begin{appendices}
+
+\end{appendices}
+
+
+\end{document}
