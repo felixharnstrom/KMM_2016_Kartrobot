@@ -109,31 +109,102 @@ I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det
     \label{fig:overview}
 \end{figure}
 
+\section{Översikt av systemet}
+% TODO: Blockschema, identifiera delsystem och gränssnitt, modularitet och uppgraderbarhet
+
+
 \section{Delsystem 1 - Sensorenhet}
 
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format.
 
+
 \subsection{Hårdvara}
 
 Sensorenheten tar in data från en distanssensor monterade på robotens topp.
+\subsubsection{Processor}
+
+\subsubsection{Ultraljudssensor/IRSensor}% TODO, val. Antal externa interrupts som krävs.
+
+\subsubsection{LIDAR}
+
+\subsubsection{IMU}
 
 \subsection{Mjukvara}
 
 Koden ska vara skriven i C/C++, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
 
-Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen. Om störningar, felaktig sensordata, kan uppstå så ska programmet kunna skicka ut ett lämpligt resultat baserad på flera mätningar. 
+Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen. Om störningar, felaktig sensordata, kan uppstå så ska programmet kunna skicka ut ett lämpligt resultat baserad på flera mätningar. % TODO: Ska vi verkligen kräva det av sensorenheten?
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
+
+\subsubsection{IN}
+
+\subsubsection{UT}
 
 \subsubsection{Alternativ 1}
 
 \subsubsection{Alternativ 2}
 
+
 \section{Delsystem 2 - Styrenhet}
+
+\subsection{Hårdvara}
+
+\subsubsection{Processor}
+
+\subsubsection{PWM-utgångar}
+
+\subsection{Mjukvara}
+
+Koden ska vara skriven i C/C++, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
+
+\subsection{Gränssnitt} \label{ssec:controllInterface}
+
+\subsubsection{Alternativ 1}
+
+\subsubsection{Alternativ 2}
+
 
 \section{Delsystem 3 - Kommunikations- och kontrollenhet}
 
+\subsection{Hårdvara}
+
+\subsubsection{Datormodell}
+
+% TODO: eventuell usb-uart
+
+\subsection{Mjukvara}
+
+Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
+
+\subsubsection{Kommunikation}
+
+\subsubsection{Ruttstyrning}
+
+\subsection{Gränssnitt} \label{ssec:brainInterface}
+
+\subsubsection{Alternativ 1}
+
+\subsubsection{Alternativ 2}
+
+
 \section{Delsystem 4 - Mjukvara på PC}
+
+\subsection{Hårdvara}
+
+\subsection{Mjukvara}
+
+Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
+
+\subsubsection{Input}
+
+\subsubsection{Output}
+
+\subsection{Gränssnitt} \label{ssec:PCInterface}
+
+\subsubsection{Alternativ 1}
+
+\subsubsection{Alternativ 2}
 
 \begin{appendices}
 
