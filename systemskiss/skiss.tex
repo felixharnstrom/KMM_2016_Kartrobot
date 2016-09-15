@@ -93,7 +93,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-    \LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{Alla}{N/A} %TODO granskare
+    \LIPSversionsinfo{0.1}{1496-05-12}{Första utkastet}{Alla}{N/A} %TODO granskare
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
@@ -101,13 +101,27 @@
 
 \section{Inledning}
 
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{overview.png}}
+    \caption{Systemet i dess omgivning.}
+    \label{fig:overview}
+\end{figure}
+
 \section{Delsystem 1 - Sensorenhet}
+
+Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format.
 
 \subsection{Hårdvara}
 
+Sensorenheten tar in data från en distanssensor monterade på robotens topp.
+
 \subsection{Mjukvara}
 
-\subsection{Gränssnitt}
+Koden ska vara skriven i C/C++, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
+
+Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen. Om störningar, felaktig sensordata, kan uppstå så ska programmet kunna skicka ut ett lämpligt resultat baserad på flera mätningar. 
+
+\subsection{Gränssnitt} \label{ssec:sensorInterface}
 
 \subsubsection{Alternativ 1}
 
