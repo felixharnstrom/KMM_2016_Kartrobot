@@ -1,0 +1,162 @@
+\newcommand{\LIPStitelsida}{
+\vspace*{200pt}
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\begin{center}
+{\fontsize{18}{22}\selectfont \textbf{\MakeUppercase{\LIPSdokumenttyp}}}
+\end{center}
+\begin{center}
+{\fontsize{16}{19}\selectfont \MakeUppercase{\LIPSprojekttitel}}
+\end{center}
+\begin{center}
+{\fontsize{12}{14}\selectfont \LIPSredaktor \\[8pt] Version \LIPSversion}
+\end{center}
+\vspace*{220pt}
+\begin{center}
+{\fontsize{12}{14}\selectfont Status}
+\end{center}
+\begin{center}
+\setlength\extrarowheight{2pt}
+\begin{tabular}{| L{100pt} | L{100pt} | L{100pt} |}
+\hline 
+Granskad & \LIPSgranskare & \LIPSgranskatdatum \\
+\hline 
+Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\ 
+\hline 
+\end{tabular} 
+\end{center}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+
+
+\newenvironment{LIPSprojektidentitet}{%
+\vspace*{200pt}
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\begin{center}
+{\fontsize{16}{19}\selectfont \textbf{PROJEKTIDENTITET}}
+\end{center}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\begin{center}
+\LIPSartaltermin, \LIPSprojektgrupp \\ Linköpings tekniska högskola, ISY
+\end{center}
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\vspace*{10pt}
+\begin{center}
+\setlength\extrarowheight{2pt}
+\begin{tabular}{| L{100pt} | L{150pt} | L{150pt} |}
+\hline
+\textbf{Namn} & \textbf{Ansvar} & \textbf{E-post} \\
+}%
+{%
+\hline
+\end{tabular} 
+\end{center}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\begin{center}
+\textbf{E-postlista för hela gruppen:} \LIPSgruppepost \\
+\textbf{Hemsida:} \LIPSgrupphemsida \\
+\vspace*{15pt}
+\textbf{Kund:} \LIPSkund \\
+\textbf{Kontaktperson hos kund:} \LIPSkundkontakt \\
+\vspace*{15pt}
+\textbf{Kursansvarig:} \LIPSkursansvarig \\
+\textbf{Handledare:} \LIPShandledare \\
+\end{center}
+}
+\newcommand{\LIPSgruppmedlem}[3]{\hline {#1} & {#2} & \href{mailto:{#3}}{{#3}} \\}
+
+\newenvironment{LIPSdokumenthistorik}{%
+\vspace*{100pt}
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\begin{center}
+{\fontsize{14}{17}\selectfont \textbf{Dokumenthistorik}}
+\end{center}
+\begin{center}
+\setlength\extrarowheight{2pt}
+\begin{tabular}{| L{50pt} | L{60pt} | L{150pt} | L{60pt} | L{55pt} |}
+\hline
+\textbf{Version} & \textbf{Datum} & \textbf{Utförda förändringar} & \textbf{Utförda av} & \textbf{Granskad} \\
+}%
+{%
+\hline
+\end{tabular} 
+\end{center}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSversionsinfo}[5]{\hline {#1} & {#2} & {#3} & {#4} & {#5} \\}
+
+\newcounter{LIPSkravnummer}
+\newcounter{LIPSunderkravnummer}[LIPSkravnummer]
+\newenvironment{LIPSkravlista}{%
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+ \setlength\extrarowheight{2pt}
+  \begin{tabular}{| L{25pt } | L{60pt} | L{260pt} | L{50pt} |}
+    }%
+  {%
+    \hline
+  \end{tabular}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSkrav}[3]{\hline\stepcounter{LIPSkravnummer}\textbf{\arabic{LIPSkravnummer}} & \textbf{{#1}} & {#2} & \textbf{{#3}} \\}
+
+\newcommand{\LIPSkravDemo}[3]{\hline\textbf{X} & \textbf{{#1}} & {#2} & \textbf{{#3}} \\}
+
+\newcommand{\LIPSunderkrav}[3]{\hline\stepcounter{LIPSunderkravnummer}\textbf{\arabic{LIPSkravnummer}\Alph{LIPSunderkravnummer}} & \textbf{{#1}} & {#2} & \textbf{{#3}} \\}
+
+
+\newenvironment{LIPSleveranslista}{
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{| L{25pt} | L{50pt} | L{200pt} | L{65pt} | L{40pt} |} 
+	}
+	{
+		\hline
+	\end{tabular}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSleverans}[4]{ \hline\stepcounter{LIPSkravnummer}\textbf{ \arabic{LIPSkravnummer}}&\textbf{{#1}}&{#2}&\textbf{{#3}}&\textbf{{#4}}\\}
+
+%Basically a kravlista with a second counter
+\newcounter{LIPSAppendixKravnummer}
+\newenvironment{LIPSAppendixKravlista}{%
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+ \setlength\extrarowheight{2pt}
+  \begin{tabular}{| L{25pt } | L{60pt} | L{310pt} |}
+    }%
+  {%
+    \hline
+  \end{tabular}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSAppendixKrav}[2]{\hline\stepcounter{LIPSAppendixKravnummer}\textbf{\arabic{LIPSAppendixKravnummer}} & \textbf{{#1}} & {#2} \\}
+
+
+\newenvironment{LIPSdokumentlista}{%
+	\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+	\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{|  L{110pt}  |  L{35pt}  |  L{140pt}  |  L{55pt}  |  L{40pt}  |} 
+		
+		\hline
+		\textbf{Dokument} & \textbf{Språk} & \textbf{Syfte/Innehåll} & \textbf{Målgrupp} & \textbf{Format} \\
+	}%
+	{%
+		\hline
+	\end{tabular}
+	\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+	\normalfont
+}
+\newcommand{\LIPSdokument}[5]{\hline {#1} & {#2} & {#3} & {#4} & {#5}\\}
