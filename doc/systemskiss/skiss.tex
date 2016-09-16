@@ -128,7 +128,7 @@ Sensorenheten tar in data från en distanssensor monterade på robotens topp.
 % TODO: Alt 2 IRSensor
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en i2c-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta.
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en I\textsuperscript{2}C-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta.
 
 Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
@@ -138,7 +138,7 @@ Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specifi
 Endast en gyro med analog output.
 
 \paragraph{Alternativ 2}
-Gyro+Accelerometer via i2c. mpu6050 % TODO: MotionMagi, handledare
+Gyro+Accelerometer via I\textsuperscript{2}C. mpu6050 % TODO: MotionMagi, handledare
 
 \subsection{Mjukvara}
 
@@ -148,11 +148,11 @@ Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna s
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten tar inte emot någon indata, och kan inte styras.
-%TODO more detailed explenation in general? Specifications around ic2 and sonic-sensors output and stuff.
+%TODO more detailed explenation in general? Specifications around i2c and sonic-sensors output and stuff.
 % TODO: A nice picture featuring hardware and interfaces
 
 \subsubsection{LIDAR och gyro}
-Då LIDAR lite v2 (\ref{sssec:lidar}) och gyron (\ref{sssec:imu}) kräver en ic2-buss så kommer en sådan att användas för kommunikation mellan dem och processorn. Vi supportar inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+Då LIDAR lite v2 (\ref{sssec:lidar}) och gyron (\ref{sssec:imu}) kräver en I\textsuperscript{2}C-buss så kommer en sådan att användas för kommunikation mellan dem och processorn. Vi supportar inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
 
 \subsubsection{Ultraljudssensorer}
 Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i sina gränssnitt, och kommunicerar via spänningsskillnader. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt daisy-chaina denna signal till en av avbrottsportarna på processorns
@@ -161,7 +161,7 @@ Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i si
 Hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-I2c-bussen som användes för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från sensorenheten får istället ta över den rollen.
+I\textsuperscript{2}C-bussen som användes för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från sensorenheten får istället ta över den rollen.
 
 \paragraph{Alternativ 2}
 Att skicka utdata via UART är en relativt enkel och elegant lösning.
@@ -214,7 +214,7 @@ Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://ww
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
 \subsubsection{Alternativ 1}
-I2C via samma buss som sensorer
+I\textsuperscript{2}C via samma buss som sensorer
 
 \subsubsection{Alternativ 2}
 USB-UART
