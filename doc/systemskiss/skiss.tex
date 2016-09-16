@@ -135,10 +135,10 @@ Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specifi
 \subsubsection{IMU} \label{sssec:imu}
 
 \paragraph{Alternativ 1}
-Endast en gyro med analog output.
+En enklare modul, exempelvis MLX90609, används, via en analog ingång. Detta ger oss då endast rotationen kring z-axeln, som kan användas för att beräkna robotens riktning i rummet.
 
 \paragraph{Alternativ 2}
-Gyro+Accelerometer via I\textsuperscript{2}C. mpu6050 % TODO: MotionMagi, handledare
+En mer avancerad modul, exempelvis MPU6050, används, via samma I\textsuperscript{2}C-buss som LIDARn. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering. % TODO: MotionMagi, handledare
 
 \subsection{Mjukvara}
 
