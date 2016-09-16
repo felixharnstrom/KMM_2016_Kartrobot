@@ -124,7 +124,7 @@ Sensorenheten tar in data från en distanssensor monterade på robotens topp.
 \subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
 % Troligtvis Atmega1284p
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
-
+En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal, men det kräver testning för att avgöras. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
 % TODO: Alt 2 IRSensor
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
