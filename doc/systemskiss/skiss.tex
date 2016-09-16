@@ -123,16 +123,16 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 Sensorenheten tar in data från en distanssensor monterade på robotens topp.
 \subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
 % Troligtvis Atmega1284p
-\subsubsection{Ultraljudssensor}
+\subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
 
 % TODO: Alt 2 IRSensor
 
-\subsubsection{LIDAR lite v2}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en i2c-buss, som därmed ska användas. Processorn behöver mjukvarustöd för detta.
+\subsubsection{LIDAR lite v2} \label{sssec:lidar}
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en i2c-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta.
 
 Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
-\subsubsection{IMU}
+\subsubsection{IMU} \label{sssec:imu}
 
 \paragraph{Alternativ 1}
 Endast en gyro med analog output.
@@ -144,16 +144,27 @@ Gyro+Accelerometer via i2c. mpu6050 % TODO: MotionMagi, handledare
 
 Koden ska vara skriven i C, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
 
-Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen.
+Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna skicka det vidare (se \ref{ssec:sensorInterface}).
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
+Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten tar inte emot någon indata, och kan inte styras.
+%TODO more detailed explenation in general? Specifications around ic2 and sonic-sensors output and stuff.
+% TODO: A nice picture featuring hardware and interfaces
+
+\subsubsection{LIDAR och gyro}
+Då LIDAR lite v2 (\ref{sssec:lidar}) och gyron (\ref{sssec:imu}) kräver en ic2-buss så kommer en sådan att användas för kommunikation mellan dem och processorn. Vi supportar inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+
+\subsubsection{Ultraljudssensorer}
+Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i sina gränssnitt, och kommunicerar via spänningsskillnader. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt daisy-chaina denna signal till en av avbrottsportarna på processorns
+
+\subsubsection{Utvärden}
+Hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-I via samma buss som sensorer
+I2c-bussen som användes för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från sensorenheten får istället ta över den rollen.
 
 \paragraph{Alternativ 2}
-UART
-
+Att skicka utdata via UART är en relativt enkel och elegant lösning.
 
 \subsubsection{IN}
 
