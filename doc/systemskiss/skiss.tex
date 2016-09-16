@@ -65,7 +65,7 @@
 \newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
 \newcommand{\LIPShandledare}{}
 \newcommand{\LIPSdokumenttyp}{Systemskiss}
-\newcommand{\LIPSredaktor}{Felix Härnström}
+\newcommand{\LIPSredaktor}{Hannes Haglund}
 \newcommand{\LIPSversion}{0.1}
 \newcommand{\LIPSgranskare}{Felix Härnström}
 \newcommand{\LIPSgranskatdatum}{N/A}
@@ -121,29 +121,42 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \subsection{Hårdvara}
 
 Sensorenheten tar in data från en distanssensor monterade på robotens topp.
-\subsubsection{Processor}
+\subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
+% Troligtvis Atmega1284p
+\subsubsection{Ultraljudssensor}
 
-\subsubsection{Ultraljudssensor/IRSensor}% TODO, val. Antal externa interrupts som krävs.
+% TODO: Alt 2 IRSensor
 
-\subsubsection{LIDAR}
+\subsubsection{LIDAR lite v2}
+Använder i2c.
 
 \subsubsection{IMU}
+
+\paragraph{Alternativ 1}
+Endast en gyro med analog output.
+
+\paragraph{Alternativ 2}
+Gyro+Accelerometer via i2c. mpu6050 % TODO: MotionMagi, handledare
 
 \subsection{Mjukvara}
 
 Koden ska vara skriven i C/C++, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
 
-Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen. Om störningar, felaktig sensordata, kan uppstå så ska programmet kunna skicka ut ett lämpligt resultat baserad på flera mätningar. % TODO: Ska vi verkligen kräva det av sensorenheten?
+Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:sensorInterface}), och skicka det vidare via bussen.
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
+
+\paragraph{Alternativ 1}
+I2C via samma buss som sensorer
+
+\paragraph{Alternativ 2}
+UART
+
 
 \subsubsection{IN}
 
 \subsubsection{UT}
 
-\subsubsection{Alternativ 1}
-
-\subsubsection{Alternativ 2}
 
 
 \section{Delsystem 2 - Styrenhet}
@@ -151,8 +164,13 @@ Programmet ska omvandla sensordata till ett lämpligt format (se \ref{ssec:senso
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
+%Samma som sensorenhet
 
 \subsubsection{PWM-utgångar}
+
+\subsubsection{Servo/steppermotor}
+\paragraph{Alternativ 1}
+AX-12
 
 \subsection{Mjukvara}
 
@@ -170,8 +188,7 @@ Koden ska vara skriven i C/C++, och ska följa <INSERT STANDARD HERE>. Funktione
 \subsection{Hårdvara}
 
 \subsubsection{Datormodell}
-
-% TODO: eventuell usb-uart
+Raspberry Pi 3. Vi utnyttjar raspberryns inbyggda blåtand.
 
 \subsection{Mjukvara}
 
@@ -184,13 +201,15 @@ Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://ww
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
 \subsubsection{Alternativ 1}
+I2C via samma buss som sensorer
 
 \subsubsection{Alternativ 2}
-
+USB-UART
 
 \section{Delsystem 4 - Mjukvara på PC}
 
 \subsection{Hårdvara}
+Har en blåtandsmodul.
 
 \subsection{Mjukvara}
 
@@ -202,9 +221,6 @@ Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://ww
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-\subsubsection{Alternativ 1}
-
-\subsubsection{Alternativ 2}
 
 \begin{appendices}
 
