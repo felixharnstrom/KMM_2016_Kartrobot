@@ -160,3 +160,20 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 	\normalfont
 }
 \newcommand{\LIPSdokument}[5]{\hline {#1} & {#2} & {#3} & {#4} & {#5}\\}
+
+
+\newenvironment{LIPSleveransplan}{
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{| L{130pt} | L{60pt} | L{170pt} | L{65pt} | L{40pt} |} 
+	\hline
+	\textbf{Leverans} & \textbf{Ansvarig} & \textbf{Beskrivning} & \textbf{Färdig} \\
+	}
+	{
+		\hline
+	\end{tabular}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSplaneradleverans}[4]{ \hline {#1}&{#2}&{#3}&\textbf{{#4}}\\}
