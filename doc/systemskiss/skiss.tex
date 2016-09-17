@@ -109,9 +109,15 @@ I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det
     \label{fig:overview}
 \end{figure}
 
+\newpage
 \section{Översikt av systemet}
 % TODO: Blockschema, identifiera delsystem och gränssnitt, modularitet och uppgraderbarhet
-
+Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med extern hårdvara tillhörande varje modul. Ett mer detaljerat blockschema finns till varje modul, samt i figur \ref{fig:modulesDetailed}.
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
+    \caption{Modulöversikt.}
+    \label{fig:modules}
+\end{figure}
 
 \section{Delsystem 1 - Sensorenhet}
 
@@ -177,7 +183,7 @@ Implementera en extra UART-buss som endast går mellan sensorenheten och kommuni
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 \paragraph{Alternativ 1}
-AX-12
+AX-12, eller en servo med liknande egenskaper om denna inte kan köras på den tillgängliga batterispänningen.
 
 \subsection{Mjukvara}
 
@@ -232,8 +238,17 @@ Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://ww
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-
+\newpage
 \begin{appendices}
+\chapter{Detaljerat blockschema}
+\\% TODO: Riktig titel
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{modules_detail.png}}
+    \caption{Detaljerat blockschema över systemet.}
+    \label{fig:modulesDetailed}
+\end{figure}\\
+* Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
+** 5V på Atmega-sidan, 3V3 krävs av sensorn.
 
 \end{appendices}
 
