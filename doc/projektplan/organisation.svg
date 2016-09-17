@@ -595,10 +595,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98510264"
-     inkscape:cx="247.77365"
-     inkscape:cy="210.37928"
+     inkscape:cx="54.53205"
+     inkscape:cy="276.93126"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4998-8-8"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
@@ -618,7 +618,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -757,15 +757,15 @@
             <text
                xml:space="preserve"
                style="font-style:normal;font-weight:normal;font-size:16.25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-               x="311.60803"
+               x="304.63782"
                y="240.18947"
                id="text5461-7-3"
                sodipodi:linespacing="125%"><tspan
                  sodipodi:role="line"
-                 x="311.60803"
+                 x="304.63782"
                  y="240.18947"
                  style="font-size:12.5px"
-                 id="tspan4955-6">M</tspan></text>
+                 id="tspan4955-6">LEV</tspan></text>
           </g>
           <g
              id="g4998-8-7"
@@ -785,15 +785,15 @@
             <text
                xml:space="preserve"
                style="font-style:normal;font-weight:normal;font-size:16.25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-               x="311.60803"
+               x="304.93079"
                y="240.18947"
                id="text5461-7-3-3"
                sodipodi:linespacing="125%"><tspan
                  sodipodi:role="line"
-                 x="311.60803"
+                 x="304.93079"
                  y="240.18947"
                  style="font-size:12.5px"
-                 id="tspan4955-6-0">M</tspan></text>
+                 id="tspan4491">TST</tspan></text>
           </g>
           <g
              id="g4998-8-9"
@@ -813,15 +813,15 @@
             <text
                xml:space="preserve"
                style="font-style:normal;font-weight:normal;font-size:16.25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-               x="311.60803"
+               x="307.37219"
                y="240.18947"
                id="text5461-7-3-0"
                sodipodi:linespacing="125%"><tspan
                  sodipodi:role="line"
-                 x="311.60803"
+                 x="307.37219"
                  y="240.18947"
                  style="font-size:12.5px"
-                 id="tspan4955-6-06">M</tspan></text>
+                 id="tspan4955-6-06">HV</tspan></text>
           </g>
           <g
              id="g4998-8-8"
@@ -841,15 +841,15 @@
             <text
                xml:space="preserve"
                style="font-style:normal;font-weight:normal;font-size:16.25px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-               x="311.60803"
+               x="306.79846"
                y="240.18947"
                id="text5461-7-3-01"
                sodipodi:linespacing="125%"><tspan
                  sodipodi:role="line"
-                 x="311.60803"
+                 x="306.79846"
                  y="240.18947"
                  style="font-size:12.5px"
-                 id="tspan4955-6-4">M</tspan></text>
+                 id="tspan4955-6-4">MV</tspan></text>
           </g>
         </g>
       </g>
