@@ -177,3 +177,20 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 \normalfont
 }
 \newcommand{\LIPSplaneradleverans}[4]{ \hline {#1}&{#2}&{#3}&\textbf{{#4}}\\}
+
+
+\newenvironment{LIPSbeslutspunkter}{
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{| L{30pt} | L{250pt} | L{100pt} |} 
+	\hline
+	\textbf{BP} & \textbf{Beskrivning} & \textbf{Färdig} \\
+	}
+	{
+		\hline
+	\end{tabular}
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+}
+\newcommand{\LIPSbp}[3]{ \hline \textbf{{#1}}&{#2}&\textbf{{#3}}\\}
