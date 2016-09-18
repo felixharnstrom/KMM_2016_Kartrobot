@@ -203,7 +203,6 @@ Processormodellen ATmega1284p.
 \paragraph{Alternativ 2}
 Processormodellen AtMega1284p's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör definitivt vara kapabel till att utföra dess givna jobb.
 
-\subsubsection{PWM-utgångar}
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
@@ -215,7 +214,7 @@ Servomotorn AX-12 används. Denna har både ett ''vanligt'' läge, och ett så k
 %TODO: Step-up även här?
 
 \subsubsection{Hjulmotorer}
-Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida).
+Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
 %TODO: Databladet säger att motorerna jobbar med 7.2V. Är det vad ingångarna tar, eller bara en strömkälla som ligger på sidan? Om det förstnämnda: skriv att vi kräver en step-up krets.
 
 \subsection{Mjukvara}
