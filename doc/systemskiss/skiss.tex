@@ -191,13 +191,13 @@ Processormodellen AtMega1284p's mindre syskon, ATmega16. Denna är inte lika kra
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
 
 \paragraph{Alternativ 1}
-Servomotorn AX-12 används. Denna har både ett "vanligt" läge, och ett så kallat "wheel"-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt ett helt varv. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget.
+Servomotorn AX-12 används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt ett helt varv. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget.
 % http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.htm
 %TODO: AX-12, AX-12A eller AX-12+?
 %TODO: Step-up även här?
 
-\subsubsection{Hjulservon}
-Totalt fyra servon finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och har fyra DC-motorer som styrs parvis (höger sida och vänster sida).
+\subsubsection{Hjulmotorer}
+Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida).
 %TODO: Databladet säger att motorerna jobbar med 7.2V. Är det vad ingångarna tar, eller bara en strömkälla som ligger på sidan? Om det förstnämnda: skriv att vi kräver en step-up krets.
 
 \subsection{Mjukvara}
@@ -253,15 +253,19 @@ Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
 
 \subsection{Hårdvara}
-Har en blåtandsmodul.
+En PC med tangentbord, mus, skärm och blåtandsmodul.
 
 \subsection{Mjukvara}
 
 Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
 
 \subsubsection{Input}
+PC-mjukvaran tar emot sensor, styrdata och kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
 
 \subsubsection{Output}
+Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
+
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt.
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
