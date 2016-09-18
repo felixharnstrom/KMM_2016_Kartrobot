@@ -138,7 +138,7 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
 
 \paragraph{Alternativ 1} % TODO: Är det verkligen 1284-p? Står bara 1284 på föreläsningsbilder.
-ATmega1284p används som processormodell, då den både är relativt kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
+ATmega1284 används som processormodell, då den både är relativt kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
 
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
 En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal, men det kräver testning för att avgöras. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
@@ -198,10 +198,10 @@ Implementera en extra UART-buss som endast går mellan sensorenheten och kommuni
 \subsubsection{Processor}
 
 \paragraph{Alternativ 1}
-Processormodellen ATmega1284p.
+Processormodellen ATmega1284.
 
 \paragraph{Alternativ 2}
-Processormodellen AtMega1284p's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör definitivt vara kapabel till att utföra dess givna jobb.
+Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör definitivt vara kapabel till att utföra dess givna jobb.
 
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
@@ -275,7 +275,7 @@ I\textsuperscript{2}C via samma buss som sensorer, där kommunikationsenheten ag
 Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v.
 
 \paragraph{Alternativ 2}
-Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har ingen inbyggd UART kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G, användas. Nackdelen är att även UART måste implementeras, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G, användas. Nackdelen är att även UART måste implementeras, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
 
 \newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
