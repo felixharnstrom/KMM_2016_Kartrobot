@@ -175,6 +175,7 @@ Följande punkter har beslutats gemensamt av projektgruppen och ska anses vara r
 \subsection{Definition av arbetsinnehåll och ansvar}
 
 \section{Dokumentplan}
+\label{sec:doc_plan}
 Dokument ska i största möjliga mån följa tillgängliga LIPS-mallar. Dokumentansvarig är i fall där LIPS-mall saknas ansvarig för att skapa eller i övrigt godkänna dokumentmallar vid behov. Dokument ska lagras på sådant sätt att alla gruppmedlemmar (och enbart dessa) har tillgång till alla dokument över internet. Alla dokument ska skrivas på svenska, men teknisk dokumentation i källkod bör skrivas på engelska. 
 
 Dokument ska revisionsnumreras på formatet \textit{\textless version\textgreater .\textless utgåva\textgreater}, där versionsnummer under 0 ska anses vara interna utkast, och version 1 är redo för leverans eller arkivering beroende på dokumenttyp. Att tilldela ett nytt versionsnummer innebär stora förändringar till dokumentets väsentliga innehåll. Utgåvenumret betecknar mindre förändringar som inte ändrar dokumentets väsentliga innehåll. Alla nya revisioner efter 1.0 av dokument som ska levereras till beställare måste göras i samröre med denne.
@@ -269,7 +270,10 @@ I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
 \section{Förändringsplan}
 
 \section{Kvalitetsplan}
+I denna sektion beskrivs rutiner gällande granskningar av dokument och tester som ska utföras på den hård- och mjukvara som produceras under projektets gång. Dessa aktiviteter ska utföras löpande under projektets gång för att minimera oförutsedda problem.
+
 \subsection{Granskningar}
+Alla dokument som ska levereras till beställare ska granskas av någon annan gruppmedlem än dokumentets redaktör såsom specificerat i sektion \ref{sec:doc_plan}. I första hand ska granskningen utföras av en gruppmedlem som har arbetat med sakfrågan som beskrivs i dokumentet.
 
 \subsection{Testplan}
 Alla gruppmedlemmar är ansvariga för att själva utföra enhetstester på all hård- och mjukvara som denne producerar. Testansvarig är ansvarig för att detta efterföljs och att det finns rimliga testprotokoll för alla delar av projektet. Testansvarig ska också säkerställa att det finns rutiner för hur misslyckade tester ska utvärderas och rapporteras. Testansvarig ska i samarbete med hårdvaruansvarig och mjukvaruansvarig utforma relevant integrationstestspecifikation och systemtestspecifikation.
