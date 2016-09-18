@@ -188,8 +188,17 @@ Processormodellen AtMega1284p's mindre syskon, ATmega16. Denna är inte lika kra
 \subsubsection{PWM-utgångar}
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
+På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
+
 \paragraph{Alternativ 1}
-AX-12, eller en servo med liknande egenskaper om denna inte kan köras på den tillgängliga batterispänningen.
+Servomotorn AX-12 används. Denna har både ett "vanligt" läge, och ett så kallat "wheel"-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt ett helt varv. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget.
+% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.htm
+%TODO: AX-12, AX-12A eller AX-12+?
+%TODO: Step-up även här?
+
+\subsubsection{Hjulservon}
+Totalt fyra servon finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och har fyra DC-motorer som styrs parvis (höger sida och vänster sida).
+%TODO: Databladet säger att motorerna jobbar med 7.2V. Är det vad ingångarna tar, eller bara en strömkälla som ligger på sidan? Om det förstnämnda: skriv att vi kräver en step-up krets.
 
 \subsection{Mjukvara}
 
