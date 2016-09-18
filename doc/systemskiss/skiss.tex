@@ -119,10 +119,20 @@ Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \
     \label{fig:modules}
 \end{figure}
 
+\newpage
 \section{Delsystem 1 - Sensorenhet}
-
+% TODO: Ska vi ha en pil till hjärnan? Är väl nån slags tvåvägskommunikation med uart/i2c, även om det inte skickas nån vettig data.
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format.
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
+    \caption{Översikt över sensorenheten.}
+    \label{fig:modules}
+\end{figure}
 
+\noindent \begin{small}
+    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
+    ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
+\end{small}
 \subsection{Hårdvara}
 
 \subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
@@ -173,8 +183,16 @@ I\textsuperscript{2}C-bussen som användes för att kommunicera med LIDAR:n och 
 \paragraph{Alternativ 2}
 Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
+\newpage
 \section{Delsystem 2 - Styrenhet} \label{sec:system2}
-
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
+    \caption{Översikt över styrenheten.}
+    \label{fig:modules}
+\end{figure}
+\noindent \begin{small}
+    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
+\end{small}
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
@@ -214,7 +232,17 @@ I\textsuperscript{2}C-bussen som användes för sensorer kan användas. Se \ref{
 \paragraph{Alternativ 2}
 Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
+\newpage
 \section{Delsystem 3 - Kommunikations- och kontrollenhet}
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
+    \caption{Översikt över kommunikations- och kontrollenheten.  }
+    \label{fig:modules}
+\end{figure}
+\noindent \begin{small}
+* Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
+\end{small}
+
 
 \subsection{Hårdvara}
 
@@ -250,8 +278,13 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 \paragraph{Alternativ 2}
 Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har ingen inbyggd UART kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G, användas. Nackdelen är att även UART måste implementeras, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
 
+\newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
-
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
+    \caption{Översikt över PCn.}
+    \label{fig:modules}
+\end{figure}
 \subsection{Hårdvara}
 En PC med tangentbord, mus, skärm och blåtandsmodul.
 
@@ -274,10 +307,10 @@ Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt.
 \chapter{Detaljerat blockschema}
 \\% TODO: Riktig titel
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{modules_detail.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
     \caption{Detaljerat blockschema över systemet.}
     \label{fig:modulesDetailed}
-\end{figure}\\
+\end{figure}
 * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
 ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
 
