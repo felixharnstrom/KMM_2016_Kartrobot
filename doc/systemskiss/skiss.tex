@@ -173,7 +173,7 @@ I\textsuperscript{2}C-bussen som användes för att kommunicera med LIDAR:n och 
 \paragraph{Alternativ 2}
 Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
-\section{Delsystem 2 - Styrenhet}
+\section{Delsystem 2 - Styrenhet} \label{sec:system2}
 
 \subsection{Hårdvara}
 
@@ -226,8 +226,20 @@ Då detta delsystem har han om relativt tunga beräkningar används en Raspberry
 Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
 
 \subsubsection{Kommunikation}
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan de. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
+
+Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se \ref{sec:system4}) över blåtand, där den skickar debugdata och kartinformation, och tar emot kommandon vid manuell styrning. Mjukvara för blåtandskommunikation måste finnas.
+
+För att hantera alla dessa meddelanden bör ett meddelandesystem implementeras. Detta görs lämpligen med en prioriterad kö, så att vissa meddelanden kan prioriteras över andra.
+
+\subsubsection{Manuellt läge}
+Roboten ska via en brytare kunna byta mellan ett autonomt och ett manuellt läge. I det manuella ska den ta emot kommandon från PC:n via blåtand (se \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Mjukvara för att på ett korrekt sätt utföra dessa kommandon behövs.
+
+\subsubsection{Kartritning}
+Robotens huvuduppdrag i det autonoma läget är att skanna ett rum och rita en karta över det. Mjukvara för att omvandla skannerdata till ett tvådimensionellt rum, samt rutiner för att söka upp och skanna outforskade delar av rummet ska finnas.
 
 \subsubsection{Ruttstyrning}
+Roboten behöver kontinuerligt ta och leta sig till outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
@@ -238,7 +250,7 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 \paragraph{Alternativ 2}
 Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har ingen inbyggd UART kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G, användas. Nackdelen är att även UART måste implementeras, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
 
-\section{Delsystem 4 - Mjukvara på PC}
+\section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
 
 \subsection{Hårdvara}
 Har en blåtandsmodul.
