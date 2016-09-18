@@ -126,7 +126,10 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \subsection{Hårdvara}
 
 \subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
-% Troligtvis Atmega1284p
+
+\paragraph{Alternativ 1} % TODO: Är det verkligen 1284-p? Står bara 1284 på föreläsningsbilder.
+ATmega1284p används som processormodell, då den både är relativt kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
+
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
 En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal, men det kräver testning för att avgöras. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
 % TODO: Alt 2 IRSensor
@@ -175,7 +178,12 @@ Implementera en extra UART-buss som endast går mellan sensorenheten och kommuni
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-%Samma som sensorenhet
+
+\paragraph{Alternativ 1}
+Processormodellen ATmega1284p.
+
+\paragraph{Alternativ 2}
+Processormodellen AtMega1284p's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör definitivt vara kapabel till att utföra dess givna jobb.
 
 \subsubsection{PWM-utgångar}
 
