@@ -23,6 +23,9 @@
 
 \usepackage[titletoc,title]{appendix}
 
+\usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex}		%Harvard-style citations
+\setlength{\bibitemsep}{\baselineskip}	%vertical space between bibliography items
+
 \usepackage{fancyhdr}
 \fancypagestyle{intro}{
     \fancyhf{}
@@ -72,6 +75,7 @@
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
+\addbibresource{bibliography.bib}
 \input{LIPS.tex}
 \begin{document}
 \pagestyle{intro}
@@ -180,6 +184,10 @@ Dokument ska i största möjliga mån följa tillgängliga LIPS-mallar. Dokument
 
 Dokument ska revisionsnumreras på formatet \textit{\textless version\textgreater .\textless utgåva\textgreater}, där versionsnummer under 0 ska anses vara interna utkast, och version 1 är redo för leverans eller arkivering beroende på dokumenttyp. Att tilldela ett nytt versionsnummer innebär stora förändringar till dokumentets väsentliga innehåll. Utgåvenumret betecknar mindre förändringar som inte ändrar dokumentets väsentliga innehåll. Alla nya revisioner efter 1.0 av dokument som ska levereras till beställare måste göras i samröre med denne.
 
+Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar följer de språkregler som gäller för dokumentspråket såsom beskrivet i tabell \ref{tab:documents}. För svenska gäller språkreglerna såsom beskrivna i \citetitle{Sprakradet2008} (\cite{Sprakradet2008}). För dokument som skrivs på engelska hänvisas till \citetitle{Ritter2003} (\cite{Ritter2003}).
+
+%TODO Table detailing all project documentation
+\label{tab:documents}
 \section{Utvecklingsmetodik}
 
 \section{Utbildningsplan}
@@ -286,4 +294,7 @@ Alla gruppmedlemmar är ansvariga för att själva utföra enhetstester på all 
 
 \begin{appendices}
 \end{appendices}
+\clearpage
+\addcontentsline{toc}{section}{Referenser}	%append references section at this location to TOC
+\printbibliography
 \end{document}
