@@ -83,6 +83,7 @@
     \LIPSgruppmedlem{Jani Jokinen}{}{janjo273@student.liu.se}
     \LIPSgruppmedlem{Silas Lenz}{}{sille914@student.liu.se}
     \LIPSgruppmedlem{Daniel Månsson}{}{danma344@student.liu.se}
+
     \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
 \end{LIPSprojektidentitet}
 \clearpage
@@ -283,17 +284,21 @@ Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har
 
 \newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot avlusningsdata och ge instruktioner vid manuellt läge.
+
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
     \caption{Översikt över PCn.}
     \label{fig:modules}
 \end{figure}
 \subsection{Hårdvara}
-En PC med tangentbord, mus, skärm och blåtandsmodul.
+En godtycklig PC med Python-3-support, skärm, tangentbord, och blåtandsmodul.
 
 \subsection{Mjukvara}
 
 Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
+
+Då grafiska element (snarare än kommandoraden) måste utnyttjas så införskaffas ett lämpligt grafikbibliotek.
 
 \subsubsection{Input}
 PC-mjukvaran tar emot sensor, styrdata och kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
