@@ -284,7 +284,7 @@ Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har
 
 \newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot avlusningsdata och ge instruktioner vid manuellt läge.
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot avlusningsdata, den upptäckta kartan, samt ge instruktioner vid manuellt läge.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
@@ -309,6 +309,8 @@ Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till r
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt.
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
+
+PC:n utnyttjar, som omnämnt, en blåtandsmodul.
 
 \newpage
 \begin{appendices}
