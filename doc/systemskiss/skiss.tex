@@ -164,7 +164,7 @@ En mer avancerad modul, exempelvis MPU6050, används, via samma I\textsuperscrip
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i C, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
+Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Funktioner ska vara kommenterade.
 
 Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna skicka det vidare (se \ref{ssec:sensorInterface}).
 
@@ -224,7 +224,7 @@ Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi 
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i C, och ska följa <INSERT STANDARD HERE>. Funktioner ska vara kommenterade.
+Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Funktioner ska vara kommenterade.
 
 \subsection{Gränssnitt} \label{ssec:controllInterface}
 
@@ -276,7 +276,7 @@ Roboten behöver kontinuerligt ta och leta sig till outfoskade delar av rummet i
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
 \paragraph{Alternativ 1}
-I\textsuperscript{2}C via samma buss som sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera UART, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten. %TODO: Visst behöver mastern styra alla inkopplade enheter?
+I\textsuperscript{2}C via samma buss som sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera UART, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
 Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v.
 
 \paragraph{Alternativ 2}
@@ -314,8 +314,9 @@ PC:n utnyttjar, som omnämnt, en blåtandsmodul.
 
 \newpage
 \begin{appendices}
-\chapter{Detaljerat blockschema}
-\\% TODO: Riktig titel
+
+\section{Detaljerat blockschema}
+% TODO: Riktig titel
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
     \caption{Detaljerat blockschema över systemet.}
@@ -323,6 +324,18 @@ PC:n utnyttjar, som omnämnt, en blåtandsmodul.
 \end{figure}
 * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
 ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
+
+\section{C-standard} \label{sec:cstandard}
+Som kodstandard för C används \href{https://www.doc.ic.ac.uk/lab/cplus/cstyle.html#N10940}{Recommended C Style and Coding Standards} med några smärre tillägg och ändringar:
+
+\begin{itemize}
+    \item Indenteringar sker med exakt fyra stycken mellanslag.
+    \item Namn på funktioner, typedef, variabler, strukter, unioner, och enums ska vara i lower camel case.
+    \item Namn på \#define's, enum-konstanter, och macrofunktioner ska vara i all-caps med ord separerade av underscore.
+    \item Typedef:ade namn ska avslutas med "\_t".
+    \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
+    \item Dokumentationskommentarer f;r funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
+\end{itemize}
 
 \end{appendices}
 
