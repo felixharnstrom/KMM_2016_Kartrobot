@@ -783,9 +783,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="735.77301"
-     inkscape:cy="256.84567"
+     inkscape:zoom="2.8"
+     inkscape:cx="168.90475"
+     inkscape:cy="209.49035"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1514,8 +1514,8 @@
          y="298.44598"
          style="font-size:7.24179649px">2</tspan></text>
     <path
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:url(#marker8166)"
-       d="m 285.09719,442.00506 68.94377,0"
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162)"
+       d="m 285.21272,442.00506 73.11395,0"
        id="path8160"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="300"
@@ -1662,7 +1662,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#969696;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="306.19986"
+       x="307.40259"
        y="465.90765"
        id="text7351-9-7-6-1-8-5-5-1"
        sodipodi:linespacing="125%"
@@ -1671,12 +1671,12 @@
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan7353-5-1-1-7-1-0-9-2"
-         x="306.19986"
+         x="307.40259"
          y="465.90765"
          style="font-size:7.24179649px;fill:#969696;fill-opacity:1;stroke:none;stroke-opacity:1">1</tspan></text>
     <path
        style="fill:#969696;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:0.98900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 318.33069,444.31868 2.47676,-5.02412"
+       d="m 319.57631,444.31868 2.47676,-5.02412"
        id="path7304-7-2-9-1-9-6-2-89"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="300"
@@ -1940,7 +1940,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="301.44711"
+       x="302.69275"
        y="433.79077"
        id="text8774"
        sodipodi:linespacing="125%"
@@ -1948,7 +1948,7 @@
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan8776"
-         x="301.44711"
+         x="302.69275"
          y="433.79077"
          style="font-size:7.5px;fill:#969696;fill-opacity:1;stroke:none;stroke-opacity:1">Nödstopp</tspan></text>
     <g

@@ -22,6 +22,20 @@
   <defs
      id="defs9776">
     <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path13245"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#969696;stroke-width:1pt;stroke-opacity:1;fill:#969696;fill-opacity:1"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+    <marker
        inkscape:stockid="Arrow1Mstart"
        orient="auto"
        refY="0"
@@ -212,9 +226,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="361.20574"
-     inkscape:cy="455.03757"
+     inkscape:zoom="2.8"
+     inkscape:cx="331.23496"
+     inkscape:cy="393.44888"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -638,7 +652,7 @@
          y="553.85309"
          style="font-size:7.24179649px">2</tspan></text>
     <path
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:url(#marker8166)"
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:"
        d="m 355.28537,607.60086 68.94377,0"
        id="path8160"
        inkscape:connector-curvature="0"
@@ -647,7 +661,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="371.63528"
+       x="370.6803"
        y="599.38654"
        id="text8774"
        sodipodi:linespacing="125%"
@@ -655,7 +669,7 @@
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan8776"
-         x="371.63528"
+         x="370.6803"
          y="599.38654"
          style="font-size:7.5px;fill:#969696;fill-opacity:1;stroke:none;stroke-opacity:1">Nödstopp</tspan></text>
     <g
@@ -748,7 +762,7 @@
     </g>
     <g
        id="g10071"
-       transform="translate(-2.687005,0)">
+       transform="translate(-3.6420119,0)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -772,5 +786,20 @@
          d="m 391.20588,609.28252 2.47676,-5.02412"
          style="fill:#969696;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:0.98900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="208.84731"
+       y="466.92676"
+       id="text10120-3"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan10122-6"
+         x="208.84731"
+         y="466.92676">In: Styrinstruktioner</tspan><tspan
+         sodipodi:role="line"
+         x="208.84731"
+         y="482.55176"
+         id="tspan10184">Ut: Styrdata</tspan></text>
   </g>
 </svg>
