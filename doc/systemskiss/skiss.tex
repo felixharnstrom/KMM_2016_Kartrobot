@@ -78,12 +78,13 @@
 \LIPStitelsida
 \clearpage
 \begin{LIPSprojektidentitet}
-    \LIPSgruppmedlem{Hannes Haglund}{}{hanha265@student.liu.se}
+    % TODO: Förkortningar
+    % TODO: Är roller korrekta?
+    \LIPSgruppmedlem{Hannes Haglund}{Designansvarig Mjukvara}{hanha265@student.liu.se}
     \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
-    \LIPSgruppmedlem{Jani Jokinen}{}{janjo273@student.liu.se}
-    \LIPSgruppmedlem{Silas Lenz}{}{sille914@student.liu.se}
-    \LIPSgruppmedlem{Daniel Månsson}{}{danma344@student.liu.se}
-
+    \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{Testansvarig}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara}{danma344@student.liu.se}
     \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
 \end{LIPSprojektidentitet}
 \clearpage
@@ -144,7 +145,7 @@ ATmega1284 används som processormodell, då den både är relativt kraftfull ut
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
 \paragraph{Alternativ 1}
 En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal, men det kräver testning för att avgöras. En annan nackdel är att de fungerar dåligt i vinkel mot en vägg, där de antingen inte ger något värde alls, eller ett ''studsat'' värde. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
-%
+
 \paragraph{Alternativ 2}
 Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analoga utdatan, som dessutom är ickelinjär. Fungerar på ett kortare intervall än ultraljudssensorer. Fördelen är snabbare avläsningar som troligtvis inte stör varandra. Bredden på mätstrålen är också mindre än med ultraljud.
 
@@ -157,10 +158,10 @@ Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specifi
 \subsubsection{IMU} \label{sssec:imu}
 
 \paragraph{Alternativ 1}
-En enklare modul, exempelvis MLX90609, används, via en analog ingång. Detta ger oss då endast rotationen kring z-axeln, som kan användas för att beräkna robotens riktning i rummet.
+En enklare modul - exempelvis MLX90609 - används, via en analog ingång. Detta ger oss då endast rotationen kring z-axeln, som kan användas för att beräkna robotens riktning i rummet.
 
 \paragraph{Alternativ 2}
-En mer avancerad modul, exempelvis MPU6050, används, via samma I\textsuperscript{2}C-buss som LIDARn. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering. % TODO: MotionMagi, handledare
+En mer avancerad modul, exempelvis MPU6050, används, via samma I\textsuperscript{2}C-buss som LIDARn. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering.% TODO: MotionMagi, handledare
 
 \subsection{Mjukvara}
 
@@ -208,7 +209,6 @@ Processormodellen ATmega1284.
 \paragraph{Alternativ 2}
 Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör vara kapabel till att utföra dess givna jobb. Om UART används för kommunikation mellan moduler räcker inte denna till, då endast en hårdvaru-UART finns tillgänglig.
 
-
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
 
@@ -254,7 +254,6 @@ Implementera en extra UART-buss som endast går mellan styrenheten och kommunika
 Då detta delsystem har han om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
 
 \subsection{Mjukvara}
-
 Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
 
 \subsubsection{Kommunikation}
