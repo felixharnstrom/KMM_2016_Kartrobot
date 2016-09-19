@@ -151,7 +151,7 @@ Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analog
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en I\textsuperscript{2}C-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta.
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en I\textsuperscript{2}C-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta. % TODO: Varför använder vi inte PWM?
 
 Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
@@ -213,10 +213,15 @@ Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraf
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
 
 \paragraph{Alternativ 1}
-Servomotorn AX-12 används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt ett helt varv. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget.
+Servomotorn AX-12(+/A) används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra med ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
 % http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.htm
 %TODO: AX-12, AX-12A eller AX-12+?
 %TODO: Step-up även här?
+
+\paragraph{Alternativ 2}
+En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, används.
+
+% Alternativ 3: Stepper motor med driver.
 
 \subsubsection{Hjulmotorer}
 Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
@@ -317,7 +322,7 @@ PC:n utnyttjar, som omnämnt, en blåtandsmodul.
 \section{Detaljerat blockschema}
 % TODO: Riktig titel
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}% TODO: Fel protokoll från LIDAR.
     \caption{Detaljerat blockschema över systemet.}
     \label{fig:modulesDetailed}
 \end{figure}
