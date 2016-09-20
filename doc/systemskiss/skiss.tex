@@ -150,7 +150,7 @@ Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analog
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en I\textsuperscript{2}C-buss, som därmed ska användas, se sektion \ref{ssec:sensorInterface}. Processorn behöver mjukvarustöd för detta. % TODO: Varför använder vi inte PWM?
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
 
 Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
@@ -160,7 +160,7 @@ Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specifi
 En enklare modul - exempelvis MLX90609 - används, via en analog ingång. Detta ger oss då endast rotationen kring z-axeln, som kan användas för att beräkna robotens riktning i rummet.
 
 \paragraph{Alternativ 2}
-En mer avancerad modul, exempelvis MPU6050, används, via samma I\textsuperscript{2}C-buss som LIDARn. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering.% TODO: MotionMagi, handledare
+En mer avancerad modul, exempelvis MPU6050, används, via en I\textsuperscript{2}C-buss. Om LIDARn implementerats med I\textsuperscript{2}C delas bussen mellan dessa två. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering.% TODO: MotionMagi, handledare
 
 \subsection{Mjukvara}
 
@@ -169,12 +169,15 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna skicka det vidare (se \ref{ssec:sensorInterface}).
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten tar inte emot någon indata, och kan inte styras.
+Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten kan ta emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
 %TODO more detailed explenation in general? Specifications around i2c and sonic-sensors output and stuff.
 % TODO: A nice picture featuring hardware and interfaces
 
-\subsubsection{LIDAR och gyro}
-Då LIDAR lite v2 (\ref{sssec:lidar}) och gyron (\ref{sssec:imu}) kräver en I\textsuperscript{2}C-buss så kommer en sådan att användas för kommunikation mellan dem och processorn. Vi supportar inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+\subsection{LIDAR}
+LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
+
+\subsubsection{I2C-buss}
+Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi supportar i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
 
 \subsubsection{Ultraljudssensorer}
 Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i sina gränssnitt, och kommunicerar via spänningsskillnader. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
@@ -183,13 +186,14 @@ Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i si
 Hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-I\textsuperscript{2}C-bussen som användes för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Delsystem 2 - Styrenhet} \label{sec:system2}
+% TODO: Input till sensorenhet
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
@@ -235,10 +239,10 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 \subsubsection{Styrsignaler samt styrdata}
 
 \paragraph{Alternativ 1}
-I\textsuperscript{2}C-bussen som användes för sensorer kan användas. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Delsystem 3 - Kommunikations- och kontrollenhet} \label{sec:system3}
@@ -279,11 +283,12 @@ Roboten behöver kontinuerligt ta och leta sig till outfoskade delar av rummet i
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
 \paragraph{Alternativ 1}
-I\textsuperscript{2}C via samma buss som sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera UART, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
-Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v.
+Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+
 
 \paragraph{Alternativ 2}
-Som alternativ till I\textsuperscript{2}C kan UART användas. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
+Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
 
 \newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
