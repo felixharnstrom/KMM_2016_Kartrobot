@@ -23,6 +23,9 @@
 
 \usepackage[titletoc,title]{appendix}
 
+\usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
+\setlength{\bibitemsep}{\baselineskip}	%vertical space between bibliography items
+
 \usepackage{fancyhdr}
 \fancypagestyle{intro}{
     \fancyhf{}
@@ -72,7 +75,9 @@
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
+\addbibresource{bibliography.bib}
 \input{LIPS.tex}
+
 \begin{document}
 \pagestyle{intro}
 \LIPStitelsida
@@ -337,7 +342,7 @@ PC:n utnyttjar, som omnämnt, en blåtandsmodul.
 \end{small}
 
 \section{C-standard} \label{sec:cstandard}
-Som kodstandard för C används \href{https://www.doc.ic.ac.uk/lab/cplus/cstyle.html}{Recommended C Style and Coding Standards} med några smärre tillägg och ändringar:
+Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
 
 \begin{itemize}
     \item Indenteringar sker med exakt fyra stycken mellanslag.
@@ -350,5 +355,7 @@ Som kodstandard för C används \href{https://www.doc.ic.ac.uk/lab/cplus/cstyle.
 
 \end{appendices}
 
-
+\clearpage
+\addcontentsline{toc}{section}{Referenser} %append references section at this location to TOC
+\printbibliography
 \end{document}
