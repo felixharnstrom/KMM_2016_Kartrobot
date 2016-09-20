@@ -24,6 +24,34 @@
     <marker
        inkscape:stockid="Arrow1Mend"
        orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="marker7283"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path7033"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.4) rotate(180) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="marker7280"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path7030"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.4) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
        refY="0"
        refX="0"
        id="marker9041"
@@ -783,17 +811,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="168.90475"
-     inkscape:cy="209.49035"
+     inkscape:zoom="1.4"
+     inkscape:cx="195.60021"
+     inkscape:cy="96.141852"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g9013"
      showgrid="false"
-     inkscape:window-width="1229"
-     inkscape:window-height="1015"
-     inkscape:window-x="683"
+     inkscape:window-width="1920"
+     inkscape:window-height="1019"
+     inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      showguides="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -807,7 +835,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1070,7 +1098,7 @@
            y="339.65128"
            x="233.86362"
            id="tspan6513-9"
-           sodipodi:role="line">USB-UART/I2C*</tspan></text>
+           sodipodi:role="line">USB-UART (I2C)*</tspan></text>
       <text
          sodipodi:linespacing="125%"
          id="text6511-2-7"
@@ -1082,7 +1110,7 @@
            y="367.80087"
            x="233.86362"
            id="tspan6513-2-3"
-           sodipodi:role="line">UART/I2C*</tspan></text>
+           sodipodi:role="line">UART (I2C)*</tspan></text>
     </g>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.70999998;stroke-miterlimit:4;stroke-dasharray:2.84, 2.84;stroke-dashoffset:0;stroke-opacity:1"
@@ -1469,14 +1497,14 @@
          sodipodi:linespacing="125%"
          id="text7351-9-7-6-1-8-5-5-5"
          y="354.23727"
-         x="190.52892"
+         x="184.32166"
          style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:7.24179649px"
            y="354.23727"
-           x="190.52892"
+           x="184.32166"
            id="tspan7353-5-1-1-7-1-0-9-7"
-           sodipodi:role="line">1USB/2</tspan></text>
+           sodipodi:role="line">1USB (2)</tspan></text>
       <text
          transform="scale(1.0356546,0.96557289)"
          sodipodi:linespacing="125%"
@@ -1581,8 +1609,8 @@
            sodipodi:role="line">Atmega1284</tspan></text>
     </g>
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.70000005;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker6503)"
-       d="m 438.04074,329.40256 0,48.40127"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.821;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.70000005;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker7280);marker-end:url(#marker7283)"
+       d="m 438.04074,329.34748 0,46.72571"
        id="path4688-0"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="300"
@@ -1601,7 +1629,7 @@
            y="339.50507"
            x="405.35715"
            id="tspan6513"
-           sodipodi:role="line">USB-UART/I2C*</tspan></text>
+           sodipodi:role="line">USB-UART (I2C)*</tspan></text>
       <text
          sodipodi:linespacing="125%"
          id="text6511-2"
@@ -1613,7 +1641,7 @@
            y="367.65466"
            x="405.35715"
            id="tspan6513-2"
-           sodipodi:role="line">UART/I2C*</tspan></text>
+           sodipodi:role="line">UART (I2C)*</tspan></text>
     </g>
     <g
        transform="translate(209.30893,0)"
@@ -1623,14 +1651,14 @@
          sodipodi:linespacing="125%"
          id="text7351-9-7-6-1-8-5-5-5-5"
          y="354.23727"
-         x="190.52892"
+         x="184.91016"
          style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:7.24179649px"
            y="354.23727"
-           x="190.52892"
+           x="184.91016"
            id="tspan7353-5-1-1-7-1-0-9-7-9"
-           sodipodi:role="line">1USB/2</tspan></text>
+           sodipodi:role="line">1USB (2)</tspan></text>
       <text
          transform="scale(1.0356546,0.96557289)"
          sodipodi:linespacing="125%"
@@ -1802,25 +1830,25 @@
       <text
          sodipodi:linespacing="125%"
          id="text8027"
-         y="525.85107"
+         y="530.97986"
          x="366.28198"
          style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:7.5px"
-           y="525.85107"
+           y="530.97986"
            x="366.28198"
            id="tspan8029"
            sodipodi:role="line">Trigger</tspan><tspan
            id="tspan8031"
            style="font-size:7.5px"
-           y="535.22607"
+           y="540.35486"
            x="366.28198"
            sodipodi:role="line">+echo</tspan><tspan
            id="tspan9011"
            style="font-size:7.5px"
-           y="544.60107"
+           y="549.72986"
            x="366.28198"
-           sodipodi:role="line">(avbrott)</tspan></text>
+           sodipodi:role="line" /></text>
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.98900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker7029-9-4-4);marker-end:url(#marker6588-9-2-7-8-5)"
@@ -1931,7 +1959,7 @@
          x="442.80017"
          y="535.552"
          style="font-size:7.5px"
-         id="tspan9370">UART**</tspan><tspan
+         id="tspan9370">PWM (I2C)**</tspan><tspan
          sodipodi:role="line"
          x="442.80017"
          y="544.927"

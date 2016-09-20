@@ -226,9 +226,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="331.23496"
-     inkscape:cy="393.44888"
+     inkscape:zoom="1.4"
+     inkscape:cx="269.35698"
+     inkscape:cy="411.24364"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -264,14 +264,14 @@
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="277.28275"
-       y="533.39667"
+       y="520.638"
        id="text6511-2-7"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan6513-2-3"
          x="277.28275"
-         y="533.39667"
-         style="font-size:7.5px">UART/I2C*</tspan></text>
+         y="520.638"
+         style="font-size:7.5px">UART (I2C)*</tspan></text>
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.70999998;stroke-miterlimit:4;stroke-dasharray:2.84, 2.84;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4290-85"
@@ -635,21 +635,21 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.96390736px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 269.47849,532.41067 5.02412,-2.47677"
+       d="m 269.47849,519.44108 5.02412,-2.47677"
        id="path7304-7-2-9-1-9-6-2-8"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="254.37665"
-       y="553.85309"
+       y="539.36639"
        id="text7351-9-7-6-1-8-5-5-4"
        sodipodi:linespacing="125%"
        transform="scale(1.0356546,0.96557289)"><tspan
          sodipodi:role="line"
          id="tspan7353-5-1-1-7-1-0-9-1"
          x="254.37665"
-         y="553.85309"
+         y="539.36639"
          style="font-size:7.24179649px">2</tspan></text>
     <path
        style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:"
@@ -792,7 +792,9 @@
        x="208.84731"
        y="466.92676"
        id="text10120-3"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan10122-6"
          x="208.84731"
