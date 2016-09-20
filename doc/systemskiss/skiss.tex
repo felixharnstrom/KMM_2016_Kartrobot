@@ -79,6 +79,7 @@
 \input{LIPS.tex}
 
 \begin{document}
+
 \pagestyle{intro}
 \LIPStitelsida
 \clearpage
@@ -232,7 +233,7 @@ En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhe
 % Alternativ 3: Stepper motor med driver.
 
 \subsubsection{Hjulmotorer}
-Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \href{https://docs.isy.liu.se/pub/VanHeden/DataSheets/terminator_prel.pdf}{Terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
+Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \cite{terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
 %TODO: Databladet säger att motorerna jobbar med 7.2V. Är det vad ingångarna tar, eller bara en strömkälla som ligger på sidan? Om det förstnämnda: skriv att vi kräver en step-up krets.
 
 \subsection{Mjukvara}
@@ -267,7 +268,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 Då detta delsystem har han om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
 
 \subsection{Mjukvara}
-Koden ska vara skriven i Python 3, och ska följa kodstandarden \href{https://www.python.org/dev/peps/pep-0008/}{PEP 8}.
+Koden ska vara skriven i Python 3, och ska följa kodstandarden \cite{pep8}.
 
 \subsubsection{Kommunikation}
 Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan de. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
