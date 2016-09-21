@@ -118,7 +118,6 @@ I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det
 
 \newpage
 \section{Översikt av systemet}
-% TODO: Blockschema, identifiera delsystem och gränssnitt, modularitet och uppgraderbarhet
 Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med extern hårdvara tillhörande varje modul. Ett mer detaljerat blockschema finns till varje modul, samt i figur \ref{fig:modulesDetailed}.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
@@ -128,7 +127,6 @@ Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \
 
 \newpage
 \section{Delsystem 1 - Sensorenhet}
-% TODO: Ska vi ha en pil till hjärnan? Är väl nån slags tvåvägskommunikation med uart/i2c, även om det inte skickas nån vettig data.
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
@@ -142,7 +140,7 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \end{small}
 \subsection{Hårdvara}
 
-\subsubsection{Processor} %TODO: Minst 4 interrupts, fråga handledare. Kan vi ha flera uarts?
+\subsubsection{Processor}
 ATmega1284 används som processormodell, då den både är relativt kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
 
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
@@ -195,7 +193,6 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 
 \newpage
 \section{Delsystem 2 - Styrenhet} \label{sec:system2}
-% TODO: Input till sensorenhet
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
@@ -228,7 +225,6 @@ En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhe
 
 \subsubsection{Hjulmotorer}
 Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \cite{terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
-%TODO: Databladet säger att motorerna jobbar med 7.2V. Är det vad ingångarna tar, eller bara en strömkälla som ligger på sidan? Om det förstnämnda: skriv att vi kräver en step-up krets.
 
 \subsection{Mjukvara}
 
