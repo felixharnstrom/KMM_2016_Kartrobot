@@ -78,271 +78,270 @@
 \addbibresource{bibliography.bib}
 \input{LIPS.tex}
 \begin{document}
-    \pagestyle{intro}
-    \LIPStitelsida
-    \clearpage
-    \begin{LIPSprojektidentitet}
-        \LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
-        \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
-        \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
-        \LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
-        \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
-        \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
-    \end{LIPSprojektidentitet}
-    \clearpage
-    \renewcommand{\familydefault}{\sfdefault}	%Sans-serif
-    \normalfont
-    \tableofcontents
-    \renewcommand{\familydefault}{\rmdefault}	%Back to serifs
-    \normalfont
-    \clearpage
-    \begin{LIPSdokumenthistorik}
-        \LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{}{}
-    \end{LIPSdokumenthistorik}
-    \clearpage
-    \setcounter{page}{1}
-    \pagestyle{content}
-    \section{Beställare}
-    Beställare är Mattias Kryssander från ISY vid Linköpings universitet.
-    
-    \section{Översiktlig beskrivning av projektet}
-    \subsection{Syfte och mål}
-    Projektet mål är att utefter givet projektdirektiv och med beställaren överenskommen kravspecifikation utveckla en robot som kan genomsöka och kartlägga ett enkelt rum. Utöver roboten ska en medföljande PC-mjukvara levereras som kan styra roboten och visa realtidsdata såsom diagnostik och kartan över rummet.
-    
-    \subsection{Leveranser}
-    \begin{flushleft}
-        \begin{LIPSleveransplan}
-            \LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Första version av projektplan, tidsplan, och systemskiss}{2016-09-22}
-            \LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Slutgiltig version av projektplan, tidsplan, och systemskiss}{2016-09-30}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 1.}{2016-10-31}
-            \LIPSplaneradleverans{Designspecifikation}{MV, HV}{Första version av designspecifikationen.}{2016-11-01}
-            \LIPSplaneradleverans{Designspecifikation}{MV, HV}{Slutgiltig version av designspecifikation.}{2016-11-04}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 2.}{2016-11-7}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 3.}{2016-11-14}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 4.}{2016-11-21}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 5.}{2016-11-28}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 6.}{2016-12-5}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 7.}{2016-12-12}
-            \LIPSplaneradleverans{Teknisk dokumentation och användarhandledning}{DOK}{Teknisk dokumentation och användarhandledning ska vara inlämnad.}{3 arbetsdagar före redovisning.}
-            \LIPSplaneradleverans{Verifiering av kraven (BP5).}{TST}{Tillsammans med beställaren fattas beslut huruvida projektet har nått målet.}{Senast dagen innan redovisning.}
-            \LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 8.}{2016-12-19}
-            \LIPSplaneradleverans{Slutpresentation}{PL}{Muntlig presentation av projektet.}{2016-12-19}
-            \LIPSplaneradleverans{Tävlingsdeltagande}{PL}{Tävla mot andra robotar som har byggts i kursen.}{2016-12-20}
-            \LIPSplaneradleverans{Efterstudie}{PL}{Efterstudie ska lämnas till beställaren.}{2016-12-21}
-            \LIPSplaneradleverans{Källkod}{MV}{Källkod ska lämnas till beställaren.}{2016-12-21}
-            \LIPSplaneradleverans{Utrustning}{HV}{All utrustning ska återlämnas.}{2016-12-22}
-        \end{LIPSleveransplan}
-    \end{flushleft}
-    
-    \subsection{Begränsningar}
-    Produkten är vid slutleverans begränsad till de krav som är formulerade i den senaste versionen av kravspecifikationen. Kravspecifikationen kan inte uppdateras utan överrenskommelse med beställaren.
-    
-    \section{Fasplan}
-    \subsection{Före projektstart}
-    Innan påbörjad projektstart ska en kravspecifikation tas fram med utgång i projektdirektivet. Ansvarsområden ska bestämmas internt inom projektgruppen. Projektgruppen ska producera en projektplan, tidsplan, samt systemskiss utefter givna resurser.
-    
-    \subsection{Under projektet}
-    I början av denna fas ska en designspecifikation tas fram och godkännas av beställare. Under projektets gång ska projektgruppen utgå från designspecifikationen och se till att överenskomna leveranser sker tidsenligt. Projektet ska utföras enligt LIPS-modellen.
-    
-    \subsection{Efter projektet}
-    Efter beslutspunkt 5 ska produkten levereras med tillhörande dokumentation. Beställaren utför acceptanstest i samband med en tävling där alla robotar som har producerats utefter samma projektdirektiv ska ställa upp. En efterstudie ska levereras.
-    
-    
-    \section{Organisationsplan för hela projektet}
-    Projektgruppen och utomstående resurser är organiserade såsom beskrivet i figur \ref{fig:org}. Utöver denna grova organisationsplan kan projektgruppen bilda interna arbetsgrupper vid behov.
-    
-    \begin{figure}[h!]
-        \centering
-        \includegraphics[scale=1]{organisation.png}
-        \caption{Översiktlig projektorganisation.}
-        \label{fig:org}
-    \end{figure}
-    
-    \subsection{Villkor för samarbetet inom projektgruppen}
-    Följande punkter har beslutats gemensamt av projektgruppen och ska anses vara riktlinjer för hur samarbetet inom gruppen ska ske. Övriga frågor ska tas upp internt på gruppmöten.
-    
-    \begin{itemize}
-        \item Deltagarna i gruppen ska gemensamt göra upp ordningsregler för gruppen om tider, närvaro, förberedelser, etc.
-        \item Alla deltagare i gruppen ska delta vid de tillfällen som gruppen kommit överens om.
-        \item Alla deltagare i gruppen ska komma väl förberedda till möten och dylikt, i den mån att det är nödvändigt för gruppens fortsatta arbete.
-        \item Alla deltagare i gruppen förväntas självständigt kommunicera med övriga gruppmedlemmar och arbetsgrupper för att underlätta sina egna och övrigas arbetsuppgifter.
-        \item Alla deltagare i gruppen ska ha en professionell inställning till arbetet som ska utföras.
-        \item Alla deltagare i gruppen kan ta upp interpersonella konflikter och frågor på möten för att säkerställa ett hälsosamt samarbete.
-        \item Problem med deltagare som inte bidrar till det gemensamma arbetet ska i första hand lösas internt, men kan vidarebefordras till kurspersonal om problemet kvarstår.
-        \item Alla deltagare i gruppen ska vara öppna för konstruktiv kritik.
-        \item Grupparbetet ska prioritera intresse framför resultat. En gruppmedlem ska inte vara tvingad att arbeta med någon visst område enbart för att vederbörande är den bäst lämpade för arbetet.
-        \item Vid schemalagda arbetstillfällen och projektmöten ska 'akademisk kvart' tillämpas.
-        \item Alla deltagare i gruppen har möjlighet att jobba hemifrån utefter eget schema efter samröre med berörda gruppmedlemmar.
-        \item Alla deltagare i gruppen ska vara kontaktbara under schemalagd arbetstid.
-    \end{itemize}
-    
-    \subsection{Definition av arbetsinnehåll och ansvar}
-    
-    %TODO gör fint
-    Testansvarig tester utförs, bra tester, pappersarbete runt tester (mjukvara, hårdvara, system i helhet). Samarbetar med hårdvaru/mjukvara. Ser till att folk rapporterar problem till resten av gruppen.
-    
-    Designansvarig att det vi designar följer kvalitet, standarder följs.
-    -Mjukvaru att det finns resurser för att få reda på hur man gör
-    -Vaktar hårdvaran från industrikonkurrenter. Med svärd.
-    -Samarbetaar med testansvarig kring tester
-    
-    DOK att följer lipsnallar. Att dokument skrivs, protokoll förs, skrivregler följs.
-    
-    Leveransansvarig har koll så tidsplan följs. Man måste snacka med denna om man vill ta tid från buffert.
-    
-    projektledarn får äran, hängs om det misslyckas. Möjligen drawn and quartered. Föra dialog mellan beställare och handledare, gruppen samarbetar, har sista ordet, att alla har arbetsuppgifter, möten sker.
-    
-    \section{Dokumentplan}
-    \label{sec:doc_plan}
-    % TODO: Enbart gruppmedlemmar ska ha access till dokument? Vad om de som delas med beställare?
-    % Kan tycka att den parantesen är onödig.
-    Dokument ska i största möjliga mån följa tillgängliga LIPS-mallar. Dokumentansvarig är i fall där LIPS-mall saknas ansvarig för att skapa eller i övrigt godkänna dokumentmallar vid behov. Dokument ska lagras på sådant sätt att alla gruppmedlemmar (och enbart dessa) har tillgång till alla dokument över internet. Alla dokument ska skrivas på svenska, men teknisk dokumentation i källkod bör skrivas på engelska. 
-    
-    Dokument ska revisionsnumreras på formatet \textit{\textless version\textgreater .\textless utgåva\textgreater}, där versionsnummer under 0 ska anses vara interna utkast, och version 1 är redo för leverans eller arkivering beroende på dokumenttyp. Att tilldela ett nytt versionsnummer innebär stora förändringar till dokumentets väsentliga innehåll. Utgåvenumret betecknar mindre förändringar som inte ändrar dokumentets väsentliga innehåll. Alla nya revisioner efter 1.0 av dokument som ska levereras till beställare måste göras i samröre med denne.
-    
-    Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar följer de språkregler som gäller för dokumentspråket såsom beskrivet i tabell \ref{tab:documents}. För svenska gäller språkreglerna såsom beskrivna i \citetitle{Sprakradet2008} (\cite{Sprakradet2008}). För dokument som skrivs på engelska hänvisas till \citetitle{Ritter2003} (\cite{Ritter2003}).
-    
-    %TODO Table detailing all project documentation
-    \label{tab:documents}
-    \section{Utvecklingsmetodik}
-    
-    %TODO förfina
-    Håll light, ingen speciell metodik. Använd inte hardcore-OO pga python, håll gärna funktioner rena. Skriv test suites.
-    
-    \section{Utbildningsplan}
-    \subsection{Egen utbildning}
-    Alla gruppmedlemmar ska genomföra en laboration i mätteknik, vilket innefattar att lära sig att använda en logikanalysator. Utöver detta förväntas alla gruppmedlemmar egenhändigt söka upp den kunskap och utbildning som krävs för att utföra sina tilldelade arbetsuppgifter.
-    
-    \section{Rapporteringsplan}
-    
-    \section{Mötesplan}
-    För alla möten gäller att projektledaren kallar till möte efter samråd om tillfälle med övriga gruppmedlemmar. Mötesprotokoll ska föras utefter LIPS-mallen. Alla gruppmedlemmar kan föra protokoll, men mötesprotokoll måste godkännas av projektledare eller dokumentansvarig.
-    
-    Regelbundna projektmöten ska ske veckovis, företrädesvis i början av varje vecka. Vid dessa möten ska den gångna veckans arbete redovisas och utvärderas. Vidare ska en plan för grupparbetet fram tills nästa möte beslutas. Dessa möten ska hållas korta, helst under en timme per mötestillfälle. 
-    
-    Utöver dessa projektmöten kan alla gruppmedlemmar föreslå möten vid behov. Dessa möten kan exempelvis handla om att fånga upp problem så tidigt som möjligt, eller göra en funktionalitets- eller kodgenomgång.
-    
-    \section{Resursplan}
-    Här beskrivs vilka personer som jobbar med projektet, samt deras uppgifter. Även ekonomi, lokaler, samt nödvändigt materiel kommer att behandlas i detta kapitel.
-    
-    \subsection{Personer}
-    Projektmedlemmarna:
-    \begin{itemize}
-        \item Felix Härnström, Projektledare (PL)
-        \item Emil Norberg, Dokumentansvarig (DOK)
-        \item Hannes Haglund, Designansvarig mjukvara (MV)
-        \item Daniel Månsson, Designansvarig hårdvara (HV)
-        \item Silas Lenz, Testansvarig (TST)
-        \item Jani Jokinen, Leveransansvarig (LEV)
-    \end{itemize}
-    Hannes Haglund kommer att vara bortrest under sista veckan av projektet, från och med den 20:e.
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+	\LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
+	\LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+	\LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
+	\LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
+	\LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
+	\LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+\clearpage
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\tableofcontents
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\clearpage
+\begin{LIPSdokumenthistorik}
+	\LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{}{}
+\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+\section{Beställare}
+Beställare är Mattias Kryssander från ISY vid Linköpings universitet.
 
-    Schemalagd tid är prioriterat för arbete och samtliga deltagare är upptagna under andra kursers föreläsningar och moment.
-    
-    Handledaren för projektet är \LIPShandledare , som under projektets gång kommer vara tillgänglig för rådgivning. Projektgruppen kommer träffa handledaren mindre i början och mer i slutet av projektet.
-    
-    Beställaren för projektet är  Mattias Kryssander på ISY, Linköpings Universitet. Mattias kommer att delta vid alla beslutspunkter.
-    
-    \subsection{Materiel}
-    Beställaren förser den hård- och mjukvara som krävs för att genomföra projektet. Gruppen kan i samröre med beställare göra förfrågan om att införskaffa ytterligare materiel. 
-    
-    Följande materiel behövs för att konstruera roboten enligt systemskissen:
-    % TODO: Glöm inte fixa listan här!
-    %\begin{itemize}
-    %	\item 1st Raspberry Pi 3
-    %	\item 2st ATmega1284
-    %	\item 1st LIDAR-lite v2
-    %
-    %	\item 4st SRF04
-    %	\item 1st AX12-A
-    %	\item 2st brytare
-    %	\item Dator
-    %	\item Robotplattform med hjul, motorer och batteri.
-    %	
-    %	\item 1st LSM9DS0
-    %\end{itemize}
-    
-    \subsection{Lokaler}
-    Gruppen har tillgång till minst en arbetsstation i laborationsytan MUXEN och där kan vid behov samtliga 6 medlemmar jobba. Vid behov kan även grupplokaler bokas kostnadsfritt på universitetet.
-    
-    \subsection{Ekonomi}
-    Gruppen ska efter beslutspunkt 2 arbeta totalt 960 timmar, då 160 timmar per person. Genomfört arbete ska redovisas veckovis till beställaren. Alla monetära utgifter står Linköpings Universitet för.
-    
-    \section{Milstolpar och beslutspunkter}
-    I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
-    
-    \subsection{Milstolpar}
-    \begin{itemize}
-        \item Gränssnittet mellan sensorer och moduler klart
-        \item PC-mjukvara klart
-        \item Köralgoritm klart
-        \item Gyrot klart och fungerande
-        \item Testning av alla system
-    \end{itemize}
-    
-    \subsection{Beslutspunkter}
-    \begin{flushleft}
-        \begin{LIPSbeslutspunkter}
-            \LIPSbp{0}{Godkännande av projektet, beslut startar förstudie}{2016-09-01}
-            \LIPSbp{1}{Godkännande av kravspecifikation, beslut startar förberedelsefasen}{2016-09-13}
-            \LIPSbp{2}{Godkännande av projektplan, tidsplan och systemskiss, beslut startar utförandefasen}{2016-09-30}
-            \LIPSbp{3}{Godkännande av designspecifikation, beslut att fortsätta utförandefasen}{2016-11-04}
-            \LIPSbp{4}{Används ej}{}
-            \LIPSbp{5}{Verifiering av kraven, samt godkännande av produktens funktionalitet, beslut leder till leveransfasen}{Senast en dag innan presentation}
-            \LIPSbp{6}{Godkännande av produktleverans, samt presentation och demonstration, leder till beslut att upplösa projektgruppen}{Vecka 51}
-        \end{LIPSbeslutspunkter}
-    \end{flushleft}
-    
-    \section{Aktiviteter}
-    % TODO: Fyll i mig!
-    
-    \section{Tidplan}
-    % TODO: Fyll i mig!
+\section{Översiktlig beskrivning av projektet}
+\subsection{Syfte och mål}
+Projektet mål är att utefter givet projektdirektiv och med beställaren överenskommen kravspecifikation utveckla en robot som kan genomsöka och kartlägga ett enkelt rum. Utöver roboten ska en medföljande PC-mjukvara levereras som kan styra roboten och visa realtidsdata såsom diagnostik och kartan över rummet.
 
-    \section{Förändringsplan}
-    % TODO: Kanske nämna leveransansvarigs roll i detta
-    Om projektet inte kan hålla den fastslagna tidsplanen ska tidsplanen revideras och projektgruppen ska ta interna åtgärder för att säkerställa tidsenliga leveranser trots förseningen. Beslut om reviderad tidsplan ska ske vid varje veckomöte. Om en försening riskerar att försena en leverans ska detta diskuteras med beställaren.
-    
-    \section{Kvalitetsplan}
-    I denna sektion beskrivs rutiner gällande granskningar av dokument och tester som ska utföras på den hård- och mjukvara som produceras under projektets gång. Dessa aktiviteter ska utföras löpande under projektets gång för att minimera oförutsedda problem.
-    
-    \subsection{Granskningar}
-    Alla dokument som ska levereras till beställare ska granskas av någon annan gruppmedlem än dokumentets redaktör såsom specificerat i sektion \ref{sec:doc_plan}. I första hand ska granskningen utföras av en gruppmedlem som har arbetat med sakfrågan som beskrivs i dokumentet.
-    
-    \subsection{Testplan}
-    Alla gruppmedlemmar är ansvariga för att själva utföra enhetstester på all hård- och mjukvara som denne producerar. Testansvarig är ansvarig för att detta efterföljs och att det finns rimliga testprotokoll för alla delar av projektet. Testansvarig ska också säkerställa att det finns rutiner för hur misslyckade tester ska utvärderas och rapporteras. Testansvarig ska i samarbete med hårdvaruansvarig och mjukvaruansvarig utforma relevant integrationstestspecifikation och systemtestspecifikation.
-    
-    \section{Riskanalys}
-    Under ett projekt finns det alltid oförutsedda händelser som kan leda till förseningar. I detta kapitel nämns några sådana händelser, hur sannolika de är, och vilken påverkan dee skulle ha på projektet.
+\subsection{Leveranser}
+\begin{flushleft}
+	\begin{LIPSleveransplan}
+		\LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Första version av projektplan, tidsplan, och systemskiss}{2016-09-22}
+		\LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Slutgiltig version av projektplan, tidsplan, och systemskiss}{2016-09-30}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 1.}{2016-10-31}
+		\LIPSplaneradleverans{Designspecifikation}{MV, HV}{Första version av designspecifikationen.}{2016-11-01}
+		\LIPSplaneradleverans{Designspecifikation}{MV, HV}{Slutgiltig version av designspecifikation.}{2016-11-04}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 2.}{2016-11-7}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 3.}{2016-11-14}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 4.}{2016-11-21}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 5.}{2016-11-28}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 6.}{2016-12-5}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 7.}{2016-12-12}
+		\LIPSplaneradleverans{Teknisk dokumentation och användarhandledning}{DOK}{Teknisk dokumentation och användarhandledning ska vara inlämnad.}{3 arbetsdagar före redovisning.}
+		\LIPSplaneradleverans{Verifiering av kraven (BP5).}{TST}{Tillsammans med beställaren fattas beslut huruvida projektet har nått målet.}{Senast dagen innan redovisning.}
+		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 8.}{2016-12-19}
+		\LIPSplaneradleverans{Slutpresentation}{PL}{Muntlig presentation av projektet.}{2016-12-19}
+		\LIPSplaneradleverans{Tävlingsdeltagande}{PL}{Tävla mot andra robotar som har byggts i kursen.}{2016-12-20}
+		\LIPSplaneradleverans{Efterstudie}{PL}{Efterstudie ska lämnas till beställaren.}{2016-12-21}
+		\LIPSplaneradleverans{Källkod}{MV}{Källkod ska lämnas till beställaren.}{2016-12-21}
+		\LIPSplaneradleverans{Utrustning}{HV}{All utrustning ska återlämnas.}{2016-12-22}
+	\end{LIPSleveransplan}
+\end{flushleft}
 
-    %% TODO borde vara en tabell och det borde finnas fler risker
-    Händelse sannorlighet risk
-    En medlem blir sjuk 4 1
-    En algoritm inte fungerar som önskat 4 3
-    En sensor går sönder eller fungerar inte 2 3
-    En motor går sönder eller fungerar inte 2 4
-    En processor går sönder eller fungerar inte 2 5
-    Delarna inte kommer fram i tid 1 3
-    
-    
-    \section{Prioriteringar}
-    Ifall det märks att tiden inte räcker till har det blivit beslutat att prioritera moment i följande ordning: (Där 1 har högsta prioritering och 6 har lägsta prioritering).
-    
-    \begin{enumerate}
-        \item Färdigt v 51
-        \item Funktionalitet
-        \item Kostnad
-        \item Resurser
-        \item Kvalitet
-        \item Estetiskt utseénde
-    \end{enumerate}
-    
-    \section{Projektavslut}
-    Projektet avslutas med en presentation av vår kartrobot, samt uppvisning av den i form av ett tävlingsdeltagande. Därefter ska allt material återlämnas till handledare. Dokumentationen ska lämnas till Linköpings Universitet för förvaring, samt ska alla medlemmar i gruppen få egna kopior för privat förvaring. När projektet är avslutat ska det utvärderas inom gruppen, innan gruppen officielt upplöses.
-    
-    \begin{appendices}
-    \end{appendices}
-    \clearpage
-    \addcontentsline{toc}{section}{Referenser}	%append references section at this location to TOC
-    \printbibliography
+\subsection{Begränsningar}
+Produkten är vid slutleverans begränsad till de krav som är formulerade i den senaste versionen av kravspecifikationen. Kravspecifikationen kan inte uppdateras utan överrenskommelse med beställaren.
+
+\section{Fasplan}
+\subsection{Före projektstart}
+Innan påbörjad projektstart ska en kravspecifikation tas fram med utgång i projektdirektivet. Ansvarsområden ska bestämmas internt inom projektgruppen. Projektgruppen ska producera en projektplan, tidsplan, samt systemskiss utefter givna resurser.
+
+\subsection{Under projektet}
+I början av denna fas ska en designspecifikation tas fram och godkännas av beställare. Under projektets gång ska projektgruppen utgå från designspecifikationen och se till att överenskomna leveranser sker tidsenligt. Projektet ska utföras enligt LIPS-modellen.
+
+\subsection{Efter projektet}
+Efter beslutspunkt 5 ska produkten levereras med tillhörande dokumentation. Beställaren utför acceptanstest i samband med en tävling där alla robotar som har producerats utefter samma projektdirektiv ska ställa upp. En efterstudie ska levereras.
+
+
+\section{Organisationsplan för hela projektet}
+Projektgruppen och utomstående resurser är organiserade såsom beskrivet i figur \ref{fig:org}. Utöver denna grova organisationsplan kan projektgruppen bilda interna arbetsgrupper vid behov.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{organisation.png}
+	\caption{Översiktlig projektorganisation.}
+	\label{fig:org}
+\end{figure}
+
+\subsection{Villkor för samarbetet inom projektgruppen}
+Följande punkter har beslutats gemensamt av projektgruppen och ska anses vara riktlinjer för hur samarbetet inom gruppen ska ske. Övriga frågor ska tas upp internt på gruppmöten.
+
+\begin{itemize}
+	\item Deltagarna i gruppen ska gemensamt göra upp ordningsregler för gruppen om tider, närvaro, förberedelser, etc.
+	\item Alla deltagare i gruppen ska delta vid de tillfällen som gruppen kommit överens om.
+	\item Alla deltagare i gruppen ska komma väl förberedda till möten och dylikt, i den mån att det är nödvändigt för gruppens fortsatta arbete.
+	\item Alla deltagare i gruppen förväntas självständigt kommunicera med övriga gruppmedlemmar och arbetsgrupper för att underlätta sina egna och övrigas arbetsuppgifter.
+	\item Alla deltagare i gruppen ska ha en professionell inställning till arbetet som ska utföras.
+	\item Alla deltagare i gruppen kan ta upp interpersonella konflikter och frågor på möten för att säkerställa ett hälsosamt samarbete.
+	\item Problem med deltagare som inte bidrar till det gemensamma arbetet ska i första hand lösas internt, men kan vidarebefordras till kurspersonal om problemet kvarstår.
+	\item Alla deltagare i gruppen ska vara öppna för konstruktiv kritik.
+	\item Grupparbetet ska prioritera intresse framför resultat. En gruppmedlem ska inte vara tvingad att arbeta med någon visst område enbart för att vederbörande är den bäst lämpade för arbetet.
+	\item Vid schemalagda arbetstillfällen och projektmöten ska 'akademisk kvart' tillämpas.
+	\item Alla deltagare i gruppen har möjlighet att jobba hemifrån utefter eget schema efter samröre med berörda gruppmedlemmar.
+	\item Alla deltagare i gruppen ska vara kontaktbara under schemalagd arbetstid.
+\end{itemize}
+
+\subsection{Definition av arbetsinnehåll och ansvar}
+
+Testansvarig tester utförs, bra tester, pappersarbete runt tester (mjukvara, hårdvara, system i helhet). Samarbetar med hårdvaru/mjukvara. Ser till att folk rapporterar problem till resten av gruppen.
+
+Designansvarig att det vi designar följer kvalitet, standarder följs.
+-Mjukvaru att det finns resurser för att få reda på hur man gör
+-Vaktar hårdvaran från industrikonkurrenter. Med svärd.
+-Samarbetaar med testansvarig kring tester
+
+DOK att följer lipsnallar. Att dokument skrivs, protokoll förs, skrivregler följs.
+
+Leveransansvarig har koll så tidsplan följs. Man måste snacka med denna om man vill ta tid från buffert.
+
+projektledarn får äran, hängs om det misslyckas. Möjligen drawn and quartered. Föra dialog mellan beställare och handledare, gruppen samarbetar, har sista ordet, att alla har arbetsuppgifter, möten sker.
+
+\section{Dokumentplan}
+\label{sec:doc_plan}
+% TODO: Enbart gruppmedlemmar ska ha access till dokument? Vad om de som delas med beställare?
+% Kan tycka att den parantesen är onödig.
+Dokument ska i största möjliga mån följa tillgängliga LIPS-mallar. Dokumentansvarig är i fall där LIPS-mall saknas ansvarig för att skapa eller i övrigt godkänna dokumentmallar vid behov. Dokument ska lagras på sådant sätt att alla gruppmedlemmar (och enbart dessa) har tillgång till alla dokument över internet. Alla dokument ska skrivas på svenska, men teknisk dokumentation i källkod bör skrivas på engelska. 
+
+Dokument ska revisionsnumreras på formatet \textit{\textless version\textgreater .\textless utgåva\textgreater}, där versionsnummer under 0 ska anses vara interna utkast, och version 1 är redo för leverans eller arkivering beroende på dokumenttyp. Att tilldela ett nytt versionsnummer innebär stora förändringar till dokumentets väsentliga innehåll. Utgåvenumret betecknar mindre förändringar som inte ändrar dokumentets väsentliga innehåll. Alla nya revisioner efter 1.0 av dokument som ska levereras till beställare måste göras i samröre med denne.
+
+Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar följer de språkregler som gäller för dokumentspråket såsom beskrivet i tabell \ref{tab:documents}. För svenska gäller språkreglerna såsom beskrivna i \citetitle{Sprakradet2008} (\cite{Sprakradet2008}). För dokument som skrivs på engelska hänvisas till \citetitle{Ritter2003} (\cite{Ritter2003}).
+
+%TODO Table detailing all project documentation
+\label{tab:documents}
+\section{Utvecklingsmetodik}
+
+%TODO förfina
+Håll light, ingen speciell metodik. Använd inte hardcore-OO pga python, håll gärna funktioner rena. Skriv test suites.
+
+\section{Utbildningsplan}
+\subsection{Egen utbildning}
+Alla gruppmedlemmar ska genomföra en laboration i mätteknik, vilket innefattar att lära sig att använda en logikanalysator. Utöver detta förväntas alla gruppmedlemmar egenhändigt söka upp den kunskap och utbildning som krävs för att utföra sina tilldelade arbetsuppgifter.
+
+\section{Rapporteringsplan}
+
+\section{Mötesplan}
+För alla möten gäller att projektledaren kallar till möte efter samråd om tillfälle med övriga gruppmedlemmar. Mötesprotokoll ska föras utefter LIPS-mallen. Alla gruppmedlemmar kan föra protokoll, men mötesprotokoll måste godkännas av projektledare eller dokumentansvarig.
+
+Regelbundna projektmöten ska ske veckovis, företrädesvis i början av varje vecka. Vid dessa möten ska den gångna veckans arbete redovisas och utvärderas. Vidare ska en plan för grupparbetet fram tills nästa möte beslutas. Dessa möten ska hållas korta, helst under en timme per mötestillfälle. 
+
+Utöver dessa projektmöten kan alla gruppmedlemmar föreslå möten vid behov. Dessa möten kan exempelvis handla om att fånga upp problem så tidigt som möjligt, eller göra en funktionalitets- eller kodgenomgång.
+
+\section{Resursplan}
+Här beskrivs vilka personer som jobbar med projektet, samt deras uppgifter. Även ekonomi, lokaler, samt nödvändigt materiel kommer att behandlas i detta kapitel.
+
+\subsection{Personer}
+Projektmedlemmarna:
+\begin{itemize}
+	\item Felix Härnström, Projektledare (PL)
+	\item Emil Norberg, Dokumentansvarig (DOK)
+	\item Hannes Haglund, Designansvarig mjukvara (MV)
+	\item Daniel Månsson, Designansvarig hårdvara (HV)
+	\item Silas Lenz, Testansvarig (TST)
+	\item Jani Jokinen, Leveransansvarig (LEV)
+\end{itemize}
+Hannes Haglund kommer att vara bortrest under sista veckan av projektet, från och med den 20:e.
+
+Schemalagd tid är prioriterat för arbete och samtliga deltagare är upptagna under andra kursers föreläsningar och moment.
+
+Handledaren för projektet är \LIPShandledare , som under projektets gång kommer vara tillgänglig för rådgivning. Projektgruppen kommer träffa handledaren mindre i början och mer i slutet av projektet.
+
+Beställaren för projektet är  Mattias Kryssander på ISY, Linköpings Universitet. Mattias kommer att delta vid alla beslutspunkter.
+
+\subsection{Materiel}
+Beställaren förser den hård- och mjukvara som krävs för att genomföra projektet. Gruppen kan i samröre med beställare göra förfrågan om att införskaffa ytterligare materiel. 
+
+Följande materiel behövs för att konstruera roboten enligt systemskissen:
+% TODO: Glöm inte fixa listan här!
+%\begin{itemize}
+%	\item 1st Raspberry Pi 3
+%	\item 2st ATmega1284
+%	\item 1st LIDAR-lite v2
+%
+%	\item 4st SRF04
+%	\item 1st AX12-A
+%	\item 2st brytare
+%	\item Dator
+%	\item Robotplattform med hjul, motorer och batteri.
+%	
+%	\item 1st LSM9DS0
+%\end{itemize}
+
+\subsection{Lokaler}
+Gruppen har tillgång till minst en arbetsstation i laborationsytan MUXEN och där kan vid behov samtliga 6 medlemmar jobba. Vid behov kan även grupplokaler bokas kostnadsfritt på universitetet.
+
+\subsection{Ekonomi}
+Gruppen ska efter beslutspunkt 2 arbeta totalt 960 timmar, då 160 timmar per person. Genomfört arbete ska redovisas veckovis till beställaren. Alla monetära utgifter står Linköpings Universitet för.
+
+\section{Milstolpar och beslutspunkter}
+I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
+
+\subsection{Milstolpar}
+\begin{itemize}
+	\item Gränssnittet mellan sensorer och moduler klart
+	\item PC-mjukvara klart
+	\item Köralgoritm klart
+	\item Gyrot klart och fungerande
+	\item Testning av alla system
+\end{itemize}
+
+\subsection{Beslutspunkter}
+\begin{flushleft}
+	\begin{LIPSbeslutspunkter}
+		\LIPSbp{0}{Godkännande av projektet, beslut startar förstudie}{2016-09-01}
+		\LIPSbp{1}{Godkännande av kravspecifikation, beslut startar förberedelsefasen}{2016-09-13}
+		\LIPSbp{2}{Godkännande av projektplan, tidsplan och systemskiss, beslut startar utförandefasen}{2016-09-30}
+		\LIPSbp{3}{Godkännande av designspecifikation, beslut att fortsätta utförandefasen}{2016-11-04}
+		\LIPSbp{4}{Används ej}{}
+		\LIPSbp{5}{Verifiering av kraven, samt godkännande av produktens funktionalitet, beslut leder till leveransfasen}{Senast en dag innan presentation}
+		\LIPSbp{6}{Godkännande av produktleverans, samt presentation och demonstration, leder till beslut att upplösa projektgruppen}{Vecka 51}
+	\end{LIPSbeslutspunkter}
+\end{flushleft}
+
+\section{Aktiviteter}
+% TODO: Fyll i mig!
+
+\section{Tidplan}
+% TODO: Fyll i mig!
+
+\section{Förändringsplan}
+% TODO: Kanske nämna leveransansvarigs roll i detta
+Om projektet inte kan hålla den fastslagna tidsplanen ska tidsplanen revideras och projektgruppen ska ta interna åtgärder för att säkerställa tidsenliga leveranser trots förseningen. Beslut om reviderad tidsplan ska ske vid varje veckomöte. Om en försening riskerar att försena en leverans ska detta diskuteras med beställaren.
+
+\section{Kvalitetsplan}
+I denna sektion beskrivs rutiner gällande granskningar av dokument och tester som ska utföras på den hård- och mjukvara som produceras under projektets gång. Dessa aktiviteter ska utföras löpande under projektets gång för att minimera oförutsedda problem.
+
+\subsection{Granskningar}
+Alla dokument som ska levereras till beställare ska granskas av någon annan gruppmedlem än dokumentets redaktör såsom specificerat i sektion \ref{sec:doc_plan}. I första hand ska granskningen utföras av en gruppmedlem som har arbetat med sakfrågan som beskrivs i dokumentet.
+
+\subsection{Testplan}
+Alla gruppmedlemmar är ansvariga för att själva utföra enhetstester på all hård- och mjukvara som denne producerar. Testansvarig är ansvarig för att detta efterföljs och att det finns rimliga testprotokoll för alla delar av projektet. Testansvarig ska också säkerställa att det finns rutiner för hur misslyckade tester ska utvärderas och rapporteras. Testansvarig ska i samarbete med hårdvaruansvarig och mjukvaruansvarig utforma relevant integrationstestspecifikation och systemtestspecifikation.
+
+\section{Riskanalys}
+Under ett projekt finns det alltid oförutsedda händelser som kan leda till förseningar. I detta kapitel nämns några sådana händelser, hur sannolika de är, och vilken påverkan dee skulle ha på projektet.
+
+%% TODO borde vara en tabell och det borde finnas fler risker
+Händelse sannorlighet risk
+En medlem blir sjuk 4 1
+En algoritm inte fungerar som önskat 4 3
+En sensor går sönder eller fungerar inte 2 3
+En motor går sönder eller fungerar inte 2 4
+En processor går sönder eller fungerar inte 2 5
+Delarna inte kommer fram i tid 1 3
+
+
+\section{Prioriteringar}
+Ifall det märks att tiden inte räcker till har det blivit beslutat att prioritera moment i följande ordning: (Där 1 har högsta prioritering och 6 har lägsta prioritering).
+
+\begin{enumerate}
+	\item Färdigt v 51
+	\item Funktionalitet
+	\item Kostnad
+	\item Resurser
+	\item Kvalitet
+	\item Estetiskt utseénde
+\end{enumerate}
+
+\section{Projektavslut}
+Projektet avslutas med en presentation av vår kartrobot, samt uppvisning av den i form av ett tävlingsdeltagande. Därefter ska allt material återlämnas till handledare. Dokumentationen ska lämnas till Linköpings Universitet för förvaring, samt ska alla medlemmar i gruppen få egna kopior för privat förvaring. När projektet är avslutat ska det utvärderas inom gruppen, innan gruppen officielt upplöses.
+
+\begin{appendices}
+\end{appendices}
+\clearpage
+\addcontentsline{toc}{section}{Referenser}	%append references section at this location to TOC
+\printbibliography
 \end{document}
