@@ -179,7 +179,7 @@ Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett
 %TODO more detailed explenation in general? Specifications around i2c and sonic-sensors output and stuff.
 % TODO: A nice picture featuring hardware and interfaces
 
-\subsection{LIDAR}
+\subsubsection{LIDAR}
 LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
 
 \subsubsection{I2C-buss}
@@ -268,7 +268,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 Då detta delsystem har han om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
 
 \subsection{Mjukvara}
-Koden ska vara skriven i Python 3, och ska följa kodstandarden \cite{pep8}.
+Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 \subsubsection{Kommunikation}
 Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan de. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
@@ -310,7 +310,7 @@ En godtycklig PC med Python-3-support, skärm, tangentbord, och blåtandsmodul.
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i Python 3, och ska följa kodstandarden \cite{pep8}.
+Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 Då grafiska element (snarare än kommandoraden) måste utnyttjas så införskaffas ett lämpligt grafikbibliotek.
 
