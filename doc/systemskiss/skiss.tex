@@ -182,8 +182,8 @@ Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan 
 \subsubsection{Ultraljudssensorer}
 Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
 
-\subsubsection{Utvärden}
-Hur passeras processerade mätvärden vidare?
+\subsubsection{Utvärden/Input}
+Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
 Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
