@@ -131,7 +131,7 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
     \caption{Översikt över sensorenheten.}
-    \label{fig:modules}
+    \label{fig:unitSensor}
 \end{figure}
 
 \noindent \begin{small}
@@ -152,7 +152,7 @@ Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analog
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för de mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
 
 Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
@@ -196,7 +196,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
-    \label{fig:modules}
+    \label{fig:unitMotorcontroller}
 \end{figure}
 \noindent \begin{small}
     * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
@@ -219,7 +219,7 @@ Servomotorn AX-12(+/A) används. Denna har både ett ''vanligt'' läge, och ett 
 % http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \paragraph{Alternativ 2}
-En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, som PWM, används. Exempelvis en (för 180-graders sikt) eller två monterade på varandra (för 360 grader) stycken RG-180 servos.
+En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, som PWM, används.
 
 % Alternativ 3: Stepper motor med driver.
 
@@ -245,7 +245,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
-    \label{fig:modules}
+    \label{fig:unitBrain}
 \end{figure}
 \noindent \begin{small}
 * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
@@ -293,7 +293,7 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{se
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
     \caption{Översikt över PCn.}
-    \label{fig:modules}
+    \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
 En godtycklig PC med Python-3-support, skärm, tangentbord, och blåtandsmodul.
