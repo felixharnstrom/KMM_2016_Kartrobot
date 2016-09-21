@@ -135,7 +135,7 @@
     \end{flushleft}
     
     \subsection{Begränsningar}
-    Produkten är vid slutleverans begränsad till de krav som är formulerade i den senaste versionen av kravspecifikationen. 
+    Produkten är vid slutleverans begränsad till de krav som är formulerade i den senaste versionen av kravspecifikationen. Kravspecifikationen kan inte uppdateras utan överrenskommelse med beställaren.
     
     \section{Fasplan}
     \subsection{Före projektstart}
@@ -194,6 +194,8 @@
     
     \section{Dokumentplan}
     \label{sec:doc_plan}
+    % TODO: Enbart gruppmedlemmar ska ha access till dokument? Vad om de som delas med beställare?
+    % Kan tycka att den parantesen är onödig.
     Dokument ska i största möjliga mån följa tillgängliga LIPS-mallar. Dokumentansvarig är i fall där LIPS-mall saknas ansvarig för att skapa eller i övrigt godkänna dokumentmallar vid behov. Dokument ska lagras på sådant sätt att alla gruppmedlemmar (och enbart dessa) har tillgång till alla dokument över internet. Alla dokument ska skrivas på svenska, men teknisk dokumentation i källkod bör skrivas på engelska. 
     
     Dokument ska revisionsnumreras på formatet \textit{\textless version\textgreater .\textless utgåva\textgreater}, där versionsnummer under 0 ska anses vara interna utkast, och version 1 är redo för leverans eller arkivering beroende på dokumenttyp. Att tilldela ett nytt versionsnummer innebär stora förändringar till dokumentets väsentliga innehåll. Utgåvenumret betecknar mindre förändringar som inte ändrar dokumentets väsentliga innehåll. Alla nya revisioner efter 1.0 av dokument som ska levereras till beställare måste göras i samröre med denne.
@@ -226,14 +228,15 @@
     \subsection{Personer}
     Projektmedlemmarna:
     \begin{itemize}
-        \item Felix Härnström, Projektledare
-        \item Emil Norberg, Dokumentansvarig
-        \item Hannes Haglund, Designansvarig mjukvara
-        \item Daniel Månsson, Designansvarig hårdvara
-        \item Silas Lenz, Testansvarig
-        \item Jani Jokinen, Leveransansvarig
+        \item Felix Härnström, Projektledare (PL)
+        \item Emil Norberg, Dokumentansvarig (DOK)
+        \item Hannes Haglund, Designansvarig mjukvara (MV)
+        \item Daniel Månsson, Designansvarig hårdvara (HV)
+        \item Silas Lenz, Testansvarig (TST)
+        \item Jani Jokinen, Leveransansvarig (LEV)
     \end{itemize}
-    Hannes Haglund kommer att vara bortrest under sista veckan av projektet.
+    Hannes Haglund kommer att vara bortrest under sista veckan av projektet, från och med den 20:e.
+
     Schemalagd tid är prioriterat för arbete och samtliga deltagare är upptagna under andra kursers föreläsningar och moment.
     
     Handledaren för projektet är \LIPShandledare , som under projektets gång kommer vara tillgänglig för rådgivning. Projektgruppen kommer träffa handledaren mindre i början och mer i slutet av projektet.
@@ -244,6 +247,7 @@
     Beställaren förser den hård- och mjukvara som krävs för att genomföra projektet. Gruppen kan i samröre med beställare göra förfrågan om att införskaffa ytterligare materiel. 
     
     Följande materiel behövs för att konstruera roboten enligt systemskissen:
+    % TODO: Glöm inte fixa listan här!
     %\begin{itemize}
     %	\item 1st Raspberry Pi 3
     %	\item 2st ATmega1284
@@ -259,10 +263,10 @@
     %\end{itemize}
     
     \subsection{Lokaler}
-    Gruppen har tillgång till minst en arbetsstation i laborationsytan MUXEN och där kan vid behov samtliga 6 medlemmar jobba. Vid behov kan grupplokaler bokas kostnadsfritt på universitetet.
+    Gruppen har tillgång till minst en arbetsstation i laborationsytan MUXEN och där kan vid behov samtliga 6 medlemmar jobba. Vid behov kan även grupplokaler bokas kostnadsfritt på universitetet.
     
     \subsection{Ekonomi}
-    Gruppen ska efter beslutspunkt 2 arbeta totalt 960 timmar, som består av 160 timmar per person. Genomfört arbete ska redovisas veckovis till beställaren. Alla monetära avgifter står Linköpings Universitet för.
+    Gruppen ska efter beslutspunkt 2 arbeta totalt 960 timmar, då 160 timmar per person. Genomfört arbete ska redovisas veckovis till beställaren. Alla monetära utgifter står Linköpings Universitet för.
     
     \section{Milstolpar och beslutspunkter}
     I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
@@ -290,10 +294,13 @@
     \end{flushleft}
     
     \section{Aktiviteter}
+    % TODO: Fyll i mig!
     
     \section{Tidplan}
-    
+    % TODO: Fyll i mig!
+
     \section{Förändringsplan}
+    % TODO: Kanske nämna leveransansvarigs roll i detta
     Om projektet inte kan hålla den fastslagna tidsplanen ska tidsplanen revideras och projektgruppen ska ta interna åtgärder för att säkerställa tidsenliga leveranser trots förseningen. Beslut om reviderad tidsplan ska ske vid varje veckomöte. Om en försening riskerar att försena en leverans ska detta diskuteras med beställaren.
     
     \section{Kvalitetsplan}
@@ -306,7 +313,8 @@
     Alla gruppmedlemmar är ansvariga för att själva utföra enhetstester på all hård- och mjukvara som denne producerar. Testansvarig är ansvarig för att detta efterföljs och att det finns rimliga testprotokoll för alla delar av projektet. Testansvarig ska också säkerställa att det finns rutiner för hur misslyckade tester ska utvärderas och rapporteras. Testansvarig ska i samarbete med hårdvaruansvarig och mjukvaruansvarig utforma relevant integrationstestspecifikation och systemtestspecifikation.
     
     \section{Riskanalys}
-    Under ett projekt finns det alltid olika händelser som kan leda till förseningar. I detta kapitel nämns några sådana händelser, samt att dem graderas hur sannorligt det är och vilken påverkan dem skulle ha på projektet. (1 liten och 5 stort)
+    Under ett projekt finns det alltid oförutsedda händelser som kan leda till förseningar. I detta kapitel nämns några sådana händelser, hur sannolika de är, och vilken påverkan dee skulle ha på projektet.
+
     %% TODO borde vara en tabell och det borde finnas fler risker
     Händelse sannorlighet risk
     En medlem blir sjuk 4 1
@@ -318,7 +326,7 @@
     
     
     \section{Prioriteringar}
-    Ifall det märks att tiden inte räcker till, har det blivit beslutat att prioritera i följande ordning: (Där 1 har högsta prioritering och 6 har lägsta prioritering)
+    Ifall det märks att tiden inte räcker till har det blivit beslutat att prioritera moment i följande ordning: (Där 1 har högsta prioritering och 6 har lägsta prioritering).
     
     \begin{enumerate}
         \item Färdigt v 51
@@ -330,7 +338,7 @@
     \end{enumerate}
     
     \section{Projektavslut}
-    Projektet avslutas med presentation av våran kartrobbot, samt uppvisning av den i formen av en tävling. Där efter skall all material återlämnas till samma plats som dem checkades ut ifrån. Dokumentationen ska lämnas till Linköpings Universitet för förvaring, samt att alla medlemmar i gruppen får ha sina egna kopior för privat förvaring. När projektet är avslutas ska den utvärderas inom gruppen, innan gruppen officielt upplöses.
+    Projektet avslutas med en presentation av vår kartrobot, samt uppvisning av den i form av ett tävlingsdeltagande. Därefter ska allt material återlämnas till handledare. Dokumentationen ska lämnas till Linköpings Universitet för förvaring, samt ska alla medlemmar i gruppen få egna kopior för privat förvaring. När projektet är avslutat ska det utvärderas inom gruppen, innan gruppen officielt upplöses.
     
     \begin{appendices}
     \end{appendices}
