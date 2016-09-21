@@ -174,8 +174,6 @@ Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna s
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten kan ta emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
-%TODO more detailed explenation in general? Specifications around i2c and sonic-sensors output and stuff.
-% TODO: A nice picture featuring hardware and interfaces
 
 \subsubsection{LIDAR}
 LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
@@ -184,13 +182,13 @@ LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam
 Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi supportar i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
 
 \subsubsection{Ultraljudssensorer}
-Ultraljudssensorerna (\ref{sssec:sonicsensors}) är betydligt mer lågnivå i sina gränssnitt, och kommunicerar via spänningsskillnader. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
+Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
 
 \subsubsection{Utvärden}
 Hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
 I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
@@ -214,19 +212,17 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 Processormodellen ATmega1284.
 
 \paragraph{Alternativ 2}
-Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör vara kapabel till att utföra dess givna jobb. Om UART används för kommunikation mellan moduler räcker inte denna till, då endast en hårdvaru-UART finns tillgänglig.
+Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör vara kapabel till att utföra dess givna jobb. Om UART används för både kommunikation mellan moduler och till servon räcker inte denna till, då endast en hårdvaru-UART finns tillgänglig.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
 
 \paragraph{Alternativ 1}
 Servomotorn AX-12(+/A) används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra med ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
-% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.htm
-%TODO: AX-12, AX-12A eller AX-12+?
-%TODO: Step-up även här?
+% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \paragraph{Alternativ 2}
-En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, används.
+En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, som PWM, används.
 
 % Alternativ 3: Stepper motor med driver.
 
@@ -243,7 +239,7 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 \subsubsection{Styrsignaler samt styrdata}
 
 \paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
 I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
@@ -282,7 +278,7 @@ Roboten ska via en brytare kunna byta mellan ett autonomt och ett manuellt läge
 Robotens huvuduppdrag i det autonoma läget är att skanna ett rum och rita en karta över det. Mjukvara för att omvandla skannerdata till ett tvådimensionellt rum, samt rutiner för att söka upp och skanna outforskade delar av rummet ska finnas.
 
 \subsubsection{Ruttstyrning}
-Roboten behöver kontinuerligt ta och leta sig till outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
+Roboten behöver kontinuerligt ta reda på, och leta sig till, outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 
