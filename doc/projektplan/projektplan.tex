@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{longtable}
+\usepackage{pdfpages}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -98,7 +99,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-	\LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{}{}
+	\LIPSversionsinfo{0.1}{2016-09-22}{Första utkastet}{FH,JJ,SL}{}
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
@@ -252,10 +253,6 @@ Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar f�
     	Efterstudie           & PL       & Beställare  & Beställare, Gruppen & 2016-12-21                     \\ \hline
     \end{tabular}
 \end{flushleft}
-%\section{Utvecklingsmetodik}
-
-%TODO förfina
-%Håll light, ingen speciell metodik. Använd inte hardcore-OO pga python, håll gärna funktioner rena. Skriv test suites.
 
 \section{Utbildningsplan}
 \subsection{Egen utbildning}
@@ -366,7 +363,7 @@ I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
     \end{LIPSaktivitetslista}
 \end{flushleft}
 \section{Tidplan}
-Se bifogat excel-dokument.
+Se bilaga \ref{app:tidplan}.
 
 \section{Förändringsplan}
 % TODO: Kanske nämna leveransansvarigs roll i detta
@@ -388,7 +385,10 @@ I fallet att projektet drabbas av tidsnöd som riskerar att påverka tidsenliga 
 \section{Projektavslut}
 Projektet avslutas med en presentation av vår kartrobot, samt uppvisning av den i form av ett tävlingsdeltagande. Därefter ska allt material återlämnas till handledare. Dokumentationen ska lämnas till Linköpings Universitet för förvaring och alla medlemmar i gruppen få egna kopior för privat förvaring. När projektet är avslutat ska det utvärderas inom gruppen innan gruppen officiellt upplöses.
 
+\clearpage
+
 \begin{appendices}
+\includepdf[scale=1.2,offset=60pt 100pt,pagecommand=\section{Tidplan}\label{app:tidplan}]{tidsplanering.pdf}
 \end{appendices}
 \clearpage
 \addcontentsline{toc}{section}{Referenser}	%append references section at this location to TOC
