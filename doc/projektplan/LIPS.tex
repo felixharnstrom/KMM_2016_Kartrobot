@@ -193,3 +193,20 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 \normalfont
 }
 \newcommand{\LIPSbp}[3]{ \hline \textbf{{#1}}&{#2}&\textbf{{#3}}\\}
+
+
+\newenvironment{LIPSmilstolpar}{
+    \renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+    \normalfont
+    \setlength\extrarowheight{2pt}
+    \begin{longtable}{| L{30pt} | L{280pt} | L{80pt} |} 
+        \hline
+        \textbf{Nr} & \textbf{Milstolpe} & \textbf{Datum} \\
+    }
+    {
+        \hline
+    \end{longtable}
+    \renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+    \normalfont
+}
+\newcommand{\LIPSmilstolpe}[3]{ \hline {#1}&{#2}&{#3}\\}
