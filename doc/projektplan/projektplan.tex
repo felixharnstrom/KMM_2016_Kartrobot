@@ -329,10 +329,45 @@ I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
 \end{flushleft}
 
 \section{Aktiviteter}
-% TODO: Fyll i mig!
 
+\begin{flushleft}
+    \begin{LIPSaktivitetslista}
+        \LIPSaktivitet{1}{Skaffa hårdvara}{Införskaffa den överenskomna hårdvaran.}{-}{1}
+        \LIPSaktivitet{2}{Protokoll mellan PC och robot}{Upprätta protokollet för att överföra data över blåtand mellan PC och robot.}{1}{10}
+        \LIPSaktivitet{3}{PWM gränssnitt för ultraljudssensorer}{Anpassa PWM gränssnittet för att även fungera för ultraljudssensorerna.}{4}{5}
+        \LIPSaktivitet{4}{PWM gränssnitt}{Skriv ett gränssnitt för att kommunicera över PWM.}{1}{10}
+        \LIPSaktivitet{5}{UART gränssnitt}{Skriv ett gränssnitt för att kommunicera över UART.}{1}{15}
+        \LIPSaktivitet{6}{Gränssnitt för blåtands-kommunikation}{Implementera funktionalitet för att skicka och behandla kommandon mellan PC och kommunikationsmodul.}{2}{10}
+        \LIPSaktivitet{7}{Upprätta ett dataflöde mellan sensormodulen och sensorerna}{Implementera kommunikation mellan sensormodulen och sensorerna.}{3, 8}{15}
+        \LIPSaktivitet{8}{Implementera sensormätning för LIDAR}{Implementera funktionalitet så att vi kan läsa av värden från LIDAR-tornets sensor.}{4}{8}
+        \LIPSaktivitet{9}{Motorstyrning i styrmodul}{Implementera funktionalitet för att styra vänster och höger motorsida i styrmodulen.}{4}{8}
+        \LIPSaktivitet{10}{Servostyrning LIDAR-torn}{Funktionalitet för att styra LIDAR-tornets servo i styrmodulen.}{5}{8}
+        \LIPSaktivitet{11}{Gränssnitt mellan kontroll- och styrmodul}{Implementera gränssnitt för USB-UART mellan kontrollmodul och styrmodul.}{5}{10}
+        \LIPSaktivitet{12}{Testning av sensorer}{Testa sensorerna och kontrollera att datan som erhålls är korrekt.}{7}{6}
+        \LIPSaktivitet{13}{Hantering och bearbetning av sensordata}{Ta in och behandla all sensordata för att göra den användbar för kontrollmodulen.}{12}{20}
+        \LIPSaktivitet{14}{Protokoll och högnivå-kommandon mellan kontroll- och styrmodul}{Implementera styrning av motorerna med hjälp av högnivåkommandon från kontrollmodulen och återkoppla med motordata.}{9, 10, 11}{20}
+        \LIPSaktivitet{15}{Test av sensormodul}{Testa och verifiera att mätvärden från sensormodulen är korrekta och användbara för kontrollmodulen.}{13}{10}
+        \LIPSaktivitet{16}{Gränssnitt mellan kontroll- och sensormodul}{Implementera gränssnitt för USB-UART mellan kontrollmodul och sensormodul.}{5, 15}{10}
+        \LIPSaktivitet{17}{Test av styrmodul}{Testa och verifiera att styrmodulen är pålitlig vid styrning från kontrollenhet.}{14}{6}
+        \LIPSaktivitet{18}{Synka diagnostisk data från kommunikationsmodul till PC}{Skriv funktionalitet för att kontinuerligt skicka diagnostisk data från kommunikationsmodul till PC.}{6, 14, 16}{20}
+        \LIPSaktivitet{19}{Filtrera mätvärden}{Behandla sensordata i sensormodulen mer ingående för att förhindra felaktiga mätvärden.}{18}{15}
+        \LIPSaktivitet{20}{Implementation av manuell styrning}{Möjliggör manuell styrning av roboten med hjälp av blåtandskommandon.}{6, 17}{30}
+        \LIPSaktivitet{21}{Styralgoritm}{Autonom styrning för att kunna köra runt i rummet utan att krocka. Följa en vägg.}{20}{40}
+        \LIPSaktivitet{22}{GUI till PC}{Presentera diagnostisk data och möjliggör manuell styrning med ändring av parametrar från ett grafiskt användargränssnitt.}{18, 20}{20}
+        \LIPSaktivitet{23}{Rumavskanning från stillastående}{Funktionalitet som stödjer att scanna av rummet och bilda en karta då roboten står still.}{19}{40}
+        \LIPSaktivitet{24}{Testning av styralgorithm}{Testa körning av roboten på autonomt läge och kontrollera att den inte krockar med någon vägg.}{21}{20}
+        \LIPSaktivitet{25}{Test av GUI}{Kontrollera att GUI:t får korrekt data och är responsivt.}{22}{10}
+        \LIPSaktivitet{26}{GUI karta}{Presentera grafiskt det rum som roboten har kartlagt.}{25, 27}{20}
+        \LIPSaktivitet{27}{Kartalgoritm}{Funktionalitet för att scanna rummet och bearbeta datan så att den blir presentabel och redo för att skickas till en PC.}{23, 24}{50}
+        \LIPSaktivitet{28}{Manuell/autonom mekanisk brytare}{Implementera hårdvara och funktionalitet för att kunna byta mellan autonom och manuell styrning av roboten.}{-}{2}
+        \LIPSaktivitet{29}{Test av kartalgoritm och autonom styrning}{Kontrollera och verifiera att det inte blir outforskade områden i kartan samt att den autonoma styrningen fungerar.}{26, 30}{30}
+        \LIPSaktivitet{30}{Navigeringsalgoritm (autonom styrning)}{Utöka den autonoma styrningen med funktionalitet som med utgångspunkt från den befintliga kartan bestämmer vart den ska köra för att scanna mer.}{27}{70}
+        \LIPSaktivitet{31}{Test av system}{Utförliga tester av roboten för att säkerställa att dess funktionalitet är pålitlig.}{28, 29}{40}
+        \LIPSaktivitet{32}{Optimering}{Optimera och testa roboten inför tävlingen i mån av tid.}{31}{20}
+    \end{LIPSaktivitetslista}
+\end{flushleft}
 \section{Tidplan}
-% TODO: Fyll i mig!
+Se bifogat excel-dokument.
 
 \section{Förändringsplan}
 % TODO: Kanske nämna leveransansvarigs roll i detta

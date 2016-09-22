@@ -210,3 +210,20 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
     \normalfont
 }
 \newcommand{\LIPSmilstolpe}[3]{ \hline {#1}&{#2}&{#3}\\}
+
+
+\newenvironment{LIPSaktivitetslista}{
+    \renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+    \normalfont
+    \setlength\extrarowheight{2pt}
+    \begin{longtable}{| L{25pt} | L{80pt} | L{165pt} | L{70pt} | L{50pt} |} 
+        \hline
+        \textbf{Nr} & \textbf{Aktivitet} & \textbf{Beskrivning} & \textbf{Beroende av aktivitet nr.} & \textbf{Beräknad tid tim} \\
+    }
+    {
+        \hline
+    \end{longtable}
+    \renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+    \normalfont
+}
+\newcommand{\LIPSaktivitet}[5]{ \hline {#1}&{#2}&{#3}&{#4}&{#5}\\}
