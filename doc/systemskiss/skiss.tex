@@ -118,7 +118,7 @@ I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det
 
 \newpage
 \section{Översikt av systemet}
-Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med extern hårdvara tillhörande varje modul. Ett mer detaljerat blockschema finns till varje modul, samt i figur \ref{fig:modulesDetailed}.
+Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med respektive moduls externa hårdvara. Ett mer detaljerat blockschema finns till varje modul, samt i sin helhet i figur \ref{fig:modulesDetailed}.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
     \caption{Modulöversikt.}
@@ -141,20 +141,20 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-ATmega1284 används som processormodell, då den både är relativt kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
+ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
 
 \subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
 \paragraph{Alternativ 1}
-En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal, men det kräver testning för att avgöras. En annan nackdel är att de fungerar dåligt i vinkel mot en vägg, där de antingen inte ger något värde alls, eller ett ''studsat'' värde. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
+En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65:e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal mellan avläsningarna, men det kräver testning för att avgöras. En annan nackdel är att de fungerar dåligt i vinkel mot en vägg, där de antingen inte ger något värde alls, eller ett ''studsat'' värde. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
 
 \paragraph{Alternativ 2}
-Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analoga utdatan, som dessutom är ickelinjär. Fungerar på ett kortare intervall än ultraljudssensorer. Fördelen är snabbare avläsningar som troligtvis inte stör varandra. Bredden på mätstrålen är också mindre än med ultraljud.
+Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analoga utdatan, som dessutom är ickelinjär, och fungerar på ett kortare intervall än ultraljudssensorer. Fördelen är snabbare avläsningar som troligtvis inte stör varandra. Bredden på mätstrålen är också mindre än med ultraljud.
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver en viss grad av noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
+LIDAR är en kraftfull lasersensor som i systemet som helhet använfds för mätningar som kräver noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
 
-Sensorn monteras på toppen av roboten - ovanpå en roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
+Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
 \subsubsection{IMU} \label{sssec:imu}
 
@@ -177,10 +177,10 @@ Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett
 LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
 
 \subsubsection{I2C-buss}
-Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi supportar i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi stödjer i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
 
 \subsubsection{Ultraljudssensorer}
-Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden på dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
+Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden av dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
 
 \subsubsection{Utvärden/Input}
 Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
@@ -255,13 +255,13 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 \subsection{Hårdvara}
 
 \subsubsection{Datormodell}
-Då detta delsystem har han om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
+Då detta delsystem har hand om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
 
 \subsection{Mjukvara}
 Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 \subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan de. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
 
 Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se \ref{sec:system4}) över blåtand, där den skickar debugdata och kartinformation, och tar emot kommandon vid manuell styrning. Mjukvara för blåtandskommunikation måste finnas.
 
@@ -288,7 +288,7 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 
 \newpage
 \section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot avlusningsdata, den upptäckta kartan, samt ge instruktioner vid manuellt läge.
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
