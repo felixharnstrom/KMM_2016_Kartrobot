@@ -5,6 +5,7 @@
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{longtable}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -237,21 +238,19 @@ Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar f�
 
 %TODO: Tagit bort syfte och distribueras till. Känns onödigt och förstör tabellen.../SL
 \label{tab:documents}
-\begin{tabular}{|l |l| l| l|}
-    \hline
-	Dokument              & Ansvarig & Godkänns av & Färdig                         \\\hline
-	Systemskiss           & PL       & Beställare  & 2016-09-30                     \\
-	Tidsplan              & PL       & Beställare  & 2016-09-30                     \\
-	Projektplan           & PL       & Beställare  & 2016-09-30                     \\
-	Tidsrapporter         & DOK      & Beställare  & Måndagar vecka 44 - vecka 51   \\
-	Uppdaterad tidsplan   & DOK      & Beställare  & Måndagar vecka 44 - vecka 51   \\
-	Designspecifikation   & MV, HV   & Handledare  & 2016-11-04                     \\
-	Teknisk dokumentation & DOK      & Beställare  & 3 arbetsdagar före redovisning \\
-	Användahandledning    & DOK      & Beställare  & 3 arbetsdagar före redovisning \\
-	Efterstudie           & PL       & Beställare  & 2016-12-21\\
-    \hline
+\begin{tabular}{|L{90pt}|L{40pt} |L{60pt} |L{70pt} |L{80pt} |}
+	\hline
+	Dokument              & Ansvarig & Godkänns av & Distribueras till   & Färdig                         \\ \hline
+	Systemskiss           & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
+	Tidsplan              & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
+	Projektplan           & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
+	Tidsrapporter         & DOK      & Beställare  & Beställare, Gruppen & Måndagar vecka 44 - vecka 51   \\ \hline
+	Uppdaterad tidsplan   & DOK      & Beställare  & Beställare, Gruppen & Måndagar vecka 44 - vecka 51   \\ \hline
+	Designspecifikation   & MV, HV   & Handledare  & Handledare, Gruppen & 2016-11-04                     \\ \hline
+	Teknisk dokumentation & DOK      & Beställare  & Beställare, Gruppen & 3 arbetsdagar före redovisning \\ \hline
+	Användahandledning    & DOK      & Beställare  & Beställare, Gruppen & 3 arbetsdagar före redovisning \\ \hline
+	Efterstudie           & PL       & Beställare  & Beställare, Gruppen & 2016-12-21                     \\ \hline
 \end{tabular}
-
 %\section{Utvecklingsmetodik}
 
 %TODO förfina
@@ -305,7 +304,14 @@ Gruppen ska efter beslutspunkt 2 arbeta totalt 960 timmar, 160 timmar per person
 I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
 
 \subsection{Milstolpar}
-
+\begin{flushleft}
+    \begin{LIPSmilstolpar}
+        \LIPSmilstolpe{1}{Roboten kan röra sig framåt.}{2016-11-11}
+        \LIPSmilstolpe{2}{Roboten kan styras manuellt.}{2016-11-18}
+        \LIPSmilstolpe{3}{Roboten kan köras autonomt.}{2016-11-25}
+        \LIPSmilstolpe{4}{Roboten uppfyller kravspecen.}{2016-12-07}
+    \end{LIPSmilstolpar}
+\end{flushleft}
 
 \subsection{Beslutspunkter}
 \begin{flushleft}
