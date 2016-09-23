@@ -6,7 +6,6 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{longtable}
-\usepackage{pdfpages}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -71,8 +70,8 @@
 \newcommand{\LIPSdokumenttyp}{Projektplan}
 \newcommand{\LIPSredaktor}{Felix Härnström}
 \newcommand{\LIPSversion}{0.1}
-\newcommand{\LIPSgranskare}{Emil Norberg}
-\newcommand{\LIPSgranskatdatum}{2016-09-22}
+\newcommand{\LIPSgranskare}{}
+\newcommand{\LIPSgranskatdatum}{}
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
@@ -99,35 +98,37 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-	\LIPSversionsinfo{0.1}{2016-09-22}{Första utkastet}{FH, JJ, SL}{EN}
+	\LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{}{}
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
 \pagestyle{content}
 \section{Beställare}
-Beställare är Mattias Krysander från ISY vid Linköpings universitet.
+Beställare är Mattias Kryssander från ISY vid Linköpings universitet.
 
 \section{Översiktlig beskrivning av projektet}
 \subsection{Syfte och mål}
 Projektets mål är att utefter givet projektdirektiv och med beställaren överenskommen kravspecifikation utveckla en robot som kan genomsöka och kartlägga ett enkelt rum. Utöver roboten ska en medföljande PC-mjukvara levereras som kan styra roboten och visa realtidsdata såsom diagnostik och kartan över rummet.
 
 \subsection{Leveranser}
+LEV ansvarar för att alla leveranser sker inom utsatt tid. 
+
 \begin{flushleft}
 	\begin{LIPSleveransplan}
 		\LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Första version av projektplan, tidsplan, och systemskiss}{2016-09-22}
 		\LIPSplaneradleverans{Projektplan, tidsplan, och systemskiss}{PL}{Slutgiltig version av projektplan, tidsplan, och systemskiss}{2016-09-30}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 1.}{2016-10-31}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 1.}{2016-10-31}
 		\LIPSplaneradleverans{Designspecifikation}{MV, HV}{Första version av designspecifikationen.}{2016-11-01}
 		\LIPSplaneradleverans{Designspecifikation}{MV, HV}{Slutgiltig version av designspecifikation.}{2016-11-04}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 2.}{2016-11-7}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 3.}{2016-11-14}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 4.}{2016-11-21}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 5.}{2016-11-28}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 6.}{2016-12-5}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 7.}{2016-12-12}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 2.}{2016-11-7}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 3.}{2016-11-14}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 4.}{2016-11-21}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 5.}{2016-11-28}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 6.}{2016-12-5}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 7.}{2016-12-12}
 		\LIPSplaneradleverans{Teknisk dokumentation och användarhandledning}{DOK}{Teknisk dokumentation och användarhandledning ska vara inlämnad.}{3 arbetsdagar före redovisning.}
 		\LIPSplaneradleverans{Verifiering av kraven (BP5).}{TST}{Tillsammans med beställaren fattas beslut huruvida projektet har nått målet.}{Senast dagen innan redovisning.}
-		\LIPSplaneradleverans{Tidrapport}{DOK}{Tidrapport 8.}{2016-12-19}
+		\LIPSplaneradleverans{Tidrapport}{PL}{Tidrapport 8.}{2016-12-19}
 		\LIPSplaneradleverans{Slutpresentation}{PL}{Muntlig presentation av projektet.}{2016-12-19}
 		\LIPSplaneradleverans{Tävlingsdeltagande}{PL}{Tävla mot andra robotar som har byggts i kursen.}{2016-12-20}
 		\LIPSplaneradleverans{Efterstudie}{PL}{Efterstudie ska lämnas till beställaren.}{2016-12-21}
@@ -182,6 +183,7 @@ Följande punkter har beslutats gemensamt av projektgruppen och ska anses vara r
 \subparagraph{Projektledare (PL)}
 \begin{itemize}
 \item Ansvarig för kontakt mellan gruppen och beställaren samt handledaren.
+\item Ansvarar för att uppdatera och i tid skicka in tidsrapporterna.
 \item Ska se till att mötesplanen följs och kallar till varje möte.
 \item Ska fördela arbetsuppgifter internt.
 \item Ska hålla en överblick över projektet och se till att alla gruppmedlemmar jobbar mot samma mål.
@@ -245,7 +247,7 @@ Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar f�
     	Systemskiss           & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
     	Tidsplan              & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
     	Projektplan           & PL       & Beställare  & Beställare, Gruppen & 2016-09-30                     \\ \hline
-    	Tidsrapporter         & DOK      & Beställare  & Beställare, Gruppen & Måndagar vecka 44 - vecka 51   \\ \hline
+    	Tidsrapporter         & PL      & Beställare  & Beställare, Gruppen & Måndagar vecka 44 - vecka 51   \\ \hline
     	Uppdaterad tidsplan   & DOK      & Beställare  & Beställare, Gruppen & Måndagar vecka 44 - vecka 51   \\ \hline
     	Designspecifikation   & MV, HV   & Handledare  & Handledare, Gruppen & 2016-11-04                     \\ \hline
     	Teknisk dokumentation & DOK      & Beställare  & Beställare, Gruppen & 3 arbetsdagar före redovisning \\ \hline
@@ -253,13 +255,17 @@ Alla gruppmedlemmar är ansvariga för att all dokumentation denne producerar f�
     	Efterstudie           & PL       & Beställare  & Beställare, Gruppen & 2016-12-21                     \\ \hline
     \end{tabular}
 \end{flushleft}
+%\section{Utvecklingsmetodik}
+
+%TODO förfina
+%Håll light, ingen speciell metodik. Använd inte hardcore-OO pga python, håll gärna funktioner rena. Skriv test suites.
 
 \section{Utbildningsplan}
 \subsection{Egen utbildning}
 Alla gruppmedlemmar ska genomföra en laboration i mätteknik, vilket innefattar att lära sig att använda en logikanalysator. Utöver detta förväntas alla gruppmedlemmar egenhändigt söka upp den kunskap och utbildning som krävs för att utföra sina tilldelade arbetsuppgifter.
 
 \section{Rapporteringsplan}
-Tidsrapporter kommer att skrivas så att beställaren kan få en bild av hur projektet löper framåt, samt om tidsplanen följs. Se avsnitt \ref{sec:doc_plan} för detaljer om hur tidsrapporter ska utformas och levereras.
+Rapporter kommer att skrivas så att beställaren kan få en bild av hur projektet löper framåt, samt om tidsplanen följs. Se avsnitt \ref{sec:doc_plan} för detaljer om hur tidsrapporter ska utformas och levereras.
 
 \section{Mötesplan}
 För alla möten gäller att projektledaren kallar till möte efter samråd om tillfälle med övriga gruppmedlemmar. Mötesprotokoll ska föras utefter LIPS-mallen. Alla gruppmedlemmar kan föra protokoll, men mötesprotokoll måste godkännas av projektledare eller dokumentansvarig.
@@ -285,9 +291,9 @@ Hannes Haglund kommer att vara bortrest under sista veckan av projektet, från o
 
 Schemalagd tid är prioriterat för arbete och samtliga deltagare är upptagna under andra kursers föreläsningar och moment.
 
-Handledaren för projektet är Olov Andersson, som under projektets gång kommer vara tillgänglig för rådgivning. Projektgruppen kommer träffa handledaren mindre i början och mer i slutet av projektet.
+Handledaren för projektet är \LIPShandledare , som under projektets gång kommer vara tillgänglig för rådgivning. Projektgruppen kommer träffa handledaren mindre i början och mer i slutet av projektet.
 
-Beställaren för projektet är  Mattias Krysander på ISY, Linköpings Universitet. Mattias kommer att delta vid alla beslutspunkter.
+Beställaren för projektet är  Mattias Kryssander på ISY, Linköpings Universitet. Mattias kommer att delta vid alla beslutspunkter.
 
 \subsection{Materiel}
 Beställaren förser gruppen med den hård- och mjukvara som krävs för att genomföra projektet. Gruppen kan i samröre med beställare göra förfrågan om att införskaffa ytterligare materiel. 
@@ -363,7 +369,7 @@ I detta kapitel förklaras vilka milstolpar samt beslutspunkter som finns.
     \end{LIPSaktivitetslista}
 \end{flushleft}
 \section{Tidplan}
-Se bilaga \ref{app:tidplan}.
+Se bifogat excel-dokument.
 
 \section{Förändringsplan}
 % TODO: Kanske nämna leveransansvarigs roll i detta
@@ -385,10 +391,7 @@ I fallet att projektet drabbas av tidsnöd som riskerar att påverka tidsenliga 
 \section{Projektavslut}
 Projektet avslutas med en presentation av vår kartrobot, samt uppvisning av den i form av ett tävlingsdeltagande. Därefter ska allt material återlämnas till handledare. Dokumentationen ska lämnas till Linköpings Universitet för förvaring och alla medlemmar i gruppen få egna kopior för privat förvaring. När projektet är avslutat ska det utvärderas inom gruppen innan gruppen officiellt upplöses.
 
-\clearpage
-
 \begin{appendices}
-\includepdf[scale=1.2,offset=60pt 100pt,pagecommand=\section{Tidplan}\label{app:tidplan}]{tidsplanering.pdf}
 \end{appendices}
 \clearpage
 \addcontentsline{toc}{section}{Referenser}	%append references section at this location to TOC
