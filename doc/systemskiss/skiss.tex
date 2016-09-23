@@ -126,8 +126,8 @@ Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \
 \end{figure}
 
 \newpage
-\section{Delsystem 1 - Sensorenhet}
-Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format.
+\section{Sensorenhet}
+Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
     \caption{Översikt över sensorenheten.}
@@ -152,9 +152,9 @@ Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analog
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet använfds för mätningar som kräver noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
+LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
 
-Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i sektion \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
+Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i avsnitt \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
 \subsubsection{IMU} \label{sssec:imu}
 
@@ -192,7 +192,9 @@ Implementera en UART-buss som endast går mellan sensorenheten och kommunikation
 I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
-\section{Delsystem 2 - Styrenhet} \label{sec:system2}
+\section{Styrenhet} \label{sec:system2}
+Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorerna. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
+
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
@@ -241,7 +243,8 @@ Implementera en extra UART-buss som endast går mellan styrenheten och kommunika
 I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
-\section{Delsystem 3 - Kommunikations- och kontrollenhet} \label{sec:system3}
+\section{Kommunikations- och kontrollenhet} \label{sec:system3}
+Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med den bärbara datorn. I denna modul ingår också kontrollenheten, som gör beräkningar relaterat till både det manuella och det autonoma läget. Se figur \ref{fig:unitBrain} för en övergripande systemskiss för kommunikations- och kontrollenheten.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -287,8 +290,8 @@ I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikation
 Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
 
 \newpage
-\section{Delsystem 4 - Mjukvara på PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge.
+\section{ Mjukvara på PC} \label{sec:system4}
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för en övergripande systemskiss för PC-mjukvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
