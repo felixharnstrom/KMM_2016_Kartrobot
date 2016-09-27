@@ -1,0 +1,160 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{mathptmx}    %Times Roman font
+\usepackage{helvet}    %Helvetica, served as a model for arial
+\usepackage{anyfontsize}
+
+\usepackage[tocgraduated]{tocstyle}
+\usetocstyle{allwithdot}
+
+\usepackage[titletoc,title]{appendix}
+
+\usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
+\setlength{\bibitemsep}{\baselineskip}	%vertical space between bibliography items
+
+\usepackage{fancyhdr}
+\fancypagestyle{intro}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\roman{page}}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+\fancypagestyle{content}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\thepage}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+
+\usepackage{titlesec}
+\titleformat{\section}
+    {\normalfont\sffamily\Large\bfseries}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\sffamily\large\bfseries}
+    {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+    {\normalfont\sffamily\bfseries}
+    {\thesubsubsection}{1em}{}
+
+\newcommand{\LIPSartaltermin}{2016/HT}
+\newcommand{\LIPSkursnamn}{TSEA29}
+\newcommand{\LIPSprojekttitel}{Kartrobot}
+\newcommand{\LIPSprojektgrupp}{Grupp 1}
+\newcommand{\LIPSgruppepost}{\href{mailto:kmm_2016_grupp1@liuonline.onmicrosoft.com}{{\small kmm\_2016\_grupp1@liuonline.onmicrosoft.com}}}
+\newcommand{\LIPSgrupphemsida}{}
+\newcommand{\LIPSkund}{ISY, Linköpings universitet, 581\,83 Linköping}
+\newcommand{\LIPSkundkontakt}{Mattias Krysander, 013-282198, matkr@isy.liu.se}
+\newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
+\newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
+\newcommand{\LIPSdokumenttyp}{Designspecifikation}
+\newcommand{\LIPSredaktor}{Jag måste skriva något här annars kan jag inte kompilera dokumentet}    %TODO Välj redaktör. Borde vara HV eller MV enligt projektplan
+\newcommand{\LIPSversion}{0.1}
+\newcommand{\LIPSgranskare}{}
+\newcommand{\LIPSgranskatdatum}{}
+\newcommand{\LIPSgodkannare}{}
+\newcommand{\LIPSgodkantdatum}{}
+
+\addbibresource{bibliography.bib}
+\input{LIPS.tex}
+
+\begin{document}
+
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+    \LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
+    \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+    \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
+    \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+
+\clearpage
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\tableofcontents
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\clearpage
+\begin{LIPSdokumenthistorik}
+    \LIPSversionsinfo{0.1}{2016-09-22}{Första utkastet}{}{}
+\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+
+\section{Inledning}
+%TODO Vad ska det här dokumentet handla om?
+
+\section{Översikt}
+%TODO Beskriv översiktligt de ingående delsystemen och deras funktion.
+
+\section{Kommunikationsprotokoll}
+\subsection{Mellan ingående delsystem}    %TODO Bättre titel.
+
+%TODO Beskriv de protokoll som används internt för varje delsystem, t.ex. mellan sensorenheten och sensorerna.
+%TODO Mer beskrivande titlar.
+\subsection{Kommunikations- och kontrollenhet}
+\subsection{Styrenhet}
+\subsection{Sensorenhet}
+
+%TODO Designspec för varje ingående delsystem.
+%TODO Borde byta ut generisk underkapitel 'hårdvara' mot mer specifika kaptiel för varje delsystem.
+\section{Kommunikations- och kontrollenhet}
+\subsection{Hårdvara}
+\subsection{Mjukvara}
+\subsection{Komponenter}
+
+\section{Styrenhet}
+\subsection{Hårdvara}
+\subsection{Mjukvara}
+\subsection{Komponenter}
+\subsection{Reglering}    %TODO Beskriv ev. PID-kontroller.
+
+\section{Sensorenhet}
+\subsection{Hårdvara}
+\subsection{Mjukvara}
+\subsection{Komponenter}
+\subsection{Filtrering av mätvärden}    %TODO Om detta ska ske direkt i sensorenheten.
+\subsection{Kalibrering}    %TODO Om applicerbart.
+
+\section{PC-mjukvara}
+
+\section{Systemtest}
+
+\newpage
+\begin{appendices}
+\section{Kopplingsschema för kommunikations- och kontrollenhet}
+
+\section{Kopplingsschema för styrenhet}
+
+\section{Kopplingsschema för sensorenhet}
+\end{appendices}
+
+\clearpage
+\addcontentsline{toc}{section}{Referenser} %append references section at this location to TOC
+\printbibliography
+\end{document}
