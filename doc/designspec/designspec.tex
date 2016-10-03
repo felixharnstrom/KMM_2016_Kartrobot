@@ -106,21 +106,12 @@
 \setcounter{page}{1}
 \pagestyle{content}
 
-\section{Inledning}
+\section{Sammanfattning}
 
 \input{intro.tex}
 
 \newpage
-\section{Översikt av systemet}
-Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med respektive moduls externa hårdvara. Ett mer detaljerat blockschema finns till varje modul, samt i sin helhet i figur \ref{fig:modulesDetailed}.
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
-    \caption{Modulöversikt.}
-    \label{fig:modules}
-\end{figure}
-
-\newpage
-\section{Sensorenhet}
+\section{Sensorenhet} \label{sec:system1}
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
