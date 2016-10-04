@@ -14,13 +14,17 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg9774"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.91 r"
    sodipodi:docname="styrenhet.svg"
+<<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
    inkscape:export-filename="/home/emil/Skrivbord/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
 =======
    inkscape:export-filename="/home/silenz/TSEA29/systemskiss/Kartrobot/doc/systemskiss/styrenhet.png"
 >>>>>>> Added systemskiss as basis for designspec
+=======
+   inkscape:export-filename="/home/emino969/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
+>>>>>>> Updated styrenhet.
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300">
   <defs
@@ -230,6 +234,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
+<<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
      inkscape:zoom="4.2639608"
      inkscape:cx="283.81006"
@@ -245,11 +250,16 @@
      inkscape:zoom="1.4"
      inkscape:cx="269.35698"
      inkscape:cy="411.24364"
+=======
+     inkscape:zoom="2.990248"
+     inkscape:cx="195.9517"
+     inkscape:cy="357.73637"
+>>>>>>> Updated styrenhet.
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1019"
+     inkscape:window-height="1028"
      inkscape:window-x="0"
      inkscape:window-y="0"
 >>>>>>> Added systemskiss as basis for designspec
@@ -288,11 +298,15 @@
          id="tspan6513-2-3"
          x="277.28275"
          y="520.638"
+<<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
          style="font-size:7.5px">UART</tspan></text>
 =======
          style="font-size:7.5px">UART (I2C)*</tspan></text>
 >>>>>>> Added systemskiss as basis for designspec
+=======
+         style="font-size:7.5px">I2C</tspan></text>
+>>>>>>> Updated styrenhet.
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.70999998;stroke-miterlimit:4;stroke-dasharray:2.84, 2.84;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4290-85"
@@ -571,6 +585,7 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
+<<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
            sodipodi:role="line">UART Half duplex</tspan><tspan
            style="font-size:7.5px"
@@ -584,6 +599,9 @@
          d="m 265.77316,503.85031 0,62.2911"
 =======
            sodipodi:role="line">UART</tspan></text>
+=======
+           sodipodi:role="line">PWM</tspan></text>
+>>>>>>> Updated styrenhet.
       <path
          inkscape:connector-curvature="0"
          id="path6571-0-5"
@@ -637,6 +655,7 @@
                y="554.14789"
                x="167.50002"
                id="tspan7353-8-0-9-4-8-1"
+<<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
                sodipodi:role="line">1</tspan></text>
           <text
@@ -656,6 +675,9 @@
            transform="matrix(1.0048241,0,0,0.92465674,-61.989429,-69.341768)"
 =======
                sodipodi:role="line">2</tspan></text>
+=======
+               sodipodi:role="line">1</tspan></text>
+>>>>>>> Updated styrenhet.
           <text
              sodipodi:linespacing="125%"
              id="text7351-9-7-6-1-8-5-1"
