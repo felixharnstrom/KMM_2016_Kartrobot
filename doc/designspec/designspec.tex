@@ -313,7 +313,14 @@ PC-mjukvaran tar emot sensordata, styrdata och kartdata från kommunikationsenhe
 \subsubsection{Output}
 Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
 
-Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt.
+\subsubsection{GUI}
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
+
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
+    \caption{Mockup av det grafiska gränssnittet.}
+    \label{fig:gui_mockup}
+\end{figure}
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
