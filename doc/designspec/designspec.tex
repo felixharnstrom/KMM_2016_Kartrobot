@@ -208,7 +208,6 @@ Styrenheten är ansvarig för all logik och funktionalitet för robotens lågniv
 Vi ska använda en Atmega1284 processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit och 1 AX-12 servo. Alla motorerna kommer kommunicera över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
 
 Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
