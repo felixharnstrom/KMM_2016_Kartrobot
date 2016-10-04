@@ -14,8 +14,9 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg9774"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.91 r"
    sodipodi:docname="styrenhet.svg"
+<<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
@@ -29,6 +30,9 @@
 =======
    inkscape:export-filename="/home/emil/Skrivbord/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
 >>>>>>> Updated image.
+=======
+   inkscape:export-filename="/home/emino969/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
+>>>>>>> Updated styrenhet.
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300">
   <defs
@@ -238,6 +242,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
+<<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< 0f1b06fbcb10addcd735ab5fa7c0b042b43de92f
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
@@ -274,6 +279,11 @@
 =======
      inkscape:cy="326.2175"
 >>>>>>> Flowchart added.
+=======
+     inkscape:zoom="2.990248"
+     inkscape:cx="195.9517"
+     inkscape:cy="357.73637"
+>>>>>>> Updated styrenhet.
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -324,6 +334,7 @@
          id="tspan6513-2-3"
          x="277.28275"
          y="520.638"
+<<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
@@ -337,6 +348,9 @@
 =======
          style="font-size:7.5px">UART</tspan></text>
 >>>>>>> Updated image.
+=======
+         style="font-size:7.5px">I2C</tspan></text>
+>>>>>>> Updated styrenhet.
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.70999998;stroke-miterlimit:4;stroke-dasharray:2.84, 2.84;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4290-85"
@@ -615,6 +629,7 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
+<<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< ec06764ad1a942edf740fc62f70f832e19d0ef16
 <<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
@@ -638,6 +653,9 @@
          d="m 265.77316,503.85031 0,62.2911"
 =======
            sodipodi:role="line">UART</tspan></text>
+=======
+           sodipodi:role="line">PWM</tspan></text>
+>>>>>>> Updated styrenhet.
 =======
            sodipodi:role="line">PWM</tspan></text>
 >>>>>>> Updated styrenhet.
@@ -700,8 +718,11 @@
                y="554.14789"
                x="167.50002"
                id="tspan7353-8-0-9-4-8-1"
+<<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
+=======
+>>>>>>> Updated styrenhet.
                sodipodi:role="line">1</tspan></text>
           <text
              sodipodi:linespacing="125%"
