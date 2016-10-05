@@ -14,8 +14,9 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg9774"
    version="1.1"
-   inkscape:version="0.91 r"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="styrenhet.svg"
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
    inkscape:export-filename="/home/emil/Skrivbord/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
@@ -25,6 +26,9 @@
 =======
    inkscape:export-filename="/home/emino969/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
 >>>>>>> Updated styrenhet.
+=======
+   inkscape:export-filename="/home/emil/Skrivbord/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
+>>>>>>> Updated image.
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300">
   <defs
@@ -252,17 +256,29 @@
      inkscape:cy="411.24364"
 =======
      inkscape:zoom="2.990248"
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
      inkscape:cx="195.9517"
      inkscape:cy="357.73637"
 >>>>>>> Updated styrenhet.
+=======
+     inkscape:cx="254.78375"
+     inkscape:cy="427.33501"
+>>>>>>> Updated image.
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g7373-0-6-9-3-0-5"
      showgrid="false"
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
      inkscape:window-width="1920"
      inkscape:window-height="1028"
      inkscape:window-x="0"
      inkscape:window-y="0"
 >>>>>>> Added systemskiss as basis for designspec
+=======
+     inkscape:window-width="1615"
+     inkscape:window-height="1026"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+>>>>>>> Updated image.
      inkscape:window-maximized="1" />
   <metadata
      id="metadata9779">
@@ -298,6 +314,7 @@
          id="tspan6513-2-3"
          x="277.28275"
          y="520.638"
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
          style="font-size:7.5px">UART</tspan></text>
@@ -307,6 +324,9 @@
 =======
          style="font-size:7.5px">I2C</tspan></text>
 >>>>>>> Updated styrenhet.
+=======
+         style="font-size:7.5px">UART</tspan></text>
+>>>>>>> Updated image.
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.70999998;stroke-miterlimit:4;stroke-dasharray:2.84, 2.84;stroke-dashoffset:0;stroke-opacity:1"
        id="rect4290-85"
@@ -585,14 +605,19 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
            sodipodi:role="line">UART Half duplex</tspan><tspan
+=======
+           sodipodi:role="line">UART</tspan><tspan
+>>>>>>> Updated image.
            style="font-size:7.5px"
            y="543.10449"
            x="270.21582"
            sodipodi:role="line"
            id="tspan3623" /></text>
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
       <path
          inkscape:connector-curvature="0"
          id="path6571-0-5"
@@ -607,6 +632,12 @@
          id="path6571-0-5"
          d="m 265.77316,501.85031 0,62.2911"
 >>>>>>> Added systemskiss as basis for designspec
+=======
+      <path
+         inkscape:connector-curvature="0"
+         id="path6571-0-5"
+         d="m 265.77316,503.85031 0,62.2911"
+>>>>>>> Updated image.
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.98934829px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#marker7029);marker-end:url(#marker6588-9-2)" />
       <rect
          y="566.58667"
@@ -680,20 +711,24 @@
 >>>>>>> Updated styrenhet.
           <text
              sodipodi:linespacing="125%"
-             id="text7351-9-7-6-1-8-5-1"
-             y="507.46683"
-             x="167.50002"
+             id="text7351-4-1-0-9-8-6-3"
+             y="506.88287"
+             x="167.86607"
              style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"><tspan
                style="font-size:7.5px"
-               y="507.46683"
-               x="167.50002"
-               id="tspan7353-5-1-1-7-1-0-5"
-               sodipodi:role="line">2</tspan></text>
+               y="506.88287"
+               x="167.86607"
+               id="tspan7353-8-0-9-4-8-1-6"
+               sodipodi:role="line">1</tspan></text>
         </g>
         <g
+<<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
            transform="matrix(1.0048241,0,0,0.92465674,-61.989429,-67.341768)"
 >>>>>>> Added systemskiss as basis for designspec
+=======
+           transform="matrix(1.0048241,0,0,0.92465674,-61.989429,-69.341768)"
+>>>>>>> Updated image.
            id="g7435-7-5-7-2-9-9">
           <path
              inkscape:connector-curvature="0"
@@ -725,7 +760,7 @@
          id="tspan7353-5-1-1-7-1-0-9-1"
          x="254.37665"
          y="539.36639"
-         style="font-size:7.24179649px">2</tspan></text>
+         style="font-size:7.24179649px">1</tspan></text>
     <path
        style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:"
        d="m 355.28537,607.60086 68.94377,0"
