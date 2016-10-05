@@ -220,12 +220,7 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 \subsection{Gränssnitt} \label{ssec:controllInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
-
-\paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
-
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
