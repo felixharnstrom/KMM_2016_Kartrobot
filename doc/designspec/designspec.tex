@@ -200,7 +200,6 @@ Styrenheten är ansvarig för all logik och funktionalitet för robotens lågniv
     \caption{Översikt över styrenheten.}
     \label{fig:unitMotorcontroller}
 \end{figure}
-\end{small}
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
@@ -216,7 +215,14 @@ Totalt är det fyra motorer som är monterade på chassit som går under namnet 
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör för att bromsa så är det lämpligt att använda avbrott för detta.
+Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
+Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 4 olika tillstånd.
+
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=1.0\textwidth]{styrenhet_schema.png}}
+	\caption{Tillstånds schema för styrenheten.}
+	\label{fig:stateDiagram}
+\end{figure}
 
 \subsection{Gränssnitt} \label{ssec:controllInterface}
 
