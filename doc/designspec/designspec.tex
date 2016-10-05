@@ -220,9 +220,10 @@ På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en 
 Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt kommer alltså 4 pinnar på Atmega1284 processorn att användas för styrning av hjulen.
 
 \subsection{Mjukvara}
-
 Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
-Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 4 olika tillstånd.
+
+\subsubsection{Tillstånds diagram}
+Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion på hur den ska köra. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart. 
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet_schema.png}}
@@ -230,10 +231,29 @@ Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har
 	\label{fig:stateDiagram}
 \end{figure}
 
+\subsubsection{Trådning}
+Eftersom att styrenheten ska kunna arbeta medans kommandon läses in och skrivs ut blir det svårt att undvika parallella trådar. Totalt ska det behövas 4 olika trådar med följande uppgifter:
+
+\newpage
+\begin{enumerate}
+	\item Läsa in data kontinuerligt från bussen och sätta navigerings instruktionen som ska läsas in till styrenheten.
+	\item Skicka ut konstant information om styrenheten, t.ex. motorernas status, nuvarande tillstånd, etc.
+	\item Styrenhetens logik
+	\item Skicka och avläsa data till motorer. Dvs att formulera de instruktioner som ska skickas till respektive protokoll. Anledningen till att det inte är en till tråd separat för AX-12 servon är för att den aldrig kommer köras samtidigt som DC-motorerna.
+\end{enumerate}
+
 \subsection{Gränssnitt} \label{ssec:controllInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
 Implementera en UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+
+\newpage
+Styrdatan ska innehålla information om följande punkter:
+\begin{itemize}
+	\item Hur många grader roboten ska svänga
+	\item Hur långt roboten ska köra i den riktningen
+	\item Vilken hastighet roboten ska köra med
+\end{itemize}
 
 \newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
