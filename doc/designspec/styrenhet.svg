@@ -246,6 +246,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
+<<<<<<< a6756e7dd368c411b6e2fc20aa80b9d09b1e8fa9
 <<<<<<< 68c4bcd37d1f9669d3a3699ee5da5902ed074fb4
 <<<<<<< 0f1b06fbcb10addcd735ab5fa7c0b042b43de92f
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
@@ -293,8 +294,13 @@
      inkscape:cx="254.78375"
      inkscape:cy="427.33501"
 >>>>>>> Updated image.
+=======
+     inkscape:zoom="4.2639608"
+     inkscape:cx="283.81006"
+     inkscape:cy="532.59838"
+>>>>>>> Edited images.
      inkscape:document-units="px"
-     inkscape:current-layer="g7373-0-6-9-3-0-5"
+     inkscape:current-layer="layer1"
      showgrid="false"
 <<<<<<< ac93b8d438b59910e3a40e3af3120943000411bc
 <<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
@@ -831,7 +837,7 @@
          id="tspan7353-5-1-1-7-1-0-9-1"
          x="254.37665"
          y="539.36639"
-         style="font-size:7.24179649px">1</tspan></text>
+         style="font-size:7.24179649px">2</tspan></text>
     <path
        style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#969696;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker8162);marker-end:"
        d="m 355.28537,607.60086 68.94377,0"
