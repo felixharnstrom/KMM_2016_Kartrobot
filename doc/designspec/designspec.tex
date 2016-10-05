@@ -194,13 +194,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 \newpage
 \section{Styrenhet} \label{sec:system2}
 Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorerna. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
-<<<<<<< HEAD
-%TODO Ändra skissens bild så pinnar och protokoll stämmer för kommunikation med LIDAR servo
-=======
 
-%TODO Ändra protokollet mellan processor och servo från UART till PWM
-
->>>>>>> c5476bdd7f963dccafdd8ef9aeb6cba1e5db6dc3
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
@@ -210,21 +204,11 @@ Styrenheten är ansvarig för all logik och funktionalitet för robotens lågniv
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-<<<<<<< HEAD
 Vi ska använda en Atmega1284 processor för styrmodulen. Processorn kommer totalt att kommunicera med 2 DC-motorer som sitter på chassit och 1 servo för rotation av tornet. Alla motorerna kommer kommunicera över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
-
-=======
-Processormodellen ATmega1284.
-
-\subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Servomotorn AX-12(+/A) används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra med ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
->>>>>>> c5476bdd7f963dccafdd8ef9aeb6cba1e5db6dc3
-% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
-
-% Alternativ 3: Stepper motor med driver.
+%http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt kommer alltså 4 pinnar på Atmega1284 processorn att användas för styrning av hjulen.
