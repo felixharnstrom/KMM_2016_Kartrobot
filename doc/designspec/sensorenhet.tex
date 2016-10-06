@@ -12,6 +12,24 @@ Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett l�
 \end{small}
 \subsection{Hårdvara}
 
+\subsubsection{Hårdvarolista}
+Här listar vi upp all hårdvara som vi behöver för att sensorenheten ska fungera.
+\begin{center}
+	\begin{tabular}{|l|l|c|}
+		\hline
+		Komponent & Förklaring & Antal \\
+		\hline\hline
+		ATmega1284 & En mikroprocessor med 44 pinnar & 1 \\
+		\hline
+		SRF04 & Ultraljudssensor & 5 \\
+		\hline
+		LIDAR lite v2 & Lasersensor & 1 \\
+		\hline
+		MLX90609 & Gyro & 1 \\
+		\hline
+	\end{tabular}
+\end{center}
+
 \subsubsection{Processor}
 ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
 
