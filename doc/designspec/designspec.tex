@@ -6,6 +6,9 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -344,6 +347,8 @@ PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmo
     ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
 \end{small}
 
+\clearpage
+
 \section{C-standard} \label{sec:cstandard}
 Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
 
@@ -355,6 +360,69 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
     \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
 \end{itemize}
+
+\clearpage
+
+\section{Programflöde}
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% Styles
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+
+% Nodes
+\node (start) [startstop] {Start};
+\node (bluetooth) [process, below of=start] {Establish Bluetooth \\ connection};
+\node (get_gui_event) [io, below of=bluetooth] {Get GUI event};
+\node (command_issued) [decision, below of=get_gui_event, yshift=-0.8cm] {GUI command \\ issued?};
+\node (should_transmit) [decision, below of=command_issued, yshift=-2cm] {Should \\ command be \\ transmitted?};
+\node (perform) [process, right of=should_transmit, xshift=4cm] {Perform command};
+\node (is_shutdown) [decision, right of=perform, xshift=3.5cm] {Command is \\ shutdown?};
+\node (stop) [startstop, below of=is_shutdown, yshift=-1cm] {Stop};
+\node (transmit) [process, below of=should_transmit, yshift=-1cm] {Transmit command};
+\node (expecting_reply) [decision, below of=transmit, yshift=-1cm] {Query expecting \\ reply?};
+\node (read_reply) [io, below of=expecting_reply, yshift=-1cm] {Read reply};
+\node (should_update) [decision, below of=read_reply, yshift=-1cm] {Reply should \\ update GUI?};
+\node (issue_event) [process, below of=should_update, yshift=-1cm] {Issue GUI event};
+
+% Arrows
+\draw [arrow] (start) -- (bluetooth);
+\draw [arrow] (bluetooth) -- (get_gui_event);
+\draw [arrow] (get_gui_event) -- (command_issued);
+\draw [arrow] (command_issued) -- node[auto] {Yes} (should_transmit);
+\draw [arrow] (should_transmit) -- (perform);
+\draw [arrow] (perform) -- (is_shutdown);
+\draw [arrow] (is_shutdown) -- node[auto] {Yes} (stop);
+\draw [arrow] (is_shutdown) |- node[anchor=east, xshift=0.8cm, yshift=-5cm] {No} (get_gui_event);
+\draw [arrow] (should_transmit) -- node[auto] {Yes} (transmit);
+\draw [arrow] (transmit) -- (expecting_reply);
+\draw [arrow] (expecting_reply) -- node[auto] {Yes} (read_reply);
+\draw [arrow] (read_reply) -- (should_update);
+\draw [arrow] (should_update) -- node[auto] {Yes} (issue_event);
+
+% Common decision arrows
+\coordinate[left of=get_gui_event, xshift=-3cm] (d1);
+\coordinate[left of=issue_event, xshift=-85pt] (d2);
+\draw [arrow] (d1) -- (get_gui_event);
+\draw [-] (d1) to[below] node[auto] {} (d2);
+\draw [-] (issue_event) to[left] node[auto] {} (d2);
+
+\coordinate[left of=should_update, xshift=-85pt] (d3);
+\draw [-] (should_update) to[left] node[auto] {No} (d3);
+
+\coordinate[left of=expecting_reply, xshift=-85pt] (d4);
+\draw [-] (expecting_reply) to[left] node[auto] {No} (d4);
+
+\coordinate[left of=command_issued, xshift=-85pt] (d5);
+\draw [-] (command_issued) to[left] node[auto] {No} (d5);
+\end{tikzpicture}
+\caption{Typiskt programflöde.}
+\label{fig:gui_flowchart}
+\end{figure}
 
 \end{appendices}
 
