@@ -294,7 +294,7 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 
 \newpage
 \section{PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för en övergripande systemskiss för PC-mjukvaran.
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-mjukvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
@@ -302,10 +302,16 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{se
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-En godtycklig PC med Python-3-support, skärm, tangentbord, och blåtandsmodul.
+PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och blåtandsmodul.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+\begin{itemize}
+\item 1 st Bärbar PC med blåtandsmodul
+\end{itemize}
 
 \subsection{Mjukvara}
-
 Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 Då grafiska element (snarare än kommandoraden) måste utnyttjas så införskaffas ett lämpligt grafikbibliotek.
