@@ -215,7 +215,7 @@ Totalt är det fyra motorer som är monterade på chassit som går under namnet 
 \subsection{Mjukvara}
 Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
-\subsubsection{Tillstånds diagram}
+\subsubsection{Tillståndsdiagram}
 Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion på hur den ska köra. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart. 
 
 \begin{figure}[h!]
@@ -225,15 +225,10 @@ Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har
 \end{figure}
 
 \subsubsection{Trådning}
-Eftersom att styrenheten ska kunna arbeta medans kommandon läses in och skrivs ut blir det svårt att undvika parallella trådar. Totalt ska det behövas 4 olika trådar med följande uppgifter:
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt så ska vi inte behöva fler än 1 tråd som sköter logiken för styrenheten.
 
-\newpage
-\begin{enumerate}
-	\item Läsa in data kontinuerligt från bussen och sätta navigerings instruktionen som ska läsas in till styrenheten.
-	\item Skicka ut konstant information om styrenheten, t.ex. motorernas status, nuvarande tillstånd, etc.
-	\item Styrenhetens logik
-	\item Skicka och avläsa data till motorer. Dvs att formulera de instruktioner som ska skickas till respektive protokoll. Anledningen till att det inte är en till tråd separat för AX-12 servon är för att den aldrig kommer köras samtidigt som DC-motorerna.
-\end{enumerate}
+\subsection{Reglering}
+Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför vara ganska korta intervall så att roboten hinner reglera sin position innan den kör in i en vägg. 
 
 \subsection{Gränssnitt} \label{ssec:controllInterface}
 
