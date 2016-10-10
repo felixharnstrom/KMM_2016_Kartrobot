@@ -228,7 +228,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="4.2639608"
      inkscape:cx="283.81006"
-     inkscape:cy="532.59838"
+     inkscape:cy="326.2175"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -550,7 +550,7 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
-           sodipodi:role="line">UART</tspan><tspan
+           sodipodi:role="line">UART Half duplex</tspan><tspan
            style="font-size:7.5px"
            y="543.10449"
            x="270.21582"
