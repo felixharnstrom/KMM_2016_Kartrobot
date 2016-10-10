@@ -159,3 +159,20 @@ Godkänd & \LIPSgodkannare & \LIPSgodkantdatum \\
 	\normalfont
 }
 \newcommand{\LIPSdokument}[5]{\hline {#1} & {#2} & {#3} & {#4} & {#5}\\}
+
+\newenvironment{HardwareList}{%
+	\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+	\normalfont
+	\setlength\extrarowheight{2pt}
+	\begin{tabular}{| L{80pt} | L{200pt} | L{50pt } |}
+		
+		\hline
+		\textbf{Komponent} & \textbf{Beskrivning} & \textbf{Antal} \\
+	}%
+	{%
+		\hline
+	\end{tabular}
+	\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+	\normalfont
+}
+\newcommand{\hardware}[3]{\hline {#1} & {#2} & {#3}\\}
