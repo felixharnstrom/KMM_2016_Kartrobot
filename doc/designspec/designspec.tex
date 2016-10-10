@@ -232,8 +232,6 @@ Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har
 \end{figure}
 
 \subsubsection{Flödesschema}
-I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, dvs hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}.  
-
 I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, dvs hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
 
 \begin{figure}[h!]
