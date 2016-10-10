@@ -268,8 +268,12 @@
 =======
      inkscape:zoom="4.2639608"
      inkscape:cx="283.81006"
+<<<<<<< ec06764ad1a942edf740fc62f70f832e19d0ef16
      inkscape:cy="532.59838"
 >>>>>>> Edited images.
+=======
+     inkscape:cy="326.2175"
+>>>>>>> Flowchart added.
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -611,6 +615,7 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
+<<<<<<< ec06764ad1a942edf740fc62f70f832e19d0ef16
 <<<<<<< da6cc5e6fb21c50f1e80c78b3c24706aa5c3ae4a
 <<<<<<< 35c9d448eabed32588fcf4e26f572bd10fec4916
 <<<<<<< 77e300aa2d0b20c003e6cca19749c3742142f046
@@ -618,6 +623,9 @@
 =======
            sodipodi:role="line">UART</tspan><tspan
 >>>>>>> Updated image.
+=======
+           sodipodi:role="line">UART Half duplex</tspan><tspan
+>>>>>>> Flowchart added.
            style="font-size:7.5px"
            y="543.10449"
            x="270.21582"
