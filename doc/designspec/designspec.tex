@@ -231,6 +231,8 @@ Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har
 
 \subsubsection{Flödesschema}
 
+I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, dvs hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika tillstånden står för, se kapitel \ref{ssec:controlInterface}. 
+
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
 	\caption{Flödesschema för styrenheten.}
@@ -243,7 +245,7 @@ Eftersom att hårdvaran sköter inläsning från en pinne parallellt så ska vi 
 \subsection{Reglering}
 Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför vara ganska korta intervall så att roboten hinner reglera sin position innan den kör in i en vägg. 
 
-\subsection{Gränssnitt} \label{ssec:controllInterface}
+\subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
 Implementera en UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
