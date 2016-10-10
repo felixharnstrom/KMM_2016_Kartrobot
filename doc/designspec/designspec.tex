@@ -221,11 +221,11 @@ Totalt är det fyra motorer som är monterade på chassit som går under namnet 
 Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
 \subsubsection{Tillståndsdiagram}
-Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion på hur den ska köra. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart. 
+Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion på hur den ska köra. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet_schema.png}}
-	\caption{Tillstånds schema för styrenheten.}
+	\caption{Tillståndsdiagram för styrenheten.}
 	\label{fig:stateDiagram}
 \end{figure}
 
@@ -250,9 +250,10 @@ Implementera en UART-buss som endast går mellan styrenheten och kommunikationse
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
-	\item Hur många grader roboten ska svänga
-	\item Hur långt roboten ska köra i den riktningen
-	\item Vilken hastighet roboten ska köra med
+	\item Om instruktionen är av typen SCAN eller DRIVE. SCAN styr AX-12 servon medans DRIVE styr DC motorerna.
+	\item Hur många grader roboten/AX-12 servon ska rotera.
+	\item Hur långt roboten ska köra i den riktningen. Denna information är endast intressan om instruktionen är av typen DRIVE.
+	\item Vilken hastighet de givna motorerna ska köra med.
 \end{itemize}
 
 \newpage
