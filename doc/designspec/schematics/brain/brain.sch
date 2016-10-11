@@ -141,26 +141,26 @@ F 3 "" H 4400 2950 50  0000 C CNN
 	1    4400 2950
 	1    0    0    -1  
 $EndComp
-NoConn ~ 2350 2950
-NoConn ~ 2350 2850
-NoConn ~ 2350 2750
-NoConn ~ 2350 2650
-NoConn ~ 2350 2550
-NoConn ~ 2350 2450
-NoConn ~ 2350 2350
-NoConn ~ 2350 2250
-NoConn ~ 2350 2150
-NoConn ~ 2350 2050
-NoConn ~ 2350 1950
-NoConn ~ 2350 1850
-NoConn ~ 2350 1750
-NoConn ~ 2350 1650
-NoConn ~ 2350 1550
-NoConn ~ 2350 1450
-NoConn ~ 2350 1350
-NoConn ~ 2350 1250
-NoConn ~ 2350 1150
-NoConn ~ 2350 1050
+NoConn ~ 2750 2950
+NoConn ~ 2750 2850
+NoConn ~ 2750 2750
+NoConn ~ 2750 2650
+NoConn ~ 2750 2550
+NoConn ~ 2750 2450
+NoConn ~ 2750 2350
+NoConn ~ 2750 2250
+NoConn ~ 2750 2150
+NoConn ~ 2750 2050
+NoConn ~ 2750 1950
+NoConn ~ 2750 1850
+NoConn ~ 2750 1750
+NoConn ~ 2750 1650
+NoConn ~ 2750 1550
+NoConn ~ 2750 1450
+NoConn ~ 2750 1350
+NoConn ~ 2750 1250
+NoConn ~ 2750 1150
+NoConn ~ 2750 1050
 NoConn ~ 3250 1050
 NoConn ~ 3250 1150
 NoConn ~ 3250 1250
@@ -179,4 +179,15 @@ NoConn ~ 3250 2450
 NoConn ~ 3250 2550
 NoConn ~ 3250 2650
 NoConn ~ 3250 2750
+$Comp
+L Raspberry_pi_3_gpio P?
+U 1 1 57FD5699
+P 3000 2000
+F 0 "P?" H 3000 3050 50  0000 C CNN
+F 1 "Raspberry_pi_3_gpio" V 3000 2000 50  0000 C CNN
+F 2 "" H 3000 1050 50  0000 C CNN
+F 3 "" H 3000 1050 50  0000 C CNN
+	1    3000 2000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

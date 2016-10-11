@@ -194,11 +194,11 @@ X 5V 6 -500 -200 200 R 50 50 1 1 W
 ENDDRAW
 ENDDEF
 #
-# Raspberry Pi 3 GPIO
+# Raspberry_pi_3_gpio
 #
-DEF Raspberry Pi 3 GPIO P 0 1 Y N 1 F N
+DEF Raspberry_pi_3_gpio P 0 1 Y N 1 F N
 F0 "P" 0 1050 50 H V C CNN
-F1 "Raspberry Pi 3 GPIO" 0 0 50 V V C CNN
+F1 "Raspberry_pi_3_gpio" 0 0 50 V V C CNN
 F2 "" 0 -950 50 H V C CNN
 F3 "" 0 -950 50 H V C CNN
 $FPLIST
