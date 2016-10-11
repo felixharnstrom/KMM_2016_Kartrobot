@@ -34,10 +34,10 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
-Date ""
-Rev ""
-Comp ""
+Title "Sensorenhet"
+Date "2016-10-11"
+Rev "0.1"
+Comp "Grupp 1"
 Comment1 ""
 Comment2 ""
 Comment3 ""
