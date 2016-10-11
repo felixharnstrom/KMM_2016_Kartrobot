@@ -45,17 +45,6 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Raspberry~Pi~3~GPIO P?
-U 1 1 57FD3D22
-P 2800 2000
-F 0 "P?" H 2800 3050 50  0000 C CNN
-F 1 "Raspberry Pi 3 GPIO" V 2800 2000 50  0000 C CNN
-F 2 "" H 2800 1050 50  0000 C CNN
-F 3 "" H 2800 1050 50  0000 C CNN
-	1    2800 2000
-	1    0    0    -1  
-$EndComp
-$Comp
 L USB_A P?
 U 1 1 57FD3DF3
 P 2950 4250
@@ -84,7 +73,7 @@ P 3800 4300
 F 0 "U?" H 3450 4650 60  0000 C CNN
 F 1 "CH340G" H 3800 4300 60  0000 C CNN
 F 2 "" H 3800 4300 60  0001 C CNN
-F 3 "" H 3800 4300 60  0001 C CNN
+F 3 "TODO: Choose component" H 3800 4300 60  0001 C CNN
 	1    3800 4300
 	-1   0    0    1   
 $EndComp
@@ -95,7 +84,7 @@ P 3800 3450
 F 0 "U?" H 3450 3800 60  0000 C CNN
 F 1 "CH340G" H 3800 3450 60  0000 C CNN
 F 2 "" H 3800 3450 60  0001 C CNN
-F 3 "" H 3800 3450 60  0001 C CNN
+F 3 "TODO: Choose component" H 3800 3450 60  0001 C CNN
 	1    3800 3450
 	-1   0    0    1   
 $EndComp
