@@ -165,7 +165,7 @@ Här listar vi upp all hårdvara som vi behöver för att sensorenheten ska fung
 \subsubsection{Processor}
 ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
 
-\subsubsection{IR-sensor} \label{sssec:sonicsensors}
+\subsubsection{IR-sensorer} \label{sssec:sonicsensors}
 Det placeras två stycken IR-sensorer av modell GP2D120 på vardera sida om robotton, samt en på baksidan. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av dem dubla R-sensorerna per sida kan makt avgöras ifall roboten åker paralelt med väggen eller inte. Dessa behöver en utgång och en interrupt-ingång var. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan mäta avstånd inom intervallet 4-30cm, vilket räcker för att roboten är tänkt att följa en vägg. För att rutnätet på banan är 40 gånger 40 cm så räcker den smala avsläsningsintervallet.
 
 %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
@@ -195,7 +195,7 @@ LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam
 \subsubsection{I2C-buss}
 Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi stödjer i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
 
-\subsubsection{Ultraljudssensorer}
+\subsubsection{IR-sensorer}
 Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden av dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
 
 \subsubsection{Utvärden/Input}
