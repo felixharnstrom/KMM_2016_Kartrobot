@@ -400,7 +400,7 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
 \draw [arrow] (bluetooth) -- (get_gui_event);
 \draw [arrow] (get_gui_event) -- (command_issued);
 \draw [arrow] (command_issued) -- node[auto] {Yes} (should_transmit);
-\draw [arrow] (should_transmit) -- (perform);
+\draw [arrow] (should_transmit) -- node[auto] {No} (perform);
 \draw [arrow] (perform) -- (is_shutdown);
 \draw [arrow] (is_shutdown) -- node[auto] {Yes} (stop);
 \draw [arrow] (is_shutdown) |- node[anchor=east, xshift=0.8cm, yshift=-5cm] {No} (get_gui_event);
