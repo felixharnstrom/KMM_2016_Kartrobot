@@ -312,10 +312,8 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \end{itemize}
 
 \subsection{Mjukvara}
-Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
-
-Då grafiska element (snarare än kommandoraden) måste utnyttjas så införskaffas ett lämpligt grafikbibliotek.
-
+PC-mjukvaran ska ansvara för att kommunicera med roboten över blåtand och låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se bilaga \ref{app:flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
+ 
 \subsubsection{Input}
 PC-mjukvaran tar emot sensordata, styrdata och kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
 
@@ -370,6 +368,8 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
 \clearpage
 
 \section{Programflöde}
+\label{app:flowchart}
+
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
