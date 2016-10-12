@@ -129,9 +129,11 @@ Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \
 
 \section{Sensorenhet}
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. 
-Sensorenheten innehåller en processor av modellen ATmega1284, samt flera ultraljudssensorer, en lasernsensor, samt gyro.
-Ultraljudssensorer används primärt för navigering, så att robotten har lättare att köra i en raklinje längst en vägg. Lasersensorn används för analys av rummet. Med hjälp av gyrot är det lättare att hålla koll på rotationen av robotten.
+Sensorenheten innehåller en processor av modellen ATmega1284, flera IR-sensorer, en lasersensor, samt gyro.
+IR-sensorerna används primärt för navigering, så att roboten har lättare att köra i en rak linje längst en vägg. Lasersensorn används för analys av rummet. Med hjälp av gyrot är det lättare att hålla koll på rotationen av roboten.
 Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
+
+%TODO Update this figure to use IR sensors and gyro
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
 	\caption{Översikt över sensorenheten.}
