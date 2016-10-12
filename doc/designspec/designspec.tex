@@ -193,7 +193,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
-Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorerna. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
+Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorer. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
@@ -203,18 +203,15 @@ Styrenheten är ansvarig för all logik och funktionalitet för robotens lågniv
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi ska använda en Atmega1284 processor för styrmodulen. Processorn kommer totalt att kommunicera med 2 DC-motorer som sitter på chassit och 1 servo för rotation av tornet. Alla motorerna kommer kommunicera över PWM.
+Vi ska använda en Atmega1284 processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit och 1 AX-12 servo. Alla motorerna kommer kommunicera över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
-<<<<<<< 5f72b6d0f5aef6fbab97390cd7d2ccf20f977ef1
 
-% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
+På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
 
-% Alternativ 3: Stepper motor med driver.
-=======
+Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
+
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
->>>>>>> Resolved conflicts locally.
 
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt kommer alltså 4 pinnar på Atmega1284 processorn att användas för styrning av hjulen.
@@ -223,7 +220,7 @@ Totalt är det fyra motorer som är monterade på chassit som går under namnet 
 Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
 \subsubsection{Tillståndsdiagram}
-Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion på hur den ska köra. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart.
+Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet-statediagram.png}}
@@ -242,10 +239,10 @@ I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalite
 \end{figure}
 
 \subsubsection{Trådning}
-Eftersom att hårdvaran sköter inläsning från en pinne parallellt så det kommer inte behövas mer än 1 tråd för styrenheten.
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så det kommer inte behövas mer än 1 tråd för styrenheten.
 
 \subsection{Reglering}
-Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför vara ganska korta intervall så att roboten hinner reglera sin position innan den kör in i en vägg. 
+Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
@@ -256,7 +253,7 @@ Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
 	\item Om instruktionen är av typen SCAN eller DRIVE. SCAN styr AX-12 servon medans DRIVE styr DC motorerna.
 	\item Hur många grader roboten/AX-12 servon ska rotera.
-	\item Hur långt roboten ska köra i den riktningen. Denna information är endast intressan om instruktionen är av typen DRIVE.
+	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressan om instruktionen är av typen DRIVE.
 	\item Vilken hastighet de givna motorerna ska köra med.
 \end{itemize}
 
