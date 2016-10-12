@@ -28,7 +28,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:styrenhet-cache
+LIBS:tsea29
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -263,4 +263,6 @@ F 3 "" H 6900 3400 60  0001 C CNN
 	1    6900 3400
 	1    0    0    -1  
 $EndComp
+Text Label 6000 5150 0    60   ~ 0
+TODO:SERVO
 $EndSCHEMATC
