@@ -199,13 +199,7 @@ Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan 
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut, antingen med ett LP-filter eller med flera mätningar och mjukvara.
 
 \subsubsection{Utvärden/Input}
-Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
-
-\paragraph{Alternativ 1}
-Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
-
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+En UART-buss används där den inbyggda UART-hårdvaran utnyttjas. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
