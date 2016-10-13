@@ -149,13 +149,17 @@ Ovanpå denna sitter den avståndskänsliga lasern LIDAR - systemets främsta va
 
 Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska kunna rotera mer precist.
 
-I figur \ref{fig:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
+I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
 
-\begin{figure}
-    \makebox[\textwidth][c]{\includegraphics[scale=0.5]{layout_topdown_vectorized.png}}
-    \caption{Placering av hårdvara på robotchassit.}
-    \label{fig:placement}
-\end{figure}
+\subsection{Kommunikation}
+\label{ssec:brainInterface}
+Två UART-bussar används, som kopplas från kommunikations- och kontrollenheten till sensorenheten och styrenheten. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt.% TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+
+\begin{center}
+\begin{HardwareList}
+\hardware{USB-UART}{Omvandlare för USB till UART}{2}
+\end{HardwareList}
+\end{center}
 
 \clearpage
 \section{Sensorenhet} \label{sec:system1}
@@ -218,10 +222,10 @@ Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssni
 Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
@@ -269,10 +273,10 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 \subsubsection{Styrsignaler samt styrdata}
 
 \paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se bilaga  \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
@@ -296,7 +300,7 @@ Då detta delsystem har hand om relativt tunga beräkningar används en Raspberr
 Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 \subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
 
 Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se \ref{sec:system4}) över blåtand, där den skickar debugdata och kartinformation, och tar emot kommandon vid manuell styrning. Mjukvara för blåtandskommunikation måste finnas.
 
@@ -311,15 +315,15 @@ Robotens huvuduppdrag i det autonoma läget är att skanna ett rum och rita en k
 \subsubsection{Ruttstyrning}
 Roboten behöver kontinuerligt ta reda på, och leta sig till, outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
 
-\subsection{Gränssnitt} \label{ssec:brainInterface}
-
-\paragraph{Alternativ 1}
-Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
-
-
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
-Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
+%\subsection{Gränssnitt} 
+%
+%\paragraph{Alternativ 1}
+%Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+%
+%
+%\paragraph{Alternativ 2}
+%I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
+%Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
 
 \newpage
 \section{ Mjukvara på PC} \label{sec:system4}
@@ -378,6 +382,15 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
     \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
 \end{itemize}
+
+\clearpage
+\section{Robotplattform}
+\label{app:placement}
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[scale=0.6]{layout_topdown_vectorized.png}}
+    \caption{Placering av hårdvara på robotchassit.}
+    \label{fig:placement}
+\end{figure}
 
 \end{appendices}
 
