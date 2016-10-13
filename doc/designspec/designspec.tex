@@ -136,7 +136,7 @@ På den externa PC:n finner vi ett användargränssnitt där en människa kan l�
 
 I figur \ref{fig:modules} beskrivs det grafiskt hur dessa moduler kommunicerar med varandra. Mer detaljerade blockschema finns till varje modul, samt en fullständig översikt i figur \ref{fig:modulesDetailed}.
 
-\begin{figure}[h!]
+\begin{figure}
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
     \caption{Modulöversikt.}
     \label{fig:modules}
@@ -151,15 +151,13 @@ Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska 
 
 I figur \ref{fig:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
 
-%TODO: Det ska vara två ir-sensorer/sida
-%TODO: Inkscapeify
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[scale=0.40]{layout_topdown.png}}
+\begin{figure}
+    \makebox[\textwidth][c]{\includegraphics[scale=0.5]{layout_topdown_vectorized.png}}
     \caption{Placering av hårdvara på robotchassit.}
     \label{fig:placement}
 \end{figure}
 
-\newpage
+\clearpage
 \section{Sensorenhet} \label{sec:system1}
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
 \begin{figure}[h!]
