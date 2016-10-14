@@ -154,7 +154,6 @@ LIDAR är en kraftfull lasersensor som används för mätningar som kräver bät
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
 \subsubsection{IMU} \label{sssec:imu}
-
 MLX90609 är ett gyro som används via en analog ingång. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
 
 \subsubsection{Komponentbudget}
@@ -171,9 +170,9 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
+Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
 
-Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna skicka det vidare (se \ref{ssec:sensorInterface}), samt ta emot avläsningsinstruktioner.
+Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot avläsningsinstruktioner. % TODO Avläsningsinstruktioner? Menas kommandon som: ``Tja, jag ser gärna detta avläst''? Bör förtydligas och utvecklas.
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten kan ta emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
