@@ -174,8 +174,12 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 
 Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot avläsningsinstruktioner. % TODO Avläsningsinstruktioner? Menas kommandon som: ``Tja, jag ser gärna detta avläst''? Bör förtydligas och utvecklas.
 
+% TODO Denna sektionen känns i största allmänhet alldeles för tunn. Utveckla mer. Lägg till flödesscheman.
+
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten kan ta emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
+Sensorenheten ska kommunicera med de sensorerna och passera vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
+
+% TODO Utveckla den här sektionen. Nämn inte I2C; det används inte. Jag misstänker att det mesta av texten nedan bara är rakt ur systemskissen.
 
 \subsubsection{LIDAR}
 LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
