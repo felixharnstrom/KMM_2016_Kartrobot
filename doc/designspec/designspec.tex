@@ -148,15 +148,14 @@ ATmega1284p används som processormodell, då den är kraftfull utan att ta det 
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
 Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallelt med väggen eller inte. Dessa behöver en A/D-omvanlare var. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm, vilket räcker, då roboten är tänkt att följa en vägg. Rutnätet på banan är nämligen 40 gånger 40 cm.
 
-
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som används för mätningar som kräver noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
+LIDAR är en kraftfull lasersensor som används för mätningar som kräver bättre noggranhet. Komponenten kommuniceras med via en trigger-pin och PWM-output.
 
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
 
 \subsubsection{IMU} \label{sssec:imu}
 
-MLX90609 är ett gyro som används via en analog ingång. Den ger oss endast rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
+MLX90609 är ett gyro som används via en analog ingång. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
