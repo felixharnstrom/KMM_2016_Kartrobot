@@ -294,7 +294,7 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 
 \newpage
 \section{PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-mjukvaran.
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
@@ -302,7 +302,7 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{se
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och blåtandsmodul.
+PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och blåtandsmodul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -314,10 +314,13 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \end{center}
 
 \subsection{Mjukvara}
-PC-mjukvaran ska ansvara för att kommunicera med roboten över blåtand, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se bilaga \ref{app:flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
- 
+PC-mjukvaran ansvarar för att kommunicera med roboten över blåtand, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se bilaga \ref{app:flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
+
+% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
+%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
+
 \subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
+PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
 
 \subsubsection{Output}
 Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
@@ -325,7 +328,7 @@ Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till r
 \subsubsection{GUI}
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
 
-Det grafiska gränssnittet ska byggas med biblioteket \textit{Tkinter}.
+Det grafiska gränssnittet byggs med grafikbiblioteket \textit{Tkinter}.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
