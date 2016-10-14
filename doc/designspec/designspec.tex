@@ -216,6 +216,14 @@ Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhind
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
 
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+% TODO rebase so we get access to updated LIPS.tex; HardwareList is undefined
+% TODO add hardware
+%\begin{HardwareList}
+%\hardware{foo}{bar}{baz}
+%\end{HardwareList}
+
 \subsection{Mjukvara}
 Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
