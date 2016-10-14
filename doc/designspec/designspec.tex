@@ -143,10 +143,10 @@ Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenhet
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift.
+ATmega1284p används som processormodell, då den är kraftfull utan att ta det till överdrift.
 
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
-Det placeras två stycken IR-sensorer av modell GP2D120 på vardera sida om robotton, samt en på baksidan. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av dem dubla IR-sensorerna per sida kan det avgöras ifall roboten åker paralelt med väggen eller inte. Dessa behöver en A/D-omvanlare var. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan mäta avstånd inom intervallet 4-30cm, vilket räcker för att roboten är tänkt att följa en vägg. För att rutnätet på banan är 40 gånger 40 cm så räcker den smala avsläsningsintervallet.
+Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallelt med väggen eller inte. Dessa behöver en A/D-omvanlare var. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm, vilket räcker, då roboten är tänkt att följa en vägg. Rutnätet på banan är nämligen 40 gånger 40 cm.
 
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
@@ -165,6 +165,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 %\begin{HardwareList}
 %\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar.}{1}
 %\hardware{GP2D120}{IR-sensor.}{5}
+%\hardware{AD-omvandlare}{För vardera av IR-sensorerna.}{5}
 %\hardware{LIDAR lite v2}{Avancerad lasersensor.}{1}
 %\hardware{MLX90609}{Gyro.}{1}
 %\end{HardwareList}
