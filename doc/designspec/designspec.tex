@@ -142,24 +142,6 @@ Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenhet
 
 \subsection{Hårdvara}
 
-\subsubsection{Hårdvarolista}
-Här listar vi upp all hårdvara som vi behöver för att sensorenheten ska fungera.
-\begin{center}
-	\begin{tabular}{|l|l|c|}
-		\hline
-		Komponent & Förklaring & Antal \\
-		\hline\hline
-		ATmega1284 & En mikroprocessor med 44 pinnar & 1 \\
-		\hline
-		GP2D120 & IR-sensor  & 5 \\
-		\hline
-		LIDAR lite v2 & Lasersensor & 1 \\
-		\hline
-		MLX90609 & Gyro & 1 \\
-		\hline
-	\end{tabular}
-\end{center}
-
 \subsubsection{Processor}
 ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift.
 
@@ -175,6 +157,17 @@ Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specif
 \subsubsection{IMU} \label{sssec:imu}
 
 MLX90609 är ett gyro som används via en analog ingång. Den ger oss endast rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+%TODO Uncomment after rebase; hardware list is not yet defined in LIPS.tex
+%\begin{HardwareList}
+%\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar.}{1}
+%\hardware{GP2D120}{IR-sensor.}{5}
+%\hardware{LIDAR lite v2}{Avancerad lasersensor.}{1}
+%\hardware{MLX90609}{Gyro.}{1}
+%\end{HardwareList}
 
 \subsection{Mjukvara}
 
