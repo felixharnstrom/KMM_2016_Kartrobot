@@ -90,15 +90,9 @@ Wire Wire Line
 Wire Wire Line
 	2800 2300 2650 2300
 Wire Wire Line
-	2800 2100 2800 2200
+	2800 2100 2800 2450
 Wire Wire Line
-	2800 2200 2800 2300
-Wire Wire Line
-	2800 2300 2800 2450
-Wire Wire Line
-	2650 2200 2800 2200
-Wire Wire Line
-	2800 2200 3000 2200
+	2650 2200 3000 2200
 Connection ~ 2800 2200
 Wire Wire Line
 	2650 2100 2800 2100
@@ -150,8 +144,6 @@ F 3 "" H 1550 2300 50  0000 C CNN
 	1    1550 2300
 	1    0    0    -1  
 $EndComp
-Text GLabel 3750 2000 0    60   Input ~ 0
-RESET
 NoConn ~ 5750 2000
 NoConn ~ 5750 2100
 NoConn ~ 5750 2200
@@ -311,4 +303,61 @@ F 3 "" H 6300 4350 50  0000 C CNN
 	1    6300 4350
 	1    0    0    -1  
 $EndComp
+$Comp
+L SPST SW?
+U 1 1 58011D2C
+P 2000 1400
+F 0 "SW?" H 2000 1500 50  0000 C CNN
+F 1 "SPST" H 2000 1300 50  0000 C CNN
+F 2 "" H 2000 1400 50  0000 C CNN
+F 3 "" H 2000 1400 50  0000 C CNN
+	1    2000 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L R 10k
+U 1 1 58011D8D
+P 2500 850
+F 0 "10k" V 2580 850 50  0000 C CNN
+F 1 "R" V 2500 850 50  0000 C CNN
+F 2 "" V 2430 850 50  0000 C CNN
+F 3 "" H 2500 850 50  0000 C CNN
+	1    2500 850 
+	1    0    0    -1  
+$EndComp
+$Comp
+L +5V #PWR?
+U 1 1 58011E06
+P 2500 700
+F 0 "#PWR?" H 2500 550 50  0001 C CNN
+F 1 "+5V" H 2500 840 50  0000 C CNN
+F 2 "" H 2500 700 50  0000 C CNN
+F 3 "" H 2500 700 50  0000 C CNN
+	1    2500 700 
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58011E31
+P 1500 1400
+F 0 "#PWR?" H 1500 1150 50  0001 C CNN
+F 1 "GND" H 1500 1250 50  0000 C CNN
+F 2 "" H 1500 1400 50  0000 C CNN
+F 3 "" H 1500 1400 50  0000 C CNN
+	1    1500 1400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2500 1000 2500 1400
+Connection ~ 2500 1200
+Text Label 1000 1100 0    60   ~ 0
+Reset_shared_between_modules
+Text GLabel 2700 1200 2    60   Input ~ 0
+RESET
+Wire Wire Line
+	2700 1200 2500 1200
+Text GLabel 3700 2000 0    60   Output ~ 0
+RESET
+Wire Wire Line
+	3700 2000 3750 2000
 $EndSCHEMATC
