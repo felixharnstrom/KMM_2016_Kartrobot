@@ -196,7 +196,7 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
-Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorer. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
+Styrenheten är ansvarig för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorer. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
@@ -207,23 +207,23 @@ Styrenheten är ansvarig för all logik och funktionalitet för robotens lågniv
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi ska använda en Atmega1284 processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit och 1 AX-12 servo. Alla motorerna kommer kommunicera över PWM.
+Vi ska använda en Atmega1284p processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommer att kommunicera över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad på en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
+På toppen av roboten ska en lasersensor (se \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
 
 Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
 
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \subsubsection{Hjulmotorer}
-Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt kommer alltså 4 pinnar på Atmega1284 processorn att användas för styrning av hjulen.
+Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
 
 \subsection{Mjukvara}
-Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
+Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
 \subsubsection{Tillståndsdiagram}
-Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har vi totalt 3 olika tillstånd. Medans styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta på en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart utan att stanna.
+Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet-statediagram.png}}
@@ -231,10 +231,8 @@ Som vi ser i tillstånds schemat för styrenheten \ref{fig:stateDiagram} så har
 	\label{fig:stateDiagram}
 \end{figure}
 
-\subsubsection{Flödesschema}
-I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, dvs hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
-
-I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, dvs hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
+\subsubsection{Övergripande programflöde}
+I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
@@ -243,7 +241,7 @@ I flödesschemat \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalite
 \end{figure}
 
 \subsubsection{Trådning}
-Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så det kommer inte behövas mer än 1 tråd för styrenheten.
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs mer än en tråd för styrenheten.
 
 \subsection{Reglering}
 Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
@@ -251,7 +249,7 @@ Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir d
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
-Implementera en UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenheten. Se sektion \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
