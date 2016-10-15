@@ -178,7 +178,6 @@ NoConn ~ 5750 2700
 NoConn ~ 5750 2900
 NoConn ~ 5750 3000
 NoConn ~ 5750 3100
-NoConn ~ 5750 3600
 NoConn ~ 5750 3800
 NoConn ~ 5750 3900
 NoConn ~ 5750 4000
