@@ -235,7 +235,7 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
 \begin{figure}[h!]
-	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet-statediagram.png}}
+	\makebox[\textwidth][c]{\includegraphics[width=0.5\textwidth]{styrenhet-statediagram.png}}
 	\caption{Tillståndsdiagram för styrenheten.}
 	\label{fig:stateDiagram}
 \end{figure}
@@ -302,14 +302,8 @@ Styrdatan ska innehålla information om följande punkter:
 
 Från styrenheten skickas information om vilka hastigheter motorerna/servot fått när instruktionen utförs.
 
-Styrdatan ska innehålla information om följande punkter:
-\begin{itemize}
-	\item Hur många grader roboten ska svänga
-	\item Hur långt roboten ska köra i den riktningen
-	\item Vilken hastighet roboten ska köra med
-\end{itemize}
+\clearpage
 
-\newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
 Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med den bärbara datorn. I denna modul ingår också kontrollenheten, som gör beräkningar relaterat till både det manuella och det autonoma läget. Se figur \ref{fig:unitBrain} för en övergripande systemskiss för kommunikations- och kontrollenheten.
 \begin{figure}[h!]
