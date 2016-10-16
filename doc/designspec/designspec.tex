@@ -181,10 +181,10 @@ Sensorenheten ska kommunicera med de sensorerna och passera vidare utdata. Senso
 % TODO Utveckla den här sektionen. Nämn inte I2C; det används inte. Jag misstänker att det mesta av texten nedan bara är rakt ur systemskissen.
 
 \subsubsection{LIDAR}
-LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
+LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ ifall behov uppstår kan också I\textsuperscript{2}C användas.
 
-\subsubsection{I2C-buss}
-Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi stödjer i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+\subsubsection{Gyro}
+MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. På kortet finns också en tempeartursensor för att att man ska kunna kompensera för störningar av temperaturskillnader. Denna implementeras endast om störningarna blir oväntat stora.
 
 \subsubsection{IR-sensorer}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut, antingen med ett LP-filter eller med flera mätningar och mjukvara.
