@@ -6,6 +6,9 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -240,7 +243,39 @@ Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) 
 I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
 
 \begin{figure}[h!]
-	\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% Styles
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+
+\node (start) [startstop] {Start};
+\node (wait_state) [process, below of=start] {\texttt{WAIT\_STATE\_ACTIVATED}};
+\node (is_instruction_ready) [decision, right of=wait_state, xshift=6cm] {Any instruction ready \\ to be executed?};
+\node (brake) [process, right of=is_instruction_ready, xshift=6cm] {Apply brakes if moving};
+\node (turn_state) [process, below of=is_instruction_ready, yshift=-2cm] {\texttt{TURN\_STATE\_ACTIVATED} \\ \\ Turn robot/tower to \\ \texttt{goal\_direction}};
+\node (scan_or_drive) [process, below of=turn_state, yshift=-1cm] {Is instruction \texttt{SCAN} or \texttt{DRIVE}?};
+\node (drive_state) [process, below of=scan_or_drive, yshift=-0.8cm] {\texttt{DRIVE\_STATE\_ACTIVATED} \\ \\ Drive distance \texttt{goal\_distance}};
+
+\draw [arrow] (start) -- (wait_state);
+\draw [arrow] (wait_state) -- (is_instruction_ready);
+\draw [arrow] (is_instruction_ready) -- node[auto] {No} (brake);
+\draw [arrow] (is_instruction_ready) -- node[auto] {Yes} (turn_state);
+\draw [arrow] (turn_state) -- (scan_or_drive);
+\draw [arrow] (scan_or_drive) -- node[auto] {\texttt{DRIVE}} (drive_state);
+\draw [arrow] (scan_or_drive) -| node[anchor=south, xshift=4cm] {\texttt{SCAN}} (wait_state);
+\draw [arrow] (drive_state) -| (wait_state);
+
+\coordinate[above of=is_instruction_ready, yshift=1cm] (d0);
+\draw [-] (brake) |- (d0);
+\draw [arrow] (d0) -- (is_instruction_ready);
+
+
+\end{tikzpicture}
+	%\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
 	\caption{Flödesschema för styrenheten.}
 	\label{fig:styrenhetFlowchart}
 \end{figure}
