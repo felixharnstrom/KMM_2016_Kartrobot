@@ -297,8 +297,8 @@ Vid kommunikationsenheten behöver dessutom en logic level shifter användas, d�
 Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
-    \caption{Översikt över PCn.}
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{PC.png}}
+    \caption{Översikt över PC-modulen.}
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
@@ -314,66 +314,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \end{center}
 
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över blåtand, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se bilaga \ref{app:flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
-
-% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
-%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
-
-\subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
-
-\subsubsection{Output}
-Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
-
-\subsubsection{GUI}
-Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
-
-Det grafiska gränssnittet byggs med grafikbiblioteket \cite{tkinter}.
-
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
-    \caption{Mockup av det grafiska gränssnittet.}
-    \label{fig:gui_mockup}
-\end{figure}
-
-\subsection{Gränssnitt} \label{ssec:PCInterface}
-
-PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
-
-\newpage
-\begin{appendices}
-
-\section{Detaljerat blockschema}
-% TODO: Riktig titel
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
-    \caption{Detaljerat blockschema över systemet.}
-    \label{fig:modulesDetailed}
-\end{figure}
-
-\noindent \begin{small}
-    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
-    ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
-\end{small}
-
-\clearpage
-
-\section{C-standard} \label{sec:cstandard}
-Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
-
-\begin{itemize}
-    \item Indenteringar sker med exakt fyra stycken mellanslag.
-    \item Namn på funktioner, typedef, variabler, strukter, unioner, och enums ska vara i lower camel case.
-    \item Namn på \#define's, enum-konstanter, och macrofunktioner ska vara i all-caps med ord separerade av underscore.
-    \item Typedef:ade namn ska avslutas med "\_t".
-    \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
-    \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
-\end{itemize}
-
-\clearpage
-
-\section{Programflöde}
-\label{app:flowchart}
+PC-mjukvaran ansvarar för att kommunicera med roboten över blåtand, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 \begin{figure}[h!]
 \centering
@@ -435,6 +376,59 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
 \label{fig:gui_flowchart}
 \end{figure}
 
+% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
+%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
+
+\subsubsection{Input}
+PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
+
+\subsubsection{Output}
+Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
+
+\subsubsection{GUI}
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
+
+Det grafiska gränssnittet byggs med grafikbiblioteket \cite{tkinter}.
+
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
+    \caption{Mockup av det grafiska gränssnittet.}
+    \label{fig:gui_mockup}
+\end{figure}
+
+\subsection{Gränssnitt} \label{ssec:PCInterface}
+
+PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
+
+\clearpage
+\begin{appendices}
+
+\section{Detaljerat blockschema}
+% TODO: Riktig titel
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
+    \caption{Detaljerat blockschema över systemet.}
+    \label{fig:modulesDetailed}
+\end{figure}
+
+\noindent \begin{small}
+    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
+    ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
+\end{small}
+
+\clearpage
+
+\section{C-standard} \label{sec:cstandard}
+Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
+
+\begin{itemize}
+    \item Indenteringar sker med exakt fyra stycken mellanslag.
+    \item Namn på funktioner, typedef, variabler, strukter, unioner, och enums ska vara i lower camel case.
+    \item Namn på \#define's, enum-konstanter, och macrofunktioner ska vara i all-caps med ord separerade av underscore.
+    \item Typedef:ade namn ska avslutas med "\_t".
+    \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
+    \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
+\end{itemize}
 \end{appendices}
 
 \clearpage
