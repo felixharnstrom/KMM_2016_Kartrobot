@@ -231,7 +231,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
 \subsubsection{Tillståndsdiagram}
-Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet WAIT så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till WAIT så kommer roboten börja på denna instruktion omedelbart utan att stanna.
+Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{styrenhet-statediagram.png}}
@@ -240,7 +240,7 @@ Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) 
 \end{figure}
 
 \subsubsection{Övergripande programflöde}
-I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna SCAN och DRIVE. Om instruktionen är av typen SCAN så kommer aldrig styrenheten att gå in i tillståndet TURN då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
+I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna \texttt{SCAN} och \texttt{DRIVE}. Om instruktionen är av typen \texttt{SCAN} så kommer aldrig styrenheten att gå in i tillståndet \texttt{TURN} då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
 
 \begin{figure}[h!]
 \centering
@@ -293,9 +293,9 @@ Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenhe
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
-	\item Om instruktionen är av typen SCAN eller DRIVE. SCAN styr AX-12 servon medans DRIVE styr DC motorerna.
+	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr AX-12 servon medans \texttt{DRIVE} styr DC motorerna.
 	\item Hur många grader roboten/AX-12 servon ska rotera.
-	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressan om instruktionen är av typen DRIVE.
+	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressan om instruktionen är av typen \texttt{DRIVE}.
 	\item Vilken hastighet de givna motorerna ska köra med.
 \end{itemize}
 
