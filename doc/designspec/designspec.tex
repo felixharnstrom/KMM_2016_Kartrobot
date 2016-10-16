@@ -241,7 +241,7 @@ Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) 
 \end{figure}
 
 \subsubsection{Övergripande programflöde}
-I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna \texttt{SCAN} och \texttt{DRIVE}. Om instruktionen är av typen \texttt{SCAN} så kommer aldrig styrenheten att gå in i tillståndet \texttt{TURN} då det inte finns något avstånd att köra. Denna typ av design utesluter givetvist möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
+I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna \texttt{SCAN} och \texttt{DRIVE}. Om instruktionen är av typen \texttt{SCAN} så kommer aldrig styrenheten att gå in i tillståndet \texttt{TURN} då det inte finns något avstånd att köra. Denna typ av design utesluter givetvis möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
 
 \begin{figure}[h!]
 \centering
@@ -296,7 +296,7 @@ Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
 	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr AX-12 servon medans \texttt{DRIVE} styr DC motorerna.
 	\item Hur många grader roboten/AX-12 servon ska rotera.
-	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressan om instruktionen är av typen \texttt{DRIVE}.
+	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressant om instruktionen är av typen \texttt{DRIVE}.
 	\item Vilken hastighet de givna motorerna ska köra med.
 \end{itemize}
 
