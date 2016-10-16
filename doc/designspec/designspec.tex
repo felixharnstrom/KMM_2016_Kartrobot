@@ -210,7 +210,7 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Styrenheten är länke
 Vi ska använda en Atmega1284p processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommer att kommunicera över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en lasersensor (se \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
+På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
 
 Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
 
@@ -257,7 +257,7 @@ Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir d
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
-Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenheten. Se sektion \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenheten. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
