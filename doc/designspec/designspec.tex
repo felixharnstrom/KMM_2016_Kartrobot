@@ -6,6 +6,9 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -290,36 +293,114 @@ I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikation
 Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
 
 \newpage
-\section{ Mjukvara på PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för en övergripande systemskiss för PC-mjukvaran.
+\section{PC} \label{sec:system4}
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{PC.png}}
-    \caption{Översikt över PCn.}
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{PC.png}}
+    \caption{Översikt över PC-modulen.}
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-En godtycklig PC med Python-3-support, skärm, tangentbord, och blåtandsmodul.
+PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och blåtandsmodul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+\begin{center}
+\begin{HardwareList}
+\hardware{PC}{Bärbar PC med blåtandsmodul}{1}
+\end{HardwareList}
+\end{center}
 
 \subsection{Mjukvara}
+PC-mjukvaran ansvarar för att kommunicera med roboten över blåtand, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
-Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% Styles
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
 
-Då grafiska element (snarare än kommandoraden) måste utnyttjas så införskaffas ett lämpligt grafikbibliotek.
+% Nodes
+\node (start) [startstop] {Start};
+\node (bluetooth) [process, below of=start] {Establish Bluetooth \\ connection};
+\node (get_gui_event) [io, below of=bluetooth] {Get GUI event};
+\node (command_issued) [decision, below of=get_gui_event, yshift=-0.8cm] {GUI command \\ issued?};
+\node (should_transmit) [decision, below of=command_issued, yshift=-2cm] {Should \\ command be \\ transmitted?};
+\node (perform) [process, right of=should_transmit, xshift=4cm] {Perform command};
+\node (is_shutdown) [decision, right of=perform, xshift=3.5cm] {Command is \\ shutdown?};
+\node (stop) [startstop, below of=is_shutdown, yshift=-1cm] {Stop};
+\node (transmit) [process, below of=should_transmit, yshift=-1cm] {Transmit command};
+\node (expecting_reply) [decision, below of=transmit, yshift=-1cm] {Query expecting \\ reply?};
+\node (read_reply) [io, below of=expecting_reply, yshift=-1cm] {Read reply};
+\node (should_update) [decision, below of=read_reply, yshift=-1cm] {Reply should \\ update GUI?};
+\node (issue_event) [process, below of=should_update, yshift=-1cm] {Issue GUI event};
+
+% Arrows
+\draw [arrow] (start) -- (bluetooth);
+\draw [arrow] (bluetooth) -- (get_gui_event);
+\draw [arrow] (get_gui_event) -- (command_issued);
+\draw [arrow] (command_issued) -- node[auto] {Yes} (should_transmit);
+\draw [arrow] (should_transmit) -- node[auto] {No} (perform);
+\draw [arrow] (perform) -- (is_shutdown);
+\draw [arrow] (is_shutdown) -- node[auto] {Yes} (stop);
+\draw [arrow] (is_shutdown) |- node[anchor=east, xshift=0.8cm, yshift=-5cm] {No} (get_gui_event);
+\draw [arrow] (should_transmit) -- node[auto] {Yes} (transmit);
+\draw [arrow] (transmit) -- (expecting_reply);
+\draw [arrow] (expecting_reply) -- node[auto] {Yes} (read_reply);
+\draw [arrow] (read_reply) -- (should_update);
+\draw [arrow] (should_update) -- node[auto] {Yes} (issue_event);
+
+% Common decision arrows
+\coordinate[left of=get_gui_event, xshift=-3cm] (d1);
+\coordinate[left of=issue_event, xshift=-85pt] (d2);
+\draw [arrow] (d1) -- (get_gui_event);
+\draw [-] (d1) to[below] node[auto] {} (d2);
+\draw [-] (issue_event) to[left] node[auto] {} (d2);
+
+\coordinate[left of=should_update, xshift=-85pt] (d3);
+\draw [-] (should_update) to[left] node[auto] {No} (d3);
+
+\coordinate[left of=expecting_reply, xshift=-85pt] (d4);
+\draw [-] (expecting_reply) to[left] node[auto] {No} (d4);
+
+\coordinate[left of=command_issued, xshift=-85pt] (d5);
+\draw [-] (command_issued) to[left] node[auto] {No} (d5);
+\end{tikzpicture}
+\caption{Typiskt programflöde.}
+\label{fig:gui_flowchart}
+\end{figure}
+
+% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
+%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
 
 \subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
+PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via blåtand. Den tar också emot instruktioner från mus och tangentbord. 
 
 \subsubsection{Output}
 Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
 
-Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt.
+\subsubsection{GUI}
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
+
+Det grafiska gränssnittet byggs med grafikbiblioteket \cite{tkinter}.
+
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
+    \caption{Mockup av det grafiska gränssnittet.}
+    \label{fig:gui_mockup}
+\end{figure}
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-PC:n utnyttjar, som omnämnt, en blåtandsmodul.
+PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
 
-\newpage
+\clearpage
 \begin{appendices}
 
 \section{Detaljerat blockschema}
@@ -335,6 +416,8 @@ PC:n utnyttjar, som omnämnt, en blåtandsmodul.
     ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
 \end{small}
 
+\clearpage
+
 \section{C-standard} \label{sec:cstandard}
 Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
 
@@ -346,7 +429,6 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
     \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
 \end{itemize}
-
 \end{appendices}
 
 \clearpage
