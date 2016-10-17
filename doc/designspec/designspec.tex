@@ -109,6 +109,18 @@
 \setcounter{page}{1}
 \pagestyle{content}
 
+
+\section{Implementationsstrategi}
+Arbetet i implementationsfasen delas så att medlemmarna kan arbeta parallelt med olika delsystem samtidigt. De som arbetar på en modul ansvarar för att tester finns, och detta säkerställs av testansvarig (generellt) och delvis mjukvaruansvarig samt hårdvaruansvarig (som ser till att testsuiter finns respektive att hårdvarutester utförs).
+
+Att säga att implementation sker "utifrån och in" eller "inifrån och ut" är därmed inte riktigt applicerbart. Implementation sker parallelt istället.
+
+Vid särskilda tidspunkter i projektet så intergreras moduler. Var då vänliga att referera till tidsplanen. Grupper är fria att testa gentemot varandra tidigare än så om de är överens. Sent i projektet sker systemtest, och tid ges för att fixa de fel som uppkommer.
+
+Feedback fås i senare i projektet via PC-mjukvaran (se kapitel \ref{sec:system4}). Tidigare så kan LED-skärmar och oscilloskop användas för debugging.
+% TODO: Hur ofta bör man sampla?
+%       Vad menas ens med att sampla? Hur ofta man utför test?
+
 \section{Systemöversikt}
 I detta projekt konstrueras en robot med förmågan att kartlägga rum som specificeras enligt \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett blåtandsgränssnitt. Se figur \ref{fig:overview} för en bild på roboten i sin omgivning.
 
