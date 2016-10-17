@@ -159,12 +159,15 @@ För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{se
 
 Vidare är en UART-buss mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske.
 
+För kommunikation mellan utvecklare och processor under utvecklingsfasen kan ytterligare hjälpmedel behövas. Ett par 7-segment-displayer för ATmega1284-processorerna kan visa sig mycket användbara för avlusning.
+
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som den övergripande kommunikationen kräver.
 
 \begin{center}
 \begin{HardwareList}
 \hardware{USB-UART}{Omvandlare för USB till UART}{2}
+\hardware{7-segment-display}{7-segment-displayer för avlusning, en för vardera ATmega1284-processor}{2}
 \end{HardwareList}
 \end{center}
 
