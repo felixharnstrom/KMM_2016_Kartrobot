@@ -149,12 +149,13 @@ Ovanpå denna sitter den avståndskänsliga lasern LIDAR - systemets främsta va
 
 Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska kunna rotera mer precist.
 
-% TODO: Remove AX-12 reference in figure
 I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
 
 \subsection{Kommunikation}
-\label{ssec:brainInterface}
-Två UART-bussar används, som kopplas från kommunikations- och kontrollenheten till sensorenheten och styrenheten. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas.
+För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används UART-bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som den övergripande kommunikationen kräver.
 
 \begin{center}
 \begin{HardwareList}
