@@ -109,9 +109,8 @@
 \setcounter{page}{1}
 \pagestyle{content}
 
-\section{Inledning}
-
-I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det är ej bindande, utan tjänar snarare som en grov kompass inför projektets implementation och planering. Skissen används för att avgöra vilka moduler som ingår och hur arbetet kan delas upp.
+\section{Systemöversikt}
+I detta projekt konstrueras en robot med förmågan att kartlägga rum som specificeras enligt \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett blåtandsgränssnitt. Se figur \ref{fig:overview} för en bild på roboten i sin omgivning.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{overview.png}}
@@ -119,17 +118,56 @@ I detta dokument redogörs idéer om hur robotens delsystem kan konstrueras. Det
     \label{fig:overview}
 \end{figure}
 
-\newpage
-\section{Översikt av systemet}
-Systemet är uppbyggt av tre separata moduler, samt en extern PC, enligt figur \ref{fig:modules}. Dessa delsystem kommunicerar med varandra, och med respektive moduls externa hårdvara. Ett mer detaljerat blockschema finns till varje modul, samt i sin helhet i figur \ref{fig:modulesDetailed}.
-\begin{figure}[h!]
+\noindent
+Systemet innehåller fyra kommunicerande datorer (enheter) med egna ansvarsområden och uppgifter:
+
+\begin{itemize}
+\item Sensorenhet (se kapitel \ref{sec:system1})
+\item Styrenhet (se kapitel \ref{sec:system2})
+\item Kommunikations- och kontrollenhet (se kapitel \ref{sec:system3})
+\item Extern PC (se kapitel \ref{sec:system4})
+\end{itemize}
+
+\noindent
+Sensorenheten behandlar data från systemets olika sensorer, för att sedan skicka vidare datan på ett mer användbart format med minimala läsfel.
+
+Styrenheten ansvarar för att omvandla högnivåkommandon till lågnivåkommandon och propagera dessa till systemets olika motorer och servos.
+
+Kommunikations- och kontrollenheten är den centrala hjärnan i systemet, som skickar kommandon till de andra enheterna. I det manuella läget utför den kommandon som kommer från den externa PC:n, och i det autonoma bestämmer den själv bästa tillvägagångssätt för att systemet ska kunna kartlägga rummet.
+
+På den externa PC:n finner vi ett användargränssnitt där en människa kan läsa av resultat, avlusningsdata, samt skicka kommandon till roboten om denna befinner sig i det manuella läget.
+
+I figur \ref{fig:modules} beskrivs det grafiskt hur dessa moduler kommunicerar med varandra. Mer detaljerade blockschema finns till varje modul, samt en fullständig översikt i figur \ref{fig:modulesDetailed}.
+
+\begin{figure}
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{modules.png}}
     \caption{Modulöversikt.}
     \label{fig:modules}
 \end{figure}
 
-\newpage
-\section{Sensorenhet}
+\noindent
+Robotens hårdvara är monterad ovanpå dess chassi, en modell som går under namnet \cite{terminator}. Denna kommer med fyra hjul påmonterade, som används för att roboten ska kunna ta sig runt i rummet. Ytterliggare ett servo, monteras på toppen av roboten.
+
+Ovanpå denna sitter den avståndskänsliga lasern LIDAR - systemets främsta vapen vad gäller rumskanning. Ytterligare sensorer hittas på tre av robotens fyra sidor: IR-sensorer för bättre kontroll under körning. Ingen monteras längst fram på chassit, eftersom LIDARn täcker den funktionaliteten då roboten rör på sig.
+
+Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska kunna rotera mer precist.
+
+I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
+
+\subsection{Kommunikation}
+För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används UART-bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som den övergripande kommunikationen kräver.
+
+\begin{center}
+\begin{HardwareList}
+\hardware{USB-UART}{Omvandlare för USB till UART}{2}
+\end{HardwareList}
+\end{center}
+
+\clearpage
+\section{Sensorenhet} \label{sec:system1}
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
@@ -189,10 +227,10 @@ Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssni
 Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
 
 \paragraph{Alternativ 1}
-Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
@@ -240,10 +278,10 @@ Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref
 \subsubsection{Styrsignaler samt styrdata}
 
 \paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se bilaga  \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
 \newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
@@ -267,7 +305,7 @@ Då detta delsystem har hand om relativt tunga beräkningar används en Raspberr
 Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
 
 \subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se \ref{ssec:brainInterface}).
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
 
 Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se \ref{sec:system4}) över blåtand, där den skickar debugdata och kartinformation, och tar emot kommandon vid manuell styrning. Mjukvara för blåtandskommunikation måste finnas.
 
@@ -282,15 +320,15 @@ Robotens huvuduppdrag i det autonoma läget är att skanna ett rum och rita en k
 \subsubsection{Ruttstyrning}
 Roboten behöver kontinuerligt ta reda på, och leta sig till, outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
 
-\subsection{Gränssnitt} \label{ssec:brainInterface}
-
-\paragraph{Alternativ 1}
-Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
-
-
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
-Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
+%\subsection{Gränssnitt} 
+%
+%\paragraph{Alternativ 1}
+%Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+%
+%
+%\paragraph{Alternativ 2}
+%I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
+%Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
 
 \newpage
 \section{PC} \label{sec:system4}
@@ -429,6 +467,15 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
     \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
 \end{itemize}
+
+\clearpage
+\section{Robotplattform}
+\label{app:placement}
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[scale=0.6]{layout_topdown_vectorized.png}}
+    \caption{Placering av hårdvara på robotchassit.}
+    \label{fig:placement}
+\end{figure}
 \end{appendices}
 
 \clearpage
