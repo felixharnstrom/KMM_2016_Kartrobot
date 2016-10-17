@@ -154,8 +154,9 @@ LIDARn används också som en sensor framåt, för attt avgöra ifall robotten k
 
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar utan att snurra roboten.
 
-\subsubsection{IMU} \label{sssec:imu}
+\subsubsection{Gyro} \label{sssec:imu}
 MLX90609 är ett gyro som används via en analog ingång. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
+Gyrot läses endast av när det efterfrågas (under sväng).
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -196,9 +197,7 @@ Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensor
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
 \subsubsection{Gyro}
-MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Alltid när roboten vänder görs en avläsning av gyrot, för att avgöra vinkeln.  
-
-Gyrot använder avläsningstiggers, för att enbart göra avläsningar när information om vändning behövs.
+MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
 
 \subsubsection{IR-sensorer}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut, med hjälp av LP-filter.
