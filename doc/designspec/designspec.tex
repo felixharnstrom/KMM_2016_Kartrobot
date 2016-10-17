@@ -162,11 +162,17 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 %TODO Uncomment after rebase; hardware list is not yet defined in LIPS.tex
 %\begin{HardwareList}
-%\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar.}{1}
+%\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
+%\hardware{IQEXO-3}{Occilator för Atmega-klockan, med standardfrekvens 16MHz}{1}
 %\hardware{GP2D120}{IR-sensor.}{5}
-%\hardware{AD-omvandlare}{För vardera av IR-sensorerna.}{5}
+%\hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
+%\hardware{Resistans}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
 %\hardware{LIDAR lite v2}{Avancerad lasersensor.}{1}
+%\hardware{Resistans}{Separation av trigger och monitor för LIDAR. 1k.}{1}
+%\hardware{Kondensator}{Störningsreducering av LIDAR. 680uF.}{1}
 %\hardware{MLX90609}{Gyro.}{1}
+%\hardware{Kondensator}{Störningsreducering av gyro. 1uF. Datablad rekommenderar X5R eller X7R med minsta spänning 10V.}{2}
+%\hardware{Kapacistans}{Störningsreducering av gyro. 0.1uF. Datablad rekommenderar X5R eller X7R med minsta spänning 25V.}{1} % TODO: Finns en till typ frivillig, se datablad. Finns inritad i schemat.
 %\end{HardwareList}
 
 \subsection{Mjukvara}
