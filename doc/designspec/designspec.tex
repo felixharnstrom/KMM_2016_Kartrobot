@@ -200,12 +200,12 @@ LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensor
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
 
 \subsubsection{IR-sensorer}
-IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut, med hjälp av LP-filter.
+IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
 
 IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
 
 \subsubsection{Utvärden/Input}
-En UART-buss används där den inbyggda UART-hårdvaran utnyttjas. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
+En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
