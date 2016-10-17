@@ -195,8 +195,6 @@ Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensor
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
-Under körning kommer mätdatan från LIDAR att användas för att avgöra om roboten kan fortsätta framåt.
-
 \subsubsection{Gyro}
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Alltid när roboten vänder görs en avläsning av gyrot, för att avgöra vinkeln.  
 
