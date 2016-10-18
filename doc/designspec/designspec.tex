@@ -211,12 +211,15 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Styrenheten är länke
 Vi använder en Atmega1284p-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
+På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn kommer vara antingen en hobbyservo, som också är våran första prioritet, eller en AX-12(+/A).
 
-% TODO: Vi funderade ju potentiellt på att inte använda AX-12 och köra med ett hobbyservo istället. Which is it?
+\begin{itemize}
 %       Om AX-12, skriv något finare än "enligt vissa källor", och faktiskt förklara hur det ligger till.
-Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
+\item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar över half- duplex vilket orsakar endel problem då vi också måste implementera ett sådant protokoll.
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
+
+\item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader.
+\end{itemize}
 
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
@@ -229,7 +232,8 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 %\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
 %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
 %\hardware{IQEXO-3}{Occilator för Atmega-klockan, med standardfrekvens 16MHz}{1}
-%\hardware{Servo.}{Hobbyservo med så högt gradtal som möjligt. Dock ej "continious".}{1}
+%\hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej "continious".}{1}
+%\hardware{AX-12(+/A)}{Om inte ett Hobbyservo är möjligt.}
 %\end{HardwareList}
 
 \subsection{Mjukvara}
@@ -298,8 +302,8 @@ Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenhe
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
-	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr AX-12 servon medans \texttt{DRIVE} styr DC motorerna.
-	\item Hur många grader roboten/AX-12 servon ska rotera.
+	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr servot medans \texttt{DRIVE} styr DC motorerna.
+	\item Hur många grader roboten/servot ska rotera.
 	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressant om instruktionen är av typen \texttt{DRIVE}.
 	\item Vilken hastighet de givna motorerna ska köra med.
 \end{itemize}
