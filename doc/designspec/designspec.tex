@@ -208,16 +208,18 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Styrenheten är länke
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi ska använda en Atmega1284p processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommer att kommunicera över PWM.
+Vi använder en Atmega1284p-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn är en AX-12(+/A) och har två rotationslägen: ''vanlig'' och ''wheel''. 
 
+% TODO: Vi funderade ju potentiellt på att inte använda AX-12 och köra med ett hobbyservo istället. Which is it?
+%       Om AX-12, skriv något finare än "enligt vissa källor", och faktiskt förklara hur det ligger till.
 Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \subsubsection{Hjulmotorer}
-Totalt är det fyra motorer som är monterade på chassit som går under namnet \cite{terminator}. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
+Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -234,7 +236,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
 \subsubsection{Tillståndsdiagram}
-Som vi ser i tillståndsschemat för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
+Som vi ser i tillståndsdiagrammet för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.5\textwidth]{styrenhet-statediagram.png}}
