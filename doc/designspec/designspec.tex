@@ -5,6 +5,7 @@
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{pdfpages}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
@@ -744,8 +745,13 @@ PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmo
     ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
 \end{small}
 
-\clearpage
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Styrenhet}]{schematics/styrenhet/kicad.pdf}
 
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Sensorenhet}]{schematics/sensorenhet/kicad.pdf}
+
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Kontrollenhet}]{schematics/brain/kicad.pdf}
+
+\clearpage
 \section{C-standard} \label{sec:cstandard}
 Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
 
