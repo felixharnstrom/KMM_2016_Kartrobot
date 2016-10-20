@@ -82,7 +82,6 @@ NoConn ~ 2750 1750
 NoConn ~ 2750 1650
 NoConn ~ 2750 1550
 NoConn ~ 2750 1450
-NoConn ~ 2750 1350
 NoConn ~ 2750 1250
 NoConn ~ 2750 1150
 NoConn ~ 3250 1050
@@ -215,4 +214,8 @@ Wire Wire Line
 	4350 3000 4150 3000
 Wire Wire Line
 	3350 3000 3550 3000
+Text GLabel 2600 1350 0    60   Input ~ 0
+RESET
+Wire Wire Line
+	2600 1350 2750 1350
 $EndSCHEMATC
