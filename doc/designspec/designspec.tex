@@ -442,7 +442,9 @@ När roboten startar så initieras den med startvärden och hamnar i den huvudlo
 \end{figure}
 
 \subsubsection{Manuellt läge}
-I det manuella läget tar roboten emot kommandon från PC:n via blåtand (se kapitel \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Dessa kommandon är relativt högnivå, exempel presenteras nedan:
+I det manuella läget tar roboten emot kommandon från PC:n via blåtand (se kapitel \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Dessa kommandon motsvarar piltangenterna på ett tangentbord och skickas direkt vidare till styrenheten i form av \texttt{DRIVE}-kommandon (se \ref{sec:system2}). % TODO: Direktlänk.
+
+För testning och felsökning implementeras också följande högnivåkommandon: 
 
 %TODO stämmer dessa?
 \begin{table}[h]
