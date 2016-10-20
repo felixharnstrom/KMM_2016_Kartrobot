@@ -5,6 +5,7 @@
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{ulem}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -63,12 +64,12 @@
 \newcommand{\LIPSkund}{ISY, Linköpings universitet, 581\,83 Linköping}
 \newcommand{\LIPSkundkontakt}{Mattias Krysander, 013-282198, matkr@isy.liu.se}
 \newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
-\newcommand{\LIPShandledare}{}
+\newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
 \newcommand{\LIPSdokumenttyp}{Kravspecifikation}
 \newcommand{\LIPSredaktor}{Felix Härnström}
-\newcommand{\LIPSversion}{1.0}
-\newcommand{\LIPSgranskare}{Felix Härnström}
-\newcommand{\LIPSgranskatdatum}{2016-09-12}
+\newcommand{\LIPSversion}{1.1}
+\newcommand{\LIPSgranskare}{Silas Lenz}
+\newcommand{\LIPSgranskatdatum}{2016-10-20}
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
@@ -82,11 +83,11 @@
 \LIPStitelsida
 \clearpage
 \begin{LIPSprojektidentitet}
-    \LIPSgruppmedlem{Hannes Haglund}{}{hanha265@student.liu.se}
+    \LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
     \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
-    \LIPSgruppmedlem{Jani Jokinen}{}{janjo273@student.liu.se}
-    \LIPSgruppmedlem{Silas Lenz}{}{sille914@student.liu.se}
-    \LIPSgruppmedlem{Daniel Månsson}{}{danma344@student.liu.se}
+    \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
     \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
 \end{LIPSprojektidentitet}
 \clearpage
@@ -97,6 +98,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
+    \LIPSversionsinfo{1.1}{2016-10-20}{Reviderade otydlig kravtext för krav 54}{FH}{SL}
     \LIPSversionsinfo{1.0}{2016-09-12}{Upphöjt till version 1.0}{FH}{DM}
     \LIPSversionsinfo{0.2}{2016-09-08}{Andra utkastet}{FH,SL}{EN}
     \LIPSversionsinfo{0.1}{2016-09-07}{Första utkastet}{Alla}{FH}
@@ -293,7 +295,8 @@ Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med 
     \LIPSkrav{Original}{Kontrollenheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}{1}
     \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för på- och avstängning.}{1}
     \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för att växla mellan autonomt och manuellt läge.}{1}
-    \LIPSkrav{Original}{Kontrollenheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}{2}
+    \LIPSkrav{Original}{\sout{Kontrollenheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 54 \newline (2016-10-20)}{Kontrollenheten ska ta emot styrdata efter utfört högnivåkommando.}{2}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
