@@ -227,15 +227,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.2639608"
-     inkscape:cx="283.81006"
+     inkscape:cx="242.41662"
      inkscape:cy="326.2175"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1615"
-     inkscape:window-height="1026"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
+     inkscape:window-width="1920"
+     inkscape:window-height="1019"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata9779">
@@ -721,29 +721,23 @@
            sodipodi:role="line"
            style="font-size:7.5px">7V2</tspan></text>
     </g>
-    <g
-       id="g9256-2-2"
-       transform="translate(-25.271258,158.58359)"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300">
-      <path
-         inkscape:connector-curvature="0"
-         id="path9039-03-4-5-8-0"
-         d="m 344.9671,616.65442 0,-13.27387"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker9041-3-5-6-6-8-42)" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text9045-4-0-6-2-5"
-         y="624.31494"
-         x="333.67865"
-         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           y="624.31494"
-           x="333.67865"
-           id="tspan9047-0-04-9-9-52"
-           sodipodi:role="line"
-           style="font-size:7.5px">9-12V</tspan></text>
-    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker9041-3-5-6-6-8-42)"
+       d="m 319.69584,775.23801 0,-13.27387"
+       id="path9039-03-4-5-8-0"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="314.48465"
+       y="782.89856"
+       id="text9045-4-0-6-2-5"
+       sodipodi:linespacing="125%"><tspan
+         style="font-size:7.5px"
+         sodipodi:role="line"
+         id="tspan9047-0-04-9-9-52"
+         x="314.48465"
+         y="782.89856">5V</tspan></text>
     <g
        id="g9682"
        transform="translate(70.188168,159.47127)">
