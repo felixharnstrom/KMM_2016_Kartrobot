@@ -71,7 +71,8 @@
 \newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
 \newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
 \newcommand{\LIPSdokumenttyp}{Designspecifikation}
-\newcommand{\LIPSredaktor}{Jag måste skriva något här för att kunna kompilera}
+\newcommand{\LIPSredaktor}{Jag måste skriva något här annars kan jag inte kompilera dokumentet}    %TODO Välj redaktör. Borde vara HV eller MV enligt projektplan
+
 \newcommand{\LIPSversion}{0.1}
 \newcommand{\LIPSgranskare}{}
 \newcommand{\LIPSgranskatdatum}{}
@@ -251,56 +252,120 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
-Styrenheten är ansvarig för all logik och funktionalitet för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorerna. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
+Styrenheten är ansvarig för robotens lågnivåstyrning. Styrenheten är länken mellan alla styrkommandon och motorer. Se figur \ref{fig:unitMotorcontroller} för en övergripande systemskiss för styrenheten.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{styrenhet.png}}
     \caption{Översikt över styrenheten.}
     \label{fig:unitMotorcontroller}
 \end{figure}
-\noindent \begin{small}
-    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
-\end{small}
+
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-
-\paragraph{Alternativ 1}
-Processormodellen ATmega1284.
-
-\paragraph{Alternativ 2}
-Processormodellen AtMega1284's mindre syskon, ATmega16. Denna är inte lika kraftfull som den förstnämnda, men bör vara kapabel till att utföra dess givna jobb. Om UART används för både kommunikation mellan moduler och till servon räcker inte denna till, då endast en hårdvaru-UART finns tillgänglig.
+Vi använder en Atmega1284p-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
 
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
-På toppen av roboten ska en sensor (se \ref{sssec:lidar}) vara monterad ovanpå en roterande servo, för att tillåta sikt i flera riktningar utan att behöva rotera hela roboten. Typen av servomotor specificeras här.
+På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara monterad, ovanpå en servo som tillåter sensorn att rotera. Servomotorn kommer vara antingen en hobbyservo, som också är våran första prioritet, eller en AX-12(+/A).
 
-\paragraph{Alternativ 1}
-Servomotorn AX-12(+/A) används. Denna har både ett ''vanligt'' läge, och ett så kallat ''wheel''-läge som tillåter fri 360 graders rotation. Det förstnämnda tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra med ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V.
-% http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
+\begin{itemize}
+%       Om AX-12, skriv något finare än "enligt vissa källor", och faktiskt förklara hur det ligger till.
+\item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar över half- duplex vilket orsakar endel problem då vi också måste implementera ett sådant protokoll.
+%http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
-\paragraph{Alternativ 2}
-En servo med liknande specifikationer kring rotationsmöjligheter och noggrannhet, men med lägre spänning, och gärna ett mindre komplext protokoll, som PWM, används.
-
-% Alternativ 3: Stepper motor med driver.
+\item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader.
+\end{itemize}
 
 \subsubsection{Hjulmotorer}
-Totalt fyra motorer finns monterade på chassit för hjulstyrning. Detta chassi går under namnet \cite{terminator}, och de fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar.
+Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+% TODO add hardware
+%\begin{HardwareList}
+%\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
+%TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
+%\hardware{IQEXO-3}{Occilator för Atmega-klockan, med standardfrekvens 16MHz}{1}
+%\hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej "continious".}{1}
+%\hardware{AX-12(+/A)}{Om inte ett Hobbyservo är möjligt.}
+%\end{HardwareList}
 
 \subsection{Mjukvara}
+Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. Eftersom nödstoppet ska kunna avbryta vad styrmodulen gör när som helst så är det lämpligt att använda avbrott för detta.
 
-Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
+\subsubsection{Tillståndsdiagram}
+Som vi ser i tillståndsdiagrammet för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en instruktion. Notera att en instruktion kan sättas i alla tillstånd, så om roboten redan har en instruktion inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
 
-\subsection{Gränssnitt} \label{ssec:controllInterface}
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.5\textwidth]{styrenhet-statediagram.png}}
+	\caption{Tillståndsdiagram för styrenheten.}
+	\label{fig:stateDiagram}
+\end{figure}
+
+\subsubsection{Övergripande programflöde}
+I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funktionalitet som inte avslöjade sig i tillståndsdiagrammet, det vill säga hur vi hanterar de olika instruktionerna \texttt{SCAN} och \texttt{DRIVE}. Om instruktionen är av typen \texttt{SCAN} så kommer aldrig styrenheten att gå in i tillståndet \texttt{TURN} då det inte finns något avstånd att köra. Denna typ av design utesluter givetvis möjligheten att köra och scanna samtidigt. För mer information angående vad de lika instruktionstyperna står för, se kapitel \ref{ssec:controlInterface}. 
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% Styles
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+
+\node (start) [startstop] {Start};
+\node (wait_state) [process, below of=start] {\texttt{WAIT\_STATE\_ACTIVATED}};
+\node (is_instruction_ready) [decision, right of=wait_state, xshift=6cm] {Any instruction ready \\ to be executed?};
+\node (brake) [process, right of=is_instruction_ready, xshift=6cm] {Apply brakes if moving};
+\node (turn_state) [process, below of=is_instruction_ready, yshift=-2cm] {\texttt{TURN\_STATE\_ACTIVATED} \\ \\ Turn robot/tower to \\ \texttt{goal\_direction}};
+\node (scan_or_drive) [process, below of=turn_state, yshift=-1cm] {Is instruction \texttt{SCAN} or \texttt{DRIVE}?};
+\node (drive_state) [process, below of=scan_or_drive, yshift=-0.8cm] {\texttt{DRIVE\_STATE\_ACTIVATED} \\ \\ Drive distance \texttt{goal\_distance}};
+
+\draw [arrow] (start) -- (wait_state);
+\draw [arrow] (wait_state) -- (is_instruction_ready);
+\draw [arrow] (is_instruction_ready) -- node[auto] {No} (brake);
+\draw [arrow] (is_instruction_ready) -- node[auto] {Yes} (turn_state);
+\draw [arrow] (turn_state) -- (scan_or_drive);
+\draw [arrow] (scan_or_drive) -- node[auto] {\texttt{DRIVE}} (drive_state);
+\draw [arrow] (scan_or_drive) -| node[anchor=south, xshift=4cm] {\texttt{SCAN}} (wait_state);
+\draw [arrow] (drive_state) -| (wait_state);
+
+\coordinate[above of=is_instruction_ready, yshift=1cm] (d0);
+\draw [-] (brake) |- (d0);
+\draw [arrow] (d0) -- (is_instruction_ready);
+
+
+\end{tikzpicture}
+	%\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
+	\caption{Flödesschema för styrenheten.}
+	\label{fig:styrenhetFlowchart}
+\end{figure}
+
+\subsubsection{Trådning}
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs mer än en tråd för styrenheten.
+
+\subsection{Reglering}
+Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
+
+\subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
+Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenheten. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
 
-\paragraph{Alternativ 1}
-Implementera en extra UART-buss som endast går mellan styrenheten och kommunikationsenheten. Se bilaga  \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Styrdatan ska innehålla information om följande punkter:
+\begin{itemize}
+	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr servot medans \texttt{DRIVE} styr DC motorerna.
+	\item Hur många grader roboten/servot ska rotera.
+	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressant om instruktionen är av typen \texttt{DRIVE}.
+	\item Vilken hastighet de givna motorerna ska köra med.
+\end{itemize}
 
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även styrenheten som slav. Enheten som tar emot data från/skickar data till styrenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+Från styrenheten skickas information om vilka hastigheter motorerna/servot fått när instruktionen utförs.
 
-\newpage
+\clearpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
 
 % SAKER SOM VI INTE GJORT SOM FINNS PÅ CHECKLISTAN:
@@ -314,7 +379,10 @@ Inga andra delsystem kommunicerar direkt med varandra (förutom ett prio-2-undan
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
     \label{fig:unitBrain}
-\end{figure} 
+\end{figure}
+\noindent \begin{small}
+* Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
+\end{small}
 
 \subsection{Hårdvara}
 
@@ -568,9 +636,9 @@ PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och blåtandsmod
 Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \begin{center}
-\begin{HardwareList}
-\hardware{PC}{Bärbar PC med blåtandsmodul}{1}
-\end{HardwareList}
+%\begin{HardwareList}
+%\hardware{PC}{Bärbar PC med blåtandsmodul}{1}
+%\end{HardwareList}
 \end{center}
 
 \subsection{Mjukvara}
