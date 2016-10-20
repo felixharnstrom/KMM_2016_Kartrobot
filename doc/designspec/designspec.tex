@@ -205,6 +205,12 @@ ATmega1284 används som processormodell, då den är kraftfull utan att ta det t
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
 Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallelt med väggen. Dessa behöver en A/D-omvanlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40x40cm.
 
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorer.jpg}}
+	\caption{Plasering av IR-sensorer, samt LIDAR.}
+	\label{fig:unitSensorPlacement}
+\end{figure}
+
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
 LIDAR Lite v2 är en lasersensor som används för mätningar som kräver bättre noggranhet. Komponenten kommunicerar via en trigger-pin och PWM-output.
 
@@ -241,6 +247,12 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot instruktioner om att läsa av en viss sensor. 
 
 Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Att läsa av sensorerna kontinuerligt gör det möjligt för sensormodulen att vara medveten ifall roboten följer en vägg eller inte. Sensorenheten kommer att ha en interrupt, som ger möjligheten för den att läsa av sensorer direkt när en avläsning begärs.
+
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_shart.png}}
+	\caption{Sensorenhetens funtionalitet.}
+	\label{fig:unitSensorFunktion}
+\end{figure}
 
 % TODO Avläsningsinstruktioner? Menas kommandon som: ``Tja, jag ser gärna detta avläst''? Bör förtydligas och utvecklas. - Tillräckligt?
 
