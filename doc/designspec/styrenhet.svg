@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="styrenhet.svg"
-   inkscape:export-filename="/home/emil/Skrivbord/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
+   inkscape:export-filename="/home/silenz/TSEA29/Kartrobot/doc/designspec/styrenhet.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300">
   <defs
@@ -226,11 +226,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.2639608"
-     inkscape:cx="242.41662"
-     inkscape:cy="326.2175"
+     inkscape:zoom="2.1319804"
+     inkscape:cx="78.102386"
+     inkscape:cy="293.87106"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g8627"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1019"
@@ -550,7 +550,7 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
-           sodipodi:role="line">UART Half duplex</tspan><tspan
+           sodipodi:role="line">PWM</tspan><tspan
            style="font-size:7.5px"
            y="543.10449"
            x="270.21582"
