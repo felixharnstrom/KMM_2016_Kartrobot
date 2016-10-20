@@ -245,9 +245,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="374.61096"
-     inkscape:cy="561.19558"
+     inkscape:zoom="1.979899"
+     inkscape:cx="360.45291"
+     inkscape:cy="659.95131"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -546,20 +546,20 @@
            y="506.31329"
            x="510.94284"
            id="tspan6513"
-           sodipodi:role="line">USB-UART (I2C)*</tspan></text>
+           sodipodi:role="line">USB-UART</tspan></text>
       <text
          transform="scale(1.0356546,0.96557289)"
          sodipodi:linespacing="125%"
          id="text7351-9-7-6-1-8-5-5-5-5"
          y="524.28229"
-         x="455.56757"
+         x="459.95676"
          style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:7.24179649px"
            y="524.28229"
-           x="455.56757"
+           x="459.95676"
            id="tspan7353-5-1-1-7-1-0-9-7-9"
-           sodipodi:role="line">1USB/2</tspan></text>
+           sodipodi:role="line">1USB</tspan></text>
       <path
          inkscape:connector-curvature="0"
          id="path7304-7-2-9-1-9-6-2-7-8"
@@ -648,39 +648,35 @@
          x="555.0788"
          y="413.91342"
          id="tspan10214">In: Instruktioner</tspan></text>
-    <g
-       id="g17365"
-       transform="translate(0,9.2042236)">
-      <text
-         sodipodi:linespacing="125%"
-         id="text6511-6"
-         y="497.10907"
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="274.28555"
+       y="506.31329"
+       id="text6511-6"
+       sodipodi:linespacing="125%"><tspan
+         id="tspan5398"
+         sodipodi:role="line"
          x="274.28555"
-         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:7.5px"
-           y="497.10907"
-           x="274.28555"
-           id="tspan6513-3"
-           sodipodi:role="line">USB-UART (I2C)*</tspan></text>
-      <text
-         transform="scale(1.0356546,0.96557289)"
-         sodipodi:linespacing="125%"
-         id="text7351-9-7-6-1-8-5-5-5-5-9"
-         y="514.74988"
-         x="227.05771"
-         style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:7.24179649px"
-           y="514.74988"
-           x="227.05771"
-           id="tspan7353-5-1-1-7-1-0-9-7-9-4"
-           sodipodi:role="line">1USB/2</tspan></text>
-      <path
-         inkscape:connector-curvature="0"
-         id="path7304-7-2-9-1-9-6-2-7-8-8"
-         d="m 264.27348,495.99639 5.02412,-2.47677"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.96390736px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    </g>
+         y="506.31329"
+         style="font-size:7.5px">USB-UART</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.06966114px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="231.4469"
+       y="524.28229"
+       id="text7351-9-7-6-1-8-5-5-5-5-9"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0356546,0.96557289)"><tspan
+         sodipodi:role="line"
+         id="tspan7353-5-1-1-7-1-0-9-7-9-4"
+         x="231.4469"
+         y="524.28229"
+         style="font-size:7.24179649px">1USB</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.96390736px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 264.27348,505.20061 5.02412,-2.47677"
+       id="path7304-7-2-9-1-9-6-2-7-8-8"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

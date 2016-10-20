@@ -7,7 +7,7 @@
 \usepackage{graphicx}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric, shapes.misc, arrows}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
 
 \usepackage{array}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -302,50 +302,253 @@ I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LI
 
 \newpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
-Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med den bärbara datorn. I denna modul ingår också kontrollenheten, som gör beräkningar relaterat till både det manuella och det autonoma läget. Se figur \ref{fig:unitBrain} för en övergripande systemskiss för kommunikations- och kontrollenheten.
+
+% SAKER SOM VI INTE GJORT SOM FINNS PÅ CHECKLISTAN:
+% Ett kopplingsschema eller väl detaljerat blockschema med namn på signaler och bussar. 
+% Vilka avbrott ska användas och vad ska avbrottsrutinerna utföra?
+
+Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
+
+Inga andra delsystem kommunicerar direkt med varandra (förutom ett prio-2-undantag mellan sensorenheten och styrenheten, se kapitel TODO), utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
     \label{fig:unitBrain}
-\end{figure}
-\noindent \begin{small}
-* Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.
-\end{small}
-
+\end{figure} 
 
 \subsection{Hårdvara}
 
 \subsubsection{Datormodell}
-Då detta delsystem har hand om relativt tunga beräkningar används en Raspberry Pi 3. Vi utnyttjar Raspberryns inbyggda blåtand för trådlös kommunikation.
+Raspberry pi 3 används, med inbyggd blåtandsmodul. Denna lilla dator är relativt kraftig, och bör därmed inte ha problem med att hålla sitt program gående i rimlig takt. Antalet portar räcker också till: två USB-utgångar behövs för USB-UARTen och två pinnar behövs för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
+
+% TODO: kolla om okej mot kravspecen, förhandla med handledare
+Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så kopplas ytterligare en knapp på, som har som funktion att stänga ner mjukvaran. Denna används då lämpligen innan brytaren för strömmen.
+
+För strömförsörjning används en klippt USB-kabel.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+\begin{HardwareList}
+\hardware{Raspberry Pi 3}{Enkortsdator.}{1}
+\hardware{SD-kort}{SD-kort på minst 4GB används som hårddisk.}{1}
+\hardware{Klippt USB-kabel}{För strömförsörjning till PI:n.}{1}
+\hardware{Knapp}{För nedstängning av mjukvara.}{1}
+\hardware{Brytare}{Mekaniska brytare för AV/PÅ respektive styrläge.}{2}
+\end{HardwareList}
 
 \subsection{Mjukvara}
-Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
+Koden skrivs i Python 3, och ska följa \cite{pep8}.
 
 \subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Den ska ha mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Mjukvara skrivs för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
 
-Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se \ref{sec:system4}) över blåtand, där den skickar debugdata och kartinformation, och tar emot kommandon vid manuell styrning. Mjukvara för blåtandskommunikation måste finnas.
+Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se kapitel \ref{sec:system4}) med hjälp av blåtandskommunikation, där den kontinuerligt skickar debugdata och kartinformation samt tar emot meddelanden. Dessa meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för blåtandskommunikationen skrivs och ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur blåtandskommunikationen fungerar, se figur \ref{fig:bluetooth}.
 
-För att hantera alla dessa meddelanden bör ett meddelandesystem implementeras. Detta görs lämpligen med en prioriterad kö, så att vissa meddelanden kan prioriteras över andra.
+% TODO implementeras UART m.h.a avbrott?
+% TODO olika köer för meddelanden från olika ingångar, eller en gemensam? Prioritetskö?
+% Vi skulle kunna använda något liknande http://raspi.tv/2013/how-to-use-interrupts-with-python-on-the-raspberry-pi-and-rpi-gpio-part-3
+För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:bluetooth} som exempel). Detta ställer vissa krav på trådsäkerhet och minneskapacitet som inte bör vara något problem att uppnå med kortet.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+    \tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+    \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black,
+    fill=green!30, align=center, inner sep=10pt, aspect=2]
+    \tikzstyle{arrow} = [thin,->,>=stealth]
+    \tikzstyle{line} = [thin,>=stealth]
+    % Nodes
+    \node (start) [startstop] {Start};
+    \node (initstart) [process, below of=start, yshift=-10pt] {Setup start\\ values};
+    \node (connectedquestion) [decision, below of=initstart, yshift=-30pt] {Connected?};
+    \node (waitforcom) [io, left of= connectedquestion, xshift=-90pt] {Wait for\\ new connection}; 
+    \node (senddata) [process, below of=connectedquestion, yshift=-20pt] {Send data\\ to PC};
+    \node (waitforpc) [io, left of=senddata, xshift=-90pt] {Wait for\\ response};
+    \node (changemode) [decision, below of=waitforpc, yshift=-20pt] {Change mode?};
+    \node (modeswitch) [process, right of=changemode, xshift=90pt] {Switch mode};
+    \node (newdata) [decision, below of=changemode, yshift=-40pt] {Commands in\\ response?};
+    \node (adddata) [process, below of=newdata, yshift=-30pt] {Add data to\\ input queue};
+    % Arrows
+    \draw [arrow] (start) -- (initstart);
+    \coordinate(dummy2) at ($(initstart) + (0pt,-40pt)$);
+    \draw [arrow] (initstart) -- (connectedquestion);
+    \draw [arrow] (connectedquestion) -- node[anchor=south] {No}(waitforcom);
+    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(senddata);
+    \draw [arrow] (senddata) -- (waitforpc);
+    \draw [arrow] (waitforpc) -- (changemode);
+    \draw [arrow] (changemode) -- node[auto] {No}(newdata);
+    \draw [arrow] (changemode) -- node[anchor=south] {Yes}(modeswitch);
+    \draw [line] (modeswitch) -- ($(modeswitch) + (83pt,0pt)$); %It works..
+    \draw [arrow] (newdata) -- node[auto] {Yes}(adddata);
+    \draw [line] (newdata) -- node[auto] {No}($(newdata) + (230pt,0pt)$);
+    \coordinate(dummy) at ($(adddata -| newdata) + (230pt,0pt)$);
+    \draw [line] (adddata) -- (dummy);
+    \draw [line] (dummy) -- (dummy |- connectedquestion);
+    \draw [arrow] (dummy |- connectedquestion) -- (connectedquestion);
+    \coordinate(test) at (waitforcom |- dummy2);
+    \draw [line] (waitforcom |- dummy2) -- (waitforcom);
+    \draw [line] (waitforcom |- dummy2) -- (dummy2);
+    
+    \end{tikzpicture}
+    \caption{Programflöde för robotens blåtandskommunikation.}
+    \label{fig:bluetooth}
+\end{figure}
+
+\subsubsection{Kartritning} \label{sssec:mapping}
+Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan beräknas av kontrollenheten och används internt för bland annat vägletning. Kartan överförs även kontinuerligt till PC:n (se kapitel \ref{sec:system4}) för skärmutritning, så att en användare kan se resultatet.
+% TODO Överväg att ha med denna skickning som ett steg i flödesscheman över
+
+\subsubsection{Lägesstyrning}
+Roboten konstrueras med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner skrivs för varje, men de delar oundvikligen båda på många funktioner och moduler.
+
+När roboten startar så initieras den med startvärden och hamnar i den huvudloop som ser till att den alltid är i det styrläge som användaren avser, se figur \ref{fig:lageskontroll}.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+    \tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+    \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black,
+     fill=green!30, align=center, inner sep=10pt, aspect=2]
+    \tikzstyle{arrow} = [thin,->,>=stealth]
+    \tikzstyle{line} = [thin,>=stealth]
+    % Nodes
+    \node (start) [startstop] {Start};
+    \node (initstart) [process, below of=start, yshift=-30pt] {Setup start\\ values};
+    \node (exitquestion) [decision, below of=initstart, yshift=-30pt] {Exit?};
+    \node (end) [startstop, left of= exitquestion, xshift=-80pt] {End}; %TODO: Behöver vi verkligen det här?
+    \node (ismanual) [decision, below of=exitquestion, yshift=-30pt] {Is mode\\ manual?};
+    \node (manualmode) [process, right of=ismanual, xshift=100pt] {Run manual mode};
+    \node (automode) [process, below of=ismanual, yshift=-30pt] {Run autonomous mode};
+    % Arrows
+    \draw [arrow] (start) -- (initstart);
+    \draw [arrow] (initstart) -- (exitquestion);
+    \draw [arrow] (exitquestion) -- node[anchor=south] {Yes}(end);
+    \draw [arrow] (exitquestion) -- node[auto] {No}(ismanual);
+    \draw [arrow] (ismanual) -- node[anchor=south] {Yes}(manualmode);
+    \draw [arrow] (ismanual) -- node[auto] {No}(automode);
+    \coordinate(dummy) at ($(manualmode |- automode) + (80pt,0pt)$);
+    \draw [line] (automode) -- (dummy);
+    \draw [line] (manualmode) -- ($(manualmode) + (80pt,0pt)$);
+    \draw [line] (dummy) -- (dummy |- exitquestion); 
+    \draw [arrow] (dummy |- exitquestion) -- (exitquestion);
+    \end{tikzpicture}
+    \caption{Programflöde för robotens huvudloop.}
+    \label{fig:lageskontroll}
+\end{figure}
 
 \subsubsection{Manuellt läge}
-Roboten ska via en brytare kunna byta mellan ett autonomt och ett manuellt läge. I det manuella ska den ta emot kommandon från PC:n via blåtand (se \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Mjukvara för att på ett korrekt sätt utföra dessa kommandon behövs.
+I det manuella läget tar roboten emot kommandon från PC:n via blåtand (se kapitel \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Dessa kommandon är relativt högnivå, exempel presenteras nedan:
 
-\subsubsection{Kartritning}
-Robotens huvuduppdrag i det autonoma läget är att skanna ett rum och rita en karta över det. Mjukvara för att omvandla skannerdata till ett tvådimensionellt rum, samt rutiner för att söka upp och skanna outforskade delar av rummet ska finnas.
+%TODO stämmer dessa?
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l}
+Namn & Funktion\\
+\hline
+\textbf{Fram} & Åk en ruta framåt (40 cm).\\
+\textbf{Bak} & Åk en ruta bakåt (40 cm).\\
+\textbf{Vänster} & Sväng 90 grader motsols\\
+\textbf{Höger} & Sväng 90 grader medsols\\
+\textbf{Skanna} & Använd LIDARn (se TODO) för att utföra en skanning\\
+\end{tabular}
+\caption{En lista på kommandon som ska kunna hanteras i det manuella läget}
+\end{table}
 
-\subsubsection{Ruttstyrning}
-Roboten behöver kontinuerligt ta reda på, och leta sig till, outfoskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar korrekta meddelanden till styrenheten (se \ref{sec:system2}) för att ta sig dit behövs.
+\noindent
+Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte mjukvaran särskilt komplex. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
 
-%\subsection{Gränssnitt} 
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% 
+% Skiss:
+% Finns meddelande i kön? -Ja-> Utför rutin givet i meddelande
+%   |     ʌ     ʌ                       |
+%  Nej    |     |                       |
+%   |     |     -------------------------
+%   V     |
+%  Invänta meddelande, dummer!
 %
-%\paragraph{Alternativ 1}
-%Två UART-bussar används, som kopplas från kommunikations- och kontrollenhet till sensorenhet respektive styrenhet. Raspberry Pi 3 har ingen inbyggd UART som kan användas utan bland annat låsa klockfrekvensen och använda spänningsomvandlare från 5v till 3v3, och har dessutom bara en ledig om blåtand används samtidigt. Istället kan två 5 volts-kompatibla USB till UART-moduler, exempelvis CH340G eller liknande enhet, användas. Nackdelen är att UART måste implementeras på alla moduler, vilket dock verkar relativt trivialt. % TODO: LiU har förmodligen inte samma saker som kina (https://www.aliexpress.com/item/CH340-Serial-Converter-USB-To-TTL-6PIN-Module-Upgrade-Small-Plate-for-PRO-mini-Instead-of/1856263846.html). CP2102 kanske (om den är 5v-kompatibel).
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+\tikzstyle{line} = [thin,>=stealth]
+% Nodes
+\node (start) [startstop] {Start};
+\node (com_in_q) [decision, below of=start, yshift=-40pt] {Are there \\queued commands?};
+\node (await_com) [io, left of=com_in_q, xshift=-170pt] {Wait for command from PC};
+\node (execute) [process, right of=com_in_q, xshift=170pt] {Execute first command in queue};
+% Arrows
+\draw [arrow] (start) -- (com_in_q);
+\draw [arrow] (com_in_q) -- node[anchor=south] {No} (await_com);
+\draw [arrow] (com_in_q) -- node[auto] {Yes} (execute);
+% Low level drawing cause I can't get this shit working with dummy nodes or fancy arrow paths.
+%   - Dummy nodes basically have a small width, meaning we'll have a white square at the turn of the arrow.
+%   - Can't figure out how to get arrow paths to turn TWICE.
+\draw [line] (await_com) -- ($(await_com) - (0, 100pt)$);
+\draw [line] (execute) -- ($(execute) - (0, 100pt)$);
+\draw [line] ($(await_com) - (0, 100pt)$) -- ($(execute) - (0, 100pt)$);
+\draw [arrow] ($(com_in_q) - (0, 100pt)$) -- (com_in_q);
+\end{tikzpicture}
+\caption{Typiskt programflöde i det manuella läget. Notera att kön även fylls upp av en separat tråd.}
+\label{fig:manual_flowchart}
+\end{figure}
+
+\subsubsection{Autonomt läge}
+Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar lämpliga kommandon till styrenheten (se kapitel \ref{sec:system2}) skrivs. Se figur \ref{fig:auto_flowchart} för ett lämpligt programflöde.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
 %
+% Skiss:
+% Är rummet klarskannat? -Ja-> vägleta till startplats -> klar
+%   |        ʌ
+%  Nej       |
+%   |        ----------------------------------------------------
+%   V                                                           |
+%  Hitta lämplig rand till outforskat område -> vägleta dit -> skanna
 %
-%\paragraph{Alternativ 2}
-%I\textsuperscript{2}C via samma buss som eventuella sensorer, där kommunikationsenheten agerar master. Detta gör att vi slipper implementera flera UART-bussar, men gör att både sensorer och tre moduler behöver samsas på samma buss. Har även nackdelen att kod i kommunikationsenheten behöver modifieras när sensoruppsättningen förändras, vilket minskar modulariteten.
-%Vid kommunikationsenheten behöver dessutom en logic level shifter användas, då Raspberry Pi använder 3v3 och övriga moduler 5v. Om I\textsuperscript{2}C inte används för LIDAR eller IMU har en onödigt komplicerad buss utvecklats i onödan.
+% Styles
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+% Nodes
+\node (start) [startstop] {Start};
+\node (complete_map) [decision, below of=start, yshift=-40pt] {Room completely mapped?};
+\node (find_border) [process, left of=complete_map, xshift=-200pt] {Find appropriate border to unmapped area};
+\node (pathfind) [process, below of=find_border] {Pathfind there};
+\node (scan) [process, below of=pathfind] {Scan};
+\node (update_map) [process, right of=scan, xshift=200pt] {Update internal map};
+\node (pathfind_start) [process, right of=complete_map, xshift=150pt] {Pathfind to start};
+\node (done) [startstop, above of=pathfind_start, yshift=40pt] {Done};
+% Arrows
+\draw [arrow] (start) -- (complete_map);
+\draw [arrow] (complete_map) -- node[anchor=south] {No} (find_border);
+\draw [arrow] (find_border) -- (pathfind);
+\draw [arrow] (pathfind) -- (scan);
+\draw [arrow] (scan) -- (update_map);
+\draw [arrow] (update_map) -- (complete_map);
+\draw [arrow] (complete_map) -- node[auto] {Yes} (pathfind_start);
+\draw [arrow] (pathfind_start) -- (done);
+\end{tikzpicture}
+\caption{Typiskt programflöde i det autonoma läget.}
+\label{fig:auto_flowchart}
+\end{figure}
+
+\subsection{Gränssnitt} \label{ssec:brainInterface}
+Kommunikations- och kontrollenheten använder sig av UART-bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data måste kunna ske åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avlusningsdata.
+
+Utöver detta behövs fungerande blåtandskommunikation. Raspberry PI:ns inbyggda blåtandsmodul används, och vi förväntar oss att PC:n som har användargränssnittet (se kapitel \ref{sec:system4}) även har support för denna typ av kommunikation. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
 
 \newpage
 \section{PC} \label{sec:system4}
