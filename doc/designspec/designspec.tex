@@ -738,17 +738,12 @@ PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmo
 \begin{appendices}
 
 \section{Detaljerat blockschema}
-% TODO: Riktig titel
+% TODO: Sensorenhet-update
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.85\textwidth]{modules_detail.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{modules_detail.png}}
     \caption{Detaljerat blockschema över systemet.}
     \label{fig:modulesDetailed}
 \end{figure}
-
-\noindent \begin{small}
-    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
-    ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
-\end{small}
 
 \includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Styrenhet}]{schematics/styrenhet/kicad.pdf}
 
