@@ -254,25 +254,27 @@ Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det sm
 	\label{fig:unitSensorFunktion}
 \end{figure}
 
-% TODO Avläsningsinstruktioner? Menas kommandon som: ``Tja, jag ser gärna detta avläst''? Bör förtydligas och utvecklas. - Tillräckligt?
-
-% TODO Denna sektionen känns i största allmänhet alldeles för tunn. Utveckla mer. Lägg till flödesscheman.
-
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare.
-
-% TODO Utveckla den här sektionen. Nämn inte I2C; det används inte. Jag misstänker att det mesta av texten nedan bara är rakt ur systemskissen.
 
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
+Begär avläsning av rummet -> Bearbeta data -> Skicka data vidare
+
+Mät avstånd framåt -> Reagera när avståndet är väldigt kort -> Flagga
+
 \subsubsection{Gyro}
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
+
+Begär rotationsdata -> Bearbeta data -> Skicka vidare rotationsdata
 
 \subsubsection{IR-sensorer}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
 
 IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
+
+Begär avläsning -> Ta tid -> Konvertera till avstånd -> Jämför sensor 1 och sensor 2 avstånd samma sida => Om samma -> Begär ny avläsning => Om inte samma -> Begär korigering -> Begär ny avläsning
 
 \subsubsection{Utvärden/Input}
 En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
