@@ -161,15 +161,24 @@ För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{se
 
 Vidare är en UART-buss mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske.
 
-För kommunikation mellan utvecklare och processor under utvecklingsfasen kan ytterligare hjälpmedel behövas. Ett par 7-segment-displayer för ATmega1284-processorerna kan visa sig mycket användbara för avlusning.
-
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som den övergripande kommunikationen kräver.
 
 \begin{center}
 \begin{HardwareList}
-\hardware{Terminator}{Robotplatform}{1}
-\hardware{Kablar}{För virning}{-}
+\hardware{USB-UART}{Omvandlare för USB till UART}{2}
+\end{HardwareList}
+\end{center}
+
+\subsection{Gemensam Hårdvara}
+Viss hårdvara kan ej anses tillhöra ett visst delsystem, och presenteras därför här.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all gemensam hårdvara.
+
+\begin{center}
+\begin{HardwareList}
+\hardware{\cite{terminator}}{Robotplatform som hårdvara monteras på.}{1}
 \hardware{Kablar}{För virning}{-}
 \hardware{Tryckknapp}{För resetfunktionalitet}{1}
 \hardware{Resistans}{Pull-up för resetfunktionalitet. $10k\Omega$}{1}
@@ -405,7 +414,6 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{Raspberry Pi 3}{Enkortsdator.}{1}
 \hardware{SD-kort}{SD-kort på minst 4GB används som hårddisk.}{1}
 \hardware{Klippt USB-kabel}{För strömförsörjning till PI:n.}{1}
-\hardware{USB-UART}{Omvandlare för USB till UART}{2}
 \hardware{Knapp}{För nedstängning av mjukvara.}{1}
 \hardware{Brytare}{Mekaniska brytare för AV/PÅ respektive styrläge.}{2}
 \end{HardwareList}
