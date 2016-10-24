@@ -106,7 +106,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-    \LIPSversionsinfo{0.1}{2016-09-22}{Första utkastet}{}{}
+    \LIPSversionsinfo{0.1}{2016-10-22}{Första utkastet}{}{}
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
@@ -247,8 +247,8 @@ Gyrot läses endast av när det efterfrågas (under sväng).
 Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \begin{HardwareList}
-\hardware{Atmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{IQEXO-3}{Oscillator för Atmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
+\hardware{ATmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
+\hardware{IQEXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
 \hardware{GP2D120}{IR-sensor.}{5}
 \hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
 \hardware{Resistor}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
@@ -272,7 +272,7 @@ Sensorenheten ska kontinuerligt läsa av sensorerna, och skickar ett tidigare av
 Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare. Inget skickas utan att mätvärdet begärts över UART-bussen.
 
 \subsubsection{LIDAR}
-LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
+LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
 \clearpage
 
@@ -298,7 +298,7 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Den är länken mellan
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi använder en Atmega1284-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
+Vi använder en ATmega1284-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
 
 \clearpage
 
@@ -321,9 +321,9 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 % TODO add hardware
 \begin{HardwareList}
-\hardware{Atmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
+\hardware{ATmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
 %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{IQEXO-3}{Oscillator för Atmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
+\hardware{IQEXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
 \hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej ''continuous''.}{1}
 \hardware{AX-12(+/A)}{Om inte ett hobbyservo är möjligt.}{1}
 \end{HardwareList}
