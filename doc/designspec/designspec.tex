@@ -106,7 +106,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-    \LIPSversionsinfo{0.1}{2016-10-24}{Första utkastet}{Alla}{}%TODO: Granskare
+    \LIPSversionsinfo{0.1}{2016-09-22}{Första utkastet}{}{}
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
@@ -204,7 +204,7 @@ Feedback fås i senare i projektet via PC-mjukvaran (se kapitel \ref{sec:system4
 %       Vad menas ens med att sampla? Hur ofta man utför test?
 
 \clearpage
-\section{Sensorenhet}\label{sec:system1}
+\section{Sensorenhet}
 Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Den innehåller en processor av modellen ATmega1284, flera IR-sensorer, en lasersensor, samt gyro.
 
 IR-sensorerna används primärt för navigering, så att roboten kan köra i en rak linje längs en vägg. Lasersensorn används för skanning av rummet. Med hjälp av gyrot går det att hålla koll på robotens rotation.
@@ -568,7 +568,7 @@ Namn & Funktion\\
 \textbf{Bak} & Åk en ruta bakåt (40 cm).\\
 \textbf{Vänster} & Sväng 90 grader motsols\\
 \textbf{Höger} & Sväng 90 grader medsols\\
-\textbf{Skanna} & Använd LIDARn (se TODO) för att utföra en skanning\\
+\textbf{Skanna} & Använd LIDARn (se kapitel \ref{sssec:lidar}) för att utföra en skanning\\
 \end{tabular}
 \caption{En lista på kommandon som ska kunna hanteras i det manuella läget}
 \end{table}
@@ -660,7 +660,7 @@ Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskad
 \end{figure}
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
-Kommunikations- och kontrollenheten använder sig av UART-bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data måste kunna ske åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avlusningsdata.
+Kommunikations- och kontrollenheten använder sig av UART-bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data måste kunna ske åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
 
 Utöver detta behövs fungerande blåtandskommunikation. Raspberry PI:ns inbyggda blåtandsmodul används, och vi förväntar oss att PC:n som har användargränssnittet (se kapitel \ref{sec:system4}) även har support för denna typ av kommunikation. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
 
