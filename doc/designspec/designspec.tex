@@ -261,12 +261,6 @@ Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vi
 
 Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Sensorenheten kommer även kunna läsa av en viss sensor direkt på uppmaning via UART.
 
-\begin{figure}[h!]
-	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_chart.png}}
-	\caption{Sensorenhetens funtionalitet.}
-	\label{fig:unitSensorFunktion}
-\end{figure}
-
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare.
 
