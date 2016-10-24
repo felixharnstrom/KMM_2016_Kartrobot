@@ -347,7 +347,7 @@ I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funkt
 \node (start) [startstop] {Start};
 \node (wait_state) [process, below of=start] {\texttt{WAIT\_STATE\_ACTIVATED}};
 \node (is_instruction_ready) [decision, right of=wait_state, xshift=6cm] {Any instruction ready \\ to be executed?};
-\node (brake) [process, right of=is_instruction_ready, xshift=6cm] {Apply brakes if moving};
+\node (brake) [process, right of=is_instruction_ready, xshift=6cm] {Stop motors};
 \node (turn_state) [process, below of=is_instruction_ready, yshift=-2cm] {\texttt{TURN\_STATE\_ACTIVATED} \\ \\ Turn robot/tower to \\ \texttt{goal\_direction}};
 \node (scan_or_drive) [process, below of=turn_state, yshift=-1cm] {Is instruction \texttt{SCAN} or \texttt{DRIVE}?};
 \node (drive_state) [process, below of=scan_or_drive, yshift=-0.8cm] {\texttt{DRIVE\_STATE\_ACTIVATED} \\ \\ Drive distance \texttt{goal\_distance}};
