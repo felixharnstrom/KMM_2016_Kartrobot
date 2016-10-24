@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{pdfpages}
+\usepackage{siunitx}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
@@ -202,70 +203,98 @@ Feedback fås i senare i projektet via PC-mjukvaran (se kapitel \ref{sec:system4
 %       Vad menas ens med att sampla? Hur ofta man utför test?
 
 \clearpage
-\section{Sensorenhet} \label{sec:system1}
-Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
+\section{Sensorenhet}
+Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Den innehåller en processor av modellen ATmega1284, flera IR-sensorer, en lasersensor, samt gyro.
+
+IR-sensorerna används primärt för navigering, så att roboten kan köra i en rak linje längs en vägg. Lasersensorn används för skanning av rummet. Med hjälp av gyrot går det att hålla koll på robotens rotation.
+Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
+
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
-    \caption{Översikt över sensorenheten.}
-    \label{fig:unitSensor}
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenhet.png}}
+	\caption{Översikt över sensorenheten.}
+	\label{fig:unitSensor}
 \end{figure}
 
-\noindent \begin{small}
-    * Om I\textsuperscript{2}C används krävs även en logic level converter mellan 5V och 3V3 på dessa platser.\\
-    ** 5V på Atmega-sidan, 3V3 krävs av sensorn.
-\end{small}
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift, men även har tillräckligt med avbrottsingångar för att kunna arbeta med LIDARn och samtliga ultraljudssensorer, se \ref{sssec:sonicsensors}.
+ATmega1284 används som processormodell, då den är kraftfull utan att ta det till överdrift. Antalet pinnar, A/D-omvandlare, interrupts samt UART-enheter som processorn har räcker för samtliga sensorer och kommunikationsbussar.
 
-\subsubsection{Ultraljudssensor} \label{sssec:sonicsensors}
-\paragraph{Alternativ 1}
-En ultraljudssensor, SRF04, placeras på var och en av robotens fyra sidor och används för navigering och positionsuppskattning. Dessa behöver en utgång och en interrupt-ingång var. Se \ref{ssec:sensorInterface}. Dessa kan användas var 65:e millisekund utan risk för störningar, vilket ger oss möjlighet att läsa av $\sim15$ sensorer per sekund. Troligtvis kan de även användas med mindre eller ingen marginal mellan avläsningarna, men det kräver testning för att avgöras. En annan nackdel är att de fungerar dåligt i vinkel mot en vägg, där de antingen inte ger något värde alls, eller ett ''studsat'' värde. %http://www.robot-electronics.co.uk/htm/sonar_faq.htm
+\subsubsection{IR-sensorer} \label{sssec:sonicsensors}
+Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40x40cm.
 
-\paragraph{Alternativ 2}
-Som alternativ kan IR-sensorer användas. Nackdelen är störningar i den analoga utdatan, som dessutom är ickelinjär, och fungerar på ett kortare intervall än ultraljudssensorer. Fördelen är snabbare avläsningar som troligtvis inte stör varandra. Bredden på mätstrålen är också mindre än med ultraljud.
-
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorer.jpg}}
+	\caption{Placering av IR-sensorer, samt LIDAR.}
+	\label{fig:unitSensorPlacement}
+\end{figure}
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
-LIDAR är en kraftfull lasersensor som i systemet som helhet används för mätningar som kräver noggranhet. Komponenten kan kommuniceras med via en trigger-pin och PWM-output, alternativt via en I\textsuperscript{2}C-buss. I första hand kommer PWM användas.
+LIDAR Lite v2 är en lasersensor som används för mätningar som kräver bättre noggrannhet. Komponenten kommunicerar via en trigger-pin och PWM-output.
 
-Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i avsnitt \ref{ssec:servomotor}. Detta för att effektivt kunna mäta avstånd i flera vinklar.
+LIDARn används också som en sensor framåt, för att avgöra ifall roboten kan fortsätta att köra.
 
-\subsubsection{IMU} \label{sssec:imu}
+Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar utan att snurra roboten.
 
-\paragraph{Alternativ 1}
-En enklare modul - exempelvis MLX90609 - används, via en analog ingång. Detta ger oss då endast rotationen kring z-axeln, som kan användas för att beräkna robotens riktning i rummet.
+\subsubsection{Gyro} \label{sssec:imu}
+MLX90609 är ett gyro som används via en analog ingång. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar.
+Gyrot läses endast av när det efterfrågas (under sväng).
 
-\paragraph{Alternativ 2}
-En mer avancerad modul, exempelvis MPU6050, används, via en I\textsuperscript{2}C-buss. Om LIDARn implementerats med I\textsuperscript{2}C delas bussen mellan dessa två. Det ger oss i så fall både riktning och acceleration, för att mer noggrannt kunna beräkna robotens placering.% TODO: MotionMagi, handledare
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+\begin{HardwareList}
+\hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
+\hardware{IQEXO-3}{Oscillator för Atmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
+\hardware{GP2D120}{IR-sensor.}{5}
+\hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
+\hardware{Resistor}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
+\hardware{LIDAR lite v2}{Avancerad lasersensor.}{1}
+\hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
+\hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
+\hardware{MLX90609}{Gyro.}{1}
+\hardware{Kondensator}{Störningsreducering av gyro. \SI{1}{\micro\farad}. Datablad rekommenderar X5R eller X7R med minsta spänning \SI{10}{\volt}.}{2}
+\hardware{Kondensator}{Störningsreducering av gyro. \SI{0.1}{\micro\farad}. Datablad rekommenderar X5R eller X7R med minsta spänning \SI{25}{\volt}.}{1} % TODO: Finns en till typ frivillig, se datablad. Finns inritad i schemat.
+\end{HardwareList}
 
 \subsection{Mjukvara}
 
-Koden ska vara skriven i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
+Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
 
-Programmet ska omvandla sensordata till ett mer läsligt format, och ska kunna skicka det vidare (se \ref{ssec:sensorInterface}).
+Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot instruktioner om att läsa av en viss sensor. 
+
+Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Att läsa av sensorerna kontinuerligt gör det möjligt för sensormodulen att vara medveten ifall roboten följer en vägg eller inte. Sensorenheten kommer att ha en interrupt, som ger möjligheten för den att läsa av sensorer direkt när en avläsning begärs.
+
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_chart.png}}
+	\caption{Sensorenhetens funtionalitet.}
+	\label{fig:unitSensorFunktion}
+\end{figure}
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten kommer behöva kommunicera med de faktiska sensorerna, samt ha ett sätt att passera vidare utdata. Sensorenheten kan ta emot uppmaningar om att starta en avläsning via samma buss som används för att rapportera mätvärden vidare.
+Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare.
 
 \subsubsection{LIDAR}
-LIDAR kommer i första hand använda avläsningstriggers och PWM via en gemensam pin. PWM-signalen kopplas i så fall till ett avbrott för att mäta dess längd, som används för att beräkna avståndet. Som alternativ kan också I\textsuperscript{2}C användas.
+LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
-\subsubsection{I2C-buss}
-Den mer avancerade av IMUerna använder I\textsuperscript{2}C. Även LIDARn kan kommunicera via I\textsuperscript{2}C. Om behov uppstår implementerar vi en I\textsuperscript{2}C-buss. Vi stödjer i så fall inte flera masters, utan behandlar processorn som den enda, med LIDAR:n och gyron som slavar.
+Begär avläsning av rummet $\rightarrow$ Bearbeta data $\rightarrow$ Skicka data vidare
 
-\subsubsection{Ultraljudssensorer}
-Ultraljudssensorerna (\ref{sssec:sonicsensors}) använder ett liknande gränssnitt som LIDARn, med en trigger-pin och en echo-pin som utgång. Deras utvärde beror på längden av dess höga signal, så för att garantera att vi börjar mäta omedelbart på en hög flank så ska avbrott utnyttjas. Detta uppnås genom att helt enkelt koppla denna signal till en av avbrottsportarna på processorns, för var och en av sensorerna.
+Mät avstånd framåt $\rightarrow$ Reagera när avståndet är väldigt kort $\rightarrow$ Flagga
+
+\subsubsection{Gyro}
+MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
+
+Begär rotationsdata $\rightarrow$ Bearbeta data $\rightarrow$ Skicka vidare rotationsdata
+
+\subsubsection{IR-sensorer}
+IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
+
+IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
+
+Begär avläsning $\rightarrow$ Ta tid $\rightarrow$ Konvertera till avstånd $\rightarrow$ Jämför sensor 1 och sensor 2 avstånd samma sida $\rightarrow$ Om samma $\rightarrow$ Begär ny avläsning $\rightarrow$ Om inte samma $\rightarrow$ Begär korrigering $\rightarrow$ Begär ny avläsning
 
 \subsubsection{Utvärden/Input}
-Hur tas instruktioner emot, samt hur passeras processerade mätvärden vidare?
-
-\paragraph{Alternativ 1}
-Implementera en UART-buss som endast går mellan sensorenheten och kommunikationsenheten. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
-
-\paragraph{Alternativ 2}
-I\textsuperscript{2}C-bussen som eventuellt används för att kommunicera med LIDAR:n och gyron kan utnyttjas, med även processorn som slav. Enheten som tar emot data från/skickar data till sensorenheten får istället ta över rollen som master. Se kapitel \ref{ssec:brainInterface} för mer detaljer om för och nackdelar.
+En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
