@@ -207,14 +207,14 @@ Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vä
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorer.jpg}}
-	\caption{Plasering av IR-sensorer, samt LIDAR.}
+	\caption{Placering av IR-sensorer, samt LIDAR.}
 	\label{fig:unitSensorPlacement}
 \end{figure}
 
 \subsubsection{LIDAR lite v2} \label{sssec:lidar}
 LIDAR Lite v2 är en lasersensor som används för mätningar som kräver bättre noggranhet. Komponenten kommunicerar via en trigger-pin och PWM-output.
 
-LIDARn används också som en sensor framåt, för attt avgöra ifall robotten kan fortsätta att köra.
+LIDARn används också som en sensor framåt, för attt avgöra ifall roboten kan fortsätta att köra.
 
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar utan att snurra roboten.
 
@@ -225,7 +225,6 @@ Gyrot läses endast av när det efterfrågas (under sväng).
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
 
-%TODO Uncomment after rebase; hardware list is not yet defined in LIPS.tex
 \begin{HardwareList}
 \hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
 \hardware{IQEXO-3}{Occilator för Atmega-klockan, med standardfrekvens 16MHz}{1}
@@ -237,7 +236,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{Kondensator}{Störningsreducering av LIDAR. 680uF.}{1}
 \hardware{MLX90609}{Gyro.}{1}
 \hardware{Kondensator}{Störningsreducering av gyro. 1uF. Datablad rekommenderar X5R eller X7R med minsta spänning 10V.}{2}
-\hardware{Kapacistans}{Störningsreducering av gyro. 0.1uF. Datablad rekommenderar X5R eller X7R med minsta spänning 25V.}{1} % TODO: Finns en till typ frivillig, se datablad. Finns inritad i schemat.
+\hardware{Kondensator}{Störningsreducering av gyro. 0.1uF. Datablad rekommenderar X5R eller X7R med minsta spänning 25V.}{1} % TODO: Finns en till typ frivillig, se datablad. Finns inritad i schemat.
 \end{HardwareList}
 
 \subsection{Mjukvara}
@@ -249,7 +248,7 @@ Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vi
 Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Att läsa av sensorerna kontinuerligt gör det möjligt för sensormodulen att vara medveten ifall roboten följer en vägg eller inte. Sensorenheten kommer att ha en interrupt, som ger möjligheten för den att läsa av sensorer direkt när en avläsning begärs.
 
 \begin{figure}[h!]
-	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_shart.png}}
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_chart.png}}
 	\caption{Sensorenhetens funtionalitet.}
 	\label{fig:unitSensorFunktion}
 \end{figure}
@@ -260,21 +259,21 @@ Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensor
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
-Begär avläsning av rummet -> Bearbeta data -> Skicka data vidare
+Begär avläsning av rummet $\rightarrow$ Bearbeta data $\rightarrow$ Skicka data vidare
 
-Mät avstånd framåt -> Reagera när avståndet är väldigt kort -> Flagga
+Mät avstånd framåt $\rightarrow$ Reagera när avståndet är väldigt kort $\rightarrow$ Flagga
 
 \subsubsection{Gyro}
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
 
-Begär rotationsdata -> Bearbeta data -> Skicka vidare rotationsdata
+Begär rotationsdata $\rightarrow$ Bearbeta data $\rightarrow$ Skicka vidare rotationsdata
 
 \subsubsection{IR-sensorer}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
 
 IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
 
-Begär avläsning -> Ta tid -> Konvertera till avstånd -> Jämför sensor 1 och sensor 2 avstånd samma sida => Om samma -> Begär ny avläsning => Om inte samma -> Begär korigering -> Begär ny avläsning
+Begär avläsning $\rightarrow$ Ta tid $\rightarrow$ Konvertera till avstånd $\rightarrow$ Jämför sensor 1 och sensor 2 avstånd samma sida $\rightarrow$ Om samma $\rightarrow$ Begär ny avläsning $\rightarrow$ Om inte samma $\rightarrow$ Begär korigering $\rightarrow$ Begär ny avläsning
 
 \subsubsection{Utvärden/Input}
 En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
