@@ -1144,9 +1144,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="279.81515"
-     inkscape:cy="175.68756"
+     inkscape:zoom="3.959798"
+     inkscape:cx="632.55278"
+     inkscape:cy="105.0533"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -2207,89 +2207,87 @@
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
-    <g
-       id="g4789"
-       transform="translate(-70.714289,-7.1428572)"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300">
-      <rect
-         y="256.78842"
-         x="100.10757"
-         height="21.718279"
-         width="42.931484"
-         id="rect4588"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.70999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path4598"
-         d="m 121.57331,256.85513 0,21.69643"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.01904929px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text4600"
-         y="271.29257"
-         x="104.87708"
-         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:10px"
-           y="271.29257"
-           x="104.87708"
-           id="tspan4602"
-           sodipodi:role="line">AV</tspan></text>
-      <text
-         sodipodi:linespacing="125%"
-         id="text4600-3"
-         y="271.29257"
-         x="125.47028"
-         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:10px"
-           y="271.29257"
-           x="125.47028"
-           id="tspan4602-6"
-           sodipodi:role="line">PÅ</tspan></text>
-    </g>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="81.566216"
-       y="232.18959"
+       x="32.964886"
+       y="244.8165"
        id="text4692"
        sodipodi:linespacing="125%"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
-         id="tspan4694"
-         x="81.566216"
-         y="232.18959"
-         style="font-size:10px;letter-spacing:-0.85000002px">Autonomt </tspan><tspan
-         sodipodi:role="line"
-         x="81.566216"
-         y="244.68959"
+         x="32.964886"
+         y="244.8165"
          id="tspan4696"
-         style="font-size:10px;letter-spacing:-0.85000002px">läge</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="28.379097"
-       y="232.18959"
-       id="text4692-2"
-       sodipodi:linespacing="125%"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300"><tspan
-         sodipodi:role="line"
-         x="28.379097"
-         y="232.18959"
-         id="tspan4696-0"
-         style="font-size:10px;letter-spacing:0px">Ström-</tspan><tspan
-         sodipodi:role="line"
-         x="28.379097"
-         y="244.68959"
-         style="font-size:10px;letter-spacing:0px"
-         id="tspan4737">brytare</tspan></text>
+         style="font-size:10px;letter-spacing:-0.85000002px">Byt läge</tspan></text>
+    <g
+       id="g9060">
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         transform="translate(520.34376,200)"
+         id="g4789">
+        <rect
+           style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.70999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="rect4588"
+           width="42.931484"
+           height="21.718279"
+           x="100.10757"
+           y="256.78842" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.01904929px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 121.57331,256.85513 0,21.69643"
+           id="path4598"
+           inkscape:connector-curvature="0" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="104.87708"
+           y="271.29257"
+           id="text4600"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4602"
+             x="104.87708"
+             y="271.29257"
+             style="font-size:10px">AV</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="125.47028"
+           y="271.29257"
+           id="text4600-3"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4602-6"
+             x="125.47028"
+             y="271.29257"
+             style="font-size:10px">PÅ</tspan></text>
+      </g>
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         sodipodi:linespacing="125%"
+         id="text4692-2"
+         y="439.33246"
+         x="619.43713"
+         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-size:10px;letter-spacing:0px"
+           id="tspan4696-0"
+           y="439.33246"
+           x="619.43713"
+           sodipodi:role="line">Ström-</tspan><tspan
+           id="tspan4737"
+           style="font-size:10px;letter-spacing:0px"
+           y="451.83246"
+           x="619.43713"
+           sodipodi:role="line">brytare</tspan></text>
+    </g>
     <g
        id="g4781"
-       transform="translate(-71.543841,-8.4841963)"
+       transform="translate(-124.1499,-8.4841963)"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <rect
@@ -2332,7 +2330,7 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="27.81147"
+       x="30.750992"
        y="293.4133"
        id="text4797"
        sodipodi:linespacing="125%"
@@ -2340,8 +2338,8 @@
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan4799"
-         x="27.81147"
-         y="293.4133">Brytare</tspan></text>
+         x="30.750992"
+         y="293.4133">Knapp</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 4;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-end:url(#marker4803)"
        d="m 479.3111,277.25087 59.64285,0"
@@ -2404,7 +2402,7 @@
          id="tspan7353-8-0-9-4-8-7-8"
          x="126.76649"
          y="298.44598"
-         style="font-size:7.24179649px">2</tspan></text>
+         style="font-size:7.24179649px">1</tspan></text>
     <g
        transform="translate(26.799298,-69.396147)"
        id="g9049-1"
@@ -2833,6 +2831,82 @@
            id="path7304-7-2-9-1-9-6-2-8-8-4-1"
            inkscape:connector-curvature="0" />
       </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="133.32399"
+       y="287.04504"
+       id="text9000"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9002"
+         x="133.32399"
+         y="287.04504" /></text>
+    <g
+       id="g9048"
+       transform="translate(34.950976,2.1751099)">
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         transform="translate(589.31794,197.82489)"
+         id="g4789-8">
+        <rect
+           style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.70999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="rect4588-7"
+           width="42.931484"
+           height="21.718279"
+           x="100.10757"
+           y="256.78842" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.01904929px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 121.57331,256.85513 0,21.69643"
+           id="path4598-9"
+           inkscape:connector-curvature="0" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="104.87708"
+           y="271.29257"
+           id="text4600-2"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4602-0"
+             x="104.87708"
+             y="271.29257"
+             style="font-size:10px">AV</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="125.47028"
+           y="271.29257"
+           id="text4600-3-2"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4602-6-3"
+             x="125.47028"
+             y="271.29257"
+             style="font-size:10px">PÅ</tspan></text>
+      </g>
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         sodipodi:linespacing="125%"
+         id="text4692-2-7"
+         y="437.15735"
+         x="688.41132"
+         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-size:10px;letter-spacing:0px"
+           id="tspan4696-0-5"
+           y="437.15735"
+           x="688.41132"
+           sodipodi:role="line">Reset-</tspan><tspan
+           id="tspan4737-9"
+           style="font-size:10px;letter-spacing:0px"
+           y="449.65735"
+           x="688.41132"
+           sodipodi:role="line">knapp</tspan></text>
     </g>
   </g>
 </svg>
