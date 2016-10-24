@@ -155,7 +155,7 @@ Ovanpå denna sitter den avståndskänsliga lasern LIDAR - systemets viktigaste 
 
 Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska kunna rotera mer precist.
 
-I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
+I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placering. Kopplingsscheman finns i bilaga \ref{schematics:styrenhet} till och med bilaga \ref{schematics:brain}.
 
 \subsection{Kommunikation}
 \label{ssec:communication}
@@ -778,11 +778,11 @@ PC:n kommunicerar med roboten över blåtand. I mjukvarulagret används Pythonmo
     \label{fig:modulesDetailed}
 \end{figure}
 
-\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Styrenhet}]{schematics/styrenhet/kicad.pdf}
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Styrenhet}\label{schematics:styrenhet}]{schematics/styrenhet/kicad.pdf}
 
-\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Sensorenhet}]{schematics/sensorenhet/kicad.pdf}
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Sensorenhet}\label{schematics:sensorenhet}]{schematics/sensorenhet/kicad.pdf}
 
-\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Kontrollenhet}]{schematics/brain/kicad.pdf}
+\includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Kontrollenhet}\label{schematics:brain}]{schematics/brain/kicad.pdf}
 
 \clearpage
 \section{C-standard} \label{sec:cstandard}
