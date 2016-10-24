@@ -161,7 +161,7 @@ I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans pla
 \label{ssec:communication}
 För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används UART-bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
 
-Vidare är en UART-buss mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske.
+Vidare är en avbrottssignal mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske men kontrollenheten inte agerat.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som den övergripande kommunikationen kräver.
