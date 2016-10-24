@@ -301,7 +301,7 @@ På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara mon
 \item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar dessutom över half- duplex vilket kan orsaka en del problem då vi också måste implementera ett sådant protokoll.
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
-\item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader.
+\item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader. Vi använder dock gärna ett med större svängvidd för att behöva scanna färre gånger.
 \end{itemize}
 
 \subsubsection{Hjulmotorer}
