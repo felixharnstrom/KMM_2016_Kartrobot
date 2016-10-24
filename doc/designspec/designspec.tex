@@ -265,7 +265,7 @@ Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det sm
 Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare.
 
 \subsubsection{LIDAR}
-LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
+LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
 Begär avläsning av rummet $\rightarrow$ Bearbeta data $\rightarrow$ Skicka data vidare
 
