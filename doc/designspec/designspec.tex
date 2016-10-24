@@ -158,6 +158,7 @@ Vidare monteras ett gyro (modell MLX90609) i mitten av roboten för att den ska 
 I bilaga \ref{app:placement} hittar ni en grafisk beskrivning av hårdvarans placering.
 
 \subsection{Kommunikation}
+\label{ssec:communication}
 För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används UART-bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
 
 Vidare är en UART-buss mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske.
@@ -179,11 +180,11 @@ Här följer en lista på all gemensam hårdvara.
 
 \begin{center}
 \begin{HardwareList}
-\hardware{\cite{terminator}}{Robotplatform som hårdvara monteras på.}{1}
+\hardware{\cite{terminator}}{Robotplattform som hårdvara monteras på.}{1}
 \hardware{Virkort}{För virning.}{-}
 \hardware{Kablar}{För virning.}{-}
 \hardware{Tryckknapp}{För resetfunktionalitet.}{1}
-\hardware{Resistans}{Pull-up för resetfunktionalitet. $10k\Omega$.}{1}
+\hardware{Resistans}{Pull-up för resetfunktionalitet. \SI{10}{\kilo\ohm}}{1}
 \hardware{JTAG-Programmerare}{För programmering av AVR-kontrollern.}{1}
 \hardware{7-segment-display}{7-segment-displayer för avlusning, en för vardera ATmega1284-processor.}{2}
 \end{HardwareList}
@@ -191,11 +192,11 @@ Här följer en lista på all gemensam hårdvara.
 
 \clearpage
 \section{Implementationsstrategi}
-Arbetet i implementationsfasen delas så att medlemmarna kan arbeta parallelt med olika delsystem samtidigt. De som arbetar på en modul ansvarar för att tester finns, och detta säkerställs av testansvarig (generellt) och delvis mjukvaruansvarig samt hårdvaruansvarig (som ser till att testsuiter finns respektive att hårdvarutester utförs).
+Arbetet i implementationsfasen delas så att medlemmarna kan arbeta parallellt med olika delsystem samtidigt. De som arbetar på en modul ansvarar för att tester finns, och detta säkerställs av testansvarig (generellt) och delvis mjukvaruansvarig samt hårdvaruansvarig (som ser till att testsviter finns respektive att hårdvarutester utförs).
 
-Att säga att implementation sker "utifrån och in" eller "inifrån och ut" är därmed inte riktigt applicerbart. Implementation sker parallelt istället.
+Att säga att implementation sker "utifrån och in" eller "inifrån och ut" är därmed inte riktigt applicerbart. Implementation sker parallellt istället.
 
-Vid särskilda tidspunkter i projektet så intergreras moduler. Var då vänliga att referera till tidsplanen. Grupper är fria att testa gentemot varandra tidigare än så om de är överens. Sent i projektet sker systemtest, och tid ges för att fixa de fel som uppkommer.
+Vid särskilda tidspunkter i projektet så integreras moduler. Var då vänliga att referera till tidsplanen. Grupper är fria att testa gentemot varandra tidigare än så om de är överens. Sent i projektet sker systemtest, och tid ges för att fixa de fel som uppkommer.
 
 Feedback fås i senare i projektet via PC-mjukvaran (se kapitel \ref{sec:system4}). Tidigare så kan LED-skärmar och oscilloskop användas för debugging.
 
@@ -316,7 +317,7 @@ På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara mon
 
 \begin{itemize}
 %       Om AX-12, skriv något finare än "enligt vissa källor", och faktiskt förklara hur det ligger till.
-\item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar över half- duplex vilket orsakar endel problem då vi också måste implementera ett sådant protokoll.
+\item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar över half- duplex vilket orsakar en del problem då vi också måste implementera ett sådant protokoll.
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
 \item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader.
@@ -332,9 +333,9 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \begin{HardwareList}
 \hardware{Atmega1284p}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
 %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{IQEXO-3}{Occilator för Atmega-klockan, med standardfrekvens 16MHz.}{1}
-\hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej "continuous".}{1}
-\hardware{AX-12(+/A)}{Om inte ett Hobbyservo är möjligt.}{1}
+\hardware{IQEXO-3}{Oscillator för Atmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
+\hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej ''continuous''.}{1}
+\hardware{AX-12(+/A)}{Om inte ett hobbyservo är möjligt.}{1}
 \end{HardwareList}
 
 \subsection{Mjukvara}
@@ -420,7 +421,8 @@ Från styrenheten skickas information om vilka hastigheter motorerna/servot fåt
 
 Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
 
-Inga andra delsystem kommunicerar direkt med varandra (förutom ett prio-2-undantag mellan sensorenheten och styrenheten, se kapitel TODO), utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
+Inga andra delsystem kommunicerar direkt med varandra (förutom ett prio-2-undantag mellan sensorenheten och styrenheten, se kapitel \ref{ssec:communication}), utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
+
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -432,7 +434,6 @@ Inga andra delsystem kommunicerar direkt med varandra (förutom ett prio-2-undan
 \subsubsection{Datormodell}
 Raspberry pi 3 används, med inbyggd blåtandsmodul. Denna lilla dator är relativt kraftig, och bör därmed inte ha problem med att hålla sitt program gående i rimlig takt. Antalet portar räcker också till: två USB-utgångar behövs för USB-UARTen och två pinnar behövs för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
 
-% TODO: kolla om okej mot kravspecen, förhandla med handledare
 Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så kopplas ytterligare en knapp på, som har som funktion att stänga ner mjukvaran. Denna används då lämpligen innan brytaren för strömmen.
 
 För strömförsörjning används en klippt USB-kabel.
@@ -442,7 +443,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \begin{HardwareList}
 \hardware{Raspberry Pi 3}{Enkortsdator.}{1}
-\hardware{SD-kort}{SD-kort på minst 4GB används som hårddisk.}{1}
+\hardware{SD-kort}{SD-kort på minst 4GB används som lagringsenhet.}{1}
 \hardware{Klippt USB-kabel}{För strömförsörjning till PI:n.}{1}
 \hardware{Knapp}{För nedstängning av mjukvara.}{1}
 \hardware{Brytare}{Mekaniska brytare för AV/PÅ respektive styrläge.}{2}
