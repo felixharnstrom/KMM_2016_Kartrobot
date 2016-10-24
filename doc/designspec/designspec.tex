@@ -267,21 +267,13 @@ Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensor
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
 
-Begär avläsning av rummet $\rightarrow$ Bearbeta data $\rightarrow$ Skicka data vidare
-
-Mät avstånd framåt $\rightarrow$ Reagera när avståndet är väldigt kort $\rightarrow$ Flagga
-
 \subsubsection{Gyro}
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
-
-Begär rotationsdata $\rightarrow$ Bearbeta data $\rightarrow$ Skicka vidare rotationsdata
 
 \subsubsection{IR-sensorer}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
 
 IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
-
-Begär avläsning $\rightarrow$ Ta tid $\rightarrow$ Konvertera till avstånd $\rightarrow$ Jämför sensor 1 och sensor 2 avstånd samma sida $\rightarrow$ Om samma $\rightarrow$ Begär ny avläsning $\rightarrow$ Om inte samma $\rightarrow$ Begär korrigering $\rightarrow$ Begär ny avläsning
 
 \subsubsection{Utvärden/Input}
 En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
