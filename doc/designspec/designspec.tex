@@ -260,10 +260,10 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 
 Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot instruktioner om att läsa av en viss sensor. 
 
-Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Sensorenheten kommer även kunna läsa av en viss sensor direkt på uppmaning via UART.
+Sensorenheten ska kontinuerligt läsa av sensorerna, och skickar ett tidigare avläst värde om det är tillräckligt aktuellt. Sensorenheten kommer även kunna läsa av en viss sensor direkt på uppmaning via UART. 
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare.
+Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare. Inget skickas utan att mätvärdet begärts över UART-bussen.
 
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På Atmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
@@ -272,9 +272,7 @@ LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensor
 MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder analog avläsning. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej, så länge mätvärdena är noggranna nog för våra behov.
 
 \subsubsection{IR-sensorer}
-IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtret måste beräknas efter mätning av störningarna.
-
-IR-sensorer kommer att genomföra kontinuerligt mätningar för att avgöra ifall roboten åker rakt fram. Det finns också möjlighet till avläsningstriggers, så att när det kommer en begäran om avläsning kan detta genomföras ögonblickligen.
+IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema. Värden på LP-filtrets komponenter måste beräknas efter mätning av störningarna.
 
 \subsubsection{Utvärden/Input}
 En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
