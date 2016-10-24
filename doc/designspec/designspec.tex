@@ -372,7 +372,7 @@ I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funkt
 \end{figure}
 
 \subsubsection{Trådning}
-Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs mer än en tråd för styrenheten.
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs inte mer än en tråd för styrenheten.
 
 \subsection{Reglering}
 Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
