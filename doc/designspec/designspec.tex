@@ -259,7 +259,7 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 
 Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot instruktioner om att läsa av en viss sensor. 
 
-Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Att läsa av sensorerna kontinuerligt gör det möjligt för sensormodulen att vara medveten ifall roboten följer en vägg eller inte. Sensorenheten kommer att ha en interrupt, som ger möjligheten för den att läsa av sensorer direkt när en avläsning begärs.
+Sensorenheten ska kontinuerligt läsa av sensorerna, på detta sätt går det smidigt att även kolla baklänges på tidigare avläsningar. Sensorenheten kommer att ha en interrupt, som ger möjligheten för den att läsa av sensorer direkt när en avläsning begärs.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{sensorenheten-flow_chart.png}}
