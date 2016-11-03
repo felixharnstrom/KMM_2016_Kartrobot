@@ -159,7 +159,7 @@ I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placer
 
 \subsection{Kommunikation}
 \label{ssec:communication}
-För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används UART-bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
+För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via blåtand med PC-mjukvaran (se kapitel \ref{sec:system4}).
 
 Dessutom är en avbrottssignal mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske men kontrollenheten inte agerat.
 
@@ -201,7 +201,7 @@ Att säga att implementation sker "utifrån och in" eller "inifrån och ut" är 
 
 Vid särskilda tidspunkter i projektet så integreras moduler. Var då vänliga att referera till tidsplanen. Grupper är fria att testa gentemot varandra tidigare än så om de är överens. Sent i projektet sker systemtest, och tid ges för att fixa de fel som uppkommer.
 
-Feedback fås i senare i projektet via PC-mjukvaran (se kapitel \ref{sec:system4}). Tidigare så kan LED-skärmar och oscilloskop användas för debugging.
+Feedback fås i den senare delen av projektet via PC-mjukvaran (se kapitel \ref{sec:system4}). Tidigare så kan LED-skärmar och oscilloskop användas för debugging.
 
 % TODO: Hur ofta bör man sampla?
 %       Vad menas ens med att sampla? Hur ofta man utför test?
@@ -247,8 +247,8 @@ Gyrot läses endast av när det efterfrågas (under sväng).
 Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \begin{HardwareList}
-\hardware{ATmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{IQEXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
+\hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
+\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
 \hardware{GP2D120}{IR-sensor.}{5}
 \hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
 \hardware{Resistor}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
@@ -256,8 +256,6 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
 \hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
 \hardware{MLX90609}{Gyro.}{1}
-\hardware{Kondensator}{Störningsreducering av gyro. \SI{1}{\micro\farad}. Datablad rekommenderar X5R eller X7R med minsta spänning \SI{10}{\volt}.}{2}
-\hardware{Kondensator}{Störningsreducering av gyro. \SI{0.1}{\micro\farad}. Datablad rekommenderar X5R eller X7R med minsta spänning \SI{25}{\volt}.}{1} % TODO: Finns en till typ frivillig, se datablad. Finns inritad i schemat.
 \end{HardwareList}
 
 \subsection{Mjukvara}
@@ -269,7 +267,7 @@ Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vi
 Sensorenheten ska kontinuerligt läsa av sensorerna, och skickar ett tidigare avläst värde om det är tillräckligt aktuellt. Sensorenheten kommer även kunna läsa av en viss sensor direkt på uppmaning via UART. 
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma UART-buss som används för att rapportera mätvärden vidare. Inget skickas utan att mätvärdet begärts över UART-bussen.
+Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma seriell buss som används för att rapportera mätvärden vidare. Inget skickas utan att mätvärdet begärts över seriella bussen.
 
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen kopplas till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
@@ -283,7 +281,7 @@ MLX90609 stödjer avläsning via en analog pinne samt via SPI. Vi använder anal
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som måste filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}. Värden på LP-filtrets komponenter måste beräknas efter mätning av störningarna.
 
 \subsubsection{Utvärden/Input}
-En UART-buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
+En seriell buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
@@ -298,7 +296,7 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Den är länken mellan
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi använder en ATmega1284-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorerna kommunicerar över PWM.
+Vi använder en ATmega1284-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
 
 \clearpage
 
@@ -310,7 +308,7 @@ På toppen av roboten ska en lasersensor (se kapitel \ref{sssec:lidar}) vara mon
 \item AX-12(+/A) har två rotationslägen: ''vanlig'' och ''wheel''. Det förstnämnda rotationsläget för AX-12:n tillåter oss att göra mycket exakta rotationer, men förhindrar oss från att svänga runt mer än 300 grader. Vi slipper potentiellt felaktiga värden, men kan inte titta rakt bakom oss. Då detta inte är ett stort problem används lämpligen det vanliga läget. Servot använder, enligt vissa källor, 9-12V men klarar sig enligt andra ner emot 7V. Kan alltså eventuellt kräva en step-up-krets från ~7V2 till 9-12V. AX-12:an kommunicerar dessutom över half- duplex vilket kan orsaka en del problem då vi också måste implementera ett sådant protokoll.
 %http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.ht
 
-\item Hobbyservot kommunicerar över PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader. Vi använder dock gärna ett med större svängvidd för att behöva skanna färre gånger.
+\item Hobbyservot styrs med PWM vilket är betydligt enklare att implementera än half-duplex. Svängvidden för hobbyservon brukar vara runt 180 grader. Vi använder dock gärna ett med större svängvidd för att behöva skanna färre gånger.
 \end{itemize}
 
 \subsubsection{Hjulmotorer}
@@ -321,9 +319,9 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 % TODO add hardware
 \begin{HardwareList}
-\hardware{ATmega1284}{Mikroprocessor med 44 pinnar (inklusive 8 A/D-omvandlare).}{1} 
+\hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} 
 %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{IQEXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
+\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
 \hardware{Hobbyservo}{Så högt gradtal som möjligt. Dock ej ''continuous''.}{1}
 \hardware{AX-12(+/A)}{Om inte ett hobbyservo är möjligt.}{1}
 \end{HardwareList}
@@ -385,8 +383,8 @@ I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funkt
 	\label{fig:styrenhetFlowchart}
 \end{figure}
 
-\subsubsection{Trådning}
-Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs inte mer än en tråd för styrenheten.
+\subsubsection{Processer}
+Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs inte mer än en process för styrenheten.
 
 \subsection{Reglering}
 Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
@@ -396,7 +394,7 @@ Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir d
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
-Vi implementerar en UART-buss som går mellan styrenheten och kommunikationsenheten.
+Vi implementerar en seriell buss som går mellan styrenheten och kommunikationsenheten.
 
 Styrdatan ska innehålla information om följande punkter:
 \begin{itemize}
@@ -446,7 +444,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \end{HardwareList}
 
 \subsection{Mjukvara}
-Koden skrivs i Python 3, och ska följa \cite{pep8}.
+Koden skrivs i Python 3, och ska följa \cite{pep8}. Operativsystemet som används är Raspbian.
 
 \subsubsection{Kommunikation}
 Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Mjukvara skrivs för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
@@ -660,7 +658,7 @@ Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskad
 \end{figure}
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
-Kommunikations- och kontrollenheten använder sig av UART-bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data måste kunna ske åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
+Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data måste kunna ske åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
 
 Utöver detta behövs fungerande blåtandskommunikation. Raspberry PI:ns inbyggda blåtandsmodul används, och vi förväntar oss att PC:n som har användargränssnittet (se kapitel \ref{sec:system4}) även har support för denna typ av kommunikation. I mjukvarulagret används Pythonmodulen \cite{pybluez}.
 
