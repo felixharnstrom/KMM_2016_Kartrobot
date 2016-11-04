@@ -3,23 +3,23 @@ Styrenhet.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000d0  00000000  00000000  00000054  2**1
+  0 .text         000000e0  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .comment      00000030  00000000  00000000  00000124  2**0
+  1 .comment      00000030  00000000  00000000  00000134  2**0
                   CONTENTS, READONLY
-  2 .debug_aranges 00000020  00000000  00000000  00000154  2**0
+  2 .debug_aranges 00000038  00000000  00000000  00000164  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_info   00000145  00000000  00000000  00000174  2**0
+  3 .debug_info   00000134  00000000  00000000  0000019c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_abbrev 000000d3  00000000  00000000  000002b9  2**0
+  4 .debug_abbrev 000000ff  00000000  00000000  000002d0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_line   0000015b  00000000  00000000  0000038c  2**0
+  5 .debug_line   00000157  00000000  00000000  000003cf  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_frame  00000024  00000000  00000000  000004e8  2**2
+  6 .debug_frame  00000054  00000000  00000000  00000528  2**2
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_str    00000171  00000000  00000000  0000050c  2**0
+  7 .debug_str    00000165  00000000  00000000  0000057c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_ranges 00000010  00000000  00000000  0000067d  2**0
+  8 .debug_ranges 00000028  00000000  00000000  000006e1  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -103,56 +103,84 @@ Disassembly of section .text:
   92:	d0 e4       	ldi	r29, 0x40	; 64
   94:	de bf       	out	0x3e, r29	; 62
   96:	cd bf       	out	0x3d, r28	; 61
-  98:	02 d0       	rcall	.+4      	; 0x9e <main>
-  9a:	18 c0       	rjmp	.+48     	; 0xcc <_exit>
+  98:	12 d0       	rcall	.+36     	; 0xbe <main>
+  9a:	20 c0       	rjmp	.+64     	; 0xdc <_exit>
 
 0000009c <__bad_interrupt>:
   9c:	b1 cf       	rjmp	.-158    	; 0x0 <__vectors>
 
-0000009e <main>:
-#include <avr/io.h>
-#include <util/delay.h>
+0000009e <uart_init>:
+// function to receive data
+unsigned char uart_recieve (void)
+{
+	while(!(UCSR0A) & (1<<RXC0));                   // wait while data is being received
+	return UDR0;                                   // return 8-bit data
+}
+  9e:	10 92 c5 00 	sts	0x00C5, r1
+  a2:	83 e3       	ldi	r24, 0x33	; 51
+  a4:	80 93 c4 00 	sts	0x00C4, r24
+  a8:	e1 ec       	ldi	r30, 0xC1	; 193
+  aa:	f0 e0       	ldi	r31, 0x00	; 0
+  ac:	80 81       	ld	r24, Z
+  ae:	88 61       	ori	r24, 0x18	; 24
+  b0:	80 83       	st	Z, r24
+  b2:	e2 ec       	ldi	r30, 0xC2	; 194
+  b4:	f0 e0       	ldi	r31, 0x00	; 0
+  b6:	80 81       	ld	r24, Z
+  b8:	8e 60       	ori	r24, 0x0E	; 14
+  ba:	80 83       	st	Z, r24
+  bc:	08 95       	ret
+
+000000be <main>:
 
 int main(void)
 {
+	unsigned char a;
+	char buffer[10];
 	DDRA = (1<<DDA7)|(1<<DDA6)|(1<<DDA5)|(1<<DDA4)|(1<<DDA3)|(1<<DDA2)|(1<<DDA1)|(1<<DDA0);	//All pins on port A as output
-  9e:	8f ef       	ldi	r24, 0xFF	; 255
-  a0:	81 b9       	out	0x01, r24	; 1
+  be:	8f ef       	ldi	r24, 0xFF	; 255
+  c0:	81 b9       	out	0x01, r24	; 1
+	uart_init();
+  c2:	ed df       	rcall	.-38     	; 0x9e <uart_init>
+}
+
+// function to receive data
+unsigned char uart_recieve (void)
+{
+	while(!(UCSR0A) & (1<<RXC0));                   // wait while data is being received
+  c4:	a0 ec       	ldi	r26, 0xC0	; 192
+  c6:	b0 e0       	ldi	r27, 0x00	; 0
+	return UDR0;                                   // return 8-bit data
+  c8:	e6 ec       	ldi	r30, 0xC6	; 198
+  ca:	f0 e0       	ldi	r31, 0x00	; 0
+}
+
+// function to receive data
+unsigned char uart_recieve (void)
+{
+	while(!(UCSR0A) & (1<<RXC0));                   // wait while data is being received
+  cc:	8c 91       	ld	r24, X
+	return UDR0;                                   // return 8-bit data
+  ce:	80 81       	ld	r24, Z
+	DDRA = (1<<DDA7)|(1<<DDA6)|(1<<DDA5)|(1<<DDA4)|(1<<DDA3)|(1<<DDA2)|(1<<DDA1)|(1<<DDA0);	//All pins on port A as output
+	uart_init();
     while(1)
     {
-        PORTA |= (1<<PORTA5);    //Turn 6th bit on PORTA (i.e. PA5) to 1 => on
-  a2:	15 9a       	sbi	0x02, 5	; 2
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
+		a=uart_recieve();
+		if(a == 'a'){
+  d0:	81 36       	cpi	r24, 0x61	; 97
+  d2:	11 f4       	brne	.+4      	; 0xd8 <main+0x1a>
+			PORTA |= (1<<PORTA5);    //Turn 6th bit on PORTA (i.e. PA5) to 1 => on
+  d4:	15 9a       	sbi	0x02, 5	; 2
+  d6:	fa cf       	rjmp	.-12     	; 0xcc <main+0xe>
+			//_delay_ms(1000);        //Delay for 1000ms => 1 sec
+		}else{
+			PORTA &= ~(1<<PORTA5);    //Turn 6th bit on PORTA (i.e. PA5) to 0 => off
+  d8:	15 98       	cbi	0x02, 5	; 2
+  da:	f8 cf       	rjmp	.-16     	; 0xcc <main+0xe>
 
-	__builtin_avr_delay_cycles(__ticks_dc);
-  a4:	2f ef       	ldi	r18, 0xFF	; 255
-  a6:	89 e6       	ldi	r24, 0x69	; 105
-  a8:	98 e1       	ldi	r25, 0x18	; 24
-  aa:	21 50       	subi	r18, 0x01	; 1
-  ac:	80 40       	sbci	r24, 0x00	; 0
-  ae:	90 40       	sbci	r25, 0x00	; 0
-  b0:	e1 f7       	brne	.-8      	; 0xaa <main+0xc>
-  b2:	00 c0       	rjmp	.+0      	; 0xb4 <main+0x16>
-  b4:	00 00       	nop
-        _delay_ms(1000);        //Delay for 1000ms => 1 sec
-        PORTA &= ~(1<<PORTA5);    //Turn 6th bit on PORTA (i.e. PA5) to 0 => off
-  b6:	15 98       	cbi	0x02, 5	; 2
-  b8:	2f ef       	ldi	r18, 0xFF	; 255
-  ba:	89 e6       	ldi	r24, 0x69	; 105
-  bc:	98 e1       	ldi	r25, 0x18	; 24
-  be:	21 50       	subi	r18, 0x01	; 1
-  c0:	80 40       	sbci	r24, 0x00	; 0
-  c2:	90 40       	sbci	r25, 0x00	; 0
-  c4:	e1 f7       	brne	.-8      	; 0xbe <main+0x20>
-  c6:	00 c0       	rjmp	.+0      	; 0xc8 <main+0x2a>
-  c8:	00 00       	nop
-  ca:	eb cf       	rjmp	.-42     	; 0xa2 <main+0x4>
+000000dc <_exit>:
+  dc:	f8 94       	cli
 
-000000cc <_exit>:
-  cc:	f8 94       	cli
-
-000000ce <__stop_program>:
-  ce:	ff cf       	rjmp	.-2      	; 0xce <__stop_program>
+000000de <__stop_program>:
+  de:	ff cf       	rjmp	.-2      	; 0xde <__stop_program>
