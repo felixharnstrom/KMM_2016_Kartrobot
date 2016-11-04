@@ -34,8 +34,12 @@ def connect_rfcomm_server():
     server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 
     port = 1
-    server_sock.bind(("", port))
+    print("Listening on port", port)
+    
+    server_sock.bind(("00:15:83:15:A3:10", port))
     server_sock.listen(1)
+
+    print("listened")
 
     client_sock, addr = server_sock.accept()
     print("Accepted ", addr)
@@ -49,7 +53,7 @@ def connect_rfcomm_server():
 def connect_rfcomm_client():
     # Figure this one out through hciconfig
     # find doesn't seem to work, need to test with 2 blutooths.
-    addr = "B8:27:EB:C1:38:DC"
+    addr = "00:15:83:15:A3:10"
     
     if addr is None:
         print("Cant find host")
@@ -70,5 +74,5 @@ def debug_test():
         connect_rfcomm_server()
     else:
         print("client")
-        list_devices()
+        #list_devices()
         connect_rfcomm_client()
