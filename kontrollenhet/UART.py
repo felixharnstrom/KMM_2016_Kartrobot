@@ -1,4 +1,5 @@
 import serial
+import modules
 
 class UART:
     def __init__(self, port : str):
@@ -6,12 +7,11 @@ class UART:
         self.ser = serial.Serial('/dev/'+port, 9600)  # open serial port
 
 
+    def create_metapacket_hex(self, addr : modules.Adress, length : int, action : modules.Functions):
+        return '{:02X}'.format(addr.value*(2**7)+int(length)*(2**4)+action.value)
+
     def create_metapacket(self, addr : int, length : int, action : int):
-        return bytes.fromhex(hex(addr*(2**7)+length*(2**4)+action).split('x')[1])
-
-
-    def create_metapacket_hex(self, addr : int, length : int, action : int):
-        return hex(addr*(2**7)+length*(2**4)+action).split('x')[1]
+        return bytes.fromhex(self.create_metapacket_hex(addr, length, action))
 
     def send_packet(self, packet : bytes):
         self.ser.write(packet)
