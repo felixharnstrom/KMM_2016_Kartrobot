@@ -20,17 +20,9 @@
 #include "uart.h"
 
 int main(void){
-	int packet[8];
 	uart_init();
     while(1){
-	    uart_packet_receive(PACKET_SIZE, packet);   // receive a packet
-        // reply with the bit pattern of the packet
-	    for(int i = 7; i >= 0; --i){
-		    if(packet[i] == 1){
-			    uart_transmit('1');
-			    }else{
-			    uart_transmit('0');
-		    }
-	    }
+        uart_receive();
+        uart_msg_transmit(0, 6, MOTOR, "bcdefg");   // sends "abcdefg"
     }
 }
