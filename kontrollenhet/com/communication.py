@@ -65,9 +65,10 @@ def send_bytes(client_socket, data):
     """
     if len(data) > MAXIMUM_PACKET_SIZE:
         raise OverflowError("Data is too large to fit in a packet")
+    
     data_size = len(data).to_bytes(BYTES_FOR_PACKET_SIZE,
                                         byteorder=BYTE_ORDER,
-                                        signed=True)
+                                        signed=False)
     msg = data_size + data
     client_socket.sendall(msg)
 
@@ -84,7 +85,7 @@ def receive_bytes(client_socket):
     # Extract data
     data_size = int.from_bytes(first[:BYTES_FOR_PACKET_SIZE],
                                byteorder=BYTE_ORDER,
-                               signed=True)
+                               signed=False)
     msg = first[BYTES_FOR_PACKET_SIZE:]
 
     # While part of message is missing, keep receiving

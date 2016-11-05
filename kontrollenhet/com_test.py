@@ -1,17 +1,26 @@
 
 from com.server import *
 from com.client import *
+import time, sys
+from random import randrange
 
 # A test for the current functionality
-
-msg = (1337).to_bytes(8, byteorder="big")
 
 if input() == "":
     print("client")
     client = Client()
     if client.connect():
-        print("sending", msg)
-        print(client.send(msg))
+        while True:
+            num = randrange(0, 65535)
+            msg = num.to_bytes(1000, byteorder="big")
+            print("sending", num)
+            back = client.send(msg)
+            bnum = int.from_bytes(back, byteorder="big")
+            if num != bnum:
+                print("ERROR", bnum)
+                sys.exit(0)
+            
+        print("sent")
         client.close()
     else:
         print("Connection failed")
@@ -19,6 +28,8 @@ else:
     print("server")
     server = Server()
     server.advertise_and_connect()
-    print(server.receive())
-    server.send(msg)
+    while True:
+        msg = server.receive()
+        #time.sleep(0.1)
+        server.send(msg)
     server.close()
