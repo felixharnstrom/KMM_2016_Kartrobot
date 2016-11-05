@@ -71,3 +71,29 @@ void uart_msg_transmit(int address, int payloadSize, t_msgType msgType, char* pa
         uart_transmit(payload[i]);
     }
 }
+
+void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload){
+    uint8_t adrMask = 0x80;   // 10000000b
+    uint8_t sizeMask = 0x70;   // 01110000b
+    uint8_t typeMask = 0x0F;   // 00001111b
+
+    char c;
+    c = uart_receive();     // receive meta packet
+    *address = (c & adrMask) >> 7;
+    *payloadSize = (c & sizeMask) >> 4;
+    int type = (c & typeMask);
+    switch(type){
+        case 0 :
+            *msgType = SENSOR;
+            break;
+        case 1 :
+            *msgType = MOTOR;
+            break;
+        default:
+            return;
+    }
+
+    for(int i = 0; i < *payloadSize; ++i){
+        payload[i] = uart_receive();
+    }
+}

@@ -49,4 +49,15 @@ void uart_packet_receive (int size, int* packet);
  */
 void uart_msg_transmit(int address, int payloadSize, t_msgType msgType, char* payload);
 
+/*
+ * Receives a meta packet and the following payload.
+ *
+ * _Parameters_
+ * (int*) address: sender address
+ * (int*) payloadSize: number of payload characters
+ * (t_msgType*) msgType: received messsage type
+ * (char*) payload: received payload
+ */
+void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload);
+
 #endif /* UART_H_ */
