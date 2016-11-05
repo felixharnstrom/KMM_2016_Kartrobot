@@ -8,9 +8,11 @@ def list_devices():
         print("  %s - %s" % (addr, name))
 
 def connect_rfcomm_server():
-    """Returns a tuple: (server socket, client socket)
+    """Returns a tuple: (server socket, client socket).
 
     Advertises an rfcomm service and waits for a client to connect.
+
+    Raises BluetoothError if accepting the connection fails.
     """
     server_sock=BluetoothSocket( RFCOMM )
     server_sock.bind(("", PORT_ANY))
@@ -27,13 +29,17 @@ def connect_rfcomm_server():
     
 
 def connect_rfcomm_client(addr = None):
-    """Returns a bluetooth socket, or None
+    """Returns a bluetooth socket, or None.
 
     Attempts to find an advertised rfcomm server and connect to it.
+
     Returns None if no such server found.
+    Multiple attempts may be required in order to find an advertising server.
+
+    Raises BluetoothError if connecting to the server fails.
     """
     # Search for service
-    service_matches = find_service( uuid = UUID, address = addr )
+    service_matches = find_service(uuid=UUID, address=addr)
 
     # Terminate if no server found
     if len(service_matches) == 0:
@@ -46,13 +52,19 @@ def connect_rfcomm_client(addr = None):
     host = first_match["host"]
 
     # Connect
-    sock=BluetoothSocket( RFCOMM )
+    sock=BluetoothSocket(RFCOMM)
     sock.connect((host, port))
     return sock
 
 
 def send_bytes(client_socket, data):
-    """Send byte data to connected socket"""
+    """Send byte data to connected socket.
+    
+    Raises OverflowError if data is too large.
+    Raises BluetoothError if sending fails.
+    """
+    if len(data) > MAXIMUM_PACKET_SIZE:
+        raise OverflowError("Data is too large to fit in a packet")
     data_size = len(data).to_bytes(BYTES_FOR_PACKET_SIZE,
                                         byteorder=BYTE_ORDER,
                                         signed=True)
@@ -60,9 +72,11 @@ def send_bytes(client_socket, data):
     client_socket.sendall(msg)
 
 def receive_bytes(client_socket):
-    """Returns received bytes
+    """Returns received bytes.
 
     Waits for client to send bytes data.
+
+    Raises BluetoothError if receiving fails.
     """
     # Receive with a bigger buffer than necessary to be safe
     first = client_socket.recv(2*MAXIMUM_PACKET_SIZE)
