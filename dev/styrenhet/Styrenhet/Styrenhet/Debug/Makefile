@@ -37,7 +37,8 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../Styrenhet.c
+../Styrenhet.c \
+../UART.c
 
 
 PREPROCESSING_SRCS += 
@@ -47,16 +48,20 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-Styrenhet.o
+Styrenhet.o \
+UART.o
 
 OBJS_AS_ARGS +=  \
-Styrenhet.o
+Styrenhet.o \
+UART.o
 
 C_DEPS +=  \
-Styrenhet.d
+Styrenhet.d \
+UART.d
 
 C_DEPS_AS_ARGS +=  \
-Styrenhet.d
+Styrenhet.d \
+UART.d
 
 OUTPUT_FILE_PATH +=Styrenhet.elf
 
@@ -72,6 +77,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
