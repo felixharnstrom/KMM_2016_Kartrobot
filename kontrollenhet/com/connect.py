@@ -1,78 +1,66 @@
-import bluetooth, time
+from bluetooth import *
+import time
 
-def find(name):
-    """Returns a string, or None
-
-    Finds the address of a device with name. Returns None if no such devices can be found. Looks once."""
-    nearby_devices = bluetooth.discover_devices(lookup_names=True)
-    for nearby_addr, nearby_name in nearby_devices:
-        if nearby_name == name:
-            return nearby_addr
-    return None
-
-def find_timed(name, timeout):
-    """Returns a string
-
-    Finds the address within a given timeout (plus the time for the final scan to finish) Returns None if none can be found."""
-    time_elapsed = 0.0
-    while(time_elapsed < timeout):
-        start_time = time.time()
-        result = find(name)
-        end_time = time.time()
-        time_elapsed += end_time - start_time
-        if result is not None:
-            return result
-    return None
+UUID = "01365216-a33e-11e6-80f5-76304dec7eb7"
 
 def list_devices():
     """Prints out names and adresses of nearby devices"""
-    nearby_devices = bluetooth.discover_devices(lookup_names=True)
+    nearby_devices = discover_devices(lookup_names=True)
     for addr, name in nearby_devices:
         print("  %s - %s" % (addr, name))
 
 def connect_rfcomm_server():
-    server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+    """Returns a tuple: (server socket, client socket)
 
-    port = 1
-    print("Listening on port", port)
-    
-    server_sock.bind(("00:15:83:15:A3:10", port))
+    Advertises an rfcomm service and waits for a client to connect."""
+    server_sock=BluetoothSocket( RFCOMM )
+    server_sock.bind(("",PORT_ANY))
     server_sock.listen(1)
+    port = server_sock.getsockname()[1]
 
-    print("listened")
+    advertise_service( server_sock, "SampleServer",
+                       service_id = UUID,
+                       service_classes = [ UUID, SERIAL_PORT_CLASS ],
+                       profiles = [ SERIAL_PORT_PROFILE ]
+#                      protocols = [ OBEX_UUID ] 
+                     )
 
-    client_sock, addr = server_sock.accept()
-    print("Accepted ", addr)
-
-    data = client_sock.recv(1024)
-    print("received [%s]" % data)
-
-    client_sock.close()
-    server_sock.close()
-
-def connect_rfcomm_client():
-    # Figure this one out through hciconfig
-    # find doesn't seem to work, need to test with 2 blutooths.
-    addr = "00:15:83:15:A3:10"
+    client_sock, client_info = server_sock.accept()
+    return server_sock, client_sock
     
-    if addr is None:
-        print("Cant find host")
-        return
+
+def connect_rfcomm_client(addr = None):
+    """Returns a bluetooth socket, or None
+
+    Attempts to find an advertised rfcomm server and connect to it.
+    Returns None if no such server found."""
     
-    port = 1
+    # Search for service
+    service_matches = find_service( uuid = UUID, address = addr )
 
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    sock.connect((addr, port))
+    # Terminate if no server found
+    if len(service_matches) == 0:
+        return None
 
-    sock.send("hello!!")
+    # Get service data
+    first_match = service_matches[0]
+    port = first_match["port"]
+    name = first_match["name"]
+    host = first_match["host"]
 
-    sock.close()
+    # Connect
+    sock=BluetoothSocket( RFCOMM )
+    sock.connect((host, port))
+    return sock
 
 def debug_test():
     if (input() == "a"):
         print("server")
-        connect_rfcomm_server()
+        a, b = connect_rfcomm_server()
+        a.close()
     else:
         print("client")
         #list_devices()
-        connect_rfcomm_client()
+        rslt = connect_rfcomm_client()
+        print(rslt)
+        rslt.close()
