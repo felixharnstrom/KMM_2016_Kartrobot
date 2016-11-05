@@ -1,5 +1,5 @@
 from bluetooth import *
-import constants
+from .constants import *
 
 def list_devices():
     """Prints out names and adresses of nearby devices"""
@@ -17,8 +17,8 @@ def connect_rfcomm_server():
     port = server_sock.getsockname()[1]
 
     advertise_service(server_sock, "SampleServer",
-                      service_id=constants.UUID,
-                      service_classes=[constants.UUID, SERIAL_PORT_CLASS],
+                      service_id=UUID,
+                      service_classes=[UUID, SERIAL_PORT_CLASS],
                       profiles=[SERIAL_PORT_PROFILE])
 
     client_sock, client_info = server_sock.accept()
@@ -32,7 +32,7 @@ def connect_rfcomm_client(addr = None):
     Returns None if no such server found."""
     
     # Search for service
-    service_matches = find_service( uuid = constants.UUID, address = addr )
+    service_matches = find_service( uuid = UUID, address = addr )
 
     # Terminate if no server found
     if len(service_matches) == 0:
