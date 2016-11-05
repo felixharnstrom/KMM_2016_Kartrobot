@@ -235,3 +235,4 @@ dkms.conf
 dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h
+!*.cproj
