@@ -25,15 +25,15 @@ void uart_init (void)
 // function to send data
 void uart_transmit (unsigned char data)
 {
-	while (!( UCSR0A & (1<<UDRE0)));                // wait while register is free
-	UDR0 = data;                                   // load data in the register
+	loop_until_bit_is_set(UCSR0A, UDRE0); /* Wait until data register empty. */
+	UDR0 = data;
 }
 
 // function to receive data
 unsigned char uart_receive (void)
 {
-	while(!(UCSR0A) & (1<<RXC0));                   // wait while data is being received
-	return UDR0;                                   // return 8-bit data
+	loop_until_bit_is_set(UCSR0A, RXC0); /* Wait until data exists. */
+    return UDR0;
 }
 
 void receive_packet (char* buffer){
@@ -55,7 +55,6 @@ int main(void)
     while(1)
     {
 		c = uart_receive();
-		if(c != 0x00){
 			for (int i = 0; i < 8; ++i) {
 				packet[i] = (c >> i) & 1;
 			}
@@ -66,7 +65,9 @@ int main(void)
 					uart_transmit('0');
 				}
 			}
-		}
+			//loop_until_bit_is_set(UCSR0A, UDRE0);
+		
+		
 		
 		
 		//if(a == 'a'){
