@@ -1,5 +1,6 @@
 from bluetooth import *
-from .constants import *
+from constants import *
+import socket
 
 def list_devices():
     """Prints out names and adresses of nearby devices"""
@@ -24,6 +25,19 @@ def connect_rfcomm_server():
                       service_classes=[UUID, SERIAL_PORT_CLASS],
                       profiles=[SERIAL_PORT_PROFILE])
 
+    client_sock, client_info = server_sock.accept()
+    return server_sock, client_sock
+
+
+def connect_rfcomm_server_ip(port : int):
+    """Returns a tuple: (server socket, client socket).
+
+    Advertises an rfcomm service on "port" and waits for a client to connect.
+    """
+    server_sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_sock.bind((socket.gethostname(), port))
+    server_sock.listen(1)
+    
     client_sock, client_info = server_sock.accept()
     return server_sock, client_sock
     
@@ -54,6 +68,23 @@ def connect_rfcomm_client(addr = None):
     # Connect
     sock=BluetoothSocket(RFCOMM)
     sock.connect((host, port))
+    return sock
+
+
+def connect_rfcomm_client_ip(addr, port):
+    """Returns a bluetooth socket, or None.
+
+    Attempts to find an advertised rfcomm server and connect to it.
+
+    Returns None if no such server found.
+    Multiple attempts may be required in order to find an advertising server.
+
+    Raises BluetoothError if connecting to the server fails.
+    """
+
+    # Connect
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((addr, port))
     return sock
 
 

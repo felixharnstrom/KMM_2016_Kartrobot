@@ -1,5 +1,5 @@
 from bluetooth import *
-from .communication import *
+from communication import *
 
 class Client:
     """A bluetooth client.
@@ -56,3 +56,25 @@ class Client:
             self._sock = None
 
         
+class IPClient(Client):
+    _port = 8080
+    _addr = None
+
+    def __init__(self, addr, port = 8080):
+        self._addr = addr
+        self._port = port
+
+
+    def connect(self):
+        """Returns true if succesful.
+
+        Attempts to connect to an advertised server.
+        Fails if already connected.
+
+        Raises BluetoothError if the connection is refused by the server.
+        """
+        if self.connected():
+            return False
+        
+        self._sock = connect_rfcomm_client_ip(self._addr, self._port)
+        return self.connected()

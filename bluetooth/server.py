@@ -1,5 +1,5 @@
 from bluetooth import *
-from .communication import *
+from communication import *
 
 
 class Server:
@@ -70,3 +70,10 @@ class Server:
             self._server_sock = None
 
         
+
+class IPServer(Server):
+    _default_port = 8080
+    def advertise_and_connect(self):
+        if self.connected():
+            return        
+        self._server_sock, self._client_sock = connect_rfcomm_server_ip(self._default_port)
