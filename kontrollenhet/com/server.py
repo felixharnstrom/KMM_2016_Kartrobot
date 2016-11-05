@@ -26,7 +26,8 @@ class Server:
     def send(self, byte_data):
         """Returns False if not connected, True otherwise
 
-        Send a message to the connected server."""
+        Send a message to the connected server.
+        """
         if not self.connected():
             return False
         send_bytes(self._client_sock, byte_data)
