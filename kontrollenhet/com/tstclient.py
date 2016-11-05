@@ -8,6 +8,7 @@
 
 from bluetooth import *
 import sys
+from communication import *
 
 if sys.version < '3':
     input = raw_input
@@ -44,6 +45,8 @@ print("connected.  type stuff")
 while True:
     data = input()
     if len(data) == 0: break
-    sock.send(data)
+    num = (1337).to_bytes(16, byteorder="big")
+    send_bytes(sock, num)
+    #sock.send(data)
 
 sock.close()

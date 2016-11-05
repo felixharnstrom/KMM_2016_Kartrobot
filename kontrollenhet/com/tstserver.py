@@ -6,6 +6,7 @@
 # $Id: rfcomm-server.py 518 2007-08-10 07:20:07Z albert $
 
 from bluetooth import *
+from communication import *
 
 server_sock=BluetoothSocket( RFCOMM )
 server_sock.bind(("",PORT_ANY))
@@ -29,9 +30,10 @@ print("Accepted connection from ", client_info)
 
 try:
     while True:
-        data = client_sock.recv(1024)
+        data = receive_bytes(client_sock)
+        data_i = int.from_bytes(data, byteorder="big")
         if len(data) == 0: break
-        print("received [%s]" % data)
+        print("received", data_i)
 except IOError:
     pass
 
