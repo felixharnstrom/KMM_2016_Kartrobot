@@ -228,3 +228,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+##Atmel Studio:
+*.atsln
+*.atsuo
+dev/Styrenhet/Styrenhet/*
+!*.c
+!*.h
