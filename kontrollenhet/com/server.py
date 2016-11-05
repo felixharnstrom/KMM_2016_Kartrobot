@@ -3,6 +3,22 @@ from .communication import *
 
 
 class Server:
+    """A bluetooth server.
+
+    After connecting to a Client, it is able to talk to said Client using
+    the send() and receive() methods.
+
+    The client can't receive a sent message at any time. Instead, the server
+    is meant to process requests from the client.
+
+    The server is to receive() a message from the client. Once that arrives
+    and it finishes processing it, it can (and should) send() a reply. Repeat.
+
+    Once the server has finished it's duty, close() it to disconnect. A closed
+    server is then able to connect to another Client. Note that the Client()
+    won't be automatically notified of this, and will raise BluetoothErrors as
+    it attempts to send to a non-connected server, unless handled.
+    """
 
     
     """The server socket"""

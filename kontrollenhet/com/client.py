@@ -2,6 +2,17 @@ from bluetooth import *
 from .communication import *
 
 class Client:
+    """A bluetooth client.
+
+    A client can connect() to an advertising Server. Once connected, it
+    is able to send() messages and get responses.
+
+    Once the client is done, it can (and should) close() to disconnect. It
+    can then connect to other Server's. Note that the server won't be
+    automatically notified of the Client invoking close(), and will wait
+    indefinetly for messages unless handled.
+    """
+
     
     """The server socket the client is connected to."""
     _sock = None
