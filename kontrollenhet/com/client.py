@@ -11,12 +11,12 @@ class Client:
         """Returns True if connected to a server"""
         return not (self._sock is None)
     
-    def connect(self, addr = None):
+    def connect(self, addr=None):
         """Returns true if succesful
 
         Attempts to connect to an advertised server.
-        Fails if already connected."""
-        
+        Fails if already connected.
+        """
         if self.connected():
             return False
         
@@ -27,7 +27,8 @@ class Client:
         """Returns server response as bytes, or None
 
         Send a message to the connected server and return answer.
-        Returns None if not connected."""
+        Returns None if not connected.
+        """
         if not self.connected():
             return None
         send_bytes(self._sock, byte_data)

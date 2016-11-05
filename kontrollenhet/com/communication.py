@@ -10,7 +10,8 @@ def list_devices():
 def connect_rfcomm_server():
     """Returns a tuple: (server socket, client socket)
 
-    Advertises an rfcomm service and waits for a client to connect."""
+    Advertises an rfcomm service and waits for a client to connect.
+    """
     server_sock=BluetoothSocket( RFCOMM )
     server_sock.bind(("", PORT_ANY))
     server_sock.listen(1)
@@ -29,8 +30,8 @@ def connect_rfcomm_client(addr = None):
     """Returns a bluetooth socket, or None
 
     Attempts to find an advertised rfcomm server and connect to it.
-    Returns None if no such server found."""
-    
+    Returns None if no such server found.
+    """
     # Search for service
     service_matches = find_service( uuid = UUID, address = addr )
 
@@ -61,7 +62,8 @@ def send_bytes(client_socket, data):
 def receive_bytes(client_socket):
     """Returns received bytes
 
-    Waits for client to send bytes data."""
+    Waits for client to send bytes data.
+    """
     # Receive with a bigger buffer than necessary to be safe
     first = client_socket.recv(2*MAXIMUM_PACKET_SIZE)
 
