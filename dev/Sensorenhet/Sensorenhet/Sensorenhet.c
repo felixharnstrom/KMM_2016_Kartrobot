@@ -10,6 +10,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+
 void initPWM(){
 	TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1) | (1 << COM3A1); //Com3B0 = 0 for inverted
 	TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
@@ -34,7 +35,13 @@ void setAngle(uint32_t angle)
 int main(void)
 {
 	DDRB = (1<<DDB7);	//All pins on port A as output
+	DDRC = 0x00;
+	DDRD = 0x00;
+	
 	initPWM();
+	
+	long irSignal;
+	long gyroSignal;
 	
     while(1)
     {
@@ -44,5 +51,8 @@ int main(void)
 		_delay_ms(2000);
 		setAngle(160);
 		_delay_ms(2000);
+		
+		irSignal = PINC;
+		gyroSignal = PIND;
     }
 }
