@@ -32,7 +32,7 @@ def connect_rfcomm_server():
 def connect_rfcomm_server_ip(port : int):
     """Returns a tuple: (server socket, client socket).
 
-    Advertises an rfcomm service on "port" and waits for a client to connect.
+    Opens a socket  on "port" and waits for a client to connect.
     """
     server_sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_sock.bind((socket.gethostname(), port))
@@ -72,14 +72,9 @@ def connect_rfcomm_client(addr = None):
 
 
 def connect_rfcomm_client_ip(addr, port):
-    """Returns a bluetooth socket, or None.
+    """Returns a socket to server on "addr" and "port"
 
-    Attempts to find an advertised rfcomm server and connect to it.
-
-    Returns None if no such server found.
-    Multiple attempts may be required in order to find an advertising server.
-
-    Raises BluetoothError if connecting to the server fails.
+    Raises ConnectionRefusedError if connecting to the server fails.
     """
 
     # Connect

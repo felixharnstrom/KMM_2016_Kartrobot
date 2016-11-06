@@ -73,7 +73,10 @@ class Server:
 
 class IPServer(Server):
     _default_port = 8080
+
+
     def advertise_and_connect(self):
+        """Starts a socket and waits for client to connect."""
         if self.connected():
             return        
         self._server_sock, self._client_sock = connect_rfcomm_server_ip(self._default_port)

@@ -68,10 +68,8 @@ class IPClient(Client):
     def connect(self):
         """Returns true if succesful.
 
-        Attempts to connect to an advertised server.
+        Attempts to connect to server on "addr".
         Fails if already connected.
-
-        Raises BluetoothError if the connection is refused by the server.
         """
         if self.connected():
             return False
