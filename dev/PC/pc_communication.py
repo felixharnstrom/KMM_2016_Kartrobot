@@ -6,7 +6,7 @@ robot.start()
 
 while 1:
 	data_string = json.dumps(["MOVE_SQUARES", {"DIRECTION" : 1, "SQUARES" : 2}]) #data serialized
-	robot.send(data_string.encode())
+	robot.client.send(data_string.encode())
 	time.sleep(2)
 	#data = robot.client.recv(1024).decode("utf-8") 
 	#data_loaded = json.loads(data) #data loaded
