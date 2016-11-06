@@ -236,3 +236,6 @@ dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h
 !*.cproj
+
+# Python
+__pycache__
