@@ -11,8 +11,10 @@
 #include <stdlib.h>
 
 void initPWM(){
-	TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
-	TCCR3B |= (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
+	TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1) | (1 << COM3A1); //Com3B0 = 0 for inverted
+	TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
+	OCR3A = 20000;	//Corresponds to 50Hz
+	OCR3B = 700; //The start value for the duty cycle
 }
 
 void setPWM(double dutyCycle)
@@ -25,18 +27,22 @@ void setPWM(double dutyCycle)
  */
 void setAngle(uint32_t angle)
 {
-	OCR3B = 700 + 8 * angle;
+	OCR3B = 710 + (int)(8.33 * angle);
 }
 
 
 int main(void)
 {
 	DDRB = (1<<DDB7);	//All pins on port A as output
-	
 	initPWM();
-	setPWM(0.5);
-
+	
     while(1)
     {
+		setAngle(0);
+		_delay_ms(2000);
+		setAngle(45);
+		_delay_ms(2000);
+		setAngle(160);
+		_delay_ms(2000);
     }
 }
