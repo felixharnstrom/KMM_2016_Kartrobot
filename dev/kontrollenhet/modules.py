@@ -32,9 +32,11 @@ class Scan(StyrenhetFunction):
 
 class Drive(StyrenhetFunction):
 	TYPE = 1
-	ARGUMENTS = {"direction" : 0, "squares" : 0}
+	ARGUMENTS = {"direction" : 0, "speed" : 0, "time1" : 0, "time2" : 0}
 
-	def __init__(self, direction : int, squares : int):
+	def __init__(self, direction : int, speed : int, time1 : int, time2 : int):
 		self.ARGUMENTS["direction"] = direction
-		self.ARGUMENTS["squares"] = squares
+		self.ARGUMENTS["speed"] = speed
+		self.ARGUMENTS["time1"] = time1
+		self.ARGUMENTS["time2"] = time2
 		self.LENGTH = len(self.ARGUMENTS)
