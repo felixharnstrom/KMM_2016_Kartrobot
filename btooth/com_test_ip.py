@@ -6,15 +6,14 @@ from random import randrange
 
 # A test for the current functionality
 
-if input() == "":
+def test_client_ip():
     print("client")
-    client = Client()
+    client = IPClient("localhost")
     if client.connect():
         while True:
             num = randrange(0, 65535)
             msg = num.to_bytes(1000, byteorder="big")
             print("sending", num)
-            time.sleep(1)
             back = client.send(msg)
             bnum = int.from_bytes(back, byteorder="big")
             if num != bnum:
@@ -25,15 +24,13 @@ if input() == "":
         client.close()
     else:
         print("Connection failed")
-else:
+
+def test_server_ip():
     print("server")
-    server = Server()
+    server = IPServer()
     server.advertise_and_connect()
     while True:
-        if server.messages_queued():
-            print("Message!")
-            msg = server.receive()
-            server.send(msg)
-        else:
-            print("No message!")
+        msg = server.receive()
+        #time.sleep(0.1)
+        server.send(msg)
     server.close()
