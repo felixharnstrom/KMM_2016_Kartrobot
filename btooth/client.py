@@ -1,5 +1,5 @@
 from bluetooth import *
-from communication import *
+from .communication import *
 
 class Client:
     """A bluetooth client.

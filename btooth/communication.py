@@ -1,5 +1,5 @@
 from bluetooth import *
-from constants import *
+from .constants import *
 import socket
 
 def list_devices():
