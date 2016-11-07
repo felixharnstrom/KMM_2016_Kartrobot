@@ -30,18 +30,22 @@ void setAngle(uint32_t angle)
 {
 	OCR3B = 710 + (int)(8.33 * angle);
 }
-
-
+/* TODO should be a sub-program that reads all sensors and returns one int value per sensor
+void readSensor(int left1, int left2, int right1, int right2, int back)
+{
+	
+}
+*/
 int main(void)
 {
 	DDRB = (1<<DDB7);	//All pins on port A as output
-	DDRC = 0x00;
-	DDRD = 0x00;
+	DDRA = 0x20;
 	
 	initPWM();
 	
-	long irSignal;
-	long gyroSignal;
+	int analogIrSignal;
+	
+	
 	
     while(1)
     {
@@ -52,7 +56,6 @@ int main(void)
 		setAngle(160);
 		_delay_ms(2000);
 		
-		irSignal = PINC;
-		gyroSignal = PIND;
+		//PORTA5 = analogIrSignal;
     }
 }
