@@ -45,9 +45,7 @@ int main(void)
 	
 	int analogIrSignal;
 	
-	
-	
-    while(1)
+	while(1)
     {
 		setAngle(0);
 		_delay_ms(2000);
@@ -56,6 +54,12 @@ int main(void)
 		setAngle(160);
 		_delay_ms(2000);
 		
-		//PORTA5 = analogIrSignal;
+		analogIrSignal = ADC0D;
+		
+		if(analogIrSignal < 500) {
+			PINA = 0x20;
+		} else {
+			PINA = 0x00;
+		}
     }
 }
