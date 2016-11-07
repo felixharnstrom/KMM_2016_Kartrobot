@@ -1,5 +1,6 @@
 import serial
 import modules
+from bitstring import BitArray
 
 class UART:
     def __init__(self, port : str):
@@ -28,6 +29,10 @@ class UART:
     def send_function(self, function : modules.Function):
         self.send_packet(self.create_metapacket(function))
         self.send_arguments(function)
+
+    def decode_metapacket(self, packet : bytes):
+        binary_packet = BitArray(uint=int.from_bytes(packet, byteorder='big', signed=False),  length=8)
+        return (int(binary_packet.bin[0], 2), int(binary_packet.bin[1:4], 2), int(binary_packet.bin[4:], 2))
 
     def close(self):
         self.ser.close()
