@@ -1,6 +1,6 @@
 
-from .server import *
-from .client import *
+from server import *
+from client import *
 import time, sys
 from random import randrange
 
@@ -14,6 +14,7 @@ if input() == "":
             num = randrange(0, 65535)
             msg = num.to_bytes(1000, byteorder="big")
             print("sending", num)
+            time.sleep(1)
             back = client.send(msg)
             bnum = int.from_bytes(back, byteorder="big")
             if num != bnum:
@@ -29,7 +30,10 @@ else:
     server = Server()
     server.advertise_and_connect()
     while True:
-        msg = server.receive()
-        #time.sleep(0.1)
-        server.send(msg)
+        if server.messages_queued():
+            print("Message!")
+            msg = server.receive()
+            server.send(msg)
+        else:
+            print("No message!")
     server.close()

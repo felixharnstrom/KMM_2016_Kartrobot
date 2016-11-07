@@ -1,6 +1,6 @@
 from bluetooth import *
 from communication import *
-
+from select import select
 
 class Server:
     """A bluetooth server.
@@ -60,6 +60,18 @@ class Server:
         Raises BluetoothError on failure.
         """
         return receive_bytes(self._client_sock)
+
+    def messages_queued(self):
+        """Returns True if a message is queued for receiving.
+
+        Only works in unix.
+        Returns False if the server is not connected."""
+        if not self.connected():
+            return False
+        # Select with timeout 0 is a poll of input queue.
+        readable, writeable, exceptional = select([self._client_sock],
+                                                  [], {}, 0)
+        return readable
 
     def close(self):
         """Close the connection, if connected."""
