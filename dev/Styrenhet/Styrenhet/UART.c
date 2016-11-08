@@ -47,27 +47,18 @@ void uart_packet_receive(int size, int* packet){
 	}
 }
 
-void uart_msg_transmit(int address, int payloadSize, t_msgType msgType, char* payload){
+void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload){
     /* Construct meta packet */
     int meta_packet;
     int type;
-    switch(msgType){
-    case SENSOR :
-        type = 0;
-    	break;
-    case MOTOR :
-        type = 1;
-        break;
-    default:
-        return;
-    }
-    meta_packet = (address * 128) + (payloadSize * 16) + type;
+    type = msgTypeEncode(msgType);
+    meta_packet = (*address * 128) + (*payloadSize * 16) + type;
 
     /* Transmit meta packet */
     uart_transmit(meta_packet);
 
     /* Transmit payload */
-    for(int i = 0; i < payloadSize; ++i){
+    for(int i = 0; i < *payloadSize; ++i){
         uart_transmit(payload[i]);
     }
 }
@@ -82,18 +73,35 @@ void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* 
     *address = (c & adrMask) >> 7;
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
-    switch(type){
-        case 0 :
-            *msgType = SENSOR;
-            break;
-        case 1 :
-            *msgType = MOTOR;
-            break;
-        default:
-            return;
-    }
+    *msgType = msgTypeDecode(type);
 
     for(int i = 0; i < *payloadSize; ++i){
         payload[i] = uart_receive();
     }
+}
+
+int msgTypeEncode(t_msgType* msgType){
+    switch(*msgType){
+        case SENSOR :
+            return 0;
+            break;
+        case MOTOR :
+            return 1;
+            break;
+        default:
+            return -1;
+    }
+}
+
+t_msgType msgTypeDecode(int msgType){
+     switch(msgType){
+         case 0 :
+            return SENSOR;
+            break;
+         case 1 :
+            return MOTOR;
+            break;
+         default:
+            return;
+     }
 }
