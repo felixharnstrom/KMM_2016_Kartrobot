@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <avr/interrupt.h>
 
 #ifndef PACKET_SIZE
 #define PACKET_SIZE 8   // define packet size
@@ -20,12 +21,8 @@
 
 #include "UART.h"
 
-/* TODO should be a sub-program that reads all sensors and returns one int value per sensor
-void readSensor(int left1, int left2, int right1, int right2, int back)
-{
-	
-}
-*/
+//global variable that keeps track of the LIDAR counter
+volatile uint8_t lidarCounter;
 
 void initPWM(){
 	TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1) | (1 << COM3A1); //Com3B0 = 0 for inverted
@@ -116,6 +113,62 @@ void waitForConversion() {
     while(ADCSRA & (1<<ADSC));
 }
 
+/*
+ *  Interrupt vector that's triggered when LIDAR monitor value is changed
+ */
+ISR (INT2_vect)
+{
+    //If the LIDAR monitor input is 1
+    if ((PINB & 0b00000100) == 0b00000100)
+    {
+        //Start counter 0
+        TCNT0 = 0;
+        TCCR0B |= (1<<CS02);
+    }
+    else
+    {
+        //Update the LIDAR counter
+        //TODO: Convert the counter value to exact measurement in centimeters.
+        lidarCounter = TCNT0;
+    }
+}
+
+void initLidar()
+{
+    //Enable interrupts
+    sei();
+    
+    //PortB2: LIDAR input
+    //PortB3: LIDAR trigger
+    DDRB = (1<<DDB3) | (0<<DDB2) | (1<<DDB0);
+    
+    //Trigger = 0 ==> LIDAR sends data 
+    PORTB |= (0<<PORTB3);
+    
+    //React on any logical change
+    EICRA |= (0<<ISC21) | (1<<ISC20);
+    
+    //Choose INT2 (PB3) as trigger for the interrupt
+    EIMSK |= (1<<INT2);
+    EIFR |= (1<<INTF2);
+}
+
+int main(void)
+{   
+    initLidar();
+
+    while(1)
+    {
+        if (lidarCounter > 100)
+            PORTB |= (1<<PORTB0);
+        else
+            PORTB &= (0<<PORTB0);
+    }
+}
+
+/*
+Hannes and Janis Debugging session.
+
 int main(void) {
     DDRB |= (1<<DDB0);
     initAD();
@@ -134,7 +187,7 @@ int main(void) {
             }
 			
 			int vint = voltageToCentimeters(getVoltage());
-			
+            
 			//Get a string without any trash
 			int charCount = 32;
 			char vstr[charCount];
@@ -148,30 +201,6 @@ int main(void) {
 					uart_transmit(vstr[i]);
 			uart_transmit('\n');
         }
-    }
-}
-
-/*
-Janis Version:
-
-int main(void)
-{
-	DDRB = (1<<DDB7);	//All pins on port A as output
-	DDRA = 0x20;
-	
-	initPWM();
-	
-	int analogIrSignal;
-	
-	while(1)
-    {
-		analogIrSignal = ADC0D;
-		
-		if(analogIrSignal < 500) {
-			PINA = 0x20;
-		} else {
-			PINA = 0x00;
-		}
     }
 }
 
