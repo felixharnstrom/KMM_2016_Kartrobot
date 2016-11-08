@@ -1,5 +1,5 @@
 from bluetooth import *
-from .constants import *
+from constants import *
 import socket
 
 def list_devices():
@@ -35,7 +35,7 @@ def connect_rfcomm_server_ip(port : int):
     Opens a socket  on "port" and waits for a client to connect.
     """
     server_sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_sock.bind((socket.gethostname(), port))
+    server_sock.bind(("", port))
     server_sock.listen(1)
     
     client_sock, client_info = server_sock.accept()

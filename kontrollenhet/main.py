@@ -12,7 +12,7 @@ if __name__ == '__main__' and __package__ is None:
     __package__ = 'Kartrobot'
 
 # Actual imports
-from .bluetooth.server import Server
+from .btooth.server import Server
 from process_request import process_request
 
 

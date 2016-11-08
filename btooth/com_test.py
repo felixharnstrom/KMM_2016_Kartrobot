@@ -1,6 +1,6 @@
 
-from .server import *
-from .client import *
+from server import *
+from client import *
 import time, sys
 from random import randrange
 
