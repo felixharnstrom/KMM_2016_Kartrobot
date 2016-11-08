@@ -82,11 +82,8 @@ void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* 
 
 int msgTypeEncode(t_msgType* msgType){
     switch(*msgType){
-        case SENSOR :
+        case ECHO :
             return 0;
-            break;
-        case MOTOR :
-            return 1;
             break;
         default:
             return -1;
@@ -96,10 +93,7 @@ int msgTypeEncode(t_msgType* msgType){
 t_msgType msgTypeDecode(int msgType){
      switch(msgType){
          case 0 :
-            return SENSOR;
-            break;
-         case 1 :
-            return MOTOR;
+            return ECHO;
             break;
          default:
             return;

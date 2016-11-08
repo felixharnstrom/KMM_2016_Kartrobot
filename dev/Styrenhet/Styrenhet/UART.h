@@ -9,7 +9,7 @@
 #ifndef UART_H_
 #define UART_H_
 
-typedef enum {SENSOR, MOTOR} t_msgType;
+typedef enum {ECHO} t_msgType;
 
 /*
  * Initialize UART
