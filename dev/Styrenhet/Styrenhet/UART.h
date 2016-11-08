@@ -47,7 +47,7 @@ void uart_packet_receive (int size, int* packet);
  * (t_msgType) msgType: the type of message to transmit
  * (char*) payload: the payload to transmit
  */
-void uart_msg_transmit(int address, int payloadSize, t_msgType msgType, char* payload);
+void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload);
 
 /*
  * Receives a meta packet and the following payload.
@@ -59,5 +59,27 @@ void uart_msg_transmit(int address, int payloadSize, t_msgType msgType, char* pa
  * (char*) payload: received payload
  */
 void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload);
+
+/*
+ * Returns the integer encoding for the given message type. Returns -1 if no encoding exist.
+ * The message types and their encodings are:
+ * SENSOR : 0
+ * MOTOR : 1
+ *
+ * _Parameters_
+ * (t_msgType*) msgType: the message type to be encoded
+ */
+int msgTypeEncode(t_msgType* msgType);
+
+/*
+ * Returns the message type for the given integer encoding. Does nothing if given integer is not a valid encoding.
+ * The message types and their encodings are:
+ * SENSOR : 0
+ * MOTOR : 1
+ *
+ * _Parameters_
+ * (int) msgType: the integer to be decoded
+ */
+t_msgType msgTypeDecode(int msgType);
 
 #endif /* UART_H_ */
