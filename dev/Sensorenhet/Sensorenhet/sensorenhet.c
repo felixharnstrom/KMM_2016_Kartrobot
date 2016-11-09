@@ -6,11 +6,12 @@
  */ 
 
 #include "sensorenhet.h"
+#include "UART.c" //gick inte att hitta funktionerna med UART.h av någon anledning?
 
 //global variable that keeps track of the LIDAR counter
 volatile uint8_t lidarCounter;
 
-void startIrRead(uint8_t channel) {
+void start_ir_read(uint8_t channel) {
     //The channel value can never be greater than 7
     channel &= 0x07;
     
@@ -21,7 +22,7 @@ void startIrRead(uint8_t channel) {
     ADCSRA |= (1<<ADSC);
 }
 
-void initAD() {
+void init_ad() {
     //ADEN: Enables ADC
     //ADPS[2:0]: Changes the clock divider 
     ADCSRA |= (1<<ADEN) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
@@ -31,13 +32,14 @@ void initAD() {
 }
 
 
-double getIrVoltage() {
+double get_ir_voltage() {
     double const AVCC = 5;
     return (double)(ADC * AVCC) / 1024.0;
 }
 
 
-double irOutputToCentimeters(double voltage) {
+double ir_output_to_centimeters() {
+    double voltage = get_ir_voltage();
 	// Formula approximated to the inverse of the following sets of data points (x, y):
 	/* 5 1.495
 	   7.5 1.420
@@ -51,12 +53,15 @@ double irOutputToCentimeters(double voltage) {
 	return pow(voltage / A, 1 / B);
 }
 
-double lidarOutputToCm(double lidarOutput) {
-    return lidarOutput; // TODO
+double lidar_output_to_centimeters() {
+    //Counter * 256 / CLK = 10^-5 * Length [cm] <==>
+    //Length [cm] = Counter * 256 * 10^5 / (8 * 10 ^ 6) = 3.2
+    const double c = 3.2;
+    return lidarCounter * c;
 }
 
 
-void waitForIrRead() {
+void wait_for_ir_read() {
     while(ADCSRA & (1<<ADSC));
 }
 
@@ -68,19 +73,21 @@ ISR (INT2_vect)
     //If the LIDAR monitor input is 1
     if ((PINB & 0b00000100) == 0b00000100)
     {
-        //Start counter 0
+        //TCNT0 is the counter value
         TCNT0 = 0;
+        //Use the CLK / 256 clock to avoid counter overflow
         TCCR0B |= (1<<CS02);
     }
     else
     {
-        //Update the LIDAR counter
+        //Update the LIDAR value with the counter
         lidarCounter = TCNT0;
+        //Turn off the timer
         TCCR0B &= (0<<CS02);
     }
 }
 
-void initLidar()
+void init_lidar()
 {
     //Enable interrupts
     sei();
@@ -89,7 +96,7 @@ void initLidar()
     //PortB3: LIDAR trigger
     DDRB = (1<<DDB3) | (0<<DDB2) | (1<<DDB0);
     
-    //Trigger = 0 ==> LIDAR sends data 
+    //PORTB3 = 0 ==> LIDAR sends data 
     PORTB |= (0<<PORTB3);
     
     //React on any logical change
@@ -100,30 +107,42 @@ void initLidar()
     EIFR |= (1<<INTF2);
 }
 
-double readSensor(sensor_t s)
+double read_sensor(sensor_t s)
 {
     switch(s) {
-        case LIDAR: return lidarOutputToCm(lidarCounter);
-        case IR_LEFT_BACK: startIrRead(0); break;
-        case IR_RIGHT_BACK: startIrRead(1); break;
-        case IR_LEFT_FRONT: startIrRead(2); break;
-        case IR_RIGHT_FRONT: startIrRead(3); break;
-        case IR_BACK: startIrRead(4); break;
+        case LIDAR: return lidar_output_to_centimeters();
+        case IR_LEFT_BACK: start_ir_read(0); break;
+        case IR_RIGHT_BACK: start_ir_read(1); break;
+        case IR_LEFT_FRONT: start_ir_read(2); break;
+        case IR_RIGHT_FRONT: start_ir_read(3); break;
+        case IR_BACK: start_ir_read(4); break;
     }
-    waitForIrRead();
-    return irOutputToCentimeters(getIrVoltage());
+    wait_for_ir_read();
+    return ir_output_to_centimeters();
 }
 
 int main(void)
 {   
-    initLidar();
+    uart_init();
+    init_lidar();
 
     while(1)
     {
-        if (lidarCounter > 100)
-            PORTB |= (1<<PORTB0);
-        else
-            PORTB &= (0<<PORTB0);
+		int vint = lidar_output_to_centimeters();
+			
+		//Get a string without any trash
+		int charCount = 7;
+		char vstr[charCount];
+        
+		for (int i = 0; i < charCount; ++i)
+		    vstr[i] = ' ';
+		// int to str
+		sprintf(vstr, "%d", vint);
+		// Send the string via UART
+		for (int i = 0; i < charCount; ++i)
+		    if (vstr[i] != 0)
+		        uart_transmit(vstr[i]);
+		uart_transmit('\n');
     }
 }
 
@@ -132,22 +151,22 @@ Hannes and Janis Debugging session.
 
 int main(void) {
     DDRB |= (1<<DDB0);
-    initAD();
+    init_ad();
 	uart_init();
 
     while(1) {
         //Loop over all channels
         for (uint8_t i = 4; i < 5; i++) {
-            startIrRead((i);
-            waitForIrRead();
+            start_ir_read((i);
+            wait_for_ir_read();
             
-            if (getIrVoltage() > 0.4) {
+            if (get_ir_voltage() > 0.4) {
                 PORTB |= (1 << PORTB0);
             } else {
                 PORTB &= (0 << PORTB0);
             }
 			
-			int vint = irOutputToCentimeters(getIrVoltage());
+			int vint = ir_output_to_centimeters(get_ir_voltage());
             
 			//Get a string without any trash
 			int charCount = 32;
