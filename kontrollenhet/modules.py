@@ -28,3 +28,13 @@ class Scan(StyrenhetFunction):
 		self.ARGUMENTS["distance"] = distance
 		self.ARGUMENTS["speed"] = speed
 		self.LENGTH = len(self.ARGUMENTS)
+
+
+class Drive(StyrenhetFunction):
+	TYPE = 1
+	ARGUMENTS = {"direction" : 0, "squares" : 0}
+
+	def __init__(self, direction : int, squares : int):
+		self.ARGUMENTS["direction"] = direction
+		self.ARGUMENTS["squares"] = squares
+		self.LENGTH = len(self.ARGUMENTS)

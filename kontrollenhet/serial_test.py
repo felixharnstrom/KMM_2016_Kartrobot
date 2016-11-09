@@ -1,10 +1,10 @@
 from UART import UART
 from modules import *
 
-uart = UART("ttyUSB0")
-scaninstruction = Scan(10,0,100)
+uart = UART("ttyUSB1")
+driveInstruction = Drive(1, 2)
 
-uart.send_function(scaninstruction)
+uart.send_function(driveInstruction)
 
 while 1:
 	print (uart.receive_packet())
