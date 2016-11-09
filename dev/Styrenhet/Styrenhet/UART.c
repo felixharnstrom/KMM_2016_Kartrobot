@@ -35,7 +35,7 @@ void uart_transmit(unsigned char c){
 }
 
 unsigned char uart_receive(void){
-	loop_until_bit_is_set(UCSR0A, RXC0);    // Wait until data exists
+	loop_until_bit_is_set(UCSR0A, RXC0);    // wait until data exists
 	return UDR0;
 }
 
@@ -47,11 +47,17 @@ void uart_packet_receive(int size, int* packet){
 	}
 }
 
-void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload){
+int uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload){
     /* Construct meta packet */
     int meta_packet;
     int type;
     type = msgTypeEncode(msgType);
+
+    /* Return -1 if invalid type */
+    if(type == -1){
+        return -1;
+    }
+
     meta_packet = (*address * 128) + (*payloadSize * 16) + type;
 
     /* Transmit meta packet */
@@ -61,29 +67,48 @@ void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char*
     for(int i = 0; i < *payloadSize; ++i){
         uart_transmit(payload[i]);
     }
+
+    return 0;
 }
 
-void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload){
-    uint8_t adrMask = 0x80;   // 10000000b
-    uint8_t sizeMask = 0x70;   // 01110000b
-    uint8_t typeMask = 0x0F;   // 00001111b
+int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload){
+    uint8_t adrMask = 0x80;     // 10000000b
+    uint8_t sizeMask = 0x70;    // 01110000b
+    uint8_t typeMask = 0x0F;    // 00001111b
 
+    /* Receive meta packet */
     char c;
-    c = uart_receive();     // receive meta packet
+    c = uart_receive();
+
+    /* Extract meta information */
     *address = (c & adrMask) >> 7;
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
     *msgType = msgTypeDecode(type);
 
+    /* Return -1 if invalid type */
+    if(*msgType == INV){
+        return -1;
+    }
+
+    /* Receive payload */
     for(int i = 0; i < *payloadSize; ++i){
         payload[i] = uart_receive();
     }
+
+    /* Transmit acknowledge */
+    int ackSize = 0;
+    t_msgType ackType = ACK;
+    return uart_msg_transmit(address, &ackSize, &ackType, NULL);
 }
 
 int msgTypeEncode(t_msgType* msgType){
     switch(*msgType){
-        case ECHO :
+        case ACK :
             return 0;
+            break;
+        case ECHO :
+            return 1;
             break;
         default:
             return -1;
@@ -91,11 +116,15 @@ int msgTypeEncode(t_msgType* msgType){
 }
 
 t_msgType msgTypeDecode(int msgType){
-     switch(msgType){
-         case 0 :
+    switch(msgType){
+        case 0 :
+            return ACK;
+            break;
+        case 1 :
             return ECHO;
             break;
-         default:
-            return;
+        default:
+            return INV;
+            break;
      }
 }
