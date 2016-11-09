@@ -5,13 +5,11 @@
 *  Author: emino969
 */
 #define F_CPU 8000000UL	//8MHz
-#define BAUD 9600                                   // define baud
-#define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)            // set baud rate value for UBRR
-
 
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
+#include "UART.h"
 
 typedef enum{
     LEFT_SIDE,
@@ -27,42 +25,6 @@ typedef enum {
     RIGHT_TURN
 } turn_t; //Could perhaps be modified into a single enum
 
-// function to initialize UART
-void uart_init (void)
-{
-    UBRR0H = (BAUDRATE>>8);                      // shift the register right by 8 bits
-    UBRR0L = BAUDRATE;                           // set baud rate
-    UCSR0B|= (1<<TXEN0)|(1<<RXEN0);                // enable receiver and transmitter
-    UCSR0C|= (1<<USBS0)|(3<<UCSZ00);			// 8bit data format
-}
-
-// function to send data
-void uart_transmit (unsigned char data)
-{
-    loop_until_bit_is_set(UCSR0A, UDRE0); /* Wait until data register empty. */
-    UDR0 = data;
-}
-
-// function to receive data
-unsigned char uart_receive (void)
-{	if(RXC0 == 1){
-        //loop_until_bit_is_set(UCSR0A, RXC0); /* Wait until data exists. */
-    return (unsigned)UDR0;
-}
-else{
-    return 0;
-}
-}
-
-void receive_packet (char* buffer){
-    unsigned char a;
-    int i = 0;
-    while(i < 8){
-        a = uart_receive();
-        buffer[i] = a;
-        i++;
-    }
-}
 
 /************************************************************************/
 /* Initiates all the PWM connections                                     */
@@ -81,13 +43,11 @@ void initPWM(){
     OCR0B = 0; //OCR0B is left side Pin 7 is direction
 }
 
-
-
 /************************************************************************/
 /* Transforms a number between 0-100 to the actual representation that is needed to set that speed */
 /************************************************************************/
 uint8_t getTransformSpeed(uint8_t speedPercentage){
-    return (int)(speedPercentage*2.5);
+    return (int)(speedPercentage*2.52);
 }
 
 /************************************************************************/
@@ -156,10 +116,28 @@ void turnDirectionAngle(turn_t turn, uint8_t angle){
     
 }
 
-void moveSquare(direction_t direction, uint8_t speedPercentage){
-    //TODO: We got to calculate the time to do this move. Weight/speed/wheels affect it.
+//Turns x*90degrees, eg. x squares using a constant speed for precision
+void turnSquares(turn_t turn, uint8_t times){
     
 }
+
+//payload[0]
+void turnSquaresPL(char* payload){
+    uint8_t direction = (uint8_t)payload[0];
+    uint8_t turns = (uint8_t)payload[1];
+    switch(direction){
+        case 0:
+            turnSquares(LEFT_TURN,turns);
+            break;
+        case 1:
+            turnSquares(RIGHT_TURN, turns);
+            break;
+        default:
+            //Should not happen
+            break;
+    }    
+}
+
 
 void move(direction_t direction, uint8_t speedPercentage){
     setSpeed(RIGHT_SIDE, direction, speedPercentage);
@@ -172,32 +150,104 @@ void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime){
     stopMotors();
 }
 
-/*
- * Set the wanted servo angle. (0 is left, 90 middle and 180 right side)
- */
-void setAngle(uint8_t angle)
-{
-    OCR3B = 710 + (int)(8.33 * angle);
+void moveSquares(direction_t direction, uint8_t squares){
+    //TODO: We got to calculate the time to do this move. Weight/speed/wheels affect it.
+    moveMS(direction,40,2000*squares);
+}
+
+//For outside use
+void moveSquaresPL(char* payload){
+    // uint8_t directionValue = (uint8_t)payload[0];
+    uint8_t squareMask = 0x03;
+    uint8_t directionMask = 0x01;
+    
+    
+    uint8_t directionValue = ((uint8_t)payload[0]) & directionMask; // Direction number mask 0000 0001
+    uint8_t squares = ((uint8_t)payload[1]) & squareMask;
+    //((uint8_t)payload[1])&0x03;
+    switch(directionValue){
+        case 0:
+        moveSquares(BACKWARD, squares);
+        break;
+        case 1:
+        moveSquares(FORWARD, squares);
+        break;
+        default:
+        //Should not happen if kontrollenhet is correctly using the protocol
+        break;
+    }
 }
 
 
+/*
+ * Set the wanted servo angle. (0 is left, 90 middle and 180 right side)
+ */
+void setServoAngle(uint8_t angle)
+{
+    if(angle > 180){
+        angle = 180; //Otherwise we might hurt the servo
+    }        
+    OCR3B = 710 + (int)(8.33 * angle);
+}
+
+void setServoAnglePL(char* payload){
+    uint8_t angle = (uint8_t)payload[0];
+    if(angle > 180)
+        angle = 180;
+    setServoAngle(angle);
+}
+
+
+
+//object* ?
+void executeFunction(t_msgType function, char* payload){
+    int adr = 0;
+    int size = 2;
+    switch(function){
+        case ECHO :
+            uart_msg_transmit(&adr, &size, &function, payload);
+            break;
+        case MOVE_SQUARES :
+            moveSquaresPL(payload);
+            break;
+        case TURN_DEGREES :
+            //TODO
+            break;
+        case TURN_SQUARES :
+            turnSquaresPL(payload);
+            break;
+        case SET_SERVO_ANGLE :
+            setServoAnglePL(payload);
+            break;       
+    }
+}
+
 int main(void)
 {
-    
-    
     DDRB = 0xFF;	//All pins on port A as output
     DDRA = 0xFF;
-    DDRD |= (1 << DDD0);
-
+    
     initPWM();
     uart_init();
-    _delay_ms(1000);
-    PORTA |= (1 << PORTA1);
-    moveMS(FORWARD,40, 2000);
+    _delay_ms(10000);
+    while(1){
+        int adr;            //Not needed
+        int size;           //Size of payload
+        char payload[7];    //Payload data 0->6
+        t_msgType funcEnum; //Corresponding function to be used with
+        PORTA |= (0 << PORTA1);
+        uart_msg_receive(&adr, &size, &funcEnum, payload);   
+        PORTA |= (1 << PORTA1);
+        //Not currently caring about size 
+        executeFunction(funcEnum, payload);
+    }
+    
+    
+    /*moveMS(FORWARD,40, 2000);
     moveMS(BACKWARD,40, 2000);
     turnDirectionMS(RIGHT_TURN, 50, 1300);
-    turnDirectionMS(LEFT_TURN, 50, 1300);
-    
+    turnDirectionMS(LEFT_TURN, 50, 1300); */
+    /*
         char c;
         int packet[8];
         //DDRA = (1<<DDA7)|(1<<DDA6)|(1<<DDA5)|(1<<DDA4)|(1<<DDA3)|(1<<DDA2)|(1<<DDA1)|(1<<DDA0);	//All pins on port A as output
@@ -219,14 +269,5 @@ int main(void)
                 }
             }
         }
-    /*
-        setAngle(0);
-        _delay_ms(1000);
-        setAngle(90);
-        _delay_ms(1000);
-        setAngle(180);
-        _delay_ms(2000);
         */
-
-    
 }

@@ -82,12 +82,21 @@ void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* 
 
 int msgTypeEncode(t_msgType* msgType){
     switch(*msgType){
-        case SENSOR :
-            return 0;
-            break;
-        case MOTOR :
-            return 1;
-            break;
+         case ECHO :
+             return 0;
+             break;
+         case MOVE_SQUARES :
+             return 1;
+             break;
+         case TURN_DEGREES :
+             return 2;
+             break;
+         case TURN_SQUARES :
+             return 3;
+             break;
+         case SET_SERVO_ANGLE :
+             return 4;
+             break;
         default:
             return -1;
     }
@@ -96,12 +105,22 @@ int msgTypeEncode(t_msgType* msgType){
 t_msgType msgTypeDecode(int msgType){
      switch(msgType){
          case 0 :
-            return SENSOR;
+            return ECHO;
             break;
          case 1 :
-            return MOTOR;
+            return MOVE_SQUARES;
+            break;
+         case 2 :
+            return TURN_DEGREES;
+            break;
+         case 3 :
+            return TURN_SQUARES;
+            break;
+         case 4 :
+            return SET_SERVO_ANGLE;
             break;
          default:
-            return;
+            //That's impossible!
+            return -1;
      }
 }
