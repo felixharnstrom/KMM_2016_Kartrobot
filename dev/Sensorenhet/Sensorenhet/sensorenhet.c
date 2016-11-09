@@ -4,50 +4,13 @@
  * Created: 11/4/2016 4:08:27 PM
  *  Author: emino969
  */ 
-#ifndef F_CPU
-#define F_CPU 8000000UL
-#endif
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <avr/interrupt.h>
-
-#ifndef PACKET_SIZE
-#define PACKET_SIZE 8   // define packet size
-#endif
-
-#include "UART.h"
+#include "sensorenhet.h"
 
 //global variable that keeps track of the LIDAR counter
 volatile uint8_t lidarCounter;
 
-void initPWM(){
-	TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1) | (1 << COM3A1); //Com3B0 = 0 for inverted
-	TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
-	OCR3A = 20000;	//Corresponds to 50Hz
-	OCR3B = 700; //The start value for the duty cycle
-}
-
-void setPWM(double dutyCycle)
-{
-	OCR3B = 1024 * dutyCycle;
-}
-
-/*
- * Set the wanted servo angle.
- */
-void setAngle(uint32_t angle)
-{
-	OCR3B = 710 + (int)(8.33 * angle);
-}
-
-/*
- *	Start a conversion
- */
-void startConversion(uint8_t channel) {
+void startIrRead(uint8_t channel) {
     //The channel value can never be greater than 7
     channel &= 0x07;
     
@@ -58,9 +21,6 @@ void startConversion(uint8_t channel) {
     ADCSRA |= (1<<ADSC);
 }
 
-/*
- * Initiate the analog/digital conversion
- */
 void initAD() {
     //ADEN: Enables ADC
     //ADPS[2:0]: Changes the clock divider 
@@ -70,18 +30,14 @@ void initAD() {
     ADMUX |= (1<<REFS0);
 }
 
-/*
- *	Convert the current value at ADC to corresponding voltage
- */
-double getVoltage() {
+
+double getIrVoltage() {
     double const AVCC = 5;
     return (double)(ADC * AVCC) / 1024.0;
 }
 
-/*
- * Convert voltage given by getVoltage() to distance in cm.
- */
-double voltageToCentimeters(double voltage) {
+
+double irOutputToCentimeters(double voltage) {
 	// Formula approximated to the inverse of the following sets of data points (x, y):
 	/* 5 1.495
 	   7.5 1.420
@@ -95,21 +51,12 @@ double voltageToCentimeters(double voltage) {
 	return pow(voltage / A, 1 / B);
 }
 
-/*
- * Alternate way to calculate voltageToCentimeters.
- * Does not work as well, currently
- */
-double voltageToCentimetersLog(double voltage) {
-	static const double A = 2.6695;
-	static const double B = -0.6336;
-	return exp((voltage - A)/B);
+double lidarOutputToCm(double lidarOutput) {
+    return lidarOutput; // TODO
 }
 
 
-/*
- *	Wait until there is no current conversions left
- */
-void waitForConversion() {
+void waitForIrRead() {
     while(ADCSRA & (1<<ADSC));
 }
 
@@ -128,8 +75,8 @@ ISR (INT2_vect)
     else
     {
         //Update the LIDAR counter
-        //TODO: Convert the counter value to exact measurement in centimeters.
         lidarCounter = TCNT0;
+        TCCR0B &= (0<<CS02);
     }
 }
 
@@ -151,6 +98,20 @@ void initLidar()
     //Choose INT2 (PB3) as trigger for the interrupt
     EIMSK |= (1<<INT2);
     EIFR |= (1<<INTF2);
+}
+
+double readSensor(sensor_t s)
+{
+    switch(s) {
+        case LIDAR: return lidarOutputToCm(lidarCounter);
+        case IR_LEFT_BACK: startIrRead(0); break;
+        case IR_RIGHT_BACK: startIrRead(1); break;
+        case IR_LEFT_FRONT: startIrRead(2); break;
+        case IR_RIGHT_FRONT: startIrRead(3); break;
+        case IR_BACK: startIrRead(4); break;
+    }
+    waitForIrRead();
+    return irOutputToCentimeters(getIrVoltage());
 }
 
 int main(void)
@@ -177,16 +138,16 @@ int main(void) {
     while(1) {
         //Loop over all channels
         for (uint8_t i = 4; i < 5; i++) {
-            startConversion(i);
-            waitForConversion();
+            startIrRead((i);
+            waitForIrRead();
             
-            if (getVoltage() > 0.4) {
+            if (getIrVoltage() > 0.4) {
                 PORTB |= (1 << PORTB0);
             } else {
                 PORTB &= (0 << PORTB0);
             }
 			
-			int vint = voltageToCentimeters(getVoltage());
+			int vint = irOutputToCentimeters(getIrVoltage());
             
 			//Get a string without any trash
 			int charCount = 32;
