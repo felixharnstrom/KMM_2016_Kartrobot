@@ -3,6 +3,7 @@ import json
 from UART import UART
 from modules import *
 import numpy as np
+import time
 
 s = server.server()
 s.start()
@@ -18,20 +19,20 @@ while 1:
 	argument_dict = data_loaded[1]
 	direction = argument_dict['DIRECTION']
 	speed = argument_dict['SPEED']
-	time = np.uint16(argument_dict['TIME'])
+	foo = np.uint16(argument_dict['TIME'])
 	mask1 = 0xFF00
 	mask2 = 0x00FF
-	time1 = (time & mask1) >> 8
-	time2 = (time & mask2)
-	driveInstruction = Drive(direction, speed, time1, time2)
+	time1 = np.uint8((foo & mask1) >> 8)
+	time2 = np.uint8((foo & mask2))
+	driveInstruction = Drive(0, 100, 7, 208)
 	uart.send_function(driveInstruction)
-	
 	print (data_loaded, type(data_loaded))
-	print (instruction_type)
-	print (direction)
-	print (speed)
-	print (time1)
-	print (time2)
+	print (instruction_type, type(instruction_type))
+	print (direction, type(direction))
+	print (speed, type(speed))
+	print (time1, type(time1))
+	print (time2, type(time2))
+	#time.sleep(1)
 	
 uart.close()
 s.close()

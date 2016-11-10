@@ -1,6 +1,7 @@
 import serial
 import modules
 from bitstring import BitArray
+import time
 
 class UART:
     def __init__(self, port : str):
@@ -42,7 +43,8 @@ class UART:
         :packet: The packet to send
         """
         # Debug print
-        # print(int.from_bytes(packet,byteorder = 'big'))
+        #print(int.from_bytes(packet,byteorder = 'big'))
+        time.sleep(0.01)
         return self.ser.write(packet)
 
     def receive_packet(self):
