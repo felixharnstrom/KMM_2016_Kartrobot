@@ -24,7 +24,7 @@ while 1:
 	mask2 = 0x00FF
 	time1 = np.uint8((foo & mask1) >> 8)
 	time2 = np.uint8((foo & mask2))
-	driveInstruction = Drive(0, 100, 7, 208)
+	driveInstruction = Drive(direction, speed, time1, time2)
 	uart.send_function(driveInstruction)
 	print (data_loaded, type(data_loaded))
 	print (instruction_type, type(instruction_type))
