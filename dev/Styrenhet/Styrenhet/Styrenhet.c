@@ -34,7 +34,7 @@ void initPWM(){
     TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
     TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
     OCR3A = 20000;	//Corresponds to 50Hz
-    OCR3B = 700; //The start value for the duty cycle
+    OCR3B = 708; //The start value for the duty cycle
     
     //Robot left side
     TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0B1) | (1 << COM0A1); //Com0B0 = 0 for inverted
@@ -105,12 +105,16 @@ void stopMotors(){
     setSpeed(LEFT_SIDE, NONE, 0);
 }
 
-void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime){
-    turnDirection(turn, speedPercentage);
-    delay_ms(sleepTime);
-    stopMotors();
-}
 
+/*
+void moveSquares(direction_t direction, uint8_t squares){
+    //TODO: We got to calculate the time to do this move. Weight/speed/wheels affect it.
+    moveMS(direction,40,2000*squares);
+}
+*/
+
+
+/*
 void turnDirectionAngle(turn_t turn, uint8_t angle){
     //TODO: We got to calculate the time to do this turning. Weight/speed/wheels affect it.
     
@@ -120,8 +124,9 @@ void turnDirectionAngle(turn_t turn, uint8_t angle){
 void turnSquares(turn_t turn, uint8_t times){
     
 }
+*/
 
-//payload[0]
+/*
 void turnSquaresPL(char* payload){
     uint8_t direction = (uint8_t)payload[0];
     uint8_t turns = (uint8_t)payload[1];
@@ -137,7 +142,13 @@ void turnSquaresPL(char* payload){
             break;
     }    
 }
+*/
 
+void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime){
+    turnDirection(turn, speedPercentage);
+    delay_ms(sleepTime);
+    stopMotors();
+}
 
 void move(direction_t direction, uint8_t speedPercentage){
     setSpeed(RIGHT_SIDE, direction, speedPercentage);
@@ -150,34 +161,115 @@ void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime){
     stopMotors();
 }
 
-void moveSquares(direction_t direction, uint8_t squares){
-    //TODO: We got to calculate the time to do this move. Weight/speed/wheels affect it.
-    moveMS(direction,40,2000*squares);
-}
-
 //For outside use
-void moveSquaresPL(char* payload){
-    // uint8_t directionValue = (uint8_t)payload[0];
-    uint8_t squareMask = 0x03;
+void moveMSPL(char* payload){
     uint8_t directionMask = 0x01;
     
-    
     uint8_t directionValue = ((uint8_t)payload[0]) & directionMask; // Direction number mask 0000 0001
-    uint8_t squares = ((uint8_t)payload[1]) & squareMask;
-    //((uint8_t)payload[1])&0x03;
+    uint8_t speed= ((uint8_t)payload[1]);
+    //Otherwise motors go cray-cray
+    if(speed > 100)
+        speed = 100;
+    uint16_t ms= (((uint16_t)payload[2]) << 8);
+    ms += (uint16_t)payload[3];
+    side_t direction;
+    
     switch(directionValue){
         case 0:
-        moveSquares(BACKWARD, squares);
-        break;
+            direction = BACKWARD;
+            break;
         case 1:
-        moveSquares(FORWARD, squares);
-        break;
+            direction = FORWARD;
+            break;
         default:
-        //Should not happen if kontrollenhet is correctly using the protocol
-        break;
+            return;
+            //Should not happen if kontrollenhet is correctly using the protocol
+            break;
+    }
+    if(ms != 0){
+        moveMS(direction, speed, ms);
+    }
+    else{
+        move(direction, speed);
     }
 }
 
+void turnDirectionMSPL(char* payload){
+    uint8_t turnMask = 0x01;
+    
+    uint8_t turnValue = ((uint8_t)payload[0]) & turnMask; // Direction number mask 0000 0001
+    uint8_t speed = ((uint8_t)payload[1]);
+    //Otherwise motors go cray-cray
+    if(speed > 100)
+     speed = 100;
+    uint16_t ms= (((uint16_t)payload[2]) << 8);
+    ms += (uint16_t)payload[3];
+    
+    turn_t turn;
+    
+    switch(turnValue){
+        case 0:
+            turn = LEFT_TURN;
+            break;
+        case 1:
+            turn = RIGHT_TURN;
+            break;
+        default:
+            return;
+            //Should not happen if kontrollenhet is correctly using the protocol
+        break;
+    }
+    
+    if(ms != 0){
+        turnDirectionMS(turn, speed, ms);
+    }
+    else{
+        turnDirection(turn, speed);
+    }
+}
+
+void setSpeedPL(char* payload){
+    uint8_t sideMask = 0x01;
+    uint8_t directionMask = 0x01;
+    
+    uint8_t sideValue = ((uint8_t)payload[0]) & sideMask; // Direction number mask 0000 0001
+    uint8_t directionValue = ((uint8_t)payload[1]) & directionMask; // Direction number mask 0000 0001
+    
+    uint8_t speed = ((uint8_t)payload[2]);
+    //Otherwise motors go cray-cray
+    if(speed > 100)
+        speed = 100;
+    
+    side_t side;
+    direction_t direction;
+    
+    switch(sideValue){
+        case 0:
+            side = LEFT_SIDE;
+            break;
+        case 1:
+            side = RIGHT_SIDE;
+            break;
+        default:
+            return;
+            //Should not happen if kontrollenhet is correctly using the protocol
+        break;
+    }
+    switch(directionValue){
+        case 0:
+            direction = BACKWARD;
+            break;
+        case 1:
+            direction = FORWARD;
+            break;
+        default:
+            return;
+            //Should not happen if kontrollenhet is correctly using the protocol
+        break;
+    }
+    
+    setSpeed(side,direction,speed);
+}
 
 /*
  * Set the wanted servo angle. (0 is left, 90 middle and 180 right side)
@@ -187,13 +279,11 @@ void setServoAngle(uint8_t angle)
     if(angle > 180){
         angle = 180; //Otherwise we might hurt the servo
     }        
-    OCR3B = 710 + (int)(8.33 * angle);
+    OCR3B = 708 + (int)(8.45 * angle);
 }
 
 void setServoAnglePL(char* payload){
     uint8_t angle = (uint8_t)payload[0];
-    if(angle > 180)
-        angle = 180;
     setServoAngle(angle);
 }
 
@@ -207,18 +297,24 @@ void executeFunction(t_msgType function, char* payload){
         case ECHO :
             uart_msg_transmit(&adr, &size, &function, payload);
             break;
-        case MOVE_SQUARES :
-            moveSquaresPL(payload);
+        case MOVE_MS :
+            moveMSPL(payload);
             break;
-        case TURN_DEGREES :
-            //TODO
+        case TURN_MS :
+            turnDirectionMSPL(payload);
             break;
-        case TURN_SQUARES :
-            turnSquaresPL(payload);
+        case SET_SIDE_SPEED:
+            setSpeedPL(payload);
             break;
         case SET_SERVO_ANGLE :
             setServoAnglePL(payload);
             break;       
+        case STOP_MOTORS :
+            stopMotors();
+            break;
+        default:
+            //Do nothing
+            break;
     }
 }
 
@@ -229,15 +325,17 @@ int main(void)
     
     initPWM();
     uart_init();
-    _delay_ms(10000);
+    PORTA |= (1 << PORTA0);
+    _delay_ms(5000);
+    //PORTA &= ~(1 << PORTA0);
+    PORTA |= (1 << PORTA1);
     while(1){
         int adr;            //Not needed
         int size;           //Size of payload
         char payload[7];    //Payload data 0->6
         t_msgType funcEnum; //Corresponding function to be used with
-        PORTA |= (0 << PORTA1);
+
         uart_msg_receive(&adr, &size, &funcEnum, payload);   
-        PORTA |= (1 << PORTA1);
         //Not currently caring about size 
         executeFunction(funcEnum, payload);
     }

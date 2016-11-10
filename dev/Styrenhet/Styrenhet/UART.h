@@ -9,7 +9,7 @@
 #ifndef UART_H_
 #define UART_H_
 
-typedef enum {ECHO, MOVE_SQUARES, TURN_DEGREES, TURN_SQUARES, SET_SERVO_ANGLE} t_msgType;
+typedef enum {ACK, MOVE_MS, TURN_MS, SET_SERVO_ANGLE, SET_SIDE_SPEED, STOP_MOTORS, INV, ECHO} t_msgType;
 
 /*
  * Initialize UART

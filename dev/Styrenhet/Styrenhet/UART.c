@@ -78,14 +78,16 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
 
     /* Receive meta packet */
     char c;
+    
     c = uart_receive();
+    PORTA &= ~(1 << PORTA1);
 
     /* Extract meta information */
     *address = (c & adrMask) >> 7;
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
     *msgType = msgTypeDecode(type);
-
+    
     /* Return -1 if invalid type */
     if(*msgType == INV){
         return -1;
@@ -99,25 +101,29 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
     /* Transmit acknowledge */
     int ackSize = 0;
     t_msgType ackType = ACK;
+    return 0;
     return uart_msg_transmit(address, &ackSize, &ackType, NULL);
 }
 
 int msgTypeEncode(t_msgType* msgType){
     switch(*msgType){
-         case ECHO :
+         case ACK :
              return 0;
              break;
-         case MOVE_SQUARES :
+         case MOVE_MS :
              return 1;
              break;
-         case TURN_DEGREES :
+         case TURN_MS :
              return 2;
              break;
-         case TURN_SQUARES :
+         case SET_SIDE_SPEED:
              return 3;
              break;
          case SET_SERVO_ANGLE :
              return 4;
+             break;
+         case STOP_MOTORS :
+             return 5;
              break;
         default:
             return -1;
@@ -127,22 +133,26 @@ int msgTypeEncode(t_msgType* msgType){
 t_msgType msgTypeDecode(int msgType){
      switch(msgType){
          case 0 :
-            return ECHO;
+            return ACK;
             break;
          case 1 :
-            return MOVE_SQUARES;
+            return MOVE_MS;
             break;
          case 2 :
-            return TURN_DEGREES;
-            break;
-         case 3 :
-            return TURN_SQUARES;
+            return TURN_MS;
+            break;    
+        case 3 :
+            return SET_SIDE_SPEED;
             break;
          case 4 :
             return SET_SERVO_ANGLE;
             break;
+         case 5 :
+            return STOP_MOTORS;
+            break;
          default:
             //That's impossible!
-            return -1;
+            return INV;
+            break;
      }
 }
