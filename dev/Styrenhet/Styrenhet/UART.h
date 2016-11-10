@@ -26,6 +26,9 @@ void uart_transmit (unsigned char data);
 
 /*
  * Receive a single character (i.e. 8 bits) over UART. Waits until data is received.
+ *
+ * _Returns_
+ * (unsigned char) A single 8-bit packet. May not correspond to ASCII character.
  */
 unsigned char uart_receive (void);
 
@@ -46,8 +49,11 @@ void uart_packet_receive (int size, int* packet);
  * (int) payloadSize: number of payload characters
  * (t_msgType) msgType: the type of message to transmit
  * (char*) payload: the payload to transmit
+ *
+ * _Returns_
+ * (int) 0 if well-formed message, else -1.
  */
-void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload);
+int uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload);
 
 /*
  * Receives a meta packet and the following payload.
@@ -57,28 +63,31 @@ void uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char*
  * (int*) payloadSize: number of payload characters
  * (t_msgType*) msgType: received messsage type
  * (char*) payload: received payload
+ *
+ * _Returns_
+ * (int) 0 if well-formed message, else -1.
  */
-void uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload);
+int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload);
 
 /*
- * Returns the integer encoding for the given message type. Returns -1 if no encoding exist.
- * The message types and their encodings are:
- * SENSOR : 0
- * MOTOR : 1
+ * Returns the integer encoding for the given message type.
  *
  * _Parameters_
  * (t_msgType*) msgType: the message type to be encoded
+ *
+ * _Returns_
+ * (int) The integer encoding for the given message type. Returns -1 if no encoding exist.
  */
 int msgTypeEncode(t_msgType* msgType);
 
 /*
- * Returns the message type for the given integer encoding. Does nothing if given integer is not a valid encoding.
- * The message types and their encodings are:
- * SENSOR : 0
- * MOTOR : 1
+ * Returns the message type for the given integer encoding.
  *
  * _Parameters_
  * (int) msgType: the integer to be decoded
+ *
+ * _Returns_
+ * (int) The message type corresponding to the given integer encoding. Returns ERR if given integer is not a valid encoding.
  */
 t_msgType msgTypeDecode(int msgType);
 
