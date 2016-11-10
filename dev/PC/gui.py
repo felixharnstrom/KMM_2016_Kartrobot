@@ -30,8 +30,8 @@ class gui_thread(threading.Thread):
             # Instruct the gui to place a marker on its canvas at the point specified in "command"
             self.place_marker_on_canvas(command[1], command[2])
         elif type(command) == list and command[0]=="set_motors":
-            self.motor_left_scale.set(command[1])
-            self.motor_right_scale.set(command[2])
+            self.left_motor_speed.set(command[1])
+            self.right_motor_speed.set(command[2])
 
     def run(self):
         """Initiates the GUI with previously specified queues."""
@@ -64,14 +64,16 @@ class gui_thread(threading.Thread):
         # Each button will place a command in the queue using send_command
 
         # Mode switching buttons
-        var = tkinter.IntVar()
-        R1 = tkinter.Radiobutton(button_frame, text="Manual", variable=var, value=1,
+        mode_var = tkinter.IntVar()
+        R1 = tkinter.Radiobutton(button_frame, text="Manual", variable=mode_var, value=1,
                          command=lambda message="mode_manual": self.send_command(message))
         R1.pack()
 
-        R2 = tkinter.Radiobutton(button_frame, text="Automnomous", variable=var, value=2,
+        R2 = tkinter.Radiobutton(button_frame, text="Automnomous", variable=mode_var, value=2,
                          command=lambda message="mode_autonomous": self.send_command(message))
         R2.pack()
+
+        mode_var.set(1)
 
         self.left_motor_speed = tkinter.DoubleVar()
         self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL, state=tkinter.DISABLED)
