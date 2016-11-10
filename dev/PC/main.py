@@ -33,9 +33,10 @@ while True:
             break
         else:
             # All commands that are not used above are sent to the raspberry server.
-            data_string = json.dumps(command).encode()
-            print ("sending",data_string)
-            robot.client.sendall(data_string)
+            gui.receive_command(["set_motors", 10, 10])
+            print ("sending",command)
+            robot.client.sendall(json.dumps(command).encode())
+
             pass
 
     # Not yet used
