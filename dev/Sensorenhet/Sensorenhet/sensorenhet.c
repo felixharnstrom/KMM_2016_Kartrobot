@@ -121,67 +121,47 @@ double read_sensor(sensor_t s)
     return ir_output_to_centimeters();
 }
 
+void sendInt(int n) {
+	int charCount = 7;
+	//Get a string without any trash
+	char vstr[charCount];
+	
+	for (int i = 0; i < charCount; ++i)
+	vstr[i] = ' ';
+	// int to str
+	sprintf(vstr, "%d", n);
+	// Send the string via UART
+	for (int i = 0; i < charCount; ++i)
+	if (vstr[i] != 0)
+	uart_transmit(vstr[i]);
+	uart_transmit('\n');
+}
+
+double readGyro() {
+	start_ir_read(5);
+	wait_for_ir_read();
+	return get_ir_voltage();
+}
+
+double gyroOutputToAngularRate(double gyroOutput) {
+	static const double BIAS = 2.5;
+	static const double GAIN = 1;
+	return (gyroOutput - BIAS) / GAIN;
+}
+
 int main(void)
-{   
-    uart_init();
-    init_lidar();
-
-    while(1)
-    {
-		int vint = lidar_output_to_centimeters();
-			
-		//Get a string without any trash
-		int charCount = 7;
-		char vstr[charCount];
-        
-		for (int i = 0; i < charCount; ++i)
-		    vstr[i] = ' ';
-		// int to str
-		sprintf(vstr, "%d", vint);
-		// Send the string via UART
-		for (int i = 0; i < charCount; ++i)
-		    if (vstr[i] != 0)
-		        uart_transmit(vstr[i]);
-		uart_transmit('\n');
-    }
-}
-
-/*
-Hannes and Janis Debugging session.
-
-int main(void) {
-    DDRB |= (1<<DDB0);
-    init_ad();
+{
 	uart_init();
+	init_lidar();
+	init_ad();
 
-    while(1) {
-        //Loop over all channels
-        for (uint8_t i = 4; i < 5; i++) {
-            start_ir_read((i);
-            wait_for_ir_read();
-            
-            if (get_ir_voltage() > 0.4) {
-                PORTB |= (1 << PORTB0);
-            } else {
-                PORTB &= (0 << PORTB0);
-            }
-			
-			int vint = ir_output_to_centimeters(get_ir_voltage());
-            
-			//Get a string without any trash
-			int charCount = 32;
-			char vstr[charCount];
-			for (int i = 0; i < charCount; ++i)
-				vstr[i] = ' '; 
-			// int to str
-			sprintf(vstr, "%d", vint); 
-			// Send the string via UART
-			for (int i = 0; i < charCount; ++i)
-				if (vstr[i] != 0)
-					uart_transmit(vstr[i]);
-			uart_transmit('\n');
-        }
-    }
+	while(1)
+	{
+		//int vint = lidar_output_to_centimeters();
+		//int vint = readGyro();
+		
+		sendInt(1337);
+		//sendInt(gyroOutputToAngularRate(vint) * 1000);
+		
+	}
 }
-
-*/
