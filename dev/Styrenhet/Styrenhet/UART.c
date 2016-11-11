@@ -23,28 +23,28 @@
 #endif
 
 void uart_init(void){
-	UBRR0H = (BAUDRATE>>8);             // shift the register right by 8 bits
-	UBRR0L = BAUDRATE;                  // set baud rate
-	UCSR0B|= (1<<TXEN0)|(1<<RXEN0);     // enable receiver and transmitter
-	UCSR0C|= (1<<USBS0)|(3<<UCSZ00);    // 8bit data format
+    UBRR0H = (BAUDRATE>>8);             // shift the register right by 8 bits
+    UBRR0L = BAUDRATE;                  // set baud rate
+    UCSR0B|= (1<<TXEN0)|(1<<RXEN0);     // enable receiver and transmitter
+    UCSR0C|= (1<<USBS0)|(3<<UCSZ00);    // 8bit data format
 }
 
 void uart_transmit(unsigned char c){
-	loop_until_bit_is_set(UCSR0A, UDRE0);   // wait until data register empty
-	UDR0 = c;
+    loop_until_bit_is_set(UCSR0A, UDRE0);   // wait until data register empty
+    UDR0 = c;
 }
 
 unsigned char uart_receive(void){
-	loop_until_bit_is_set(UCSR0A, RXC0);    // wait until data exists
-	return UDR0;
+    loop_until_bit_is_set(UCSR0A, RXC0);    // wait until data exists
+    return UDR0;
 }
 
 void uart_packet_receive(int size, int* packet){
-	char c;
-	c = uart_receive();
-	for(int i = 0; i < size; ++i){
-		packet[i] = (c >> i) & 1;
-	}
+    char c;
+    c = uart_receive();
+    for(int i = 0; i < size; ++i){
+        packet[i] = (c >> i) & 1;
+    }
 }
 
 int uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* payload){
@@ -107,52 +107,58 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
 
 int msgTypeEncode(t_msgType* msgType){
     switch(*msgType){
-         case ACK :
-             return 0;
-             break;
-         case MOVE_MS :
-             return 1;
-             break;
-         case TURN_MS :
-             return 2;
-             break;
-         case SET_SIDE_SPEED:
-             return 3;
-             break;
-         case SET_SERVO_ANGLE :
-             return 4;
-             break;
-         case STOP_MOTORS :
-             return 5;
-             break;
+        case ACK :
+            return 0;
+            break;
+        case MOVE_MS :
+            return 1;
+            break;
+        case TURN_MS :
+            return 2;
+            break;
+        case SET_SIDE_SPEED:
+            return 3;
+            break;
+        case SET_SERVO_ANGLE :
+            return 4;
+            break;
+        case STOP_MOTORS :
+            return 5;
+            break;
+        case GET_DIAG :
+           return 6;
+           break;
         default:
-            return -1;
+           return -1;
     }
 }
 
 t_msgType msgTypeDecode(int msgType){
-     switch(msgType){
-         case 0 :
+    switch(msgType){
+        case 0 :
             return ACK;
             break;
-         case 1 :
+        case 1 :
             return MOVE_MS;
             break;
-         case 2 :
+        case 2 :
             return TURN_MS;
             break;    
         case 3 :
             return SET_SIDE_SPEED;
             break;
-         case 4 :
+        case 4 :
             return SET_SERVO_ANGLE;
             break;
-         case 5 :
+        case 5 :
             return STOP_MOTORS;
             break;
-         default:
+        case 6 :
+            return GET_DIAG;
+            break;
+        default:
             //That's impossible!
             return INV;
             break;
-     }
+    }
 }
