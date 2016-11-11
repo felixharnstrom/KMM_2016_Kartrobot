@@ -34,7 +34,7 @@ class UART:
         :function: The function of which to send the arguments.
         """
         for value in function.ARGUMENTS:
-            self.send_packet(bytes.fromhex('{:02X}'.format(function.ARGUMENTS[value])))
+            self.send_packet(bytes.fromhex('{:02X}'.format(value)))
 
     def send_packet(self, packet : bytes):
         """
@@ -43,8 +43,8 @@ class UART:
         :packet: The packet to send
         """
         # Debug print
-        #print(int.from_bytes(packet,byteorder = 'big'))
-        time.sleep(0.01)
+        print(int.from_bytes(packet,byteorder = 'big'))
+        time.sleep(0.1)
         return self.ser.write(packet)
 
     def receive_packet(self):
@@ -61,6 +61,7 @@ class UART:
         """
         self.send_packet(self.create_metapacket(function))
         self.send_arguments(function)
+        #self.ser.flush()
 
     def decode_metapacket(self, packet : bytes):
         """
