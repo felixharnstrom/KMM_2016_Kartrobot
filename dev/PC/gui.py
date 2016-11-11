@@ -116,3 +116,10 @@ class gui_thread(threading.Thread):
                                      fill="black")
 
         pass
+
+    def draw_map(self, map : list):
+        for x,mapx in enumerate(map):
+            for y,mapy in enumerate(mapx):
+                if mapy==1:
+                    self.place_marker_on_canvas(100+x*10,100+y*10)
+

@@ -1,6 +1,6 @@
 import queue
 import gui
-
+import time
 import json
 from client import client
 
@@ -8,6 +8,7 @@ from client import client
 robot = client()
 robot.start(ip="localhost")
 
+map = [[1,0,1],[0,1,1]]
 
 # Send messages back and forth from the GUI using a Queue
 command_queue = queue.Queue()
@@ -16,9 +17,10 @@ response_queue = queue.Queue()
 # Start our GUI thread
 gui = gui.gui_thread(command_queue, response_queue)
 gui.start()
-
+time.sleep(0.2)
 # Use an infinite loop to check for commands from the GUI
 while True:
+    gui.draw_map(map)
     if not command_queue.empty():
         # There is a command. Lets get it.
         command = command_queue.get()
