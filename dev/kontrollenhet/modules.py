@@ -21,13 +21,14 @@ class StyrenhetFunction(Function):
 
 class Drive(StyrenhetFunction):
 	TYPE = 1
-	ARGUMENTS = {"direction" : 0, "speed" : 0, "time1" : 0, "time2" : 0}
+	ARGUMENTS = []
 
 	def __init__(self, direction : int, speed : int, time1 : int, time2 : int):
-		self.ARGUMENTS["direction"] = direction
-		self.ARGUMENTS["speed"] = speed
-		self.ARGUMENTS["time1"] = time1
-		self.ARGUMENTS["time2"] = time2
+		self.ARGUMENTS = []
+		self.ARGUMENTS.append(direction)
+		self.ARGUMENTS.append(speed)
+		self.ARGUMENTS.append(time1)
+		self.ARGUMENTS.append(time2)
 		self.LENGTH = len(self.ARGUMENTS)
 
 		
