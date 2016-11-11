@@ -287,7 +287,14 @@ void setServoAnglePL(char* payload){
     setServoAngle(angle);
 }
 
-
+/*Send back diagnostic information to the control unit 
+(meaning it should and must listen to the output from the controller)
+If it doesn't there's a risk that the control unit will get incorrect data or get stuck in an indef. loop.
+TODO: Make this approach more robust
+*/
+void getDiag(){
+    
+}
 
 //object* ?
 void executeFunction(t_msgType function, char* payload){
@@ -302,7 +309,7 @@ void executeFunction(t_msgType function, char* payload){
             break;
         case TURN_MS :
             turnDirectionMSPL(payload);
-            break;
+            break;  
         case SET_SIDE_SPEED:
             setSpeedPL(payload);
             break;
@@ -311,6 +318,9 @@ void executeFunction(t_msgType function, char* payload){
             break;       
         case STOP_MOTORS :
             stopMotors();
+            break;
+        case GET_DIAG :
+            getDiag(); //Sends diag on uart
             break;
         default:
             //Do nothing
