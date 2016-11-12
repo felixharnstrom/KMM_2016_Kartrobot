@@ -62,11 +62,11 @@ void delay_ms(uint32_t ms){
 
 void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction){
     switch(direction){
-        case FORWARD:
-            *port |= (1 << portnr);
-        break;
         case BACKWARD:
             *port &= ~(1 << portnr);
+        break;
+        case FORWARD:
+            *port |= (1 << portnr);
         break;
         default:
             //Do nothing
@@ -76,13 +76,13 @@ void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction){
 
 void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage){
     switch(side){
-        case RIGHT_SIDE:
-            OCR0A = getTransformSpeed(speedPercentage);
-            setPinValue(&PORTB, PORTB5, direction);
-        break;
         case LEFT_SIDE:
             OCR0B = getTransformSpeed(speedPercentage);
             setPinValue(&PORTB, PORTB6, direction);
+        break;
+        case RIGHT_SIDE:
+            OCR0A = getTransformSpeed(speedPercentage);
+            setPinValue(&PORTB, PORTB5, direction);
         break;
     }
 }
@@ -293,7 +293,30 @@ If it doesn't there's a risk that the control unit will get incorrect data or ge
 TODO: Make this approach more robust
 */
 void getDiag(){
+    uint16_t servoMsbMask = 0xFF00;
+    uint16_t servoLsbMask = 0x00FF;
+    uint8_t payloadLength = 6;
+    uint8_t adress = 0;
     
+    /*
+    Packet 0, 1 contains left side information
+	Packet 2, 3 contains right side information
+	0,2 contains motor direction, 0=backward, 1=forward
+	1,3 contains motor PWM(M) (M/2.5 for speed percentage)
+	4,5 contains servo PWM (S) 4 being MSB, 5 LSB eg S=[4]*2^8+[5] ((S-708)/8.45 for gyro angle)
+	*/
+    uint8_t leftSideDirection = (PORTB & (1 << PINB6)) != 0;
+    uint8_t leftSidePWM = OCR0B;
+    
+    uint8_t rightSideDirection = (PORTB & (1 << PINB5)) != 0;
+    uint8_t rightSidePWM = OCR0A;
+    
+    uint16_t servoPWM = OCR3B; //This might need to be casted
+    uint8_t servoMsbPWM = (uint8_t)((servoPWM & servoMsbMask) >> 8);
+    uint8_t servoLsbPWM = (uint8_t)(servoPWM & servoLsbMask);
+    
+    char payload[6] = {leftSideDirection, leftSidePWM, rightSideDirection, rightSidePWM, servoMsbPWM, servoLsbPWM};
+    uart_msg_transmit(adress, payloadLength, GET_DIAG ,payload); //TODO: Different msgType as this is a response?
 }
 
 //object* ?
