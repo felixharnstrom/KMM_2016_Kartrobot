@@ -6,7 +6,7 @@
  */ 
 
 #include "sensorenhet.h"
-#include "UART.c" //gick inte att hitta funktionerna med UART.h av någon anledning?
+#include "UART.h"
 
 //global variable that keeps track of the LIDAR counter
 volatile uint8_t lidarCounter;
@@ -198,22 +198,58 @@ void calibrationTest() {
 	}
 }
 
+/*
+ * Return the byte yielded from the 8 least significant bits.
+ */
+uint8_t lowestByte(unsigned int n) {
+	return (n & 0xFF);
+}
+
+/*
+ * Send a 2-byte number as two single-byte numbers, starting with the MSB.
+ */
+void sendReply(uint16_t val) {
+	uint8_t lowest = lowestByte(val);
+	uint8_t highest = lowestByte(val >> 8);
+	uart_transmit(highest);
+	uart_transmit(lowest);
+	//sendInt(highest); sendInt(lowest);
+}
+
 int main(void)
 {
 	uart_init();
 	init_lidar();
 	init_ad();
 	
-	calibrationTest();
-	/*
+	//calibrationTest();
+	//while(1) sendReply(0x201);
+	
+	double bias = calculateBias();
+	
 	while(1)
 	{
 		uint8_t msg = uart_receive();
+		//uint8_t msg = 5;
 		switch (msg) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:
+			case 0: //IR 0
+			case 1: //IR 1
+			case 2: //IR 2
+			case 3: //IR 3
+			case 4: //IR 4
+			case 5:;//LIDAR
+				double sensorOutput = read_sensor(msg);
+				uint16_t mmRounded = sensorOutput * 10;
+				sendReply(mmRounded);
+				break;
+			case 6:;//Gyro
+				double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
+				int16_t perHektoSecond = gyroOutput * 100;
+				uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
+				sendReply(usigned);
+				break;
+			default: 
+				break;
 		}
-	}*/
+	}
 }
