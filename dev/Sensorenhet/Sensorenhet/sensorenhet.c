@@ -65,6 +65,7 @@ void wait_for_ir_read() {
     while(ADCSRA & (1<<ADSC));
 }
 
+
 /*
  *  Interrupt vector that's triggered when LIDAR monitor value is changed
  */
@@ -143,10 +144,58 @@ double readGyro() {
 	return get_ir_voltage();
 }
 
-double gyroOutputToAngularRate(double gyroOutput) {
-	static const double BIAS = 2.5;
-	static const double GAIN = 1;
-	return (gyroOutput - BIAS) / GAIN;
+double gyroOutputToAngularRate(double gyroOutput, double bias) {
+	static const double GAIN = 1.0 / 17.0; //TODO: may require further adjustment
+	return (gyroOutput - bias) / GAIN;
+}
+
+/*
+ * Returns the average gyro output over a number of iterations.
+ * Intended to be used in standstill to acquire bias.
+ */
+double calculateBias() {
+	static const int ITERATIONS = 1000;
+	double sum = 0;
+	for (int i = 0; i < ITERATIONS; ++i)
+		sum += readGyro();
+	return sum / ((double) ITERATIONS);
+}
+
+/*
+ * Continually transmits the current angle over UART.
+ */
+void calibrationTest() {
+	//Set up Timer1
+	TCNT1 = 0;  //set timer to zero, may not be necessary. This register will count up over time.
+	TCCR1A = 0;	//normal counting up - output compare pins not used, initially zero so not necessary
+	TCCR1B |= ((1 << CS10) | (1 << CS12)); // start the timer at 8MHz/1024
+
+	double clockRate = 8000000.0 / 1024.0;
+	double timeToMax = 65535 / clockRate;
+	double clocksPerSec = 65535 / timeToMax;
+	
+	double bias = calculateBias();
+	
+	double angle;
+	
+	while(1)
+	{
+		//int vint = lidar_output_to_centimeters();
+		//int vint = readGyro();
+		int time = TCNT1;
+		TCNT1 = 0;
+		
+		double av = gyroOutputToAngularRate(readGyro(), bias);
+		double dif = av * (time / clocksPerSec);
+		angle += dif;
+		
+		//if (dif > 0.01)
+		//sendInt(1000*dif);
+		sendInt(100*angle);
+		//sendInt(gyroOutputToAngularRate(readGyro()) * 100);
+		
+		while(TCNT1 < clocksPerSec / 1000);
+	}
 }
 
 int main(void)
@@ -154,14 +203,17 @@ int main(void)
 	uart_init();
 	init_lidar();
 	init_ad();
-
+	
+	calibrationTest();
+	/*
 	while(1)
 	{
-		//int vint = lidar_output_to_centimeters();
-		//int vint = readGyro();
-		
-		sendInt(1337);
-		//sendInt(gyroOutputToAngularRate(vint) * 1000);
-		
-	}
+		uint8_t msg = uart_receive();
+		switch (msg) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+		}
+	}*/
 }
