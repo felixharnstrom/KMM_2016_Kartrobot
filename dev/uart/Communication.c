@@ -84,7 +84,12 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
     *address = (c & adrMask) >> 7;
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
-    *msgType = msgTypeDecode(type);
+	// If the first bit of address is 0, then we have a motor
+	if ((*address & 1) == 0) {
+		*msgType = msgTypeDecode(type, MOTOR);
+	} else { // Sensor
+		*msgType = msgTypeDecode(type, SENSOR);
+	}
 
     /* Return -1 if invalid type */
     if(*msgType == INV){
@@ -114,19 +119,19 @@ int msgTypeEncode(t_msgType* msgType){
         case ACK :
             return 0;
             break;
-        case MOVE_MS :
+        case MOTOR_MOVE_MS :
             return 1;
             break;
-        case TURN_MS :
+        case MOTOR_TURN_MS :
             return 2;
             break;
-        case SET_SIDE_SPEED:
+        case MOTOR_SET_SIDE_SPEED:
             return 3;
             break;
-        case SET_SERVO_ANGLE :
+        case MOTOR_SET_SERVO_ANGLE :
             return 4;
             break;
-        case STOP_MOTORS :
+        case MOTOR_STOP_MOTORS :
             return 5;
             break;
         case DONE :
@@ -137,32 +142,50 @@ int msgTypeEncode(t_msgType* msgType){
     }
 }
 
-t_msgType msgTypeDecode(int msgType){
-    switch(msgType){
-        case 0 :
-            return ACK;
-            break;
-        case 1 :
-            return MOVE_MS;
-            break;
-        case 2 :
-            return TURN_MS;
-            break;
-        case 3 :
-            return SET_SIDE_SPEED;
-            break;
-        case 4 :
-            return SET_SERVO_ANGLE;
-            break;
-        case 5 :
-            return STOP_MOTORS;
-            break;
-        case 15 :
-            return DONE;
-            break;
-        default:
-            //That's impossible!
-            return INV;
-            break;
-     }
+t_msgType msgTypeDecode(int msgType, t_unitType sensor){
+	if (sensor == MOTOR) {
+		switch(msgType){
+			case 0 :
+				return ACK;
+				break;
+			case 1 :
+				return MOTOR_MOVE_MS;
+				break;
+			case 2 :
+				return MOTOR_TURN_MS;
+				break;
+			case 3 :
+				return MOTOR_SET_SIDE_SPEED;
+				break;
+			case 4 :
+				return MOTOR_SET_SERVO_ANGLE;
+				break;
+			case 5 :
+				return MOTOR_STOP_MOTORS;
+				break;
+			case 15 :
+				return DONE;
+				break;
+			default:
+				//That's impossible!
+				return INV;
+				break;
+		}
+	} else if (sensor == SENSOR) {
+		switch(msgType){
+			case 0 :
+				return ACK;
+				break;
+			case 15 :
+				return DONE;
+				break;
+			default:
+				//That's impossible!
+				return INV;
+				break;
+		}
+	}
+	
+	// impossible
+	return INV;
 }

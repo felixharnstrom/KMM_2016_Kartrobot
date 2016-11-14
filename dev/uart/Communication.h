@@ -9,7 +9,17 @@
 #ifndef COMMUNICATION_H_
 #define COMMUNICATION_H_
 
-typedef enum {ACK, MOVE_MS, TURN_MS, SET_SERVO_ANGLE, SET_SIDE_SPEED, STOP_MOTORS, INV, ECHO, DONE} t_msgType;
+typedef enum {
+		// General
+		ACK, INV, ECHO, DONE,
+		// Motor-specific
+		MOTOR_MOVE_MS, MOTOR_TURN_MS, MOTOR_SET_SERVO_ANGLE, MOTOR_SET_SIDE_SPEED, MOTOR_STOP_MOTORS,
+		// Sensor-specific
+		SENSOR_READ_IR_LEFT_FRONT, SENSOR_READ_IR_LEFT_BACK, SENSOR_READ_IR_RIGHT_FRONT, SENSOR_READ_IR_RIGHT_BACK,
+		SENSOR_READ_IR_BACK, SENSOR_READ_LIDAR, SENSOR_READ_GYRO
+	} t_msgType;
+
+typedef enum {MOTOR, SENSOR} t_unitType;
 
 /*
  * Initialize UART
@@ -78,10 +88,11 @@ int msgTypeEncode(t_msgType* msgType);
  *
  * _Parameters_
  * (int) msgType: the integer to be decoded
+ * (t_unitType) motor: true if msgType represents a motor signal, false if a sensor signal
  *
  * _Returns_
  * (int) The message type corresponding to the given integer encoding. Returns ERR if given integer is not a valid encoding.
  */
-t_msgType msgTypeDecode(int msgType);
+t_msgType msgTypeDecode(int msgType, t_unitType motor);
 
 #endif /* COMMUNICATION_H_ */
