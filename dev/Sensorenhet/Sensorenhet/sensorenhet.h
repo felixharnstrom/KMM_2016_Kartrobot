@@ -23,40 +23,68 @@
 #define PACKET_SIZE 8   // define packet size
 #endif
 
+  /**
+   @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
+*/
 typedef enum {IR_LEFT_BACK, IR_LEFT_FRONT, IR_RIGHT_BACK, IR_RIGHT_FRONT, IR_BACK, LIDAR} sensor_t;
 
-/*
- *	Start a AD conversion
- */
+ /**
+   @brief   Starts AD conversion on a specific chanel
+   @param   chanel is a uint8_t number of a chanel and the value can never be greater than 7
+   @return  none
+*/
 void startADConversion(uint8_t channel);
 
-/*
- * Initiate the analog/digital conversion
- */
+  /**
+   @brief   Initilize the analog/digital conversion
+   @param   none
+   @return  none
+*/
 void initAdc();
 
-/*
- *	Convert the current value at ADC to corresponding voltage
- */
+  /**
+   @brief   Converts the current value from A/D conversion to corresponding voltage
+   @param   none
+   @return  A double that is a voltage value
+*/
 double getAdcVoltage();
 
-/*
- * Convert voltage given by getIrVoltage() to distance in cm.
- */
+  /**
+   @brief   Uses getAdcVoltage for IR sensors and converts the value to a distance in centimeters
+   @param   none
+   @return  A double value that is the IR distance in centimeters
+*/
 double getIrDistance();
 
+  /**
+   @brief   Uses getAdcVoltage for LIDAR and converts the value to a distance in centimeters
+   @param   none
+   @return  A double value that is the LIDAR distance in centimeters
+*/
 double getLidarDistance();
 
-/*
- *	Wait until there is no current conversions left
- */
+   /**
+   @brief   Waits for the current A/D conversion to finnish
+   @param   none
+   @return  none
+*/
 void waitForADConversion();
 
+  /**
+   @brief   Initilize LIDAR
+   @param   none
+   @return  none
+*/
 void initLidar();
 
 /*
  * Return the distance recorded by a given sensor.
  */
+   /**
+   @brief   Reads a given sensor and returns the distance
+   @param   s is the sensor that will be read in hte format sensor_t
+   @return  A double value that is distance in centimeters
+*/
 double readSensor(sensor_t s);
 
 #endif /* SENSORENHET_H_ */
