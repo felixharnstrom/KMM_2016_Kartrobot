@@ -1,5 +1,5 @@
 ﻿/*
- * UART.h
+ * Communication.h
  *
  * Created: 11/5/2016 11:04:23 AM
  *  Author: felha423
@@ -8,8 +8,6 @@
 
 #ifndef COMMUNICATION_H_
 #define COMMUNICATION_H_
-
-typedef enum {ACK, MOVE_MS, TURN_MS, SET_SERVO_ANGLE, SET_SIDE_SPEED, STOP_MOTORS, INV, ECHO, DONE} t_msgType;
 
 /*
  * Initialize UART
@@ -61,27 +59,5 @@ int uart_msg_transmit(int* address, int* payloadSize, t_msgType* msgType, char* 
  * (int) 0 if well-formed message, else -1.
  */
 int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* payload);
-
-/*
- * Returns the integer encoding for the given message type.
- *
- * _Parameters_
- * (t_msgType*) msgType: the message type to be encoded
- *
- * _Returns_
- * (int) The integer encoding for the given message type. Returns -1 if no encoding exist.
- */
-int msgTypeEncode(t_msgType* msgType);
-
-/*
- * Returns the message type for the given integer encoding.
- *
- * _Parameters_
- * (int) msgType: the integer to be decoded
- *
- * _Returns_
- * (int) The message type corresponding to the given integer encoding. Returns ERR if given integer is not a valid encoding.
- */
-t_msgType msgTypeDecode(int msgType);
 
 #endif /* COMMUNICATION_H_ */
