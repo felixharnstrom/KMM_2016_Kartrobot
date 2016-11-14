@@ -115,8 +115,6 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
 }
 
 int msgTypeEncode(t_msgType* msgType){
-			//SENSOR_READ_IR_LEFT_FRONT, SENSOR_READ_IR_LEFT_BACK, SENSOR_READ_IR_RIGHT_FRONT, SENSOR_READ_IR_RIGHT_BACK,
-			//SENSOR_READ_IR_BACK, SENSOR_READ_LIDAR, SENSOR_READ_GYRO
     switch(*msgType){
         case ACK :
             return 0;
