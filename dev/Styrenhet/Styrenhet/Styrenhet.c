@@ -1,34 +1,16 @@
 /*
-* Sensorenhet.c
+* Styrenhet.c
 *
-* Created: 11/4/2016 4:08:27 PM
-*  Author: emino969
+*  Author: danma344
 */
 #define F_CPU 8000000UL	//8MHz
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include <stdlib.h>
+#include <avr/interrupt.h>
 #include "UART.h"
+#include "Styrenhet.h"
 
-typedef enum{
-    LEFT_SIDE,
-    RIGHT_SIDE
-} side_t;
-typedef enum {
-    NONE = -1,
-    FORWARD = 1,
-    BACKWARD = 0
-} direction_t; //Other possible solution is to handle case for negative, none and positive speed, eg -100 <= speed <= 100
-typedef enum {
-    LEFT_TURN,
-    RIGHT_TURN
-} turn_t; //Could perhaps be modified into a single enum
-
-
-/************************************************************************/
-/* Initiates all the PWM connections                                     */
-/************************************************************************/
 void initPWM(){
     //PWM for LIDAR tower servo
     TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
@@ -43,16 +25,11 @@ void initPWM(){
     OCR0B = 0; //OCR0B is left side Pin 7 is direction
 }
 
-/************************************************************************/
-/* Transforms a number between 0-100 to the actual representation that is needed to set that speed */
-/************************************************************************/
 uint8_t getTransformSpeed(uint8_t speedPercentage){
     return (int)(speedPercentage*2.52);
 }
 
-/************************************************************************/
-/* Delays for the given ms                                                                     */
-/************************************************************************/
+
 void delay_ms(uint32_t ms){
     while(ms > 0){
         _delay_ms(1);
@@ -69,33 +46,7 @@ void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction){
             *port |= (1 << portnr);
         break;
         default:
-            //Do nothing
-        break;
-    }
-}
-
-void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage){
-    switch(side){
-        case LEFT_SIDE:
-            OCR0B = getTransformSpeed(speedPercentage);
-            setPinValue(&PORTB, PORTB6, direction);
-        break;
-        case RIGHT_SIDE:
-            OCR0A = getTransformSpeed(speedPercentage);
-            setPinValue(&PORTB, PORTB5, direction);
-        break;
-    }
-}
-
-void turnDirection(turn_t turn, uint8_t speedPercentage){
-    switch(turn){
-        case RIGHT_TURN:
-            setSpeed(RIGHT_SIDE, FORWARD, speedPercentage);
-            setSpeed(LEFT_SIDE, BACKWARD, speedPercentage);
-        break;
-        case LEFT_TURN:
-            setSpeed(RIGHT_SIDE, BACKWARD, speedPercentage);
-            setSpeed(LEFT_SIDE, FORWARD, speedPercentage);
+            //Do nothing (Also do this for value NONE)
         break;
     }
 }
@@ -105,54 +56,42 @@ void stopMotors(){
     setSpeed(LEFT_SIDE, NONE, 0);
 }
 
-
-/*
-void moveSquares(direction_t direction, uint8_t squares){
-    //TODO: We got to calculate the time to do this move. Weight/speed/wheels affect it.
-    moveMS(direction,40,2000*squares);
-}
-*/
-
-
-/*
-void turnDirectionAngle(turn_t turn, uint8_t angle){
-    //TODO: We got to calculate the time to do this turning. Weight/speed/wheels affect it.
-    
+void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage){
+    switch(side){
+        case LEFT_SIDE:
+        OCR0B = getTransformSpeed(speedPercentage);
+        setPinValue(&PORTB, PORTB6, direction);
+        break;
+        case RIGHT_SIDE:
+        OCR0A = getTransformSpeed(speedPercentage);
+        setPinValue(&PORTB, PORTB5, direction);
+        break;
+    }
 }
 
-//Turns x*90degrees, eg. x squares using a constant speed for precision
-void turnSquares(turn_t turn, uint8_t times){
-    
-}
-*/
-
-/*
-void turnSquaresPL(char* payload){
-    uint8_t direction = (uint8_t)payload[0];
-    uint8_t turns = (uint8_t)payload[1];
-    switch(direction){
-        case 0:
-            turnSquares(LEFT_TURN,turns);
-            break;
-        case 1:
-            turnSquares(RIGHT_TURN, turns);
-            break;
-        default:
-            //Should not happen
-            break;
-    }    
-}
-*/
-
-void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime){
-    turnDirection(turn, speedPercentage);
-    delay_ms(sleepTime);
-    stopMotors();
+void turnDirection(turn_t turn, uint8_t speedPercentage){
+    switch(turn){
+        case RIGHT_TURN:
+        setSpeed(RIGHT_SIDE, FORWARD, speedPercentage);
+        setSpeed(LEFT_SIDE, BACKWARD, speedPercentage);
+        break;
+        case LEFT_TURN:
+        setSpeed(RIGHT_SIDE, BACKWARD, speedPercentage);
+        setSpeed(LEFT_SIDE, FORWARD, speedPercentage);
+        break;
+    }
 }
 
 void move(direction_t direction, uint8_t speedPercentage){
     setSpeed(RIGHT_SIDE, direction, speedPercentage);
     setSpeed(LEFT_SIDE, direction, speedPercentage);
+}
+
+void setServoAngle(uint8_t angle){
+    if(angle > 180){
+        angle = 180; //Otherwise we might hurt the servo
+    }
+    OCR3B = 708 + (int)(8.45 * angle);
 }
 
 void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime){
@@ -161,7 +100,12 @@ void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime){
     stopMotors();
 }
 
-//For outside use
+void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime){
+    turnDirection(turn, speedPercentage);
+    delay_ms(sleepTime);
+    stopMotors();
+}
+
 void moveMSPL(char* payload){
     uint8_t directionMask = 0x01;
     
@@ -271,32 +215,17 @@ void setSpeedPL(char* payload){
     setSpeed(side,direction,speed);
 }
 
-/*
- * Set the wanted servo angle. (0 is left, 90 middle and 180 right side)
- */
-void setServoAngle(uint8_t angle)
-{
-    if(angle > 180){
-        angle = 180; //Otherwise we might hurt the servo
-    }        
-    OCR3B = 708 + (int)(8.45 * angle);
-}
-
 void setServoAnglePL(char* payload){
     uint8_t angle = (uint8_t)payload[0];
     setServoAngle(angle);
 }
 
-/*Send back diagnostic information to the control unit 
-(meaning it should and must listen to the output from the controller)
-If it doesn't there's a risk that the control unit will get incorrect data or get stuck in an indef. loop.
-TODO: Make this approach more robust
-*/
 void getDiag(){
     uint16_t servoMsbMask = 0xFF00;
     uint16_t servoLsbMask = 0x00FF;
-    uint8_t payloadLength = 6;
-    uint8_t adress = 0;
+    int payloadLength = 6;
+    int adress = 0;
+    t_msgType sendDiag = GET_DIAG;
     
     /*
     Packet 0, 1 contains left side information
@@ -316,10 +245,9 @@ void getDiag(){
     uint8_t servoLsbPWM = (uint8_t)(servoPWM & servoLsbMask);
     
     char payload[6] = {leftSideDirection, leftSidePWM, rightSideDirection, rightSidePWM, servoMsbPWM, servoLsbPWM};
-    uart_msg_transmit(adress, payloadLength, GET_DIAG ,payload); //TODO: Different msgType as this is a response?
+    uart_msg_transmit(&adress, &payloadLength, &sendDiag, payload); //TODO: Different msgType as this is a response?
 }
 
-//object* ?
 void executeFunction(t_msgType function, char* payload){
     int adr = 0;
     int size = 2;
@@ -343,7 +271,7 @@ void executeFunction(t_msgType function, char* payload){
             stopMotors();
             break;
         case GET_DIAG :
-            getDiag(); //Sends diag on uart
+            getDiag(); //Sends diag. data over uart
             break;
         default:
             //Do nothing
@@ -353,52 +281,22 @@ void executeFunction(t_msgType function, char* payload){
 
 int main(void)
 {
-    DDRB = 0xFF;	//All pins on port A as output
-    DDRA = 0xFF;
-    
+    DDRA = 0xFF;	//All pins on port A as output
+    DDRB = 0xFF;    //All pins on port B as output
     initPWM();
     uart_init();
-    PORTA |= (1 << PORTA0);
-    _delay_ms(5000);
-    //PORTA &= ~(1 << PORTA0);
-    PORTA |= (1 << PORTA1);
+    //Set interrupts enabled
+    sei();
+    _delay_ms(1000);
+    PORTA |= (1 << PORTA0) | (1 << PORTA1);
     while(1){
         int adr;            //Not needed
         int size;           //Size of payload
         char payload[7];    //Payload data 0->6
         t_msgType funcEnum; //Corresponding function to be used with
-
-        uart_msg_receive(&adr, &size, &funcEnum, payload);   
-        //Not currently caring about size 
+        PORTA |= ~(1 << PORTA1); //Set segment PORTA1 to 0 while waiting for new uart data
+        uart_msg_receive(&adr, &size, &funcEnum, payload);  
+        PORTA |= (1 << PORTA1); //Set segment PORTA1 to 1 while executing received command
         executeFunction(funcEnum, payload);
     }
-    
-    
-    /*moveMS(FORWARD,40, 2000);
-    moveMS(BACKWARD,40, 2000);
-    turnDirectionMS(RIGHT_TURN, 50, 1300);
-    turnDirectionMS(LEFT_TURN, 50, 1300); */
-    /*
-        char c;
-        int packet[8];
-        //DDRA = (1<<DDA7)|(1<<DDA6)|(1<<DDA5)|(1<<DDA4)|(1<<DDA3)|(1<<DDA2)|(1<<DDA1)|(1<<DDA0);	//All pins on port A as output
-        uart_init();
-        while(1)
-        {
-            c = uart_receive();
-            if(c != 0){
-                PORTA |= (1 << PORTA0);
-                for (int i = 0; i < 8; ++i) {
-                    packet[i] = (c >> i) & 1;
-                }
-                for (int i = 7; i >= 0; --i) {
-                    if(packet[i] == 1){
-                        uart_transmit('1');
-                        }else{
-                        uart_transmit('0');
-                    }
-                }
-            }
-        }
-        */
 }
