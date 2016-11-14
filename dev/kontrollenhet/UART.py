@@ -8,7 +8,6 @@ class UART:
         self.port = port
         self.ser = serial.Serial('/dev/'+port, 9600)  # open serial port
 
-
     def create_metapacket_hex(self, function : modules.Function):
         """
         Create a hex packet consisting of adress, length and type
@@ -43,7 +42,7 @@ class UART:
         :packet: The packet to send
         """
         # Debug print
-        print(int.from_bytes(packet,byteorder = 'big'))
+        #print(int.from_bytes(packet,byteorder = 'big'))
         time.sleep(0.1)
         return self.ser.write(packet)
 
