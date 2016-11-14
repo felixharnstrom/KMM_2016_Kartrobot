@@ -88,11 +88,11 @@ int msgTypeEncode(t_msgType* msgType);
  *
  * _Parameters_
  * (int) msgType: the integer to be decoded
- * (t_unitType) motor: true if msgType represents a motor signal, false if a sensor signal
+ * (t_unitType) unitType: the type of unit to decode to
  *
  * _Returns_
  * (int) The message type corresponding to the given integer encoding. Returns ERR if given integer is not a valid encoding.
  */
-t_msgType msgTypeDecode(int msgType, t_unitType motor);
+t_msgType msgTypeDecode(int msgType, t_unitType unitType);
 
 #endif /* COMMUNICATION_H_ */

@@ -115,10 +115,13 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
 }
 
 int msgTypeEncode(t_msgType* msgType){
+			//SENSOR_READ_IR_LEFT_FRONT, SENSOR_READ_IR_LEFT_BACK, SENSOR_READ_IR_RIGHT_FRONT, SENSOR_READ_IR_RIGHT_BACK,
+			//SENSOR_READ_IR_BACK, SENSOR_READ_LIDAR, SENSOR_READ_GYRO
     switch(*msgType){
         case ACK :
             return 0;
             break;
+		/* motor-specific */
         case MOTOR_MOVE_MS :
             return 1;
             break;
@@ -134,6 +137,29 @@ int msgTypeEncode(t_msgType* msgType){
         case MOTOR_STOP_MOTORS :
             return 5;
             break;
+		/* sensor-specific */
+		case SENSOR_READ_IR_LEFT_FRONT :
+			return 1;
+			break;
+		case SENSOR_READ_IR_LEFT_BACK :
+			return 2;
+			break;
+		case SENSOR_READ_IR_RIGHT_FRONT:
+			return 3;
+			break;
+		case SENSOR_READ_IR_RIGHT_BACK :
+			return 4;
+			break;
+		case SENSOR_READ_IR_BACK :
+			return 5;
+			break;
+		case SENSOR_READ_LIDAR :
+			return 6;
+			break;
+		case SENSOR_READ_GYRO :
+			return 7;
+			break;
+		/* general */
         case DONE :
             return 15;
             break;
@@ -142,8 +168,8 @@ int msgTypeEncode(t_msgType* msgType){
     }
 }
 
-t_msgType msgTypeDecode(int msgType, t_unitType sensor){
-	if (sensor == MOTOR) {
+t_msgType msgTypeDecode(int msgType, t_unitType unitType){
+	if (unitType == MOTOR) {
 		switch(msgType){
 			case 0 :
 				return ACK;
@@ -167,25 +193,47 @@ t_msgType msgTypeDecode(int msgType, t_unitType sensor){
 				return DONE;
 				break;
 			default:
-				//That's impossible!
+				// Wrong unit type
 				return INV;
 				break;
 		}
-	} else if (sensor == SENSOR) {
+
+	} else if (unitType == SENSOR) {
 		switch(msgType){
 			case 0 :
 				return ACK;
+				break;
+			case 1 :
+				return SENSOR_READ_IR_LEFT_FRONT;
+				break;
+			case 2 :
+				return SENSOR_READ_IR_LEFT_BACK;
+				break;
+			case 3 :
+				return SENSOR_READ_IR_RIGHT_FRONT;
+				break;
+			case 4 :
+				return SENSOR_READ_IR_RIGHT_BACK;
+				break;
+			case 5 :
+				return SENSOR_READ_IR_BACK;
+				break;
+			case 6 :
+				return SENSOR_READ_LIDAR;
+				break;
+			case 7 :
+				return SENSOR_READ_GYRO;
 				break;
 			case 15 :
 				return DONE;
 				break;
 			default:
-				//That's impossible!
+				// Wrong unit type
 				return INV;
 				break;
 		}
 	}
 	
-	// impossible
+	// unreachable
 	return INV;
 }
