@@ -1,5 +1,5 @@
 ﻿/*
- * Communication.c
+ * communication.c
  *
  * Created: 11/5/2016 11:04:13 AM
  *  Author: felha423
@@ -15,7 +15,6 @@
 
 #include "Communication.h"
 #include "UART.h"
-#include "MessageTypes.h"
 
 #ifndef BAUD
 #define BAUD 9600   // define baud
@@ -108,4 +107,62 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
         }
     }
     return 0;
+}
+
+int msgTypeEncode(t_msgType* msgType){
+    switch(*msgType){
+        case ACK :
+            return 0;
+            break;
+        case MOVE_MS :
+            return 1;
+            break;
+        case TURN_MS :
+            return 2;
+            break;
+        case SET_SIDE_SPEED:
+            return 3;
+            break;
+        case SET_SERVO_ANGLE :
+            return 4;
+            break;
+        case STOP_MOTORS :
+            return 5;
+            break;
+        case DONE :
+            return 15;
+            break;
+        default:
+            return -1;
+    }
+}
+
+t_msgType msgTypeDecode(int msgType){
+    switch(msgType){
+        case 0 :
+            return ACK;
+            break;
+        case 1 :
+            return MOVE_MS;
+            break;
+        case 2 :
+            return TURN_MS;
+            break;
+        case 3 :
+            return SET_SIDE_SPEED;
+            break;
+        case 4 :
+            return SET_SERVO_ANGLE;
+            break;
+        case 5 :
+            return STOP_MOTORS;
+            break;
+        case 15 :
+            return DONE;
+            break;
+        default:
+            //That's impossible!
+            return INV;
+            break;
+     }
 }
