@@ -85,7 +85,7 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
 	// If the first bit of address is 0, then we have a motor
-	if ((*address & 1) == 0) {
+	if (*address == 0) {
 		*msgType = msgTypeDecode(type, MOTOR);
 	} else { // Sensor
 		*msgType = msgTypeDecode(type, SENSOR);
