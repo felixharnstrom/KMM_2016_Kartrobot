@@ -38,7 +38,7 @@ double getAdcVoltage() {
 }
 
 
-double irOutputToCentimeters() {
+double getIrDistance() {
     double voltage = getAdcVoltage();
 	// Formula approximated to the inverse of the following sets of data points (x, y):
 	/* 5 1.495
@@ -53,7 +53,7 @@ double irOutputToCentimeters() {
 	return pow(voltage / A, 1 / B);
 }
 
-double lidarOutputToCentimeters() {
+double getLidarDistance() {
     //Counter * 256 / CLK = 10^-5 * Length [cm] <==>
     //Length [cm] = Counter * 256 * 10^5 / (8 * 10 ^ 6) = 3.2
     const double c = 3.2;
@@ -111,7 +111,7 @@ void initLidar()
 double readSensor(sensor_t s)
 {
     switch(s) {
-        case LIDAR: return lidarOutputToCentimeters();
+        case LIDAR: return getLidarDistance();
         case IR_LEFT_BACK: startADConversion(0); break;
         case IR_RIGHT_BACK: startADConversion(1); break;
         case IR_LEFT_FRONT: startADConversion(2); break;
@@ -119,7 +119,7 @@ double readSensor(sensor_t s)
         case IR_BACK: startADConversion(4); break;
     }
     waitForADConversion();
-    return irOutputToCentimeters();
+    return getIrDistance();
 }
 
 void sendInt(int n) {

@@ -43,9 +43,9 @@ double getAdcVoltage();
 /*
  * Convert voltage given by getIrVoltage() to distance in cm.
  */
-double irOutputToCentimeters();
+double getIrDistance();
 
-double lidarOutputToCentimeters();
+double getLidarDistance();
 
 /*
  *	Wait until there is no current conversions left
