@@ -11,7 +11,7 @@
 //global variable that keeps track of the LIDAR counter
 volatile uint8_t lidarCounter;
 
-void start_ir_read(uint8_t channel) {
+void startADConversion(uint8_t channel) {
     //The channel value can never be greater than 7
     channel &= 0x07;
     
@@ -22,7 +22,7 @@ void start_ir_read(uint8_t channel) {
     ADCSRA |= (1<<ADSC);
 }
 
-void init_ad() {
+void initAdc() {
     //ADEN: Enables ADC
     //ADPS[2:0]: Changes the clock divider 
     ADCSRA |= (1<<ADEN) | (0<<ADPS2) | (0<<ADPS1) | (0<<ADPS0);
@@ -32,14 +32,14 @@ void init_ad() {
 }
 
 
-double get_ir_voltage() {
+double getAdcVoltage() {
     double const AVCC = 5;
     return (double)(ADC * AVCC) / 1024.0;
 }
 
 
-double ir_output_to_centimeters() {
-    double voltage = get_ir_voltage();
+double irOutputToCentimeters() {
+    double voltage = getAdcVoltage();
 	// Formula approximated to the inverse of the following sets of data points (x, y):
 	/* 5 1.495
 	   7.5 1.420
@@ -53,7 +53,7 @@ double ir_output_to_centimeters() {
 	return pow(voltage / A, 1 / B);
 }
 
-double lidar_output_to_centimeters() {
+double lidarOutputToCentimeters() {
     //Counter * 256 / CLK = 10^-5 * Length [cm] <==>
     //Length [cm] = Counter * 256 * 10^5 / (8 * 10 ^ 6) = 3.2
     const double c = 3.2;
@@ -61,7 +61,7 @@ double lidar_output_to_centimeters() {
 }
 
 
-void wait_for_ir_read() {
+void waitForADConversion() {
     while(ADCSRA & (1<<ADSC));
 }
 
@@ -88,7 +88,7 @@ ISR (INT2_vect)
     }
 }
 
-void init_lidar()
+void initLidar()
 {
     //Enable interrupts
     sei();
@@ -108,18 +108,18 @@ void init_lidar()
     EIFR |= (1<<INTF2);
 }
 
-double read_sensor(sensor_t s)
+double readSensor(sensor_t s)
 {
     switch(s) {
-        case LIDAR: return lidar_output_to_centimeters();
-        case IR_LEFT_BACK: start_ir_read(0); break;
-        case IR_RIGHT_BACK: start_ir_read(1); break;
-        case IR_LEFT_FRONT: start_ir_read(2); break;
-        case IR_RIGHT_FRONT: start_ir_read(3); break;
-        case IR_BACK: start_ir_read(4); break;
+        case LIDAR: return lidarOutputToCentimeters();
+        case IR_LEFT_BACK: startADConversion(0); break;
+        case IR_RIGHT_BACK: startADConversion(1); break;
+        case IR_LEFT_FRONT: startADConversion(2); break;
+        case IR_RIGHT_FRONT: startADConversion(3); break;
+        case IR_BACK: startADConversion(4); break;
     }
-    wait_for_ir_read();
-    return ir_output_to_centimeters();
+    waitForADConversion();
+    return irOutputToCentimeters();
 }
 
 void sendInt(int n) {
@@ -139,9 +139,9 @@ void sendInt(int n) {
 }
 
 double readGyro() {
-	start_ir_read(5);
-	wait_for_ir_read();
-	return get_ir_voltage();
+	startADConversion(5);
+	waitForADConversion();
+	return getAdcVoltage();
 }
 
 double gyroOutputToAngularRate(double gyroOutput, double bias) {
@@ -219,8 +219,8 @@ void sendReply(uint16_t val) {
 int main(void)
 {
 	uart_init();
-	init_lidar();
-	init_ad();
+	initLidar();
+	initAdc();
 	
 	//calibrationTest();
 	//while(1) sendReply(0x201);
@@ -238,7 +238,7 @@ int main(void)
 			case 3: //IR 3
 			case 4: //IR 4
 			case 5:;//LIDAR
-				double sensorOutput = read_sensor(msg);
+				double sensorOutput = readSensor(msg);
 				uint16_t mmRounded = sensorOutput * 10;
 				sendReply(mmRounded);
 				break;
