@@ -25,7 +25,7 @@
 #endif
 
 #ifndef SENSOR_ADRESS
-#define SENSOR_ADRESS 128
+#define SENSOR_ADRESS 1
 #endif
 
   /**
