@@ -85,7 +85,7 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
 	// If the first bit of address is 0, then we have a motor
-	if (*address == 0) {
+	if ((*address & 1) == 0) {
 		*msgType = msgTypeDecode(type, MOTOR);
 	} else { // Sensor
 		*msgType = msgTypeDecode(type, SENSOR);
@@ -157,6 +157,9 @@ int msgTypeEncode(t_msgType* msgType){
 		case SENSOR_READ_GYRO :
 			return 7;
 			break;
+		case SENSOR_DATA :
+			return 8;
+			break;
 		/* general */
         case DONE :
             return 15;
@@ -195,7 +198,6 @@ t_msgType msgTypeDecode(int msgType, t_unitType unitType){
 				return INV;
 				break;
 		}
-
 	} else if (unitType == SENSOR) {
 		switch(msgType){
 			case 0 :
@@ -221,6 +223,9 @@ t_msgType msgTypeDecode(int msgType, t_unitType unitType){
 				break;
 			case 7 :
 				return SENSOR_READ_GYRO;
+				break;
+			case 8:
+				return SENSOR_DATA;
 				break;
 			case 15 :
 				return DONE;

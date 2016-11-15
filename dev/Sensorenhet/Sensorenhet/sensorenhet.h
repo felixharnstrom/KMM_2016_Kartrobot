@@ -20,8 +20,10 @@
 #include <avr/interrupt.h>
 
 #ifndef PACKET_SIZE
-#define PACKET_SIZE 8   // define packet size
+#define PACKET_SIZE (1 << 7)   // define packet size
 #endif
+
+#define SENSOR_ADRESS 128
 
   /**
    @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
