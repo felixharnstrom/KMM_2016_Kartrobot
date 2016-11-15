@@ -1,4 +1,5 @@
 from styrenhet_functions import *
+from sensorenhet_functions import *
 import numpy as np
 
 class Functions(Enum):
@@ -8,13 +9,13 @@ class Functions(Enum):
     SERVO = 4
     STOP_MOTORS = 5
     CONTROLLER_INFORMATION = 6
-    READ_IR_LEFT_FRONT = 11
-    READ_IR_LEFT_BACK = 12
-    READ_IR_RIGHT_FRONT = 13
-    READ_IR_RIGHT_BACK = 14
-    READ_IR_BACK = 15
-    READ_LIDAR = 16
-    READ_GYRO = 17
+    READ_IR_LEFT_FRONT = 17
+    READ_IR_LEFT_BACK = 18
+    READ_IR_RIGHT_FRONT = 19
+    READ_IR_RIGHT_BACK = 20
+    READ_IR_BACK = 21
+    READ_LIDAR = 22
+    READ_GYRO = 23
 
 def splitTime(times): #Taken from robot_com
     time_16 = np.uint16(times)
@@ -22,22 +23,20 @@ def splitTime(times): #Taken from robot_com
     mask_low = 0x00FF
     time_high = np.uint8((time_16 & mask_high) >> 8)
     time_low = np.uint8((time_16 & mask_low))
-    return [time_high, time_low]
+    return int(time_high), int(time_low)
         
-#Returns a StyrenhetFunction object for the correct integer (params = dict) 
-def GetExecutableFunction(function_number : int, params={}):
+#Returns a StyrenhetFunction object for the correct integer (params = list) 
+def GetExecutableFunction(function_number : int, params=[]):
     function_enum = Functions(function_number)    #Should work
     #Params should be supplied correctly, otherwise we will have to handle it (TODO: implement check)
     if(function_enum == Functions.DRIVE):
-        times = splitTime(params['TIME'])
-        return Drive(params['DIRECTION'], params['SPEED'], times[0], times[1])
+        return Drive(params[0], params[1], params[2], params[3])
     elif(function_enum == Functions.TURN):
-        times = splitTime(params['TIME'])
-        return Turn(params['DIRECTION'], params['SPEED'], times[0], times[1])
+        return Turn(params[0], params[1], params[2], params[3])
     elif(function_enum == Functions.SIDE_SPEED):
-        return SideSpeed(params['SIDE'], params['DIRECTION'], params['SPEED'])
+        return SideSpeed(params[0], params[1], params[2])
     elif(function_enum == Functions.SERVO):
-        return Servo(params['DEGREES'])
+        return Servo(params[0])
     elif(function_enum == Functions.STOP_MOTORS):
         return StopMotors()
     elif(function_enum == Functions.CONTROLLER_INFORMATION):

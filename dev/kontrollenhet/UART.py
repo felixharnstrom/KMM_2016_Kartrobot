@@ -1,5 +1,5 @@
 import serial
-import modules
+import function
 from bitstring import BitArray
 import time
 
@@ -8,7 +8,7 @@ class UART:
         self.port = port
         self.ser = serial.Serial('/dev/'+port, 9600)  # open serial port
 
-    def create_metapacket_hex(self, function : modules.Function):
+    def create_metapacket_hex(self, function : function.Function):
         """
         Create a hex packet consisting of adress, length and type
 
@@ -17,7 +17,7 @@ class UART:
         """
         return '{:02X}'.format(function.ADRESS*(2**7)+function.LENGTH*(2**4)+function.TYPE)
 
-    def create_metapacket(self, function : modules.Function):
+    def create_metapacket(self, function : function.Function):
         """
         Create a byte-sized packet consisting of adress, length and type
 
@@ -26,7 +26,7 @@ class UART:
         """
         return bytes.fromhex(self.create_metapacket_hex(function))
 
-    def send_arguments(self, function : modules.Function):
+    def send_arguments(self, function : function.Function):
         """
         Loops through all arguments and sends them (in the order specified in the functions arguments dictionary)
 
@@ -52,7 +52,7 @@ class UART:
         """
         return self.ser.read()
 
-    def send_function(self, function : modules.Function):
+    def send_function(self, function : function.Function):
         """
         Sends a function command including arguments
 
