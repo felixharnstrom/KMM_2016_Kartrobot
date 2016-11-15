@@ -248,6 +248,17 @@ void getDiag(){
     uart_msg_transmit(&adress, &payloadLength, &sendDiag, payload); //TODO: Different msgType as this is a response?
 }
 
+/*
+ * Transmit an ACK message over UART without payload.
+ */
+void transmitAcknowledge() {
+	int adr = 0;
+	int size = 0;
+	t_msgType type = ACK;
+	char payload;
+	uart_msg_transmit(&adr, &size, &type, &payload);
+}
+
 void executeFunction(t_msgType function, char* payload){
     int adr = 0;
     int size = 2;
@@ -297,6 +308,7 @@ int main(void)
         PORTA |= ~(1 << PORTA1); //Set segment PORTA1 to 0 while waiting for new uart data
         uart_msg_receive(&adr, &size, &funcEnum, payload);  
         PORTA |= (1 << PORTA1); //Set segment PORTA1 to 1 while executing received command
+		transmitAcknowledge();
         executeFunction(funcEnum, payload);
     }
 }
