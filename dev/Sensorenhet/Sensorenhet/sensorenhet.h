@@ -37,15 +37,6 @@
 */
 typedef enum {IR_LEFT_BACK, IR_LEFT_FRONT, IR_RIGHT_BACK, IR_RIGHT_FRONT, IR_BACK, LIDAR} sensor_t;
 
-/*
- * Initialize the internal timer.
- * Use TCNT1 to access the current timer value.
- *
- * _returns_
- * (double): the amount TCNT1 increases with in a real-time second.
- */
-double initTimer();
-
  /**
    @brief   Starts AD conversion on a specific chanel
    @param   chanel is a uint8_t number of a chanel and the value can never be greater than 7

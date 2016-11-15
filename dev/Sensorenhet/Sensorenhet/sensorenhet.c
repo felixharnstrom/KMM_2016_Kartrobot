@@ -12,7 +12,7 @@
  * Global variable that keeps track of the LIDAR counter.
  * Read-only.
  */
-volatile uint8_t lidarCounter;
+volatile uint16_t lidarCounter;
 
 void startADConversion(uint8_t channel) {
     //The channel value can never be greater than 7
@@ -60,7 +60,8 @@ double getIrDistance() {
 double getLidarDistance() {
     //Counter * 256 / CLK = 10^-5 * Length [cm] <==>
     //Length [cm] = Counter * 256 * 10^5 / (8 * 10 ^ 6) = 3.2
-    const double c = 3.2;
+	//New lidarCounter runs 256 times as fast
+    const double c = 3.2 / 256.0;
     return lidarCounter * c;
 }
 
@@ -78,22 +79,24 @@ ISR (INT2_vect)
     //If the LIDAR monitor input is 1
     if ((PINB & 0b00000100) == 0b00000100)
     {
-        //TCNT0 is the counter value
-        TCNT0 = 0;
-        //Use the CLK / 256 clock to avoid counter overflow
-        TCCR0B |= (1<<CS02);
+        //TCNT1 is the counter value
+		//Start counting
+        TCNT1 = 0;
     }
     else
     {
         //Update the LIDAR value with the counter
-        lidarCounter = TCNT0;
-        //Turn off the timer
-        TCCR0B &= (0<<CS02);
+        lidarCounter = TCNT1;
     }
 }
 
 void initLidar()
 {
+	//Set up Timer1
+	TCNT1 = 0;  //set timer to zero, may not be necessary. This register will count up over time.
+	TCCR1A = 0;	//normal counting up - output compare pins not used, initially zero so not necessary
+	TCCR1B |= ((1 << CS10) | (0 << CS11) | (0 << CS12)); // start the timer with no prescaler
+	
     //Enable interrupts
     sei();
     
@@ -161,22 +164,17 @@ double calculateBias() {
 	return sum / ((double) ITERATIONS);
 }
 
-double initTimer() {
+
+void calibrationTest() {
 	//Set up Timer1
+	//Note that the LIDAR is using the same timer
 	TCNT1 = 0;  //set timer to zero, may not be necessary. This register will count up over time.
 	TCCR1A = 0;	//normal counting up - output compare pins not used, initially zero so not necessary
-	TCCR1B |= ((1 << CS10) | (1 << CS12)); // start the timer at 8MHz/1024
-	
+	TCCR1B |= ((1 << CS10) | (0 << CS11) | (1 << CS12)); // start the timer at 8MHz/1024
+		
 	double clockRate = 8000000.0 / 1024.0;
 	double timeToMax = 65535 / clockRate;
 	double clocksPerSec = 65535 / timeToMax;
-		
-	return clocksPerSec;
-}
-
-
-void calibrationTest() {
-	double clocksPerSec = initTimer();
 	
 	double bias = calculateBias();
 	
