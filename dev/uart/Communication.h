@@ -1,5 +1,5 @@
 ﻿/*
- * UART.h
+ * Communication.h
  *
  * Created: 11/5/2016 11:04:23 AM
  *  Author: felha423
@@ -11,14 +11,12 @@
 
 typedef enum {
 		// General
-		ACK,
+		ACK, INV, ECHO, DONE,
 		// Motor-specific
 		MOTOR_MOVE_MS, MOTOR_TURN_MS, MOTOR_SET_SERVO_ANGLE, MOTOR_SET_SIDE_SPEED, MOTOR_STOP_MOTORS,
 		// Sensor-specific
 		SENSOR_READ_IR_LEFT_FRONT, SENSOR_READ_IR_LEFT_BACK, SENSOR_READ_IR_RIGHT_FRONT, SENSOR_READ_IR_RIGHT_BACK,
-		SENSOR_READ_IR_BACK, SENSOR_READ_LIDAR, SENSOR_READ_GYRO,
-		// More general
-		INV, ECHO, DONE
+		SENSOR_READ_IR_BACK, SENSOR_READ_LIDAR, SENSOR_READ_GYRO
 	} t_msgType;
 
 typedef enum {MOTOR, SENSOR} t_unitType;

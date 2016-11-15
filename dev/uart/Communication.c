@@ -1,5 +1,5 @@
 ﻿/*
- * communication.c
+ * Communication.c
  *
  * Created: 11/5/2016 11:04:13 AM
  *  Author: felha423
@@ -25,13 +25,13 @@ void comm_init(void){
 }
 
 void uart_transmit(unsigned char c){
-	loop_until_bit_is_set(UCSR0A, UDRE0);   // wait until data register empty
+	loop_until_bit_is_set(UCSR0A, UDRE0);  // wait until data register empty
 	UDR0 = c;
-    loop_until_bit_is_set(UCSR0A, TXC0);  // Wait until transmission ready.
+    loop_until_bit_is_set(UCSR0A, TXC0);   // Wait until transmission ready.
 }
 
 unsigned char uart_receive(void){
-	loop_until_bit_is_set(UCSR0A, RXC0);    // wait until data exists
+	loop_until_bit_is_set(UCSR0A, RXC0);   // wait until data exists
 	return UDR0;
 }
 
@@ -78,12 +78,11 @@ int uart_msg_receive(int* address, int* payloadSize, t_msgType* msgType, char* p
             }
         }
 
-    PORTA &= ~(1 << PORTA1);
-
     /* Extract meta information */
     *address = (c & adrMask) >> 7;
     *payloadSize = (c & sizeMask) >> 4;
     int type = (c & typeMask);
+
 	// If the first bit of address is 0, then we have a motor
 	if (*address == 0) {
 		*msgType = msgTypeDecode(type, MOTOR);
