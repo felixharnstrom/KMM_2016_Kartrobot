@@ -67,9 +67,9 @@
 \newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
 \newcommand{\LIPSdokumenttyp}{Kravspecifikation}
 \newcommand{\LIPSredaktor}{Felix Härnström}
-\newcommand{\LIPSversion}{1.1}
+\newcommand{\LIPSversion}{1.2}
 \newcommand{\LIPSgranskare}{Silas Lenz}
-\newcommand{\LIPSgranskatdatum}{2016-10-20}
+\newcommand{\LIPSgranskatdatum}{2016-11-14}
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
@@ -98,6 +98,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
+    \LIPSversionsinfo{1.2}{2016-11-13}{Förhandlade om kravet på blåtand till Wi-Fi}{FH}{SL}
     \LIPSversionsinfo{1.1}{2016-10-20}{Reviderade otydlig kravtext för krav 54}{FH}{SL}
     \LIPSversionsinfo{1.0}{2016-09-12}{Upphöjt till version 1.0}{FH}{DM}
     \LIPSversionsinfo{0.2}{2016-09-08}{Andra utkastet}{FH,SL}{EN}
@@ -138,29 +139,29 @@ Leverantör: \LIPSprojektgrupp \\
 %Handledare: xxx 
 
 \subsection{Syfte och mål}
-Att leverera en kartrobot som kan styras manuellt via Blåtand, samt autonomt navigera en bana uppbyggd enligt \CourseSpecRef och samtidigt rita upp en karta över området.  
+Att leverera en kartrobot som kan styras manuellt via Wi-Fi, samt autonomt navigera en bana uppbyggd enligt \CourseSpecRef och samtidigt rita upp en karta över området.  
 
 \subsection{Användning}
 Roboten ska ha två lägen varav det första är manuell fjärrstyrning och det andra ett autonomt läge. Man ska kunna växla mellan dessa lägen med en brytare på roboten. Även en på- och avstängningsknapp kommer att finnas på roboten.
 
 \subsubsection{Manuell styrning}
-Vid manuell styrning så ska roboten reagera på styrkommandon som skickas via Blåtand. 
+Vid manuell styrning så ska roboten reagera på styrkommandon som skickas via Wi-Fi. 
 
 \subsubsection{Autonom styrning}
 I det autonoma läget ska roboten utforska en bana som är uppbyggd enligt \CourseSpecRef. Den ska skicka data till en ansluten dator, som ritar upp en karta över området. Efter kartläggningen ska roboten återvända till startområdet. 
 
 \section{Översikt av systemet}
-Vår produkt är en robot som kan navigera genom en rum som är specificerat i \CourseSpecRef och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Blåtand och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
+Vår produkt är en robot som kan navigera genom en rum som är specificerat i \CourseSpecRef och kartlägga hur banan ser ut. Roboten ska ha två olika lägen; ett då den styrs manuellt med hjälp av Wi-Fi och ett annat då den är självkörande och kartlägger banan själv. Roboten ska även oavsett läge alltid skicka information angående sin status, diverse data från sensorer, robotens läge med mera. 
 
 \subsection{Produktkomponenter}
-Kartrobot med stöd för Blåtand, mjukvara med stöd för manuell styrning och robotdiagnostik via Blåtand, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
+Kartrobot med stöd för Wi-Fi, mjukvara med stöd för manuell styrning och robotdiagnostik via Wi-Fi, teknisk dokumentation, användarmanual, demonstration och en efterstudie. 
 
 \subsection{Ingående delsystem}
 De moduler som ingår i konstruktionen är:
 \begin{itemize}
     \item Sensorenhet (avläsning) 
     \item Styrenhet (styrning av motorer) 
-    \item Kommunikations- och kontrollenhet (Blåtand, beräkningar av rutt) 
+    \item Kommunikations- och kontrollenhet (Wi-Fi, beräkningar av rutt) 
 \end{itemize}
 Hur dessa ska konstrueras och stå i relation till varandra kan ses i figur \ref{fig:all_subsystems}.
 
@@ -180,7 +181,8 @@ Behöver endast klara av banor utformade enligt \CourseSpecRef.
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Roboten ska kunna bestämma avstånd till väggar.}{1}
     \LIPSkrav{Original}{Roboten ska kunna förflytta sig.}{1}
-    \LIPSkrav{Original}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Blåtand).}{1}
+    \LIPSkrav{Original}{\sout{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Blåtand).}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 3 \newline (2016-11-13)}{Roboten ska kunna styras manuellt av användaren via ett trådlöst medium (t.ex. Wi-Fi).}{1}
     \LIPSkrav{Original}{Roboten ska kunna styras autonomt.}{1}
     \LIPSkrav{Original}{Roboten ska undvika kollisioner i autonomt läge.}{1}
     \LIPSkrav{Original}{Roboten ska ha en fysisk brytare med vilken man kan välja mellan autonom och manuell styrning. }{1}
@@ -291,8 +293,10 @@ Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med 
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Kontrollenheten ska ta emot sensordata.}{1}
     \LIPSkrav{Original}{Kontrollenheten ska kunna skicka motorinstruktioner.}{1}
-    \LIPSkrav{Original}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}{1}
-    \LIPSkrav{Original}{Kontrollenheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}{1}
+    \LIPSkrav{Original}{\sout{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Blåtand.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 50 \newline (2016-11-13)}{Kommunikationsenheten ska ta emot kommandon från PC-mjukvaran via Wi-Fi.}{1}
+    \LIPSkrav{Original}{\sout{Kontrollenheten ska skicka aktuell sensor- och motordata till PC:n via Blåtand.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 51 \newline (2016-11-13)}{Kontrollenheten ska skicka aktuell sensor- och motordata till PC:n via Wi-Fi.}{1}
     \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för på- och avstängning.}{1}
     \LIPSkrav{Original}{Kontrollenheten ska kunna ta emot en signal från en brytare för att växla mellan autonomt och manuellt läge.}{1}
     \LIPSkrav{Original}{\sout{Kontrollenheten ska ta emot styrdata efter utfört högnivåkommando (se föregående krav).}}{Utgått}
@@ -324,22 +328,25 @@ Kommunikations-enheten kommunicerar med de andra modulerna på roboten samt med 
 \end{figure}
 
 \subsection{Inledande beskrivning av delsystem 4}
-För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Blåtand ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Blåtand. 
+För att den manuella navigeringen ska fungera måste den dator som skickar kommandon över Wi-Fi ha mjukvara som stödjer detta. Mjukvaran ska inte bara förbereda dina kommandon för ett lämpligt protokoll men även sända kommandot över Wi-Fi. 
 
 \subsection{Gränssnitt}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Mjukvaran ska skicka kommandon för navigering som roboten kan avläsa och utföra: åk framåt/bakåt, sväng vänster/höger, stanna.}{1}
     \LIPSkrav{Original}{Mjukvaran ska skicka kommandon för att genomföra en avståndsskanning.}{1}
     \LIPSkrav{Original}{Mjukvaran ska kunna skicka ett kommando för att växla mellan autonomt och manuellt läge.}{1}
-    \LIPSkrav{Original}{Kommandon för navigering ska skickas över Blåtand.}{1}
-    \LIPSkrav{Original}{Sensorernas värden och robotens status ska skickas tas emot över Blåtand och presenteras för användaren.}{1}
+    \LIPSkrav{Original}{\sout{Kommandon för navigering ska skickas över Blåtand.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 67 \newline (2016-11-13)}{Kommandon för navigering ska skickas över Wi-Fi.}{1}
+    \LIPSkrav{Original}{\sout{Sensorernas värden och robotens status ska skickas tas emot över Blåtand och presenteras för användaren.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 68 \newline (2016-11-13)}{Sensorernas värden och robotens status ska skickas tas emot över Wi-Fi och presenteras för användaren.}{1}
     \LIPSkrav{Original}{Den karta som är genererad av roboten ska kunna ritas ut i denna mjukvara.}{1}
 \end{LIPSkravlista}
 
 \subsection{Designkrav}
 \begin{LIPSkravlista}
     \LIPSkrav{Original}{Mjukvaran ska vara skriven i Python 3.}{1}
-    \LIPSkrav{Original}{Mjukvaran ska kommunicera med roboten över Blåtand.}{1}
+    \LIPSkrav{Original}{\sout{Mjukvaran ska kommunicera med roboten över Blåtand.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 71 \newline (2016-11-13)}{Mjukvaran ska kommunicera med roboten över Wi-Fi.}{1}
     \LIPSkrav{Original}{Datan för att hämta karta samt skicka kommandon sker över samma protokoll.}{2}
 \end{LIPSkravlista}
 
@@ -348,7 +355,8 @@ För att den manuella navigeringen ska fungera måste den dator som skickar komm
     \LIPSkrav{Original}{Mjukvaran ska rita ut kartan som ett tydlig rutnät i storlek 17 $\times$ 17, där varje cell är antingen en vägg eller öppen yta och ska representera en 40 $\times$ 40 centimeters verklig yta.}{1}
     \LIPSkrav{Original}{Mjukvaran ska rita ut robotens position i rummet.}{1}
     \LIPSkrav{Original}{Robotens och sensorernas status samt den hitintills genererade kartan presenteras, samt uppdateras kontinuerligt i mjukvaran.}{1}
-    \LIPSkrav{Original}{Utforskning ska fortlöpa även om Blåtandslänken bryts.}{1}
+    \LIPSkrav{Original}{\sout{Utforskning ska fortlöpa även om Blåtandslänken bryts.}}{Utgått}
+    \LIPSunderkrav{Nytt innehåll i krav 76 \newline (2016-11-13)}{Utforskning ska fortlöpa även om den trådlösa länken bryts.}{1}
     \LIPSkrav{Original}{Vid återuppkoppling ska det gå att få ut nuvarande karta.}{2}
 \end{LIPSkravlista}
 
