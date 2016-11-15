@@ -6,9 +6,12 @@
  */ 
 
 #include "sensorenhet.h"
-#include "../../uart/Communication.h"
 
-//global variable that keeps track of the LIDAR counter
+
+/*
+ * Global variable that keeps track of the LIDAR counter.
+ * Read-only.
+ */
 volatile uint8_t lidarCounter;
 
 void startADConversion(uint8_t channel) {
@@ -149,10 +152,6 @@ double gyroOutputToAngularRate(double gyroOutput, double bias) {
 	return (gyroOutput - bias) / GAIN;
 }
 
-/*
- * Returns the average gyro output over a number of iterations.
- * Intended to be used in standstill to acquire bias.
- */
 double calculateBias() {
 	static const int ITERATIONS = 1000;
 	double sum = 0;
@@ -174,9 +173,7 @@ double initTimer() {
 	return clocksPerSec;
 }
 
-/*
- * Continually transmits the current angle over UART.
- */
+
 void calibrationTest() {
 	double clocksPerSec = initTimer();
 	
@@ -204,23 +201,18 @@ void calibrationTest() {
 	}
 }
 
-/*
- * Return the byte yielded from the 8 least significant bits.
- */
+
 uint8_t lowestByte(unsigned int n) {
 	return (n & 0xFF);
 }
 
-/*
- * Send a 2-byte number as two single-byte numbers, starting with the MSB.
- */
 void sendReply(uint16_t val) {
 	uint8_t lowest = lowestByte(val);
 	uint8_t highest = lowestByte(val >> 8);
 	uart_transmit(highest);
 	uart_transmit(lowest);
 	
-	int address = SENSOR_ADRESS; //0b10000000
+	int address = SENSOR_ADRESS;
 	int payloadSize = 2;
 	t_msgType msgType= SENSOR_DATA;
 	char payload[2];
@@ -230,14 +222,7 @@ void sendReply(uint16_t val) {
 }
 
 void sendError() {
-	int address = SENSOR_ADRESS; //0b10000000
-	int payloadSize = 0;
-	t_msgType msgType= INV;
-	uart_msg_transmit(&address, &payloadSize, &msgType, NULL);
-}
-
-void sendDone() {
-	int address = SENSOR_ADRESS; //0b10000000
+	int address = SENSOR_ADRESS;
 	int payloadSize = 0;
 	t_msgType msgType= DONE;
 	uart_msg_transmit(&address, &payloadSize, &msgType, NULL);
@@ -268,26 +253,24 @@ int main(void)
 	initLidar();
 	initAdc();
 	
-	double clocksPerSec = initTimer();
-	
 	double bias = calculateBias();
 	
 	while(1)
 	{
+		/* Read client request */
 		int dontCare1;
 		int dontCare2;
 		char dontCare3;
 		t_msgType msg;
 		uart_msg_receive(&dontCare1, &dontCare2, &msg, &dontCare3);
 		
-		int tAddress = SENSOR_ADRESS; //0b10000000
+		/* Acknowledge client */
+		int tAddress = SENSOR_ADRESS;
 		int payloadSize = 0;
 		t_msgType msgType = ACK;
 		uart_msg_transmit(&tAddress, &payloadSize, &msgType, NULL);
 		
-		//TCNT1 = 0;
-		//while (TCNT1 < clocksPerSec / 1);
-		
+		/* Process and reply */
 		switch (msg) {
 			case SENSOR_READ_IR_LEFT_FRONT:
 			case SENSOR_READ_IR_LEFT_BACK:
@@ -299,14 +282,16 @@ int main(void)
 				uint16_t mmRounded = sensorOutput * 10;
 				sendReply(mmRounded);
 				break;
+				
 			case SENSOR_READ_GYRO:;
 				double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
 				int16_t perHektoSecond = gyroOutput * 100;
 				uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
 				sendReply(usigned);
 				break;
+				
 			default: 
-				sendDone();
+				sendError();
 				break;
 		}
 	}

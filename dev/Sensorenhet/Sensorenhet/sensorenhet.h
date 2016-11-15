@@ -18,17 +18,29 @@
 #include <stdio.h>
 #include <math.h>
 #include <avr/interrupt.h>
+#include "../../uart/Communication.h"
 
 #ifndef PACKET_SIZE
-#define PACKET_SIZE (1 << 7)   // define packet size
+#define PACKET_SIZE (1 << 7)
 #endif
 
+#ifndef SENSOR_ADRESS
 #define SENSOR_ADRESS 128
+#endif
 
   /**
    @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
 */
 typedef enum {IR_LEFT_BACK, IR_LEFT_FRONT, IR_RIGHT_BACK, IR_RIGHT_FRONT, IR_BACK, LIDAR} sensor_t;
+
+/*
+ * Initialize the internal timer.
+ * Use TCNT1 to access the current timer value.
+ *
+ * _returns_
+ * (double): the amount TCNT1 increases with in a real-time second.
+ */
+double initTimer();
 
  /**
    @brief   Starts AD conversion on a specific chanel
@@ -80,6 +92,35 @@ void waitForADConversion();
 void initLidar();
 
 /*
+ * Returns the average gyro output over a number of iterations.
+ * Intended to be used in standstill to acquire the bias for gyroOutputToAngularRate().
+ *
+ * _returns_
+ * (double): the bias value.
+ */
+double calculateBias();
+
+/*
+ * Return the voltage output from the gyro.
+ *
+ * _returns_
+ * (double): the gyro voltage output.
+ */
+double readGyro();
+
+/*
+ * Convert gyro voltage output to angular rate in degrees per second.
+ *
+ * _parameters_
+ * (double) gyroOutput: the gyro voltage output
+ * (double) bias: the gyro voltage in a standstill
+ * 
+ * _returns_
+ * (double): the angular rate in degrees per second. Sign indicates direction. TODO: which direction is positive?
+ */
+double gyroOutputToAngularRate(double gyroOutput, double bias);
+
+/*
  * Return the distance recorded by a given sensor.
  */
    /**
@@ -88,5 +129,55 @@ void initLidar();
    @return  A double value that is distance in centimeters
 */
 double readSensor(sensor_t s);
+
+/*
+ * Get the corresponding sensor channel of a given message type.
+ * 
+ * _parameters_
+ * (t_msgType) mst: the message type to convert
+ *
+ * _returns_
+ * (int) its corresponding channel, or INV if the message type is not a valid sensor.
+ */
+int msgTypeToSensor(t_msgType mst);
+
+/*
+ * Transmits a DONE without payload over UART.
+ */
+void sendError();
+
+/*
+ * Transmits a SENSOR_DATA message with a payload consisting of a 2-byte number
+ *  as two single-byte numbers, starting with the MSBits.
+ *
+ * _parameters_
+ * (uint16_t val): the payload
+ */
+void sendReply(uint16_t val);
+
+/*
+ * Returns the 8 least significant bits of a given number.
+ *
+ * _parameters_
+ * (unsigned int) n: the number to extract from
+ * 
+ * _returns_
+ * (uint16_t): the 8 least significant bits
+ */
+uint8_t lowestByte(unsigned int n);
+
+/*
+ * Convert int to string and send it over UART for debugging porpuses.
+ *
+ * _parameters_
+ * (int) n: the number to send
+ */
+void sendInt(int n);
+
+/*
+ * Continuously transmits the current angle of the gyro over UART.
+ * Never terminates.
+ */
+void calibrationTest();
 
 #endif /* SENSORENHET_H_ */
