@@ -250,6 +250,7 @@ int msgTypeToSensor(t_msgType mst) {
 int main(void)
 {
 	comm_init();
+	sei();
 	initLidar();
 	initAdc();
 	
@@ -277,7 +278,7 @@ int main(void)
 			case SENSOR_READ_IR_RIGHT_FRONT:
 			case SENSOR_READ_IR_RIGHT_BACK:
 			case SENSOR_READ_IR_BACK:
-			case SENSOR_READ_LIDAR:;
+			case SENSOR_READ_LIDAR:; 
 				double sensorOutput = readSensor(msgTypeToSensor(msg));
 				uint16_t mmRounded = sensorOutput * 10;
 				sendReply(mmRounded);
