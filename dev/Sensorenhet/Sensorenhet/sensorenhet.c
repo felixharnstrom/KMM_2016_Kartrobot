@@ -179,7 +179,7 @@ void calibrationTest() {
 	
 	double bias = calculateBias();
 	
-	double angle;
+	double angle = 0;
 	
 	while(1)
 	{
