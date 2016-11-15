@@ -53,7 +53,8 @@ double getIrDistance() {
 	   30 0.445 */
 	static const double A = 4.5770;
 	static const double B = -0.6340;
-	return pow(voltage / A, 1 / B);
+	double dist = pow(voltage / A, 1 / B);
+	return (dist < MAX_IR_DISTANCE_CM) ? dist : MAX_IR_DISTANCE_CM;
 }
 
 double getLidarDistance() {
@@ -181,8 +182,7 @@ void calibrationTest() {
 	
 	double angle = 0;
 	
-	while(1)
-	{
+	while(1) {
 		//int vint = lidar_output_to_centimeters();
 		//int vint = readGyro();
 		int time = TCNT1;
@@ -209,8 +209,6 @@ uint8_t lowestByte(unsigned int n) {
 void sendReply(uint16_t val) {
 	uint8_t lowest = lowestByte(val);
 	uint8_t highest = lowestByte(val >> 8);
-	uart_transmit(highest);
-	uart_transmit(lowest);
 	
 	int address = SENSOR_ADRESS;
 	int payloadSize = 2;
@@ -256,8 +254,7 @@ int main(void)
 	
 	double bias = calculateBias();
 	
-	while(1)
-	{
+	while(1) {
 		/* Read client request */
 		int dontCare1;
 		int dontCare2;

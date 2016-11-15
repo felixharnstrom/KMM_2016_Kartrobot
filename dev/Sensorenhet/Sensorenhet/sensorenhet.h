@@ -28,6 +28,10 @@
 #define SENSOR_ADRESS 1
 #endif
 
+#ifndef MAX_IR_DISTANCE_CM
+#define MAX_IR_DISTANCE_CM 30.0
+#endif
+
   /**
    @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
 */
@@ -63,11 +67,12 @@ void initAdc();
 */
 double getAdcVoltage();
 
-  /**
-   @brief   Uses getAdcVoltage for IR sensors and converts the value to a distance in centimeters
-   @param   none
-   @return  A double value that is the IR distance in centimeters
-*/
+/*
+ * Uses getAdcVoltage for IR sensors and converts the value to a distance in centimeters
+ * 
+ * _returns_
+ * (double): the IR distance in centimeters, or MAX_IR_DISTANCE_CM, whichever is smallest.
+ */
 double getIrDistance();
 
   /**
