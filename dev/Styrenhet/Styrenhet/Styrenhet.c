@@ -8,8 +8,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include "UART.h"
 #include "Styrenhet.h"
+#include "../../uart/UART.h"
 
 void initPWM(){
     //PWM for LIDAR tower servo
@@ -225,7 +225,7 @@ void getDiag(){
     uint16_t servoLsbMask = 0x00FF;
     int payloadLength = 6;
     int adress = 0;
-    t_msgType sendDiag = GET_DIAG;
+    t_msgType sendDiag = MOTOR_GET_DIAG;
     
     /*
     Packet 0, 1 contains left side information
@@ -255,22 +255,22 @@ void executeFunction(t_msgType function, char* payload){
         case ECHO :
             uart_msg_transmit(&adr, &size, &function, payload);
             break;
-        case MOVE_MS :
+        case MOTOR_MOVE_MS :
             moveMSPL(payload);
             break;
-        case TURN_MS :
+        case MOTOR_TURN_MS :
             turnDirectionMSPL(payload);
             break;  
-        case SET_SIDE_SPEED:
+        case MOTOR_SET_SIDE_SPEED:
             setSpeedPL(payload);
             break;
-        case SET_SERVO_ANGLE :
+        case MOTOR_SET_SERVO_ANGLE :
             setServoAnglePL(payload);
             break;       
-        case STOP_MOTORS :
+        case MOTOR_STOP_MOTORS :
             stopMotors();
             break;
-        case GET_DIAG :
+        case MOTOR_GET_DIAG :
             getDiag(); //Sends diag. data over uart
             break;
         default:
@@ -284,7 +284,7 @@ int main(void)
     DDRA = 0xFF;	//All pins on port A as output
     DDRB = 0xFF;    //All pins on port B as output
     initPWM();
-    uart_init();
+    comm_init();
     //Set interrupts enabled
     sei();
     _delay_ms(1000);

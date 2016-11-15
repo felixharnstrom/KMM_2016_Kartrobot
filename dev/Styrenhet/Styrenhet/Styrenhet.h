@@ -5,23 +5,33 @@
  */
 #ifndef STYRENHET_H_
 #define STYRENHET_H_
+#include "../../uart/Communication.h"
 
 typedef enum{LEFT_SIDE, RIGHT_SIDE} side_t; //What side of motors are we targeting?
 typedef enum {NONE, FORWARD, BACKWARD} direction_t; //What direction are the motors running in?
 typedef enum {LEFT_TURN, RIGHT_TURN} turn_t; //What way are we turning?
 
-/************************************************************************/
-/* Initiates all the PWM connections                                    */
-/************************************************************************/
+/*
+ * Initiates all the PWM connections                                    
+ */
 void initPWM();
 
-/***************************************************************************************************/
-/* Transforms a number between 0-100 to the actual representation that is needed to set that speed */
-/***************************************************************************************************/
+/*
+ * Transforms a number between 0-100 to the actual representation that is needed to set that speed.
+ *
+ * _Parameters_
+ * (uint8_t) speedPercentage: The speed percentage between 0-100 to get the corresponding PWM setting for.
+ *
+ * _Returns_
+ * (uint8_t) The PWM setting that corresponds to the input speed percentage. 
+ */
 uint8_t getTransformSpeed(uint8_t speedPercentage);
-/************************************************************************/
-/* Delays for the given ms                                              */
-/************************************************************************/
+/*
+ * Sleep for the given milliseconds.
+ *
+ * _Parameters_
+ * (uint32_t) ms: the milliseconds to sleep
+ */
 void delay_ms(uint32_t ms);
 void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction);
 

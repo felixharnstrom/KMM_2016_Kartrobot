@@ -135,6 +135,9 @@ int msgTypeEncode(t_msgType* msgType){
         case MOTOR_STOP_MOTORS :
             return 5;
             break;
+        case MOTOR_GET_DIAG :
+            return 6;
+            break;
 		/* sensor-specific */
 		case SENSOR_READ_IR_LEFT_FRONT :
 			return 1;
@@ -187,6 +190,9 @@ t_msgType msgTypeDecode(int msgType, t_unitType unitType){
 			case 5 :
 				return MOTOR_STOP_MOTORS;
 				break;
+            case 6 :
+                return MOTOR_GET_DIAG;
+                break;
 			case 15 :
 				return DONE;
 				break;
