@@ -1,23 +1,19 @@
 import json
 import time
+from modules import*
+from communication import*
 from client import client
 robot = client()
-robot.start(12345, "192.168.43.190")
+robot.start(12345, "localhost")
 
-commands = [["MOVE_MS", {"DIRECTION" : 1, "SPEED" : 10, "TIME" : 1000}], ["MOVE_MS", {"DIRECTION" : 1, "SPEED" : 50, "TIME" : 2000}], ["MOVE_MS", {"DIRECTION" : 1, "SPEED" : 100, "TIME" : 3000}]]
+time_high, time_low = splitTime(2000)
+driveInstruction = Drive(1, 100, time_high, time_low)
+foo = ReadLeftBackIr()
 
-
-
-for command in commands:
-	data_string = json.dumps(command) #data serialized
-	robot.client.sendall("TEST".encode())
+while 1:
+	robot.client.sendall("TRANSMIT".encode())
 	data = robot.client.recv(4096).decode("utf-8")
 	if (data == "ACK"):
 		print ("GOT ACK")
-		robot.client.sendall(data_string.encode())
-	time.sleep(0.01)
-	#data = robot.client.recv(1024).decode("utf-8") 
-	#data_loaded = json.loads(data) #data loaded
-	#print (data_loaded, type(data_loaded))
-
-robot.client.sendall("KILL".encode())
+		transmit_function(foo, robot.client)
+	time.sleep(1)
