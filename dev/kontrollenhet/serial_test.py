@@ -7,6 +7,6 @@ driveInstruction = Drive(1, 2)
 uart.send_function(driveInstruction)
 
 while 1:
-	print (uart.receive_packet())
+    print (uart.receive_packet())
 
 uart.close()
