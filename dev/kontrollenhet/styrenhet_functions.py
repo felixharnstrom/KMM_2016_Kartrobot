@@ -71,6 +71,6 @@ class ControllerInformation(StyrenhetFunction):
     #1,3 contains motor PWM(M) (M/2.5 for speed percentage)
     #4,5 contains servo PWM (S) 4 being MSB, 5 LSB eg S=[4]*2^8+[5] ((S-708)/8.45 for gyro angle)
     
-    def __init__(self):
-        self.ARGUMENTS = []
-        self.LENGTH = 0
+    def __init__(self, left_dir, left_pwm, right_dir, right_pwm, servo_pwm_high, servo_pwm_low):
+        self.ARGUMENTS = [left_dir, left_pwm, right_dir, right_pwm, servo_pwm_high, servo_pwm_low]
+        self.LENGTH = 6
