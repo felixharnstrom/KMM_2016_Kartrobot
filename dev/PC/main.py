@@ -11,23 +11,37 @@ from client import client
 def transmit_command(command, socket, guit):
     """Transmits '"TRANSMIT"' followed by the respective function
     for a command, then waits for acknowledge."""
-    socket.sendall(json.dumps("TRANSMIT").encode())
+    
     if command == "forward":
+        socket.sendall(json.dumps("TRANSMIT").encode())
         transmit_function(styrenhet_functions.Drive(0, 50, 0, 0), socket)
-        guit.receive_command(["set_motors", 50, 50])
     elif command == "back":
+        socket.sendall(json.dumps("TRANSMIT").encode())
         transmit_function(styrenhet_functions.Drive(1, 50, 0, 0), socket)
-        guit.receive_command(["set_motors", 50, 50])
     elif command == "left":
+        socket.sendall(json.dumps("TRANSMIT").encode())
         transmit_function(styrenhet_functions.Turn(0, 50, 0, 0), socket)
-        guit.receive_command(["set_motors", 50, 50])
     elif command == "right":
+        socket.sendall(json.dumps("TRANSMIT").encode())
         transmit_function(styrenhet_functions.Turn(1, 50, 0, 0), socket)
-        guit.receive_command(["set_motors", 50, 50])
     elif command == "stop_motors":
+        socket.sendall(json.dumps("TRANSMIT").encode())
         transmit_function(styrenhet_functions.StopMotors(), socket)
-        guit.receive_command(["set_motors", 0, 0])
+    elif command == "get_diagnostics":
+        socket.sendall(json.dumps("GET_MOTOR_DIAG").encode())
+        ack = socket.recv(4096)
+        responsef = receive_function(socket)
+        response = responsef.ARGUMENTS
+        print(responsef.TYPE)
+        print(response)
+        left_dir = response[0]
+        left_pwm = response[1]
+        right_dir = response[2]
+        right_pwm = response[3]
+        servo_pvm = response[4]*2**8 + response[5]
+        guit.receive_command(["set_motors", left_pwm, right_pwm])
     ack = socket.recv(4096)
+
 
 def main():
     # Make sure to start a server before starting the gui.
@@ -44,7 +58,7 @@ def main():
     guit = gui.gui_thread(command_queue, response_queue)
     guit.start()
 
-    # Prevent key press from spamming
+    # Prevent key press from spamming on linux
     os.system("xset r off")
     
     time.sleep(0.2)
@@ -65,7 +79,8 @@ def main():
                 break
             else:
                 # All commands that are not used above are sent to the raspberry server.
-                transmit_command(command, robot.client, guit)
+                #transmit_command(command, robot.client, guit)
+                transmit_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
@@ -76,6 +91,7 @@ def main():
 
     # Reset settings
     os.system("xset r on")
+    
     print("exiting")
 
 if __name__ == "__main__":

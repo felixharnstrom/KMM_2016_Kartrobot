@@ -22,6 +22,7 @@ class gui_thread(threading.Thread):
         self.gui = None
 
     def key_pressed(self, event):
+        """Callback for key press."""
         button = event.keysym
         if button == "Left":
             self.send_command("left")
@@ -34,6 +35,7 @@ class gui_thread(threading.Thread):
 
 
     def key_released(self, event):
+        """Callback for key release."""
         button = event.keysym
         buttons = {"Left", "Right", "Up", "Down"}
         if button in buttons:
