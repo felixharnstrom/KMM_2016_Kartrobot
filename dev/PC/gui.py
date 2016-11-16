@@ -1,5 +1,6 @@
 import threading
 import tkinter
+import os
 
 
 class gui_thread(threading.Thread):
@@ -19,6 +20,21 @@ class gui_thread(threading.Thread):
         # Make variables accessible to the whole class
         self.queue = queue_input
         self.gui = None
+
+    def key_pressed(self, event):
+        button = event.keysym
+        if button == "Left":
+            self.send_command("left")
+        elif button == "Right":
+            self.send_command("right")
+        elif button == "Up":
+            self.send_command("forward")
+
+    def key_released(self, event):
+        button = event.keysym
+        buttons = {"Left", "Right", "Up"}
+        if button in buttons:
+            self.send_command("stop_motors")
 
     def send_command(self, mode):
         print("Command", mode, "put into queue.")
@@ -40,6 +56,15 @@ class gui_thread(threading.Thread):
         self.gui = tkinter.Tk()
         self.gui.minsize(900, 500)
         self.gui.grid()
+
+        # Bind keys
+        self.gui.bind("<Left>", self.key_pressed)
+        self.gui.bind("<Right>", self.key_pressed)
+        self.gui.bind("<Up>", self.key_pressed)
+        self.gui.bind("<KeyRelease-Left>", self.key_released)
+        self.gui.bind("<KeyRelease-Right>", self.key_released)
+        self.gui.bind("<KeyRelease-Up>", self.key_released)
+
 
         # We need to know how big our window got.
         self.gui.update()
