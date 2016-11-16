@@ -11,9 +11,9 @@ driveInstruction = Drive(1, 100, time_high, time_low)
 foo = ReadLeftBackIr()
 
 while 1:
-	robot.client.sendall("TRANSMIT".encode())
-	data = robot.client.recv(4096).decode("utf-8")
-	if (data == "ACK"):
-		print ("GOT ACK")
-		transmit_function(foo, robot.client)
-	time.sleep(1)
+    robot.client.sendall("TRANSMIT".encode())
+    data = robot.client.recv(4096).decode("utf-8")
+    if (data == "ACK"):
+        print ("GOT ACK")
+        transmit_function(foo, robot.client)
+    time.sleep(1)
