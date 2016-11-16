@@ -172,47 +172,53 @@ void turnDirectionMSPL(char* payload){
     }
 }
 
-void setSpeedPL(char* payload){
-    uint8_t sideMask = 0x01;
+void setSpeedsPL(char* payload){
     uint8_t directionMask = 0x01;
     
-    uint8_t sideValue = ((uint8_t)payload[0]) & sideMask; // Direction number mask 0000 0001
-    uint8_t directionValue = ((uint8_t)payload[1]) & directionMask; // Direction number mask 0000 0001
+    uint8_t leftDirectionValue = ((uint8_t)payload[0]) & directionMask; // Direction number mask 0000 0001
+    uint8_t leftSpeed = ((uint8_t)payload[1]);
     
-    uint8_t speed = ((uint8_t)payload[2]);
-    //Otherwise motors go cray-cray
-    if(speed > 100)
-        speed = 100;
+    uint8_t rightDirectionValue = ((uint8_t)payload[2]) & directionMask; // Direction number mask 0000 0001
+    uint8_t rightSpeed = ((uint8_t)payload[3]);
     
-    side_t side;
-    direction_t direction;
+   
+   //Otherwise motors go cray-cray
+    if(leftSpeed > 100)
+       leftSpeed = 100;
+      
+    if(rightSpeed > 100)
+       rightSpeed = 100;
+
+    direction_t leftDirection; //0 left
+    direction_t rightDirection; //1 right
     
-    switch(sideValue){
+    switch(leftDirectionValue){
         case 0:
-            side = LEFT_SIDE;
+            leftDirection = BACKWARD;
             break;
         case 1:
-            side = RIGHT_SIDE;
+            leftDirection = FORWARD;
             break;
         default:
             return;
             //Should not happen if kontrollenhet is correctly using the protocol
-        break;
-    }
-    switch(directionValue){
+    }    
+
+    
+    switch(rightDirectionValue){
         case 0:
-            direction = BACKWARD;
+            rightDirection = BACKWARD;
             break;
         case 1:
-            direction = FORWARD;
+            rightDirection = FORWARD;
             break;
         default:
             return;
             //Should not happen if kontrollenhet is correctly using the protocol
-        break;
     }
-    
-    setSpeed(side,direction,speed);
+
+    setSpeed(LEFT_SIDE,leftDirection,leftSpeed);
+    setSpeed(RIGHT_SIDE,rightDirection,rightSpeed);    
 }
 
 void setServoAnglePL(char* payload){
@@ -220,7 +226,7 @@ void setServoAnglePL(char* payload){
     setServoAngle(angle);
 }
 
-void getDiag(){
+void sendDiag(){
     uint16_t servoMsbMask = 0xFF00;
     uint16_t servoLsbMask = 0x00FF;
     int payloadLength = 6;
@@ -273,7 +279,7 @@ void executeFunction(t_msgType function, char* payload){
             turnDirectionMSPL(payload);
             break;  
         case MOTOR_SET_SIDE_SPEED:
-            setSpeedPL(payload);
+            setSpeedsPL(payload);
             break;
         case MOTOR_SET_SERVO_ANGLE :
             setServoAnglePL(payload);
@@ -282,7 +288,7 @@ void executeFunction(t_msgType function, char* payload){
             stopMotors();
             break;
         case MOTOR_GET_DIAG :
-            getDiag(); //Sends diag. data over uart
+            sendDiag(); //Sends diag. data over uart
             break;
         default:
             //Do nothing
@@ -308,7 +314,7 @@ int main(void)
         PORTA |= ~(1 << PORTA1); //Set segment PORTA1 to 0 while waiting for new uart data
         uart_msg_receive(&adr, &size, &funcEnum, payload);  
         PORTA |= (1 << PORTA1); //Set segment PORTA1 to 1 while executing received command
-		transmitAcknowledge();
+        transmitAcknowledge();
         executeFunction(funcEnum, payload);
     }
 }

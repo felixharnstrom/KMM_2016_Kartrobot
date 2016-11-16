@@ -36,7 +36,7 @@ void delay_ms(uint32_t ms);
 void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction);
 
 void stopMotors();
-void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage);
+void setSpeeds(side_t side, direction_t direction, uint8_t speedPercentage);
 void turnDirection(turn_t turn, uint8_t speedPercentage);
 void move(direction_t direction, uint8_t speedPercentage);
 /*
@@ -56,7 +56,7 @@ void setServoAnglePL(char* payload);
 If it doesn't there's a risk that the control unit will get incorrect data or get stuck in an indef. loop.
 TODO: Make this approach more robust
 */
-void getDiag();
+void sendDiag();
 
 void executeFunction(t_msgType function, char* payload);
 #endif
