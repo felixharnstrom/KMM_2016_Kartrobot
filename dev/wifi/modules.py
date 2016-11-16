@@ -40,7 +40,7 @@ def GetExecutableFunction(function_number : int, params=[]):
     elif(function_enum == Functions.STOP_MOTORS):
         return StopMotors()
     elif(function_enum == Functions.CONTROLLER_INFORMATION):
-        return ControllerInformation()
+        return ControllerInformation(params[0], params[1], params[2], params[3], params[4], params[5])
     elif(function_enum == Functions.READ_IR_LEFT_FRONT):
         return ReadLeftFrontIr()
     elif(function_enum == Functions.READ_IR_LEFT_BACK):
