@@ -58,7 +58,7 @@ def main():
 
             if command == "quit":
                 # Quit tkinter
-                gui.gui.quit()
+                guit.gui.quit()
                 # Close socket
                 robot.close()
                 # Exit the while loop
