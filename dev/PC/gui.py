@@ -29,10 +29,13 @@ class gui_thread(threading.Thread):
             self.send_command("right")
         elif button == "Up":
             self.send_command("forward")
+        elif button == "Down":
+            self.send_command("back")
+
 
     def key_released(self, event):
         button = event.keysym
-        buttons = {"Left", "Right", "Up"}
+        buttons = {"Left", "Right", "Up", "Down"}
         if button in buttons:
             self.send_command("stop_motors")
 
@@ -61,9 +64,11 @@ class gui_thread(threading.Thread):
         self.gui.bind("<Left>", self.key_pressed)
         self.gui.bind("<Right>", self.key_pressed)
         self.gui.bind("<Up>", self.key_pressed)
+        self.gui.bind("<Down>", self.key_pressed)
         self.gui.bind("<KeyRelease-Left>", self.key_released)
         self.gui.bind("<KeyRelease-Right>", self.key_released)
         self.gui.bind("<KeyRelease-Up>", self.key_released)
+        self.gui.bind("<KeyRelease-Down>", self.key_released)
 
 
         # We need to know how big our window got.

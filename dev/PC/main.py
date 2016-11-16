@@ -15,6 +15,9 @@ def transmit_command(command, socket, guit):
     if command == "forward":
         transmit_function(styrenhet_functions.Drive(0, 50, 0, 0), socket)
         guit.receive_command(["set_motors", 50, 50])
+    elif command == "back":
+        transmit_function(styrenhet_functions.Drive(1, 50, 0, 0), socket)
+        guit.receive_command(["set_motors", 50, 50])
     elif command == "left":
         transmit_function(styrenhet_functions.Turn(0, 50, 0, 0), socket)
         guit.receive_command(["set_motors", 50, 50])
