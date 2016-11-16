@@ -32,6 +32,18 @@ while 1:
         while ack[2] != 0:
             ack = uart.decode_metapacket(uart.receive_packet())
         print("done")
+
+    if (data == "GET_MOTOR_DIAG"):
+        s.client.sendall("ACK".encode())
+        func = ControllerInformation(0,0,0,0,0,0)
+        # TODO: Should properly have a seperate function type for responses
+        # For now, do this
+        func.ARGUMENTS = []
+        func.LENGTH = 0
+        uart.send_function(func)
+        ack = uart.receive_packet()
+        ret = uart.receive_function()
+        transmit_function(ret, s.client)
         
 uart.close()
 s.close()

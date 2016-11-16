@@ -1,5 +1,6 @@
 import serial
 import function
+import modules
 from bitstring import BitArray
 import time
 
@@ -61,6 +62,16 @@ class UART:
         self.send_packet(self.create_metapacket(function))
         self.send_arguments(function)
         #self.ser.flush()
+
+        
+    def receive_function(self):
+        """Receive a function."""
+        (adr, length, msg_type) = self.decode_metapacket(self.receive_packet())
+        arguments = []
+        for i in range(length):
+            arguments.append(int.from_bytes(self.receive_packet(), byteorder='big'))
+        constructed = modules.GetExecutableFunction((msg_type + adr*16), arguments)
+        return constructed
 
     def decode_metapacket(self, packet : bytes):
         """
