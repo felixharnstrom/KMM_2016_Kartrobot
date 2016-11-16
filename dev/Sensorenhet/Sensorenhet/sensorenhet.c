@@ -150,12 +150,12 @@ double readGyro() {
 }
 
 double gyroOutputToAngularRate(double gyroOutput, double bias) {
-	static const double GAIN = 1.0 / 17.0; //TODO: may require further adjustment
+	static const double GAIN = 1.0 / 119.0; //TODO: may require further adjustment
 	return (gyroOutput - bias) / GAIN;
 }
 
 double calculateBias() {
-	static const int ITERATIONS = 1000;
+	static const int ITERATIONS = 100000;
 	double sum = 0;
 	for (int i = 0; i < ITERATIONS; ++i)
 		sum += readGyro();
