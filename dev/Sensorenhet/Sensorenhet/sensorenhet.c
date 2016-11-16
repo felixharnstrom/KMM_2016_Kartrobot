@@ -65,11 +65,9 @@ double getLidarDistance() {
     return lidarCounter * c;
 }
 
-
 void waitForADConversion() {
     while(ADCSRA & (1<<ADSC));
 }
-
 
 /*
  *  Interrupt vector that's triggered when LIDAR monitor value is changed
@@ -224,20 +222,20 @@ void sendError() {
 	uart_msg_transmit(&address, &payloadSize, &msgType, NULL);
 }
 
-int msgTypeToSensor(t_msgType mst) {
+sensor_t msgTypeToSensor(t_msgType mst) {
 	switch (mst) {
 		case SENSOR_READ_IR_LEFT_FRONT:
-			return 0;
+			return IR_LEFT_FRONT;
 		case SENSOR_READ_IR_LEFT_BACK:
-			return 1;
+			return IR_LEFT_BACK;
 		case SENSOR_READ_IR_RIGHT_FRONT:
-			return 2;
+			return IR_RIGHT_FRONT;
 		case SENSOR_READ_IR_RIGHT_BACK:
-			return 3;
+			return IR_RIGHT_BACK;
 		case SENSOR_READ_IR_BACK:
-			return 4;
+			return IR_BACK;
 		case SENSOR_READ_LIDAR:
-			return 5;
+			return LIDAR;
 		default:
 			return -1;		
 	}
@@ -273,7 +271,7 @@ int main(void)
 			case SENSOR_READ_IR_RIGHT_FRONT:
 			case SENSOR_READ_IR_RIGHT_BACK:
 			case SENSOR_READ_IR_BACK:
-			case SENSOR_READ_LIDAR:; 
+			case SENSOR_READ_LIDAR:;
 				double sensorOutput = readSensor(msgTypeToSensor(msg));
 				uint16_t mmRounded = sensorOutput * 10;
 				sendReply(mmRounded);

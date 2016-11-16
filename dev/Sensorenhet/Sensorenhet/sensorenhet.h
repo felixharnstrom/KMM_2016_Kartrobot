@@ -133,9 +133,9 @@ double readSensor(sensor_t s);
  * (t_msgType) mst: the message type to convert
  *
  * _returns_
- * (int) its corresponding channel, or INV if the message type is not a valid sensor.
+ * (sensor_t) its corresponding channel, or INV if the message type is not a valid sensor.
  */
-int msgTypeToSensor(t_msgType mst);
+sensor_t msgTypeToSensor(t_msgType mst);
 
 /*
  * Transmits a DONE without payload over UART.

@@ -165,12 +165,31 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\uart\Communication.c">
+      <SubType>compile</SubType>
+      <Link>uart\Communication.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\Communication.h">
+      <SubType>compile</SubType>
+      <Link>uart\Communication.h</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.c">
+      <SubType>compile</SubType>
+      <Link>uart\UART.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.h">
+      <SubType>compile</SubType>
+      <Link>uart\UART.h</Link>
+    </Compile>
     <Compile Include="sensorenhet.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sensorenhet.h">
       <SubType>compile</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="uart" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
