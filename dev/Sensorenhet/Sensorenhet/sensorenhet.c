@@ -280,8 +280,9 @@ int main(void)
 			case SENSOR_READ_GYRO:;
 				double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
 				int16_t perHektoSecond = gyroOutput * 100;
-				uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
-				sendReply((uint16_t) perHektoSecond);
+				//uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
+                uint16_t usigned = (uint16_t) perHektoSecond;
+				sendReply(usigned);
 				break;
 				
 			default: 
