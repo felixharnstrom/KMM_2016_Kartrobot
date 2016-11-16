@@ -79,8 +79,8 @@ def main():
                 break
             else:
                 # All commands that are not used above are sent to the raspberry server.
-                #transmit_command(command, robot.client, guit)
-                transmit_command("get_diagnostics", robot.client, guit)
+                transmit_command(command, robot.client, guit)
+                #transmit_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
