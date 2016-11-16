@@ -281,7 +281,7 @@ int main(void)
 				double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
 				int16_t perHektoSecond = gyroOutput * 100;
 				uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
-				sendReply(usigned);
+				sendReply((uint16_t) perHektoSecond);
 				break;
 				
 			default: 
