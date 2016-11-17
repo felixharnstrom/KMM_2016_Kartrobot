@@ -1,9 +1,9 @@
-import modules
+from command import Command
 from sensorenhet_functions import *
 from UART import UART
 
 uart = UART("ttyUSB0")
-instr = ReadLeftFrontIr()
+instr = Command.read_left_front_ir()
 
 
 while True:

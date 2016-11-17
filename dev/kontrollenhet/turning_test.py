@@ -1,10 +1,10 @@
-import modules
+from command import Command
 import time
 from sensorenhet_functions import *
 from UART import UART
 
 uart = UART("ttyUSB0")
-instr = ReadGyro()
+instr = Command.read_gyro()
 
 angle = 0
 clk = time.time()
