@@ -1,14 +1,15 @@
 import serial
+import function
 import modules
 from bitstring import BitArray
+import time
 
 class UART:
     def __init__(self, port : str):
         self.port = port
         self.ser = serial.Serial('/dev/'+port, 9600)  # open serial port
 
-
-    def create_metapacket_hex(self, function : modules.Function):
+    def create_metapacket_hex(self, function : function.Function):
         """
         Create a hex packet consisting of adress, length and type
 
@@ -17,7 +18,7 @@ class UART:
         """
         return '{:02X}'.format(function.ADRESS*(2**7)+function.LENGTH*(2**4)+function.TYPE)
 
-    def create_metapacket(self, function : modules.Function):
+    def create_metapacket(self, function : function.Function):
         """
         Create a byte-sized packet consisting of adress, length and type
 
@@ -26,14 +27,14 @@ class UART:
         """
         return bytes.fromhex(self.create_metapacket_hex(function))
 
-    def send_arguments(self, function : modules.Function):
+    def send_arguments(self, function : function.Function):
         """
         Loops through all arguments and sends them (in the order specified in the functions arguments dictionary)
 
         :function: The function of which to send the arguments.
         """
         for value in function.ARGUMENTS:
-            self.send_packet(bytes.fromhex('{:02X}'.format(function.ARGUMENTS[value])))
+            self.send_packet(bytes.fromhex('{:02X}'.format(value)))
 
     def send_packet(self, packet : bytes):
         """
@@ -42,7 +43,8 @@ class UART:
         :packet: The packet to send
         """
         # Debug print
-        # print(int.from_bytes(packet,byteorder = 'big'))
+        #print(int.from_bytes(packet,byteorder = 'big'))
+        time.sleep(0.1)
         return self.ser.write(packet)
 
     def receive_packet(self):
@@ -51,7 +53,7 @@ class UART:
         """
         return self.ser.read()
 
-    def send_function(self, function : modules.Function):
+    def send_function(self, function : function.Function):
         """
         Sends a function command including arguments
 
@@ -59,6 +61,17 @@ class UART:
         """
         self.send_packet(self.create_metapacket(function))
         self.send_arguments(function)
+        #self.ser.flush()
+
+        
+    def receive_function(self):
+        """Receive a function."""
+        (adr, length, msg_type) = self.decode_metapacket(self.receive_packet())
+        arguments = []
+        for i in range(length):
+            arguments.append(int.from_bytes(self.receive_packet(), byteorder='big'))
+        constructed = modules.GetExecutableFunction((msg_type + adr*16), arguments)
+        return constructed
 
     def decode_metapacket(self, packet : bytes):
         """

@@ -176,6 +176,27 @@ TSWLatexianTemp*
 # KBibTeX
 *~[0-9]*
 
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*~
+_autosave-*
+*.tmp
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+.dsn
+
+# Exported BOM files
+*.xml
+*.csv
+
 ##C:
 # Prerequisites
 *.d
@@ -236,3 +257,6 @@ dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h
 !*.cproj
+
+# Python
+__pycache__
