@@ -1,22 +1,21 @@
-from modules import *
-from function import *
+from command import *
 import socket
 import json
 
-def construct_msg(function : Function):
-    return json.dumps([function.ADRESS, function.TYPE, function.ARGUMENTS])
+def constructMsg(command : Command):
+    return json.dumps([command.address, command.command_type, command.arguments])
 
-def construct_function(msg : list):
+def constructCommand(msg : list):
     address = msg[0]
     msg_type = msg[1]
     args = msg[2]
-    return GetExecutableFunction((msg_type + address*16), args)
+    return getExecutableCommand(msg_type + (address * 16), args)
 
-def transmit_function(function : Function, socket : socket):
-    json_msg = construct_msg(function)
+def transmitCommand(command : Command, socket : socket):
+    json_msg = constructMsg(command)
     socket.sendall(json_msg.encode())
 
-def receive_function(socket : socket):
+def receiveCommand(socket : socket):
     data = socket.recv(4096).decode("utf-8")
     json_msg = json.loads(data)
-    return construct_function(json_msg)
+    return constructCommand(json_msg)
