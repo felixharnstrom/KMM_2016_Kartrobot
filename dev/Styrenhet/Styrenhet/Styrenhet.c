@@ -3,7 +3,7 @@
 *
 *  Author: danma344
 */
-#define F_CPU 8000000UL	//8MHz
+#define F_CPU 8000000UL    //8MHz
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -15,7 +15,7 @@ void initPWM(){
     //PWM for LIDAR tower servo
     TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
     TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
-    OCR3A = 20000;	//Corresponds to 50Hz
+    OCR3A = 20000;    //Corresponds to 50Hz
     OCR3B = 708; //The start value for the duty cycle
     
     //Robot left side
@@ -235,11 +235,11 @@ void sendDiag(){
     
     /*
     Packet 0, 1 contains left side information
-	Packet 2, 3 contains right side information
-	0,2 contains motor direction, 0=backward, 1=forward
-	1,3 contains motor PWM(M) (M/2.5 for speed percentage)
-	4,5 contains servo PWM (S) 4 being MSB, 5 LSB eg S=[4]*2^8+[5] ((S-708)/8.45 for gyro angle)
-	*/
+    Packet 2, 3 contains right side information
+    0,2 contains motor direction, 0=backward, 1=forward
+    1,3 contains motor PWM(M) (M/2.5 for speed percentage)
+    4,5 contains servo PWM (S) 4 being MSB, 5 LSB eg S=[4]*2^8+[5] ((S-708)/8.45 for gyro angle)
+    */
     uint8_t leftSideDirection = (PORTB & (1 << PINB6)) != 0;
     uint8_t leftSidePWM = OCR0B;
     
@@ -258,11 +258,11 @@ void sendDiag(){
  * Transmit an ACK message over UART without payload.
  */
 void transmitAcknowledge() {
-	int adr = 0;
-	int size = 0;
-	t_msgType type = ACK;
-	char payload;
-	uart_msg_transmit(&adr, &size, &type, &payload);
+    int adr = 0;
+    int size = 0;
+    t_msgType type = ACK;
+    char payload;
+    uart_msg_transmit(&adr, &size, &type, &payload);
 }
 
 void executeFunction(t_msgType function, char* payload){
@@ -298,7 +298,7 @@ void executeFunction(t_msgType function, char* payload){
 
 int main(void)
 {
-    DDRA = 0xFF;	//All pins on port A as output
+    DDRA = 0xFF;    //All pins on port A as output
     DDRB = 0xFF;    //All pins on port B as output
     initPWM();
     comm_init();
