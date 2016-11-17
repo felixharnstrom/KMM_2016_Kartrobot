@@ -33,7 +33,7 @@ while 1:
     """
     if (data == "GET_MOTOR_DIAG"):
         s.client.sendall("ACK".encode())
-        func = Command.ControllerInformation()
+        func = Command.controllerInformation()
         # TODO: Should properly have a seperate function type for responses
         # For now, do this
         func.ARGUMENTS = []
