@@ -2,32 +2,33 @@ import queue
 import gui
 import time
 import json
+import os
 from command import Command
 from communication import *
 from client import client
 
 
-def transmit_command(command, socket, guit):
-    """Transmits '"TRANSMIT"' followed by the respective function
+def send_command(command, socket, guit):
+    """Transmits 'TRANSMIT' followed by the respective function
     for a command, then waits for acknowledge."""
     
     if command == "forward":
-        socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_command(Command.drive(0, 50, 1000), socket)
+        socket.sendall("TRANSMIT".encode())
+        transmit_command(Command.drive(0, 50, 0), socket)
     elif command == "back":
-        socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_command(Command.drive(1, 50, 1000), socket)
+        socket.sendall("TRANSMIT".encode())
+        transmit_command(Command.drive(1, 50, 0), socket)
     elif command == "left":
-        socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_command(Command.turn(0, 50, 1000), socket)
+        socket.sendall("TRANSMIT".encode())
+        transmit_command(Command.turn(0, 50, 0), socket)
     elif command == "right":
-        socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_command(Command.turn(1, 50, 1000), socket)
+        socket.sendall("TRANSMIT".encode())
+        transmit_command(Command.turn(1, 50, 0), socket)
     elif command == "stop_motors":
-        socket.sendall(json.dumps("TRANSMIT").encode())
+        socket.sendall("TRANSMIT".encode())
         transmit_command(Command.stop_motors(), socket)
     elif command == "get_diagnostics":
-        socket.sendall(json.dumps("GET_MOTOR_DIAG").encode())
+        socket.sendall("GET_MOTOR_DIAG".encode())
         ack = socket.recv(4096)
         responsef = receive_command(socket)
         response = responsef.ARGUMENTS
@@ -78,8 +79,8 @@ def main():
                 break
             else:
                 # All commands that are not used above are sent to the raspberry server.
-                transmit_command(command, robot.client, guit)
-                #transmit_command("get_diagnostics", robot.client, guit)
+                send_command(command, robot.client, guit)
+                #send_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
