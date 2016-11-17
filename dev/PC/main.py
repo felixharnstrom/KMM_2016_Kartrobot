@@ -10,22 +10,29 @@ from client import client
 
 def send_command(command, socket, guit):
     """Transmits 'TRANSMIT' followed by the respective function
-    for a command, then waits for acknowledge."""
+    for a command, then waits for acknowledge.
+
+    "command" are the strings from the gui thread."""
     
     if command == "forward":
         socket.sendall("TRANSMIT".encode())
+        ack = socket.recv(4096)
         transmit_command(Command.drive(0, 50, 0), socket)
     elif command == "back":
         socket.sendall("TRANSMIT".encode())
+        ack = socket.recv(4096)
         transmit_command(Command.drive(1, 50, 0), socket)
     elif command == "left":
         socket.sendall("TRANSMIT".encode())
+        ack = socket.recv(4096)
         transmit_command(Command.turn(0, 50, 0), socket)
     elif command == "right":
         socket.sendall("TRANSMIT".encode())
+        ack = socket.recv(4096)
         transmit_command(Command.turn(1, 50, 0), socket)
     elif command == "stop_motors":
         socket.sendall("TRANSMIT".encode())
+        ack = socket.recv(4096)
         transmit_command(Command.stop_motors(), socket)
     elif command == "get_diagnostics":
         socket.sendall("GET_MOTOR_DIAG".encode())
@@ -40,7 +47,7 @@ def send_command(command, socket, guit):
         right_pwm = response[3]
         servo_pvm = response[4]*2**8 + response[5]
         guit.receive_command(["set_motors", left_pwm, right_pwm])
-    ack = socket.recv(4096)
+
 
 
 def main():
@@ -80,6 +87,8 @@ def main():
             else:
                 # All commands that are not used above are sent to the raspberry server.
                 send_command(command, robot.client, guit)
+                # TODO: We should send diagnostics to update settings
+                # We may need a wait inbetween
                 #send_command("get_diagnostics", robot.client, guit)
 
 
