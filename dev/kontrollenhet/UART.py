@@ -24,7 +24,7 @@ class UART:
         :command: The command to create the metapacket from.
         :return: a package of the command's metadata in form of a single byte
         """
-        return bytes.fromhex(self.create_metapacket_hex(comamnd))
+        return bytes.fromhex(self.create_metapacket_hex(command))
 
     def send_arguments(self, command : Command):
         """
@@ -69,7 +69,7 @@ class UART:
         arguments = []
         for i in range(length):
             arguments.append(int.from_bytes(self.receive_packet(), byteorder='big'))
-        constructed = GetExecutableCommand((msg_type + adr*16), arguments)
+        constructed = get_executable_command((msg_type + adr*16), arguments)
         return constructed
 
     def decode_metapacket(self, packet : bytes):
@@ -79,7 +79,7 @@ class UART:
         :packet: The packet to decode
         :return: tuple with (adress, length, type)
         """
-        binary_packet = BitArray(uint=int.from_bytes(packet, byteorder='big', signed=False),  length=8)
+        binary_packet = BitArray(uint=int.from_bytes(packet, byteorder='big', signed=False), length=8)
         return (int(binary_packet.bin[0], 2), int(binary_packet.bin[1:4], 2), int(binary_packet.bin[4:], 2))
 
     def close(self):

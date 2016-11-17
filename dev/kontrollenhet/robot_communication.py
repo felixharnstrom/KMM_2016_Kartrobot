@@ -21,7 +21,7 @@ while 1:
         # Acknowledge client
         s.client.sendall("ACK".encode())
         # Receive function
-        command = receiveCommand(s.client)
+        command = receive_command(s.client)
         print (type(command))
         print (command.address, len(command.arguments), command.command_type, command.arguments)
         # Send over uart
