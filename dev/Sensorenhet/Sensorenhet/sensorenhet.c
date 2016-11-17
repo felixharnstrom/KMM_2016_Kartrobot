@@ -150,7 +150,7 @@ double readGyro() {
 }
 
 double gyroOutputToAngularRate(double gyroOutput, double bias) {
-    static const double GAIN = 1.23 / 119.0; //TODO: may require further adjustment
+    static const double GAIN = 1.0 / (119.0 * 1.23); //TODO: may require further adjustment
     return (gyroOutput - bias) / GAIN;
 }
 
