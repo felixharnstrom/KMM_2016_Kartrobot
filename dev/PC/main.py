@@ -3,7 +3,6 @@ import gui
 import time
 import json
 from command import Command
-import styrenhet_functions
 from communication import *
 from client import client
 
