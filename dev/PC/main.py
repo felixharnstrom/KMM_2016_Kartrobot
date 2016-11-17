@@ -2,7 +2,7 @@ import queue
 import gui
 import time
 import json
-import os
+from command import Command
 import styrenhet_functions
 from communication import *
 from client import client
@@ -14,23 +14,23 @@ def transmit_command(command, socket, guit):
     
     if command == "forward":
         socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_function(styrenhet_functions.Drive(0, 50, 0, 0), socket)
+        transmit_command(Command.drive(0, 50, 1000), socket)
     elif command == "back":
         socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_function(styrenhet_functions.Drive(1, 50, 0, 0), socket)
+        transmit_command(Command.drive(1, 50, 1000), socket)
     elif command == "left":
         socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_function(styrenhet_functions.Turn(0, 50, 0, 0), socket)
+        transmit_command(Command.turn(0, 50, 1000), socket)
     elif command == "right":
         socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_function(styrenhet_functions.Turn(1, 50, 0, 0), socket)
+        transmit_command(Command.turn(1, 50, 1000), socket)
     elif command == "stop_motors":
         socket.sendall(json.dumps("TRANSMIT").encode())
-        transmit_function(styrenhet_functions.StopMotors(), socket)
+        transmit_command(Command.stop_motors(), socket)
     elif command == "get_diagnostics":
         socket.sendall(json.dumps("GET_MOTOR_DIAG").encode())
         ack = socket.recv(4096)
-        responsef = receive_function(socket)
+        responsef = receive_command(socket)
         response = responsef.ARGUMENTS
         print(responsef.TYPE)
         print(response)
