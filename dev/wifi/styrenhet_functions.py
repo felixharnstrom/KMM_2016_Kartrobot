@@ -32,17 +32,18 @@ class Turn(StyrenhetFunction):
         self.LENGTH = len(self.ARGUMENTS)
 
 
-class SideSpeed(StyrenhetFunction):
+class SideSpeeds(StyrenhetFunction):
     TYPE = 3
     #0 left, 1 right
     #0 backward, 1 forward
     #0 - 100
 
-    def __init__(self, side : int, direction : int, speed : int):
+    def __init__(self, leftDirection : int, leftSpeed: int, rightDirection : int, rightSpeed : int):
         self.ARGUMENTS = []
-        self.ARGUMENTS.append(side)
-        self.ARGUMENTS.append(direction)
-        self.ARGUMENTS.append(speed)
+        self.ARGUMENTS.append(leftDirection) #0 backward, 1 forward
+        self.ARGUMENTS.append(leftSpeed) #0 - 100
+        self.ARGUMENTS.append(rightDirection)
+        self.ARGUMENTS.append(rightSpeed)
         self.LENGTH = len(self.ARGUMENTS)
     
 

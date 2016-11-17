@@ -5,7 +5,7 @@ import numpy as np
 class Functions(Enum):
     DRIVE = 1
     TURN = 2
-    SIDE_SPEED = 3
+    SIDE_SPEEDS = 3
     SERVO = 4
     STOP_MOTORS = 5
     CONTROLLER_INFORMATION = 6
@@ -33,14 +33,14 @@ def GetExecutableFunction(function_number : int, params=[]):
         return Drive(params[0], params[1], params[2], params[3])
     elif(function_enum == Functions.TURN):
         return Turn(params[0], params[1], params[2], params[3])
-    elif(function_enum == Functions.SIDE_SPEED):
-        return SideSpeed(params[0], params[1], params[2])
+    elif(function_enum == Functions.SIDE_SPEEDS):
+        return SideSpeeds(params[0], params[1], params[2], params[3])
     elif(function_enum == Functions.SERVO):
         return Servo(params[0])
     elif(function_enum == Functions.STOP_MOTORS):
         return StopMotors()
     elif(function_enum == Functions.CONTROLLER_INFORMATION):
-        return ControllerInformation(params[0], params[1], params[2], params[3], params[4], params[5])
+        return ControllerInformation(params[0], params[1], params[2], params[3], params[4], params[5]) #Why would this one require parameters when we don't send anything?
     elif(function_enum == Functions.READ_IR_LEFT_FRONT):
         return ReadLeftFrontIr()
     elif(function_enum == Functions.READ_IR_LEFT_BACK):
