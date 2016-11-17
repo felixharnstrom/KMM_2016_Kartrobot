@@ -181,8 +181,7 @@ void setSpeedsPL(char* payload){
     uint8_t rightDirectionValue = ((uint8_t)payload[2]) & directionMask; // Direction number mask 0000 0001
     uint8_t rightSpeed = ((uint8_t)payload[3]);
     
-   
-   //Otherwise motors go cray-cray
+    //Otherwise motors go cray-cray
     if(leftSpeed > 100)
        leftSpeed = 100;
       
@@ -204,7 +203,6 @@ void setSpeedsPL(char* payload){
             //Should not happen if kontrollenhet is correctly using the protocol
     }    
 
-    
     switch(rightDirectionValue){
         case 0:
             rightDirection = BACKWARD;
@@ -254,9 +252,6 @@ void sendDiag(){
     uart_msg_transmit(&adress, &payloadLength, &sendDiag, payload); //TODO: Different msgType as this is a response?
 }
 
-/*
- * Transmit an ACK message over UART without payload.
- */
 void transmitAcknowledge() {
     int adr = 0;
     int size = 0;
