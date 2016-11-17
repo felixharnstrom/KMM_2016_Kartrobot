@@ -14,7 +14,8 @@ s.connect()
 
 while 1:
     # The messages are made with json which appends extra "" - cut them off
-    data = s.client.recv(4096).decode("utf-8")[1:-1].upper()
+    data = s.client.recv(4096).decode("utf-8")
+    print (data)
     
     if (data == "TRANSMIT"):
         # Acknowledge client
