@@ -49,6 +49,10 @@ class Command():
         return Command(Command_enums.STOP_MOTORS)
 
     @staticmethod
+    def controllerInformation():
+        return Command(Command_enums.CONTROLLER_INFORMATION)
+
+    @staticmethod
     def readLeftFrontIr():
         return Command(Command_enums.READ_IR_LEFT_FRONT)
 
