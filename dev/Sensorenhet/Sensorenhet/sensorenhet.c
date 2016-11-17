@@ -150,16 +150,16 @@ double readGyro() {
 }
 
 double gyroOutputToAngularRate(double gyroOutput, double bias) {
-    static const double GAIN = 1.0 / 119.0; //TODO: may require further adjustment
+    static const double GAIN = 1.23 / 119.0; //TODO: may require further adjustment
     return (gyroOutput - bias) / GAIN;
 }
 
 double calculateBias() {
-    static const int ITERATIONS = 100000;
+    static const int ITERATIONS = 10000;
     double sum = 0;
     for (int i = 0; i < ITERATIONS; ++i)
         sum += readGyro();
-    return sum / ((double) ITERATIONS);
+    return sum / ((double)ITERATIONS);
 }
 
 
@@ -248,6 +248,8 @@ int main(void)
     initLidar();
     initAdc();
     
+    _delay_ms(500);
+    
     double bias = calculateBias();
     
     while(1) {
@@ -280,9 +282,8 @@ int main(void)
             case SENSOR_READ_GYRO:;
                 double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
                 int16_t perHektoSecond = gyroOutput * 100;
-                //uint16_t usigned = *(uint16_t*)&perHektoSecond; // Interpret the same bit pattern as uint16
                 uint16_t usigned = (uint16_t) perHektoSecond;
-                sendReply(usigned);
+                sendReply(perHektoSecond);
                 break;
                 
             default: 
