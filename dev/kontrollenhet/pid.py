@@ -3,20 +3,21 @@ import time
 
 class Pid():
 
-    time_last = None
-    input_data = 0
-    output_data = 0
-    setpoint = 0
+    time_last = None        # Time since last compute()
+    input_data = 0          # Input
+    output_data = 0         # Output
+    setpoint = 0            # Value we're aiming for
     i_term = 0              # Integration term
-    last_input = 0
-    kp = 0
-    ki = 0
-    kd = 0
+    last_input = 0          # Last input value
+    kp = 0                  # Proportional tuning parameter
+    ki = 0                  # Integration tuning parameter
+    kd = 0                  # Derivative tuning parameter
     sample_time = 1000      # 1 sec
-    automatic_mode = False
-    min_out = 0
-    max_out = 0
+    automatic_mode = False  # True = PID on, False = PID off
+    min_out = 0             # Will clamp output to at least this value
+    max_out = 0             # Will clamp output to at most this value
 
+    # CONSTANTS
     MANUAL = 0
     AUTOMATIC = 1
 
@@ -27,6 +28,7 @@ class Pid():
         if (not self.automatic_mode):
             return
 
+        # Calculate time diff
         time_now = datetime.now()
         diff = time_now - self.time_last
         time_change = diff.microseconds / 1000      # Time diff in millis
