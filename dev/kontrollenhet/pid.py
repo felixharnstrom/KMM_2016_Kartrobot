@@ -87,10 +87,10 @@ class Pid():
         new_mode = (mode == self.AUTOMATIC)
         if (new_mode and not self.automatic_mode):
             # From manual to auto
-            self.initalize()
+            self.initialize()
         self.automatic_mode = new_mode
 
-    def initalize(self):
+    def initialize(self):
         self.last_input = self.input_data
         self.i_term = self.output_data
 
