@@ -71,7 +71,7 @@ class UART:
         constructed = get_executable_command((msg_type + adr*16), arguments)
         return constructed
 
-    def receive_packets(self):
+    def receive_payload(self):
         """Receive packets as a list of integers"""
         (adr, length, msg_type) = self.decode_metapacket(self.receive_packet())
         arguments = []
