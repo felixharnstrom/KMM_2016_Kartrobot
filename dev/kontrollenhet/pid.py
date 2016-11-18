@@ -1,8 +1,9 @@
-import datetime
+from datetime import datetime
+import time
 
 class Pid():
 
-    time_last = 0
+    time_last = None
     input_data = 0
     output_data = 0
     setpoint = 0
@@ -12,13 +13,18 @@ class Pid():
     ki = 0
     kd = 0
 
-    def compute(self):
-        time_now = (datetime.now().microsecond()) * 1000    # current time in millis
-        time_change = time_now - self.time_last
+    def __init__(self):
+        self.time_last = datetime.now()
 
-        error = self.setpoint - self.input_data               # Proportional
-        self.err_sum += (error * time_change)            # Integral
-        err_d = (error - last_err) / time_change    # Derivative
+    def compute(self):
+        time_now = datetime.now()
+        diff = time_now - self.time_last
+        time_change = diff.microseconds / 1000
+        print (time_change)
+
+        error = self.setpoint - self.input_data             # Proportional
+        self.err_sum += (error * time_change)               # Integral
+        err_d = (error - self.last_err) / time_change       # Derivative
 
         self.output_data = (self.kp * error) + (self.ki * self.err_sum) + (self.kd * err_d)
 
