@@ -2,6 +2,7 @@ import numpy as np
 from enum import Enum
 
 class CommandEnums(Enum):
+    ACK = 0
     DRIVE = 1
     TURN = 2
     SIDE_SPEEDS = 3
@@ -26,6 +27,10 @@ class Command():
         self.command_type = command_type.value - (self.address * 16)
         self.arguments = arguments
 
+    @staticmethod
+    def ack()
+        return Command(CommandEnums.ACK)
+        
     @staticmethod
     def drive(direction : int, speed : int, time : int):
         time1, time2 = split_time(time)

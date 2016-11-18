@@ -16,6 +16,10 @@ s.connect()
 motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_DIRECTION":0,"LEFT_SIDE_SPEED":0,"RIGHT_SIDE_DIRECTION":0,"RIGHT_SIDE_SPEED":0,"SERVO_ANGLE":0}
 sensor_data = {"IR_LEFT_FRONT":0,"IR_LEFT_BACK":0,"IR_RIGHT_FRONT":0,"IR_RIGHT_BACK","IR_BACK":0,"IR_LIDAR":0,"GYRO":0}
 
+def send_ack():
+    ack = Command.ack() #Create ack command
+    UART.send_command(ack) #Send it over uart
+
 #If someone finds a better way, please change this.
 def get_sensor_dict_key(c_enum : CommandEnums):
     if(c_enum == CommandEnums.READ_IR_LEFT_FRONT):
@@ -34,13 +38,31 @@ def get_sensor_dict_key(c_enum : CommandEnums):
         return "GYRO"
     else:
         return False
+        
 #Reads IR-sensor and sets corresponding sensor_data key.
 def read_ir_sensor(command : Command):
     c_enum = command.get_enum()
     UART.send_command(command)
     ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
-    (ir_value) = UART.receive_payload()
+    (ir_value_msb, ir_value_lsb) = UART.receive_payload()
+    send_ack()
+    ir_value = ir_value_msb*(2**8)+ir_value_lsb
     sensor_data[get_sensor_dict_key(c_enum)] = ir_value
+    return
+    
+def read_gyro_sensor(command : Command):
+    UART.send_command(command)
+    ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    (gyro_value_msb, gyro_value_lsb) = UART.receive_payload()
+    send_ack()
+    #We need to cast it to signed int 16 bit (due to being a gyro)
+    gyro_value = gyro_value_msb*(2**8)+gyro_value_lsb
+    if(gyro_value > 0x7fff):
+        gyro_value -= 65536 #0x7000
+    sensor_data["GYRO"] = gyro_value
+    return
+    
+    
 
 #Send command to controller to retrieve and return motor data
 def get_motor_diagnostics(command : Command):
@@ -70,9 +92,10 @@ def handle_command(command : Command):
             c_enum == CommandEnums.READ_IR_LEFT_BACK or
             c_enum == CommandEnums.READ_IR_RIGHT_FRONT or
             c_enum == CommandEnums.READ_IR_RIGHT_BACK or
-            c_enum == CommandEnums.READ_IR_BACK):
+            c_enum == CommandEnums.READ_IR_BACK or
+            c_enum == CommandEnums.READ_IR_LIDAR):
         read_ir_sensor(command)  
-    elif(c_enum == CommandEnums.READ_IR_LIDAR):
+    elif:
     
     elif(c_enum == CommandEnums.READ_GYRO):
     
