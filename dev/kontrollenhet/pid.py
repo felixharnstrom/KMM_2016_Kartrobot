@@ -1,5 +1,4 @@
 from datetime import datetime
-import time
 
 class Pid():
 
@@ -54,7 +53,7 @@ class Pid():
             elif (self.output_data < self.min_out):
                 self.output_data = self.min_out
 
-            self.last_input = input_data
+            self.last_input = self.input_data
             self.time_last = time_now
 
     def set_tunings(self, p : float, i: float, d : float):
