@@ -14,13 +14,12 @@ class Pid():
     kd = 0
 
     def __init__(self):
-        self.time_last = datetime.now()
+        self.time_last = datetime.now()     # Need this to calculate the first time diff in compute()
 
     def compute(self):
         time_now = datetime.now()
         diff = time_now - self.time_last
-        time_change = diff.microseconds / 1000
-        print (time_change)
+        time_change = diff.microseconds / 1000              # Time diff in millis
 
         error = self.setpoint - self.input_data             # Proportional
         self.err_sum += (error * time_change)               # Integral
