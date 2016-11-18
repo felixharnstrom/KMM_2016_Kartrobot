@@ -7,7 +7,7 @@ class Pid():
     input_data = 0
     output_data = 0
     setpoint = 0
-    err_sum = 0
+    i_term = 0 # integration term
     last_input = 0
     kp = 0
     ki = 0
@@ -26,10 +26,10 @@ class Pid():
 
         # Error variables
         error = self.setpoint - self.input_data
-        self.err_sum += error
+        self.i_term += (self.ki * error)        # Removes output bump when changing tuning parameters on the fly
         d_input = (self.input_data - self.last_input)
 
-        self.output_data = (self.kp * error) + (self.ki * self.err_sum) - (self.kd * d_input)
+        self.output_data = (self.kp * error) + self.i_term - (self.kd * d_input)
 
         self.last_input = input_data
         self.time_last = time_now
@@ -40,7 +40,7 @@ class Pid():
         self.ki = i * sample_time_in_sec
         self.kd = d / sample_time_in_sec
 
-    def SetSampleTime(new_sample_time : int):
+    def set_sample_time(new_sample_time : int):
         ratio  = new_sample_time / self.sample_time
         ki *= ratio
         kd /= ratio
