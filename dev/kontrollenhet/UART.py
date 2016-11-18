@@ -62,15 +62,22 @@ class UART:
         self.send_arguments(command)
         #self.ser.flush()
 
-        
     def receive_command(self):
         """Receive a command."""
-        (adr, length, msg_type) = self.decode_metapacket(self.receive_command())
+        (adr, length, msg_type) = self.decode_metapacket(self.receive_packet())
         arguments = []
         for i in range(length):
             arguments.append(int.from_bytes(self.receive_packet(), byteorder='big'))
         constructed = get_executable_command((msg_type + adr*16), arguments)
         return constructed
+
+    def receive_packets(self):
+        """Receive packets as a list of integers"""
+        (adr, length, msg_type) = self.decode_metapacket(self.receive_packet())
+        arguments = []
+        for i in range(length):
+            arguments.append(int.from_bytes(self.receive_packet(), byteorder='big'))
+        return arguments   
 
     def decode_metapacket(self, packet : bytes):
         """
