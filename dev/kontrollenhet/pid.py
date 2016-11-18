@@ -33,7 +33,6 @@ class Pid():
         time_change = diff.microseconds / 1000      # Time diff in millis
         if (time_change >= self.sample_time):
 
-
             # Error variables
             error = self.setpoint - self.input_data
             self.i_term += (self.ki * error)            # Removes output bump when changing tuning parameters on the fly
@@ -69,7 +68,6 @@ class Pid():
         self.sample_time = new_sample_time
 
     def set_output_limits(self, min_out : float, max_out : float):
-
         self.min_out = min_out
         self.max_out = max_out
 
