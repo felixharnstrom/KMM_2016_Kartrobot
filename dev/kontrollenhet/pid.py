@@ -13,11 +13,18 @@ class Pid():
     ki = 0
     kd = 0
     sample_time = 1000      # 1 sec
+    automatic_mode = False
+
+    MANUAL = 0
+    AUTOMATIC = 1
 
     def __init__(self):
         self.time_last = datetime.now()     # Need this to calculate the first time diff in compute()
 
     def compute(self):
+        if (!automatic_mode):
+            return
+
         time_now = datetime.now()
         diff = time_now - self.time_last
         time_change = diff.microseconds / 1000      # Time diff in millis
@@ -71,3 +78,6 @@ class Pid():
             self.i_term = max_out
         elif (self.i_term < min_out):
             self.i_term = min_out
+
+    def set_mode(self, mode : int):
+        self.automatic_mode = (mode == self.AUTOMATIC)
