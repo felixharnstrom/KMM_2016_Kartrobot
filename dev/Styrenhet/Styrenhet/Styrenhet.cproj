@@ -111,13 +111,26 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\uart\Communication.c">
+      <SubType>compile</SubType>
+      <Link>Communication.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\Communication.h">
+      <SubType>compile</SubType>
+      <Link>Communication.h</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.c">
+      <SubType>compile</SubType>
+      <Link>UART.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.h">
+      <SubType>compile</SubType>
+      <Link>UART.h</Link>
+    </Compile>
     <Compile Include="Styrenhet.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="UART.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="UART.h">
+    <Compile Include="Styrenhet.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
