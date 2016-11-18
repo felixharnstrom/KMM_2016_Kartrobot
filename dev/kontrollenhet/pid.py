@@ -80,4 +80,18 @@ class Pid():
             self.i_term = min_out
 
     def set_mode(self, mode : int):
-        self.automatic_mode = (mode == self.AUTOMATIC)
+        new_mode = (mode == self.AUTOMATIC)
+        if (new_mode && !self.automatic_mode):
+            # From manual to auto
+            self.initalize()
+        self.automatic_mode = new_mode
+
+    def initalize(self):
+        self.last_input = self.input_data
+        self.i_term = self.output_data
+
+        # Clamping the integration term to min/max values, to avoid this growing even when output is limited
+        if (self.i_term > max_out):
+            self.i_term = max_out
+        elif (self.i_term < min_out):
+            self.i_term = min_out
