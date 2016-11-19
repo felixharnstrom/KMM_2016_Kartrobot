@@ -13,7 +13,7 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 
 grid = []
 
-# Constants for howe accurate this system should be
+# Constants for how accurate this system should be
 GRID_SIZE = 400     # What si the Grid size
 POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be devided
 MIN_MESURE = 1      # How many messurments should be in every like section
