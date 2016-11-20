@@ -3,7 +3,7 @@ from command import Command
 from UART import UART
 import time
 import math
-import atexit
+import timeit
 
 # Return a sensor value
 def read_sensor(sensor_instr : Command):
@@ -28,44 +28,40 @@ def mean_sensor(it : int, sensor_instr : Command):
 
 def drive(ratio : int, base_speed : int):
     uart_styrenhet = UART("tty.usbserial-FT94S3SE")
-
-    if (ratio < 0):
-        print("LEFT")
-        left_speed = base_speed * ((90 - (ratio * (-1))) / 100)
-        right_speed = base_speed
-
-    elif (ratio > 0):
-        print("RIGHT")
-        left_speed = base_speed
-        right_speed = base_speed * ((90 - ratio) / 100)
-        
-    else:
-        right_speed = base_speed
-        left_speed = base_speed
+    print ("RATIO: ", ratio)
+    left_speed = base_speed / ratio
+    right_speed = base_speed * ratio
     
-    print("LEFT: ", left_speed)
-    print("RIGHT: ", right_speed)
+    print("LEFT: ", round(left_speed))
+    print("RIGHT: ", round(right_speed))
     drive_instr = Command.side_speeds(1, round(right_speed), 1, round(left_speed))
     uart_styrenhet.send_command(drive_instr)
 
 
 controller = Pid() 
-controller.setpoint = 100
+controller.setpoint = 80
 controller.output_data = 0
-controller.set_tunings(2,0.1,0.1)
-controller.set_sample_time(100)
-controller.set_output_limits(-90,90)
+controller.set_tunings(1.5,5,10)
+controller.set_sample_time(160)
+controller.set_output_limits(75,125)
 controller.set_mode(1)
+
 uart_styrenhet = UART("tty.usbserial-FT94S3SE")
 
 while 1:
-    ir_left_front = mean_sensor(10, Command.read_left_back_ir())
-    ir_left_back = mean_sensor(10, Command.read_left_front_ir())
+    # Get sensor values
+    ir_right_back = mean_sensor(5, Command.read_right_back_ir())
+    ir_right_front = mean_sensor(5, Command.read_right_front_ir())
 
-    dist = (ir_left_front + ir_left_back) / 2
-    error = dist - controller.setpoint
-    print ("ERROR: ", error)
-    controller.input_data = error
+    # We need to get the distance from the center of the robot perpendicular to the wall
+    dist = (ir_right_front + ir_right_back) / 2
+    angle = math.atan2(ir_right_back - ir_right_front, 95)  # 95 = distance between sensors
+    perpendicular_dist = dist * math.cos(angle)
+
+    print ("DIST: ", dist)
+    print ("PERPENDICULAR DIST: ", perpendicular_dist)
+    controller.input_data = perpendicular_dist
     controller.compute()
     print ("OUTPUT: ", controller.output_data)
-    drive(controller.output_data, 25)
+    drive(controller.output_data / 100, 50)
+    print ("------")
