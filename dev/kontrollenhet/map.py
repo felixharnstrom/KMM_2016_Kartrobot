@@ -20,7 +20,6 @@ POINTS_LINE = 3     # How many Linesections should have messures to be a line
 ACCURACY = 100      # How far from line is it ok for mesurments to be
 
 
-# TODO consider robot position and angle when getting coordinates
 def plot_room(robot, plt):
     """
     This definition plots the room
