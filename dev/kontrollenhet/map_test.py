@@ -1,4 +1,5 @@
 from map import *
+import matplotlib.pyplot as plt
 
 # robot position
 x = 0
