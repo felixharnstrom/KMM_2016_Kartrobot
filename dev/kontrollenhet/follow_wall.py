@@ -46,8 +46,6 @@ controller.set_sample_time(160)
 controller.set_output_limits(75,125)
 controller.set_mode(1)
 
-uart_styrenhet = UART("tty.usbserial-FT94S3SE")
-
 while 1:
     # Get sensor values
     ir_right_back = mean_sensor(5, Command.read_right_back_ir())
