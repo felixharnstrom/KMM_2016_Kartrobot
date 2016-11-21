@@ -28,8 +28,8 @@ class Command():
         self.arguments = arguments
 
     @staticmethod
-    def ack()
-        return Command(CommandEnums.ACK)
+    def ack():
+        return Command(CommandEnums.ACK, [])
         
     @staticmethod
     def drive(direction : int, speed : int, time : int):

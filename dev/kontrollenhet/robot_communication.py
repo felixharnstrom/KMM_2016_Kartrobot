@@ -5,26 +5,28 @@ from UART import UART
 import time
 
 #Contains all data for motors, servo and sensors
-motor_data = {"LEFT_SIDE_DIRECTION":0,"LEFT_SIDE_SPEED":0,"RIGHT_SIDE_DIRECTION":0,"RIGHT_SIDE_SPEED":0,"SERVO_ANGLE":0}
-sensor_data = {"IR_LEFT_FRONT":0,"IR_LEFT_BACK":0,"IR_RIGHT_FRONT":0,"IR_RIGHT_BACK","IR_BACK":0,"IR_LIDAR":0,"GYRO":0}
+motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0 ,"RIGHT_SIDE_DIRECTION":0, "RIGHT_SIDE_SPEED":0, "SERVO_ANGLE":0}
+sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, "IR_BACK":0, "IR_LIDAR":0, "GYRO":0}
+
+#TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
+#This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
+UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
+UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+
+def init_UARTs():
+    #Get serial com. names from system
+    #Send dummy messages to find out which com port is assigned to which atmega
+    #Set UART_motor and UART_sensor to the correct objects.
+    UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
+    UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+    return
 
 s = server.server()
 s.start()
 s.connect()
 
-UART_motor = None
-UART_sensor = None
-init_UARTs()
 
-#TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
-#This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
-def init_UARTs():
-    #Get serial com. names from system
-    #Send dummy messages to find out which com port is assigned to which atmega
-    #Set UART_motor and UART_sensor to the correct objects.
-    UART_motor = UART("ttyUSB0") #TODO: This is not always true!
-    UART_motor = UART("ttyUSB1") #TODO: This is not always true!
-    return
+init_UARTs()
 
 def send_ack():
     ack = Command.ack() #Create ack command
@@ -53,18 +55,18 @@ def get_sensor_dict_key(c_enum : CommandEnums):
 def read_ir_sensor(command : Command):
     c_enum = command.get_enum()
     UART.send_command(command)
-    ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    #ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
     (ir_value_msb, ir_value_lsb) = UART.receive_payload()
-    send_ack()
+    #send_ack()
     ir_value = ir_value_msb*(2**8)+ir_value_lsb
     sensor_data[get_sensor_dict_key(c_enum)] = ir_value
     return
     
 def read_gyro_sensor(command : Command):
     UART.send_command(command)
-    ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    #ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
     (gyro_value_msb, gyro_value_lsb) = UART.receive_payload()
-    send_ack()
+    #send_ack()
     #We need to cast it to signed int 16 bit (due to being a gyro)
     gyro_value = gyro_value_msb*(2**8)+gyro_value_lsb
     if(gyro_value > 0x7fff): #unsigned 16-bit -> signed 16-bit 
@@ -76,7 +78,7 @@ def read_gyro_sensor(command : Command):
 def get_motor_diagnostics(command : Command):
     pwm_to_speed = 2.5 #Constant for getting motor pwm -> motor speed percentage
     UART.send_command(command)
-    ack = UART.receive_packet() #Receive ack
+    #ack = UART.receive_packet() #Receive ack
     #Sorry for unreadable code!
     (left_direction, left_pwm, right_direction, right_pwm, servo_pwm_msb, servo_pwm_lsb) = uart.receive_payload()
     send_ack()
@@ -96,6 +98,7 @@ def get_motor_diagnostics(command : Command):
 #We can handle pc -> rpi -> pc in shell methods (By adding command instructions for them but utilizing c_enums > 31)
 def handle_command(command : Command):
     c_enum = command.get_enum()
+    print("Getting enum", command.command_type)
     if(c_enum == CommandEnums.CONTROLLER_INFORMATION):
         get_motor_diagnostics(command)
     elif(c_enum == CommandEnums.READ_IR_LEFT_FRONT or 
@@ -103,15 +106,21 @@ def handle_command(command : Command):
             c_enum == CommandEnums.READ_IR_RIGHT_FRONT or
             c_enum == CommandEnums.READ_IR_RIGHT_BACK or
             c_enum == CommandEnums.READ_IR_BACK or
-            c_enum == CommandEnums.READ_IR_LIDAR):
+            c_enum == CommandEnums.READ_LIDAR):
         read_ir_sensor(command)      
     elif(c_enum == CommandEnums.READ_GYRO):
         read_gyro_sensor(command)
     else:
         #Temporary solution for all non-special commands (eg. just send)
         #Does >not< handle incorrectly parsed commands
-        UART.send_command(command)
-        ack = UART.receive_packet() #Receive ack
+        if (command.address == 1):
+            print("Sensor command")
+            UART_sensor.send_command(command)
+            #ack = UART_sensor.receive_packet() #Receive ack
+        else:
+            print("Motor command")
+            UART_motor.send_command(command)
+            #ack = UART_motor.receive_packet() #Receive ack
     return
 
 while 1:
@@ -126,8 +135,8 @@ while 1:
         # Receive function
         command = receive_command(s.client)
         handle_command(command)
-        #print (type(command))
-        #print (command.address, len(command.arguments), command.command_type, command.arguments)
+        print (type(command))
+        print (command.address, len(command.arguments), command.command_type, command.arguments)
         # Send over uart
         #uart.send_function(function)
         # Wait for acknowledge
