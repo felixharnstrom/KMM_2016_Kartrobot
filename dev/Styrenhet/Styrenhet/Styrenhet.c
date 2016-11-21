@@ -9,7 +9,6 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include "Styrenhet.h"
-#include "../../uart/UART.h"
 
 void initPWM(){
     //PWM for LIDAR tower servo
@@ -229,7 +228,7 @@ void sendDiag(){
     uint16_t servoLsbMask = 0x00FF;
     int payloadLength = 6;
     int adress = 0;
-    t_msgType sendDiag = MOTOR_GET_DIAG;
+    t_msgType send_diag_type = MOTOR_GET_DIAG;
     
     /*
     Packet 0, 1 contains left side information
@@ -249,7 +248,13 @@ void sendDiag(){
     uint8_t servoLsbPWM = (uint8_t)(servoPWM & servoLsbMask);
     
     char payload[6] = {leftSideDirection, leftSidePWM, rightSideDirection, rightSidePWM, servoMsbPWM, servoLsbPWM};
-    uart_msg_transmit(&adress, &payloadLength, &sendDiag, payload); //TODO: Different msgType as this is a response?
+    uart_msg_transmit(&adress, &payloadLength, &send_diag_type, payload); //TODO: Different msgType as this is a response?
+    //Just receive ack so we don't mess something up
+    int adr = 0;
+    int size = 0;
+    t_msgType msg_type;
+    char *payload_dummy;
+    uart_msg_receive(&adr,&size, &msg_type,payload_dummy); //ack dummy
 }
 
 void transmitAcknowledge() {

@@ -148,7 +148,7 @@ void sendDiag();
 /*
  * Transmit and ACK meta-packet over UART without payload.
  */
-void transmitAcknowledge()
+void transmitAcknowledge();
 
 /*
  * Handles execution of controller functions by passing the payload to the correct payload function, given by the t_msgType.
