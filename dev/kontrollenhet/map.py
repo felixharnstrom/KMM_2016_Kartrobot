@@ -5,6 +5,8 @@ import json
 import math, time
 import logging
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -27,10 +29,9 @@ def plot_room(robot, plt):
     :param plt: Pevious ploting of room
     :return: Returns plt, that is the plot of room
     """
+    coordinates = get_coordinates(measure_lidar(), robot)
 
-    #coordinates = get_coordinates(measure_lidar(), robot)
-
-    coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
+    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
     #coordinates = read_debug_data('demo_data/perfect_square_center.json')
     #coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
     #coordinates = read_debug_data('demo_data/perfect_square_right_back_corner.json')
@@ -84,7 +85,7 @@ def plot_room(robot, plt):
         degree_plot.append(degree)
         distance_plot.append(dist)
     # If you don't want all mesurment point comment out the next line
-    plt.plot(degree_plot, distance_plot, '.')
+    #plt.plot(degree_plot, distance_plot, '.')
 
     # Create a area on graph, based on area of messures
     plt.plot([(size[0]-1)*GRID_SIZE, (size[1])*GRID_SIZE], [(size[2]-1)*GRID_SIZE, (size[3])*GRID_SIZE], '.')
@@ -190,8 +191,8 @@ def get_coordinates(mesurments, robot):
     """
     coordinates = []
     for degree, dist in mesurments:
-        x = (math.sin(math.radians(degree + robot[2])) * dist) + robot[0]
-        y = (math.cos(math.radians(degree + robot[2])) * dist) + robot[1]
+        x = (math.sin(math.radians(degree + robot[2] - 10)) * dist) + robot[0]
+        y = (math.cos(math.radians(degree + robot[2] - 10)) * dist) + robot[1]
         coordinates.append([x, y])
 
     return coordinates
@@ -212,15 +213,17 @@ def measure_lidar():
     Turns servo 180 degrees while scanning and converts the scanned points to cordinates.
     :return: Measurements in [[x1,y2],[x2,y2], ...]
     """
-    uart = UART("ttyUSB1")
 
-    sensorunit = UART("ttyUSB0")
+    uart = UART("COM4")
+
+    sensorunit = UART("COM3")
     driveInstruction = Servo(0)
 
     degree_plot = []
     distance_plot = []
 
     uart.send_function(driveInstruction)
+
     time.sleep(2)
     degree = 0
 
