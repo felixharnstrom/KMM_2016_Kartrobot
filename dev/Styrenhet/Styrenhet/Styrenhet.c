@@ -21,8 +21,8 @@ void initPWM(){
     //Robot left side
     TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0B1) | (1 << COM0A1); //Com0B0 = 0 for inverted
     TCCR0B |= (1 << CS01) | (1 << CS00);
-    OCR0A = 0; //Speed is 0-255 (But since we need atleast a pulse for the speed to work we will use 0 -> 240) OCR0A is right side Pin 6 is direction
-    OCR0B = 0; //OCR0B is left side Pin 7 is direction
+    OCR0A = 0; //Speed is 0-255 (But since we need atleast a pulse for the speed to work we will use 0 -> 240) OCR0B is right side Pin 6 is direction
+    OCR0B = 0; //OCR0A is left side Pin 7 is direction
 }
 
 uint8_t getTransformSpeed(uint8_t speedPercentage){
@@ -58,11 +58,11 @@ void stopMotors(){
 
 void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage){
     switch(side){
-        case LEFT_SIDE:
+        case RIGHT_SIDE:
         OCR0B = getTransformSpeed(speedPercentage);
         setPinValue(&PORTB, PORTB6, direction);
         break;
-        case RIGHT_SIDE:
+        case LEFT_SIDE:
         OCR0A = getTransformSpeed(speedPercentage);
         setPinValue(&PORTB, PORTB5, direction);
         break;
@@ -71,11 +71,11 @@ void setSpeed(side_t side, direction_t direction, uint8_t speedPercentage){
 
 void turnDirection(turn_t turn, uint8_t speedPercentage){
     switch(turn){
-        case RIGHT_TURN:
+        case LEFT_TURN:
         setSpeed(RIGHT_SIDE, FORWARD, speedPercentage);
         setSpeed(LEFT_SIDE, BACKWARD, speedPercentage);
         break;
-        case LEFT_TURN:
+        case RIGHT_TURN:
         setSpeed(RIGHT_SIDE, BACKWARD, speedPercentage);
         setSpeed(LEFT_SIDE, FORWARD, speedPercentage);
         break;
@@ -238,11 +238,11 @@ void sendDiag(){
     1,3 contains motor PWM(M) (M/2.5 for speed percentage)
     4,5 contains servo PWM (S) 4 being MSB, 5 LSB eg S=[4]*2^8+[5] ((S-708)/8.45 for gyro angle)
     */
-    uint8_t leftSideDirection = (PORTB & (1 << PINB6)) != 0;
-    uint8_t leftSidePWM = OCR0B;
+    uint8_t rightSideDirection = (PORTB & (1 << PINB6)) != 0;
+    uint8_t rightSidePWM = OCR0B;
     
-    uint8_t rightSideDirection = (PORTB & (1 << PINB5)) != 0;
-    uint8_t rightSidePWM = OCR0A;
+    uint8_t leftSideDirection = (PORTB & (1 << PINB5)) != 0;
+    uint8_t leftSidePWM = OCR0A;
     
     uint16_t servoPWM = OCR3B; //This might need to be casted
     uint8_t servoMsbPWM = (uint8_t)((servoPWM & servoMsbMask) >> 8);
