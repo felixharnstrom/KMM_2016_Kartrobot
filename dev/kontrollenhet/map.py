@@ -20,6 +20,7 @@ POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be de
 MIN_MESURE = 1      # How many messurments should be in every like section
 POINTS_LINE = 3     # How many Linesections should have messures to be a line
 ACCURACY = 100      # How far from line is it ok for mesurments to be
+ANGEL_DIFF = -10    # How much the staring point of LIDAR scanner is off
 
 
 def plot_room(robot, plt):
@@ -29,9 +30,9 @@ def plot_room(robot, plt):
     :param plt: Pevious ploting of room
     :return: Returns plt, that is the plot of room
     """
-    coordinates = get_coordinates(measure_lidar(), robot)
+    #coordinates = get_coordinates(measure_lidar(), robot)
 
-    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
+    coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
     #coordinates = read_debug_data('demo_data/perfect_square_center.json')
     #coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
     #coordinates = read_debug_data('demo_data/perfect_square_right_back_corner.json')
@@ -191,8 +192,8 @@ def get_coordinates(mesurments, robot):
     """
     coordinates = []
     for degree, dist in mesurments:
-        x = (math.sin(math.radians(degree + robot[2] - 10)) * dist) + robot[0]
-        y = (math.cos(math.radians(degree + robot[2] - 10)) * dist) + robot[1]
+        x = (math.sin(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[0]
+        y = (math.cos(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[1]
         coordinates.append([x, y])
 
     return coordinates
