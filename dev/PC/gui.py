@@ -85,18 +85,21 @@ class gui_thread(threading.Thread):
         window_height = self.gui.winfo_height()
 
         # Split the window into frames
-        button_frame = tkinter.Frame(self.gui, width=(window_width / 4), height=window_height)
-        button_frame.grid(row=0, column=0)
+        canvas_frame = tkinter.Frame(self.gui, width=4*window_width/8, height=window_height/2)
+        canvas_frame.grid(row=0, column=0)
 
-        canvas_frame = tkinter.Frame(self.gui, width=2 * window_width / 4, height=window_height)
-        canvas_frame.grid(row=0, column=1)
+        button_frame = tkinter.Frame(self.gui, width=window_width/8, height=window_height/2)
+        button_frame.grid(row=0, column=1)
 
-        debug_frame = tkinter.Frame(self.gui, width=window_width / 4, height=window_height)
-        debug_frame.grid(row=0, column=2)
+        debug_frame = tkinter.Frame(self.gui, width=window_width/8, height=window_height/2)
+        debug_frame.grid(row=1, column=1)
+
+        #dummy_frame = tkinter.Frame(self.gui, width=(window_width / 4), height=window_height)
+        #dummy_frame.grid(row=1, column=1)
 
         # Place a canvas into canvas_frame
-        self.canvas = tkinter.Canvas(canvas_frame, width=2 * window_width / 4, height=window_height)
-        self.canvas.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        self.canvas = tkinter.Canvas(canvas_frame, width=4*window_width/8, height=window_height)
+        self.canvas.place(relx=0.5, rely=1, anchor=tkinter.CENTER)
 
         # Create a bunch of buttons in the left frame.
         # Each button will place a command in the queue using send_command
