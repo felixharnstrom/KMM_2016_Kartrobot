@@ -107,12 +107,13 @@ class gui_thread(threading.Thread):
         mode_var.set(1)
 
         self.left_motor_speed = tkinter.DoubleVar()
-        self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL, state=tkinter.DISABLED)
+        self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL,
+                                              from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_left_scale.pack()
 
         self.right_motor_speed = tkinter.DoubleVar()
         self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
-                                         state=tkinter.DISABLED)
+                                               from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_right_scale.pack()
 
         # Buttons for manual control
