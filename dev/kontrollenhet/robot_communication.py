@@ -12,6 +12,7 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGH
 #This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
 UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
 UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
 def init_UARTs():
     #Get serial com. names from system
@@ -27,6 +28,42 @@ s.connect()
 
 
 init_UARTs()
+
+def adjust_speeds():
+    c = Command.stop_motors() #Dummy
+    if key_pressed["up"]:
+        if not key_pressed["left"] and not key_pressed["right"] and not key_pressed["down"]: #Forward
+            c = Command.drive(1,80,0)
+        elif key_pressed["left"] and not key_pressed["right"]:
+            c = Command.side_speeds(1,90,1,70)       
+        elif key_pressed["right"] and not key_pressed["left"]:
+            c = Command.side_speeds(1,70,1,90)
+        else:
+            c = Command.stop_motors() #Stop pressing like stupid
+    elif key_pressed["down"]:
+        if not key_pressed["left"] and not key_pressed["right"]: #Backward
+            c = Command.drive(0,80,0)
+        elif key_pressed["left"] and not key_pressed["right"]:
+            c = Command.side_speeds(0,90,0,70)       
+        elif key_pressed["right"] and not key_pressed["left"]:
+            c = Command.side_speeds(0,70,0,90)
+        else:
+            c = Command.stop_motors() #Stop pressing like stupid
+    elif key_pressed["left"] and not key_pressed["right"]: #Left
+        c = Command.turn(0,80)
+    elif key_pressed["right"] and not key_pressed["left"]: #Right
+        c = Command.turn(1,80)
+    else:
+        c = Command.stop_motors() #Stop pressing like stupid   
+    handle_command(c)
+
+def handle_key(key_event : String):
+    key = key_event[:-2] #All but the last 2 chars ex. "right" in "right_p"
+    key_e = key_event[-1:] #Only the last char ex. "p" in "right_p"
+    if key in pressed_key.keys() and key_e in ["p", "r"]:
+        key_pressed[pressed_key] = (key_e == "p")
+        adjust_speeds()
+    
 
 def send_ack():
     ack = Command.ack() #Create ack command
@@ -144,6 +181,13 @@ while 1:
         #while ack[2] != 0:
         #    ack = uart.decode_metapacket(uart.receive_packet())
         #print("done")
+    elif (data == "KEY_EVENT"):
+        # Acknowledge client
+        s.client.sendall("ACK".encode())
+        # Receive keyevent
+        key_event = s.client.recv(4096).decode("utf-8")
+        handle_key(key_event)
+        
     """
     if (data == "GET_MOTOR_DIAG"):
         s.client.sendall("ACK".encode())
