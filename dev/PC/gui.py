@@ -108,20 +108,25 @@ class gui_thread(threading.Thread):
 
         mode_var.set(1)
 
+        
         self.left_motor_speed = tkinter.DoubleVar()
         self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL,
                                               from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_left_scale.pack()
+        self.insert_text("Left Motor Speed", debug_frame)
+        
 
         self.right_motor_speed = tkinter.DoubleVar()
         self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
                                                from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_right_scale.pack()
-
+        self.insert_text("Right Motor Speed", debug_frame)
+        
         self.servo_angle = tkinter.DoubleVar()
         self.servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
                                                from_=-90, to=90, state=tkinter.DISABLED)
         self.servo_angle_scale.pack()
+        self.insert_text("Servo Angle", debug_frame)
 
         # Buttons for manual control
         #forward_command_button = tkinter.Button(button_frame, text='Forward',
@@ -148,6 +153,14 @@ class gui_thread(threading.Thread):
 
         # Start tkinters mainloop
         self.gui.mainloop()
+
+    def insert_text(self, txt, target):
+        """Inserts and packs text on a target canvas"""
+        padded_txt = " " + txt + " "
+        self.left_motor_text = tkinter.Text(target, height=1, width=len(padded_txt))
+        self.left_motor_text.insert(tkinter.INSERT, padded_txt)
+        self.left_motor_text.config(state=tkinter.DISABLED)
+        self.left_motor_text.pack()
 
     def place_marker_on_canvas(self, x, y):
         self.canvas.create_rectangle(x - 5, y - 5,
