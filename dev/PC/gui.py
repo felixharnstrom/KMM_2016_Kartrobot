@@ -46,13 +46,15 @@ class gui_thread(threading.Thread):
         self.queue.put(mode)
 
     def receive_command(self, command):
-        if type(command)==list and command[0]=="draw":
+        if type(command)==list and command[0] == "draw":
             # It was a draw command.
             # Instruct the gui to place a marker on its canvas at the point specified in "command"
             self.place_marker_on_canvas(command[1], command[2])
-        elif type(command) == list and command[0]=="set_motors":
+        elif type(command) == list and command[0] == "set_motors":
             self.left_motor_speed.set(command[1])
             self.right_motor_speed.set(command[2])
+        elif type(command) == list and command[0] == "set_servo":
+            self.servo_angle.set(command[1])
 
     def run(self):
         """Initiates the GUI with previously specified queues."""
@@ -115,6 +117,11 @@ class gui_thread(threading.Thread):
         self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
                                                from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_right_scale.pack()
+
+        self.servo_angle = tkinter.DoubleVar()
+        self.servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
+                                               from_=-90, to=90, state=tkinter.DISABLED)
+        self.servo_angle_scale.pack()
 
         # Buttons for manual control
         #forward_command_button = tkinter.Button(button_frame, text='Forward',
