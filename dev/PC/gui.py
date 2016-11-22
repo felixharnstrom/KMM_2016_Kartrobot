@@ -72,7 +72,6 @@ class gui_thread(threading.Thread):
         self.gui.bind("<KeyRelease-Up>", self.key_released)
         self.gui.bind("<KeyRelease-Down>", self.key_released)
 
-
         # We need to know how big our window got.
         self.gui.update()
         window_width = self.gui.winfo_width()
@@ -117,24 +116,24 @@ class gui_thread(threading.Thread):
         self.motor_right_scale.pack()
 
         # Buttons for manual control
-        forward_command_button = tkinter.Button(button_frame, text='Forward',
-                                             command=lambda message="forward": self.send_command(message))
-        left_command_button = tkinter.Button(button_frame, text='Left',
-                                             command=lambda message="left": self.send_command(message))
-        right_command_button = tkinter.Button(button_frame, text='Right',
-                                              command=lambda message="right": self.send_command(message))
-        stop_command_button = tkinter.Button(button_frame, text='Stop',
-                                             command=lambda message="stop_motors": self.send_command(message))
+        #forward_command_button = tkinter.Button(button_frame, text='Forward',
+        #                                     command=lambda message="forward": self.send_command(message))
+        #left_command_button = tkinter.Button(button_frame, text='Left',
+        #                                     command=lambda message="left": self.send_command(message))
+        #right_command_button = tkinter.Button(button_frame, text='Right',
+        #                                      command=lambda message="right": self.send_command(message))
+        #stop_command_button = tkinter.Button(button_frame, text='Stop',
+        #                                     command=lambda message="stop_motors": self.send_command(message))
 
         # Quit button
         quit_button = tkinter.Button(button_frame, text='QUIT',
                                      command=lambda message="quit": self.send_command(message))
 
         # Place them into the UI
-        forward_command_button.pack()
-        left_command_button.pack()
-        right_command_button.pack()
-        stop_command_button.pack()
+        #forward_command_button.pack()
+        #left_command_button.pack()
+        #right_command_button.pack()
+        #stop_command_button.pack()
         quit_button.pack()
 
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
