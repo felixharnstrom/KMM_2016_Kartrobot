@@ -25,21 +25,26 @@ class gui_thread(threading.Thread):
         """Callback for key press."""
         button = event.keysym
         if button == "Left":
-            self.send_command("left")
+            self.send_command("key_left_p")
         elif button == "Right":
-            self.send_command("right")
+            self.send_command("key_right_p")
         elif button == "Up":
-            self.send_command("forward")
+            self.send_command("key_up_p")
         elif button == "Down":
-            self.send_command("back")
+            self.send_command("key_down_p")
 
 
     def key_released(self, event):
         """Callback for key release."""
         button = event.keysym
-        buttons = {"Left", "Right", "Up", "Down"}
-        if button in buttons:
-            self.send_command("stop_motors")
+        if button == "Left":
+            self.send_command("key_left_r")
+        elif button == "Right":
+            self.send_command("key_right_r")
+        elif button == "Up":
+            self.send_command("key_up_r")
+        elif button == "Down":
+            self.send_command("key_down_r")
 
     def send_command(self, mode):
         print("Command", mode, "put into queue.")
