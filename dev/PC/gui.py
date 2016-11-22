@@ -113,20 +113,20 @@ class gui_thread(threading.Thread):
         self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL,
                                               from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_left_scale.pack()
-        self.insert_text("Left Motor Speed", debug_frame)
+        self.insert_text(" Left Motor Speed ", debug_frame)
         
 
         self.right_motor_speed = tkinter.DoubleVar()
         self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
                                                from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_right_scale.pack()
-        self.insert_text("Right Motor Speed", debug_frame)
+        self.insert_text(" Right Motor Speed ", debug_frame)
         
         self.servo_angle = tkinter.DoubleVar()
         self.servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
                                                from_=-90, to=90, state=tkinter.DISABLED)
         self.servo_angle_scale.pack()
-        self.insert_text("Servo Angle", debug_frame)
+        self.insert_text(" Servo Angle ", debug_frame)
 
         # Buttons for manual control
         #forward_command_button = tkinter.Button(button_frame, text='Forward',
@@ -149,16 +149,20 @@ class gui_thread(threading.Thread):
         #stop_command_button.pack()
         quit_button.pack()
 
+        self.insert_text("Use the arrow keys to\nmove in manual mode.", button_frame)
+
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
 
         # Start tkinters mainloop
         self.gui.mainloop()
 
     def insert_text(self, txt, target):
-        """Inserts and packs text on a target canvas"""
-        padded_txt = " " + txt + " "
-        self.left_motor_text = tkinter.Text(target, height=1, width=len(padded_txt))
-        self.left_motor_text.insert(tkinter.INSERT, padded_txt)
+        """Inserts and packs text on a target canvas. Supports multiline with \n in txt."""
+        lines = txt.split("\n")
+        longest_line_len = max(len(line) for line in lines)
+        self.left_motor_text = tkinter.Text(target, height=len(lines), width=longest_line_len)
+        for line in lines:
+            self.left_motor_text.insert(tkinter.INSERT, line)
         self.left_motor_text.config(state=tkinter.DISABLED)
         self.left_motor_text.pack()
 
