@@ -10,8 +10,8 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGH
 
 #TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
 #This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
-#UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
-#UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
+UART_motor = UART("ttyUSB0") #TODO: This is not always true!
 key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
 def init_UARTs():
@@ -27,7 +27,7 @@ s.start()
 s.connect()
 
 
-#init_UARTs()
+init_UARTs()
 
 def adjust_speeds():
     c = Command.stop_motors() #Dummy
