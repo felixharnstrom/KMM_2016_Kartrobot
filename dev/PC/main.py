@@ -40,19 +40,16 @@ def send_command(command, socket, guit):
         ack = socket.recv(4096)
         socket.sendall(command[4:].encode())
     elif command == "get_diagnostics":
-        socket.sendall("GET_MOTOR_DIAG".encode())
+        socket.sendall("FORWARD_CTRL_INFO".encode())
         ack = socket.recv(4096)
-        responsef = receive_command(socket)
-        response = responsef.ARGUMENTS
-        print(responsef.TYPE)
-        print(response)
-        left_dir = response[0]
-        left_pwm = response[1]
-        right_dir = response[2]
-        right_pwm = response[3]
-        servo_pvm = response[4]*2**8 + response[5]
-        guit.receive_command(["set_motors", left_pwm, right_pwm])
-
+        motor_data = json.loads(socket.recv(4096).decode("utf-8"))
+        dir_mod_left = 1 if motor_data["LEFT_SIDE_DIRECTION"] else -1
+        dir_mod_right = 1 if motor_data["RIGHT_SIDE_DIRECTION"] else -1
+        speed_left = motor_data["LEFT_SIDE_SPEED"]*dir_mod_left
+        speed_right = motor_data["RIGHT_SIDE_SPEED"]*dir_mod_right
+        guit.receive_command(["set_motors", speed_left, speed_right])
+        guit.receive_command(["set_servo", motor_data["SERVO_ANGLE"]])
+        
 
 
 def main():
@@ -91,10 +88,10 @@ def main():
                 break
             else:
                 # All commands that are not used above are sent to the raspberry server.
-                send_command(command, robot.client, guit)
+                #send_command(command, robot.client, guit)
                 # TODO: We should send diagnostics to update settings
                 # We may need a wait inbetween
-                #send_command("get_diagnostics", robot.client, guit)
+                send_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
