@@ -274,13 +274,13 @@ def check_available_grid(map):
     """
     size = get_size(map)
     possible_squares = []
-    corr = 1        # size correction, should it go outside known area or not, 1 = not, 0 = yes
+    corr = 0        # size correction, should it go outside known area or not, 0 = not, 1 = yes
 
-    for y in range(size[2], size[3] - corr):
+    for y in range(size[2], size[3] - 1 + corr):
         y_next = y + 1
 
-        for x in range(size[0], size[1] - corr):
-            x_next = x + 11
+        for x in range(size[0], size[1] - 1 + corr):
+            x_next = x + 1
 
             if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
                 possible_squares.append((x, y, x_next, y))
