@@ -272,16 +272,20 @@ int main(void)
             case SENSOR_READ_IR_LEFT_BACK:
             case SENSOR_READ_IR_RIGHT_FRONT:
             case SENSOR_READ_IR_RIGHT_BACK:
-            case SENSOR_READ_IR_BACK:
-            case SENSOR_READ_LIDAR:;
+            case SENSOR_READ_IR_BACK:;
 				double sum = 0;
 				for (int i = 0; i<5; i++){
 					double sensorOutput = readSensor(msgTypeToSensor(msg));
 					uint16_t mmRounded = sensorOutput * 10;
 					sum = sum + mmRounded;
 				}
-                sendReply(sum/5);
-                break;
+				sendReply(sum/5);
+				break;
+            case SENSOR_READ_LIDAR:;
+				double sensorOutput = readSensor(msgTypeToSensor(msg));
+				uint16_t mmRounded = sensorOutput * 10;
+				sendReply(mmRounded);
+				break;
                 
             case SENSOR_READ_GYRO:;
                 double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
