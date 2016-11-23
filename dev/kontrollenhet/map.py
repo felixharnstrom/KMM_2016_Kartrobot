@@ -267,14 +267,20 @@ def measure_lidar():
 
 
 def check_available_grid(map):
+    """
+    Checks all available arches between nodes the robot can go
+    :param map: A list with tupleres containing all walls
+    :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
+    """
     size = get_size(map)
     possible_squares = []
+    corr = 1        # size correction, should it go outside known area or not, 1 = not, 0 = yes
 
-    for y in range(size[2], size[3] - 1):
+    for y in range(size[2], size[3] - corr):
         y_next = y + 1
 
-        for x in range(size[0], size[1] - 1):
-            x_next = x + 1
+        for x in range(size[0], size[1] - corr):
+            x_next = x + 11
 
             if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
                 possible_squares.append((x, y, x_next, y))
