@@ -10,7 +10,7 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGH
 
 #TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
 #This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
-UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
+#UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
 UART_motor = UART("ttyUSB0") #TODO: This is not always true!
 key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
@@ -27,7 +27,7 @@ s.start()
 s.connect()
 
 
-init_UARTs()
+#init_UARTs()
 
 def adjust_speeds():
     c = Command.stop_motors() #Dummy
@@ -50,18 +50,20 @@ def adjust_speeds():
         else:
             c = Command.stop_motors() #Stop pressing like stupid
     elif key_pressed["left"] and not key_pressed["right"]: #Left
-        c = Command.turn(0,80)
+        c = Command.turn(0,80,0)
     elif key_pressed["right"] and not key_pressed["left"]: #Right
-        c = Command.turn(1,80)
+        c = Command.turn(1,80,0)
     else:
-        c = Command.stop_motors() #Stop pressing like stupid   
+        c = Command.stop_motors() #Stop pressing like stupid
+    print("sendin")
+    #UART_motor.send_command(c)
     handle_command(c)
 
-def handle_key(key_event : String):
+def handle_key(key_event : str):
     key = key_event[:-2] #All but the last 2 chars ex. "right" in "right_p"
     key_e = key_event[-1:] #Only the last char ex. "p" in "right_p"
-    if key in pressed_key.keys() and key_e in ["p", "r"]:
-        key_pressed[pressed_key] = (key_e == "p")
+    if key in key_pressed.keys() and key_e in ["p", "r"]:
+        key_pressed[key] = (key_e == "p")
         adjust_speeds()
     
 
@@ -181,6 +183,15 @@ while 1:
         #while ack[2] != 0:
         #    ack = uart.decode_metapacket(uart.receive_packet())
         #print("done")
+    """elif (data == "FORWARD_CTRL_INFO"):
+        # Acknowledge
+        s.client.sendall("ACK".encode())
+        #handle_command(Command.controller_information())
+        motor_data["SERVO_ANGLE"] = 45
+        # Is this the intended way? 
+        s.client.sendall(motor_data.dumps().encode())"""
+        
+        
     elif (data == "KEY_EVENT"):
         # Acknowledge client
         s.client.sendall("ACK".encode())
