@@ -31,29 +31,29 @@ class Pid():
         time_now = datetime.now()
         diff = time_now - self.time_last
         time_change = diff.microseconds / 1000      # Time diff in millis
-        if (time_change >= self.sample_time):
+        #if (time_change >= self.sample_time):
 
-            # Error variables
-            error = self.setpoint - self.input_data
-            self.i_term += (self.ki * error)            # Removes output bump when changing tuning parameters on the fly
+        # Error variables
+        error = self.setpoint - self.input_data
+        self.i_term += (self.ki * error)            # Removes output bump when changing tuning parameters on the fly
 
-            # Clamping the integration term to min/max values, to avoid this growing even when output is limited
-            if (self.i_term > self.max_out):
-                self.i_term = self.max_out
-            elif (self.i_term < self.min_out):
-                self.i_term = self.min_out
-            d_input = (self.input_data - self.last_input)
+        # Clamping the integration term to min/max values, to avoid this growing even when output is limited
+        if (self.i_term > self.max_out):
+            self.i_term = self.max_out
+        elif (self.i_term < self.min_out):
+            self.i_term = self.min_out
+        d_input = (self.input_data - self.last_input)
 
-            self.output_data = (self.kp * error) + self.i_term - (self.kd * d_input)
+        self.output_data = (self.kp * error) + self.i_term - (self.kd * d_input)
 
-            # Clamping output to min/max values
-            if (self.output_data > self.max_out):
-                self.output_data = self.max_out
-            elif (self.output_data < self.min_out):
-                self.output_data = self.min_out
+        # Clamping output to min/max values
+        if (self.output_data > self.max_out):
+            self.output_data = self.max_out
+        elif (self.output_data < self.min_out):
+            self.output_data = self.min_out
 
-            self.last_input = self.input_data
-            self.time_last = time_now
+        self.last_input = self.input_data
+        self.time_last = time_now
 
     def set_tunings(self, p : float, i: float, d : float):
         sample_time_in_sec = self.sample_time / 1000
