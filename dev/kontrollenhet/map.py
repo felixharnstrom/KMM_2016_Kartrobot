@@ -30,9 +30,9 @@ def map_room(robot, map):
     :param map: Pevious mapping of the room
     :return: Returns new_lines, that is a list of tupels with line information [(x11, y11, x21, y21), (x12, y12...), ...]
     """
-    #coordinates = get_coordinates(measure_lidar(), robot)
+    coordinates = get_coordinates(measure_lidar(), robot)
 
-    coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
+    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
 
     # Gets size coordinate area in squares of GRID_SIZE
     # size = [min_x, max_x, min_y, max_y]
@@ -85,6 +85,48 @@ def map_room(robot, map):
     test_plot(map, coordinates, size)
 
     return new_lines
+
+
+
+def plot_room(map):
+    """
+    Plots the room and return the plot
+    :param map: Is a list of tupels that has the information about walls [(x11, y11, x21, y21), (x12, y12, ...), ...]
+    :return: A list of coordinates
+    """
+    for coord in map:
+        if coord[1] == coord[3]:
+            line = np.linspace(coord[0], coord[2], POINTS)
+            plt.plot(line, [coord[1]] * POINTS)
+        if coord[0] == coord[2]:
+            line = np.linspace(coord[1], coord[3], POINTS)
+            plt.plot([coord[0]] * POINTS, line)
+    return plt
+
+
+
+def check_available_grid(map):
+    """
+    Checks all available arches between nodes the robot can go
+    :param map: A list with tupleres containing all walls
+    :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
+    """
+    size = get_size(map)
+    possible_squares = []
+    corr = 0        # size correction, should it go outside known area or not, 0 = not, 1 = yes
+
+    for y in range(size[2], size[3] - 1 + corr):
+        y_next = y + 1
+
+        for x in range(size[0], size[1] - 1 + corr):
+            x_next = x + 1
+
+            if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
+                possible_squares.append((x, y, x_next, y))
+            if (x * GRID_SIZE, (y + 1) * GRID_SIZE, x_next * GRID_SIZE, (y + 1) * GRID_SIZE) not in map:
+                possible_squares.append((x, y, x, y_next))
+
+    return possible_squares
 
 
 
@@ -266,46 +308,11 @@ def measure_lidar():
 
 
 
-def check_available_grid(map):
-    """
-    Checks all available arches between nodes the robot can go
-    :param map: A list with tupleres containing all walls
-    :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
-    """
-    size = get_size(map)
-    possible_squares = []
-    corr = 0        # size correction, should it go outside known area or not, 0 = not, 1 = yes
-
-    for y in range(size[2], size[3] - 1 + corr):
-        y_next = y + 1
-
-        for x in range(size[0], size[1] - 1 + corr):
-            x_next = x + 1
-
-            if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
-                possible_squares.append((x, y, x_next, y))
-            if (x * GRID_SIZE, (y + 1) * GRID_SIZE, x_next * GRID_SIZE, (y + 1) * GRID_SIZE) not in map:
-                possible_squares.append((x, y, x, y_next))
-
-    return possible_squares
 
 
 
 
-def plot_room(map):
-    """
-    Plots the room and return the plot
-    :param map: Is a list of tupels that has the information about walls [(x11, y11, x21, y21), (x12, y12, ...), ...]
-    :return: A list of coordinates
-    """
-    for coord in map:
-        if coord[1] == coord[3]:
-            line = np.linspace(coord[0], coord[2], POINTS)
-            plt.plot(line, [coord[1]] * POINTS)
-        if coord[0] == coord[2]:
-            line = np.linspace(coord[1], coord[3], POINTS)
-            plt.plot([coord[0]] * POINTS, line)
-    return plt
+
 
 
 
