@@ -29,9 +29,9 @@ def turn(direction : Direction, degrees : int):
 
     #Set the current direction to zero
     current_dir = 0
-
+    
     #Set time to zero to turn untill stopped
-    turn_instr = Command.turn(1, 30, 0)
+    turn_instr = Command.turn(direction, 30, 0)
     uart_styrenhet.send_command(turn_instr)
 
     while (abs(current_dir) < degrees):
@@ -48,6 +48,7 @@ def turn(direction : Direction, degrees : int):
     turn_instr = Command.stop_motors()
     uart_styrenhet.send_command(turn_instr)
     uart_styrenhet.close()
+    
 
 #Take a average value from a given sensor
 def mean_sensor(it : int, sensor_instr : Command):
@@ -64,27 +65,46 @@ def drive(ratio : int, base_speed : int):
     
     print("LEFT: ", round(left_speed))
     print("RIGHT: ", round(right_speed))
-    drive_instr = Command.side_speeds(1, round(right_speed), 1, round(left_speed))
+    drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
     uart_styrenhet.send_command(drive_instr)
 
-
+"""
+uart_styrenhet = UART("tty.usbserial-FT94S3SE")
+turn_instr = Command.turn(1, 30, 1500)
+uart_styrenhet.send_command(turn_instr)
+uart_styrenhet.close()
+"""
 controller = Pid() 
-controller.setpoint = 80
+controller.setpoint = 90
 controller.output_data = 0
-controller.set_tunings(1.5,5,10)
+controller.set_tunings(0.7,0,0.6)
 controller.set_sample_time(160)
-controller.set_output_limits(75,125)
+controller.set_output_limits(-25,25)
 controller.set_mode(1)
 
 last_val = mean_sensor(5, Command.read_right_front_ir())
+#turn(Direction.LEFT, 90)
 
 while 1:
     
     # Get sensor values
-    ir_right_front = mean_sensor(5, Command.read_right_back_ir())
-    ir_right_back = mean_sensor(5, Command.read_right_front_ir())
-    
+    ir_right_front = mean_sensor(5, Command.read_right_front_ir())
+    ir_right_back = mean_sensor(5, Command.read_right_back_ir())
+    lidar = read_sensor(Command.read_lidar())
     #print ("DIST: ", ir_right_front)
+    
+    if(lidar < 200):
+        print ("OBSTACLE")
+        uart_styrenhet = UART("tty.usbserial-FT94S3SE")
+        stop = Command.stop_motors()
+        uart_styrenhet.send_command(stop)
+        time.sleep(1)
+        turn(Direction.LEFT, 90)
+        time.sleep(1)
+        uart_styrenhet.close()
+        last_val = mean_sensor(5, Command.read_right_back_ir())
+        continue
+    
     if (ir_right_front > (2 * last_val)):
         print ("EDGE")
         uart_styrenhet = UART("tty.usbserial-FT94S3SE")
@@ -112,7 +132,8 @@ while 1:
     print ("PERPENDICULAR DIST: ", perpendicular_dist)
     controller.input_data = perpendicular_dist
     controller.compute()
+    controller.output_data += 100
     print ("OUTPUT: ", controller.output_data)
-    drive(controller.output_data / 100, 50)
+    drive(controller.output_data / 100, 30)
     print ("------")
-    
+
