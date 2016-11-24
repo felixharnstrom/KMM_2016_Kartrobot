@@ -53,24 +53,24 @@ class Command():
         return Command(CommandEnums.CONTROLLER_INFORMATION)
 
     @staticmethod
-    def read_left_front_ir():
-        return Command(CommandEnums.READ_IR_LEFT_FRONT)
+    def read_left_front_ir(measurements : int):
+        return Command(CommandEnums.READ_IR_LEFT_FRONT, [measurements])
 
     @staticmethod
-    def read_left_back_ir():
-        return Command(CommandEnums.READ_IR_LEFT_BACK)
+    def read_left_back_ir(measurements : int):
+        return Command(CommandEnums.READ_IR_LEFT_BACK, [measurements])
 
     @staticmethod
-    def read_right_front_ir():
-        return Command(CommandEnums.READ_IR_RIGHT_FRONT)
+    def read_right_front_ir(measurements : int):
+        return Command(CommandEnums.READ_IR_RIGHT_FRONT, [measurements])
 
     @staticmethod
-    def read_right_back_ir():
-        return Command(CommandEnums.READ_IR_RIGHT_BACK)
+    def read_right_back_ir(measurements : int):
+        return Command(CommandEnums.READ_IR_RIGHT_BACK, [measurements])
 
     @staticmethod
-    def read_back_ir():
-        return Command(CommandEnums.READ_IR_BACK)
+    def read_back_ir(measurements : int):
+        return Command(CommandEnums.READ_IR_BACK, [measurements])
 
     @staticmethod
     def read_lidar():
