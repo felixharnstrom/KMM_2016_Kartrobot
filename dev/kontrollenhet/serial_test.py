@@ -1,12 +1,12 @@
 from UART import UART
-from modules import *
+from command import Command
 
 uart = UART("ttyUSB1")
-driveInstruction = Drive(1, 2)
+drive_instruction = Command.drive(1, 2, 1000)
 
-uart.send_function(driveInstruction)
+uart.send_function(drive_instruction)
 
 while 1:
-	print (uart.receive_packet())
+    print (uart.receive_packet())
 
 uart.close()
