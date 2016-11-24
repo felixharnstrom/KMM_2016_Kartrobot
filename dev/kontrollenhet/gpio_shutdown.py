@@ -31,7 +31,8 @@ def poll_in_other_thread():
     t.start()
     return t
 
-poll_in_other_thread()
-time.sleep(600)
+# Test
+#poll_in_other_thread()
+#time.sleep(600)
 
 
