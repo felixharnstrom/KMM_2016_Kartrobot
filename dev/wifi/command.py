@@ -1,7 +1,7 @@
 import numpy as np
 from enum import Enum
 
-class CommandEnums(Enum):
+class Command_enums(Enum):
     DRIVE = 1
     TURN = 2
     SIDE_SPEEDS = 3
@@ -28,62 +28,62 @@ class Command():
 
     @staticmethod
     def drive(direction : int, speed : int, time : int):
-        time1, time2 = split_time(time)
-        return Command(CommandEnums.DRIVE, [direction, speed, time1, time2])
+        time1, time2 = splitTime(time)
+        return Command(Command_enums.DRIVE, [direction, speed, time1, time2])
 
     @staticmethod
     def turn(turn : int, speed : int, time : int):
-        time1, time2 = split_time(time)
-        return Command(CommandEnums.TURN, [turn, speed, time1, time2])
+        time1, time2 = splitTime(time)
+        return Command(Command_enums.TURN, [turn, speed, time1, time2])
 
     @staticmethod
-    def side_speeds(left_direction : int, left_speed: int, right_direction : int, right_speed : int):
-        return Command(CommandEnums.SIDE_SPEEDS, [left_direction, left_speed, right_direction, right_speed])
+    def sideSpeeds(leftDirection : int, leftSpeed: int, rightDirection : int, rightSpeed : int):
+        return Command(Command_enums.SIDE_SPEEDS, [leftDirection, leftSpeed, rightDirection, rightSpeed])
 
     @staticmethod
     def servo(degrees : int):
-        return Command(CommandEnums.SERVO, [degrees])
+        return Command(Command_enums.SERVO, [degrees])
 
     @staticmethod
-    def stop_motors():
-        return Command(CommandEnums.STOP_MOTORS)
+    def stopMotors():
+        return Command(Command_enums.STOP_MOTORS)
 
     @staticmethod
-    def controller_information():
-        return Command(CommandEnums.CONTROLLER_INFORMATION)
+    def controllerInformation():
+        return Command(Command_enums.CONTROLLER_INFORMATION)
 
     @staticmethod
-    def read_left_front_ir(measurements : int):
-        return Command(CommandEnums.READ_IR_LEFT_FRONT, [measurements])
+    def readLeftFrontIr():
+        return Command(Command_enums.READ_IR_LEFT_FRONT)
 
     @staticmethod
-    def read_left_back_ir(measurements : int):
-        return Command(CommandEnums.READ_IR_LEFT_BACK, [measurements])
+    def readLeftBackIr():
+        return Command(Command_enums.READ_IR_LEFT_BACK)
 
     @staticmethod
-    def read_right_front_ir(measurements : int):
-        return Command(CommandEnums.READ_IR_RIGHT_FRONT, [measurements])
+    def readRightFrontIr():
+        return Command(Command_enums.READ_IR_RIGHT_FRONT)
 
     @staticmethod
-    def read_right_back_ir(measurements : int):
-        return Command(CommandEnums.READ_IR_RIGHT_BACK, [measurements])
+    def readRightBackIr():
+        return Command(Command_enums.READ_IR_RIGHT_BACK)
 
     @staticmethod
-    def read_back_ir(measurements : int):
-        return Command(CommandEnums.READ_IR_BACK, [measurements])
+    def readBackIr():
+        return Command(Command_enums.READ_IR_BACK)
 
     @staticmethod
-    def read_lidar():
-        return Command(CommandEnums.READ_LIDAR)
+    def readLidar():
+        return Command(Command_enums.READ_LIDAR)
 
     @staticmethod
-    def read_gyro():
-        return Command(CommandEnums.READ_GYRO)
+    def readGyro():
+        return Command(Command_enums.READ_GYRO)
 
-    def get_enum(self):
-        return CommandEnums((self.address * 16) + self.command_type)
+    def getEnum(self):
+        return Command_enums((self.address * 16) + self.command_type)
 
-def split_time(time):
+def splitTime(time):
     time_16 = np.uint16(time)
     mask_high = 0xFF00
     mask_low = 0x00FF
@@ -91,7 +91,7 @@ def split_time(time):
     time_low = np.uint8((time_16 & mask_low))
     return int(time_high), int(time_low)
 
-def get_executable_command(command_number : int, params = []):
-    command_enum = CommandEnums(command_number)
+def getExecutableCommand(command_number : int, params = []):
+    command_enum = Command_enums(command_number)
     return Command(command_enum, params)
 
