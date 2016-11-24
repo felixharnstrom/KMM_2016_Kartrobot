@@ -127,7 +127,7 @@ class Robot:
             print ("IR_BACK: " + str(ir_right_back) + " IR_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front)
             
             #Obstacle detected
-            """if(lidar < 150):
+            if(lidar < 150):
                 #Save the given length driven
                 uart_styrenhet.send_command(Command.stop_motors())
                 self.driven_distance += start_lidar - lidar
@@ -141,13 +141,14 @@ class Robot:
                 self.driven_distance += start_lidar - lidar
                 self.save_position()
                 return DriveStatus.RIGHT_CORRIDOR_DETECTED
+            #Detect corridor to the left
             elif (ir_left_front > 2 * ir_left_back and ir_left_front > 200):
                 #Save the given length driven
                 self.wait_for_empty_corridor(Direction.LEFT)
                 uart_styrenhet.send_command(Command.stop_motors())
                 self.driven_distance += start_lidar - lidar
                 self.save_position()
-                return DriveStatus.LEFT_CORRIDOR_DETECTED"""
+                return DriveStatus.LEFT_CORRIDOR_DETECTED
 
             # We need to get the distance from the center of the robot perpendicular to the wall
             dist = (ir_right_front + ir_right_back) / 2
