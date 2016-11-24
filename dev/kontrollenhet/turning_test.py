@@ -198,8 +198,8 @@ while 1:
 		robot.turn(Direction.LEFT, 90)
 		robot.turn(Direction.LEFT, 90)
 	elif (status == DriveStatus.LEFT_CORRIDOR_DETECTED):
-		print("---------- DETECTED CORRIDOR TO LEFT!")
-		print("---------- TURNING LEFT 90 degrees")
+		print ("---------- DETECTED CORRIDOR TO LEFT!")
+		print ("---------- TURNING LEFT 90 degrees")
 		robot.turn(Direction.LEFT, 90)
 	elif (status == DriveStatus == RIGHT_CORRIDOR_DETECTED):
 		print ("---------- DETECTED CORRIDOR TO RIGHT!")
