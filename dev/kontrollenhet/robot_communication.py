@@ -3,16 +3,25 @@ from command import *
 from communication import *
 from UART import UART
 import time
+import threading
+import robot_wifi
+import queue
+import mode
 
 #Contains all data for motors, servo and sensors
 motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0 ,"RIGHT_SIDE_DIRECTION":0, "RIGHT_SIDE_SPEED":0, "SERVO_ANGLE":0}
+motor_data_lock = threading.Lock()
 sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, "IR_BACK":0, "IR_LIDAR":0, "GYRO":0}
+sensor_data_lock = threading.Lock()
+key_pressed = {"right":False, "left":False, "up":False, "down":False}
+input_queue = queue.Queue() #Execute on robot
+
 
 #TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
 #This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
 UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
 UART_motor = UART("ttyUSB0") #TODO: This is not always true!
-key_pressed = {"right":False, "left":False, "up":False, "down":False}
+#key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
 def init_UARTs():
     #Get serial com. names from system
@@ -22,12 +31,12 @@ def init_UARTs():
     UART_motor = UART("ttyUSB0") #TODO: This is not always true!
     return
 
-s = server.server()
-s.start()
-s.connect()
+#s = server.server()
+#s.start()
+#s.connect()
+#init_UARTs()
 
-
-init_UARTs()
+threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,motor_data_lock,sensor_data_lock,input_queue)).start()
 
 def adjust_speeds():
     c = Command.stop_motors() #Dummy
@@ -56,7 +65,6 @@ def adjust_speeds():
     else:
         c = Command.stop_motors() #Stop pressing like stupid
     print("sendin")
-    #UART_motor.send_command(c)
     handle_command(c)
 
 def handle_key(key_event : str):
@@ -66,7 +74,6 @@ def handle_key(key_event : str):
         key_pressed[key] = (key_e == "p")
         adjust_speeds()
     
-
 def send_ack():
     ack = Command.ack() #Create ack command
     UART.send_command(ack) #Send it over uart
@@ -161,7 +168,32 @@ def handle_command(command : Command):
             UART_motor.send_command(command)
             #ack = UART_motor.receive_packet() #Receive ack
     return
+#print("sent")
+#c2 = Command.side_speeds(1,90,1,70)
+#UART_motor.send_command(c2)
+#time.sleep(2)
+#c3 = Command.stop_motors()
+#UART_motor.send_command(c3)
+#print("sent")
+while 1:
+    next_action = None
+    try:
+        next_action = input_queue.get()
+    except Exception:
+        next_action = None
+        pass
+    #Then we have a command!
+    if next_action != None:
+        if next_action[0] == "COMMAND":
+            handle_command(next_action[1])
+        elif next_action[0] == "KEY_EVENT":
+            print("Handling", next_action)
+            handle_key(next_action[1])
+    
+        
+        
 
+'''
 while 1:
     # The messages are made with json which appends extra "" - cut them off
     data = s.client.recv(4096).decode("utf-8")
@@ -196,8 +228,8 @@ while 1:
         # Receive keyevent
         key_event = s.client.recv(4096).decode("utf-8")
         handle_key(key_event)
-        
-    """
+'''
+"""
     if (data == "GET_MOTOR_DIAG"):
         s.client.sendall("ACK".encode())
         func = Command.controllerInformation()
@@ -208,7 +240,8 @@ while 1:
         uart.send_function(func)
         ack = uart.receive_packet()
         ret = uart.receive_function()
-        transmit_function(ret, s.client)"""
+        transmit_function(ret, s.client)
+"""
         
 UART_motor.close()
 UART_sensor.close()
