@@ -99,4 +99,3 @@ def split_time(time):
 def get_executable_command(command_number : int, params = []):
     command_enum = CommandEnums(command_number)
     return Command(command_enum, params)
-
