@@ -39,6 +39,10 @@ def send_command(command, socket, guit):
         socket.sendall("KEY_EVENT".encode())
         ack = socket.recv(4096)
         socket.sendall(command[4:].encode())
+    elif len(command) > 4 and command [:5] == "mode_":
+        socket.sendall("TOGGLE_MODE".encode())
+        ack = socket.recv(4096)
+        socket.sendall(command[5:].encode())
     elif command == "get_diagnostics":
         socket.sendall("FORWARD_CTRL_INFO".encode())
         ack = socket.recv(4096)
@@ -88,10 +92,10 @@ def main():
                 break
             else:
                 # All commands that are not used above are sent to the raspberry server.
-                #send_command(command, robot.client, guit)
+                send_command(command, robot.client, guit)
                 # TODO: We should send diagnostics to update settings
                 # We may need a wait inbetween
-                send_command("get_diagnostics", robot.client, guit)
+                #send_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
