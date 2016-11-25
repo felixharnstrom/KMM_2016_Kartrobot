@@ -2,7 +2,7 @@ import numpy as np
 from enum import Enum
 
 class CommandEnums(Enum):
-    ACK = 0,
+    ACK = 0
     DRIVE = 1
     TURN = 2
     SIDE_SPEEDS = 3
