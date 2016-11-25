@@ -43,12 +43,14 @@ def wifi_main(motor_data, sensor_data, motor_data_lock : threading.Lock,
                 print("Hej")
                 input_queue.put(("KEY_EVENT",key_event))
         elif (data == "TOGGLE_MODE"):
-            print ("Toggle")
             new_mode = s.client.recv(4096).decode("utf-8")
-            if (new_mode == "MANUAL"):
-                mode.set_mode(ControlModeEnums.MANUAL)
-            elif (new_mode == "AUTO"):
-                mode.set_mode(ControlModeEnums.AUTO)
+            print ("Toggle: ", new_mode)
+            if (new_mode == "manual"):
+                print("Manual set")
+                mode.set_mode(mode.ControlModeEnums.MANUAL)
+            elif (new_mode == "autonomous"):
+                print("Autonomous set")
+                mode.set_mode(mode.ControlModeEnums.AUTO)
             #TODO: Make this change the mode to new_mode (using mode.py)
             
 
