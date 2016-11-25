@@ -31,12 +31,13 @@ def init_UARTs():
     UART_motor = UART("ttyUSB0") #TODO: This is not always true!
     return
 
-#s = server.server()
-#s.start()
-#s.connect()
-#init_UARTs()
+def close_UARTs():
+    UART_motor.close()
+    UART_sensor.close()
+    s.close()
 
-threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,motor_data_lock,sensor_data_lock,input_queue)).start()
+def init_wifi_thread():
+    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,motor_data_lock,sensor_data_lock,input_queue)).start()
 
 def adjust_speeds():
     c = Command.stop_motors() #Dummy
@@ -175,7 +176,11 @@ def handle_command(command : Command):
 #c3 = Command.stop_motors()
 #UART_motor.send_command(c3)
 #print("sent")
-while 1:
+
+def process_action():
+    """Process the next action on the input queue.
+
+    Returns True if an action was popped from the queue, false if not."""
     next_action = None
     try:
         next_action = input_queue.get()
@@ -184,65 +189,20 @@ while 1:
         pass
     #Then we have a command!
     if next_action != None:
+        print(next_action)
         if next_action[0] == "COMMAND":
             handle_command(next_action[1])
         elif next_action[0] == "KEY_EVENT":
             print("Handling", next_action)
             handle_key(next_action[1])
-    
-        
-        
 
-'''
-while 1:
-    # The messages are made with json which appends extra "" - cut them off
-    data = s.client.recv(4096).decode("utf-8")
-    print (data)
-    
-    #Different cases can be handled by passing them to a different handler (or by passing an additional parameter to the current handler)
-    if (data == "TRANSMIT"):
-        # Acknowledge client
-        s.client.sendall("ACK".encode())
-        # Receive function
-        command = receive_command(s.client)
-        handle_command(command)
-        print (type(command))
-        print (command.address, len(command.arguments), command.command_type, command.arguments)
-        # Send over uart
-        #uart.send_function(function)
-        # Wait for acknowledge
-        #ack = (1, 1, 1)
-        #while ack[2] != 0:
-        #    ack = uart.decode_metapacket(uart.receive_packet())
-        #print("done")
-    elif (data == "FORWARD_CTRL_INFO"):
-        # Acknowledge
-        s.client.sendall("ACK".encode())
-        # Is this the intended way? 
-        s.client.sendall(json.dumps(motor_data).encode())
+def process_actions():
+    """Process all actions on the input queue"""
+    while process_action():
+        pass
+
+
+            
+#while 1:
+#    process_action()
         
-        
-    elif (data == "KEY_EVENT"):
-        # Acknowledge client
-        s.client.sendall("ACK".encode())
-        # Receive keyevent
-        key_event = s.client.recv(4096).decode("utf-8")
-        handle_key(key_event)
-'''
-"""
-    if (data == "GET_MOTOR_DIAG"):
-        s.client.sendall("ACK".encode())
-        func = Command.controllerInformation()
-        # TODO: Should properly have a seperate function type for responses
-        # For now, do this
-        func.ARGUMENTS = []
-        func.LENGTH = 0
-        uart.send_function(func)
-        ack = uart.receive_packet()
-        ret = uart.receive_function()
-        transmit_function(ret, s.client)
-"""
-        
-UART_motor.close()
-UART_sensor.close()
-s.close()

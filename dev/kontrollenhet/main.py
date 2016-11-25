@@ -1,38 +1,46 @@
 
-# Hack to be able to import packages from parent directory
-# Basically fools main into believing it resides in ..
-# Only works in unix.
-# TODO: Temporary solution. Look into other solutions.
-import sys
-from pathlib import Path
-if __name__ == '__main__' and __package__ is None:
-    top = Path(__file__).resolve().parents[2]
-    sys.path.append(str(top))
-    import Kartrobot
-    __package__ = 'Kartrobot'
+from robot_communication import *
+import gpio_shutdown as gpio
+from command import Command
 
-# Actual imports
-from .btooth.server import Server
-from process_request import process_request
-
+def autonomous_step():
+    """Perform the next action decided by the autonomous mode."""
+    pass
 
 def main():
-    server = Server()
-    print("Waiting for client connection.")
-    server.advertise_and_connect()
-    print("Connected succesfully")
+    """Main loop"""
 
-    # Main loop
-    while True:
+    manual_mode = True # False if autonomous
+    mode_toggle = False # Changes to true whenever change mode is pressed
 
-        #print(process_request(bytes(10)))
-        #continue
+    # Init
+    gpio.init()
+    #gpio.poll_shutdown_in_other_thread()
+    init_wifi_thread()
     
-        # Process incoming messages
-        while server.messages_queued():
-            server.send(process_request(server.receive()))
+    # Loop
+    while True:
+        # Process messages
+        process_actions()
 
-        # TODO: do other stuff
+        # Update motor diagnostics values
+        # TODO: Doesn't work for some reason
+        #handle_command(Command.controller_information())
+
+        # Autonomous step
+        if not manual_mode:
+            autonomous_step()
+
+        # Check mode switch logic
+        if gpio.change_mode_is_pressed():
+            print("pressed")
+            if not mode_toggle:
+                manual_mode = not manual_mode
+            mode_toggle = True
+        else:
+            mode_toggle = False
+            
+    close_UARTs()
     
 
 if __name__ == "__main__":
