@@ -188,6 +188,8 @@ def process_action():
     """Process the next action on the input queue.
 
     Returns True if an action was popped from the queue, false if not."""
+    if input_queue.empty():
+        return False
     next_action = None
     try:
         next_action = input_queue.get()
@@ -202,6 +204,8 @@ def process_action():
         elif next_action[0] == "KEY_EVENT":
             print("Handling", next_action)
             handle_key(next_action[1])
+        return True
+    return False
 
 def process_actions():
     """Process all actions on the input queue"""
