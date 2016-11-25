@@ -195,7 +195,6 @@ def process_action():
         next_action = input_queue.get()
     except Exception:
         next_action = None
-        pass
     #Then we have a command!
     if next_action != None:
         print(next_action)

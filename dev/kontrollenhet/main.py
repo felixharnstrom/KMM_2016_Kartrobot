@@ -5,6 +5,7 @@ from command import Command
 
 def autonomous_step():
     """Perform the next action decided by the autonomous mode."""
+    # TODO
     pass
 
 def main():
@@ -25,7 +26,6 @@ def main():
         process_actions()
 
         # Update motor diagnostics values
-        # TODO: Doesn't work for some reason
         handle_command(Command.controller_information())
 
         # Autonomous step
