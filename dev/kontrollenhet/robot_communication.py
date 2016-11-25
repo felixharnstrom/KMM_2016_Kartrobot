@@ -42,26 +42,26 @@ def adjust_speeds():
     c = Command.stop_motors() #Dummy
     if key_pressed["up"]:
         if not key_pressed["left"] and not key_pressed["right"] and not key_pressed["down"]: #Forward
-            c = Command.drive(1,80,0)
+            c = Command.drive(1,50,0)
         elif key_pressed["left"] and not key_pressed["right"]:
-            c = Command.side_speeds(1,90,1,70)       
+            c = Command.side_speeds(1,25,1,75)       
         elif key_pressed["right"] and not key_pressed["left"]:
-            c = Command.side_speeds(1,70,1,90)
+            c = Command.side_speeds(1,75,1,25)
         else:
             c = Command.stop_motors() #Stop pressing like stupid
     elif key_pressed["down"]:
         if not key_pressed["left"] and not key_pressed["right"]: #Backward
-            c = Command.drive(0,80,0)
+            c = Command.drive(0,50,0)
         elif key_pressed["left"] and not key_pressed["right"]:
-            c = Command.side_speeds(0,90,0,70)       
+            c = Command.side_speeds(0,75,0,25)       
         elif key_pressed["right"] and not key_pressed["left"]:
-            c = Command.side_speeds(0,70,0,90)
+            c = Command.side_speeds(0,25,0,75)
         else:
             c = Command.stop_motors() #Stop pressing like stupid
     elif key_pressed["left"] and not key_pressed["right"]: #Left
-        c = Command.turn(0,80,0)
+        c = Command.turn(0,50,0)
     elif key_pressed["right"] and not key_pressed["left"]: #Right
-        c = Command.turn(1,80,0)
+        c = Command.turn(1,50,0)
     else:
         c = Command.stop_motors() #Stop pressing like stupid
     print("sendin")
