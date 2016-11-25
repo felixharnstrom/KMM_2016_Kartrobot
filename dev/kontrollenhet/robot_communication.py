@@ -75,10 +75,15 @@ def handle_key(key_event : str):
         key_pressed[key] = (key_e == "p")
         adjust_speeds()
     
-def send_ack():
+def send_sensor_ack():
     ack = Command.ack() #Create ack command
-    UART.send_command(ack) #Send it over uart
+    UART_sensor.send_command(ack) #Send it over uart
 
+def send_motor_ack():
+    ack = Command.ack() #Create ack command
+    UART_motor.send_command(ack) #Send it over uart
+
+    
 #If someone finds a better way, please change this.
 def get_sensor_dict_key(c_enum : CommandEnums):
     if(c_enum == CommandEnums.READ_IR_LEFT_FRONT):
@@ -101,19 +106,19 @@ def get_sensor_dict_key(c_enum : CommandEnums):
 #Reads IR-sensor and sets corresponding sensor_data key.
 def read_ir_sensor(command : Command):
     c_enum = command.get_enum()
-    UART.send_command(command)
-    #ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
-    (ir_value_msb, ir_value_lsb) = UART.receive_payload()
-    #send_ack()
+    UART_sensor.send_command(command)
+    #ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    (ir_value_msb, ir_value_lsb) = UART_sensor.receive_payload()
+    #send_sensor_ack()
     ir_value = ir_value_msb*(2**8)+ir_value_lsb
     sensor_data[get_sensor_dict_key(c_enum)] = ir_value
     return
     
 def read_gyro_sensor(command : Command):
-    UART.send_command(command)
-    #ack = UART.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
-    (gyro_value_msb, gyro_value_lsb) = UART.receive_payload()
-    #send_ack()
+    UART_sensor.send_command(command)
+    #ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    (gyro_value_msb, gyro_value_lsb) = UART_sensor.receive_payload()
+    #send_sensor_ack()
     #We need to cast it to signed int 16 bit (due to being a gyro)
     gyro_value = gyro_value_msb*(2**8)+gyro_value_lsb
     if(gyro_value > 0x7fff): #unsigned 16-bit -> signed 16-bit 
@@ -124,11 +129,13 @@ def read_gyro_sensor(command : Command):
 #Send command to controller to retrieve and return motor data
 def get_motor_diagnostics(command : Command):
     pwm_to_speed = 2.5 #Constant for getting motor pwm -> motor speed percentage
-    UART.send_command(command)
-    #ack = UART.receive_packet() #Receive ack
+    print(command)
+    print(UART)
+    UART_motor.send_command(command)
+    #ack = UART_motor.receive_packet() #Receive ack
     #Sorry for unreadable code!
-    (left_direction, left_pwm, right_direction, right_pwm, servo_pwm_msb, servo_pwm_lsb) = uart.receive_payload()
-    send_ack()
+    (left_direction, left_pwm, right_direction, right_pwm, servo_pwm_msb, servo_pwm_lsb) = UART_motor.receive_payload()
+    send_motor_ack()
     servo_angle = ((servo_pwm_msb*(2**8)+servo_pwm_lsb)-708)/8.45 #Formula for translating servo pwm to servo angle
     print("LEFT: ", 
           "forward " if left_direction else "backward ",  left_pwm/pwm_to_speed, "%\n",

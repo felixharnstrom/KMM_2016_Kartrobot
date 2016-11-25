@@ -14,6 +14,7 @@ def main():
     mode_toggle = False # Changes to true whenever change mode is pressed
 
     # Init
+    init_UARTs()
     gpio.init()
     #gpio.poll_shutdown_in_other_thread()
     init_wifi_thread()
@@ -25,7 +26,7 @@ def main():
 
         # Update motor diagnostics values
         # TODO: Doesn't work for some reason
-        #handle_command(Command.controller_information())
+        handle_command(Command.controller_information())
 
         # Autonomous step
         if not manual_mode:
