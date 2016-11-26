@@ -23,14 +23,14 @@ ACCURACY = 100      # How far from line is it ok for mesurments to be
 ANGEL_DIFF = -10    # How much the staring point of LIDAR scanner is off
 
 
-def map_room(robot, map):
+def map_room(x_position, y_position, angle, map):
     """
     This definition plots the room
     :param robot: A list with robot position and angle [x, y, angle]
     :param map: Pevious mapping of the room
     :return: Returns new_lines, that is a list of tupels with line information [(x11, y11, x21, y21), (x12, y12...), ...]
     """
-    coordinates = get_coordinates(measure_lidar(), robot)
+    coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
 
     #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
 
@@ -228,7 +228,7 @@ def get_vertical_lines(coordinates, size):
 
 
 
-def get_coordinates(mesurments, robot):
+def get_coordinates(mesurments, x_position, y_position, angle):
     """
     Gets coordinates out of mesures
     :param mesurments: A list of mesures, where a mesurement is [degree, distancs]
@@ -236,9 +236,10 @@ def get_coordinates(mesurments, robot):
     :return: A list of coordinates
     """
     coordinates = []
+    print (mesurments)
     for degree, dist in mesurments:
-        x = (math.sin(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[0]
-        y = (math.cos(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[1]
+        x = (math.sin(math.radians(degree + angle + ANGEL_DIFF)) * dist) + x_position
+        y = (math.cos(math.radians(degree + angle + ANGEL_DIFF)) * dist) + y_position
         coordinates.append([x, y])
 
     return coordinates
@@ -304,7 +305,7 @@ def measure_lidar():
         measurements.append([degree, dist])
 
         uart.send_function(Servo(int(degree)))
-
+        time.sleep(0.003)
     return measurements
 
 
