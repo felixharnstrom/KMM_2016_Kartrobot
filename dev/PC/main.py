@@ -93,9 +93,9 @@ def main():
             else:
                 # All commands that are not used above are sent to the raspberry server.
                 send_command(command, robot.client, guit)
-                # TODO: We should send diagnostics to update settings
-                # We may need a wait inbetween
-                #send_command("get_diagnostics", robot.client, guit)
+                # TODO: Send periodically instead?
+                # This works but might be spammy
+                send_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
