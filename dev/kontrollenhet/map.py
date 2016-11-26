@@ -21,18 +21,17 @@ GRID_SIZE = 400     # What si the Grid size
 POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be devided
 MIN_MESURE = 1      # How many messurments should be in every like section
 POINTS_LINE = 3     # How many Linesections should have messures to be a line
-ACCURACY = 100      # How far from line is it ok for mesurments to be
-ANGEL_DIFF = -10    # How much the staring point of LIDAR scanner is off
+ACCURACY = 200      # How far from line is it ok for mesurments to be
 
 
-def map_room(robot, map):
+def map_room(x_position, y_position, angle, map):
     """
     This definition plots the room
     :param robot: A list with robot position and angle [x, y, angle]
     :param map: Pevious mapping of the room
     :return: Returns new_lines, that is a list of tupels with line information [(x11, y11, x21, y21), (x12, y12...), ...]
     """
-    coordinates = get_coordinates(measure_lidar(), robot)
+    coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
 
     #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
 
@@ -153,7 +152,6 @@ def get_size(coordinates):
             min_x, max_x =check_size(x2, min_x, max_x)
             min_y, max_y =check_size(y1, min_y, max_y)
             min_y, max_y =check_size(y2, min_y, max_y)
-    print (min_x,min_y,max_x,max_y)
 
     return [int((min_x//GRID_SIZE)-1), int((max_x//GRID_SIZE)+2), int((min_y//GRID_SIZE)-1), int((max_y//GRID_SIZE)+2)]
 
@@ -231,7 +229,7 @@ def get_vertical_lines(coordinates, size):
 
 
 
-def get_coordinates(mesurments, robot):
+def get_coordinates(mesurments, x_position, y_position, angle):
     """
     Gets coordinates out of mesures
     :param mesurments: A list of mesures, where a mesurement is [degree, distancs]
@@ -240,8 +238,8 @@ def get_coordinates(mesurments, robot):
     """
     coordinates = []
     for degree, dist in mesurments:
-        x = (math.sin(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[0]
-        y = (math.cos(math.radians(degree + robot[2] + ANGEL_DIFF)) * dist) + robot[1]
+        x = (math.sin(math.radians(degree + angle)) * dist) + x_position
+        y = (math.cos(math.radians(degree + angle)) * dist) + y_position
         coordinates.append([x, y])
 
     return coordinates
@@ -275,7 +273,7 @@ def measure_lidar():
 
     uart.send_function(driveInstruction)
 
-    time.sleep(2)
+    time.sleep(1.5)
     degree = 0
 
     measurements = []
@@ -307,16 +305,8 @@ def measure_lidar():
         measurements.append([degree, dist])
 
         uart.send_function(Servo(int(degree)))
-
+        time.sleep(0.005)
     return measurements
-
-
-
-
-
-
-
-
 
 
 
@@ -333,6 +323,7 @@ def test_plot(map, coordinates, size):
     plt.plot(x_plot, y_plot, '.')
     plt.plot([(size[0] - 1) * GRID_SIZE, (size[1]) * GRID_SIZE], [(size[2] - 1) * GRID_SIZE, (size[3]) * GRID_SIZE], '.')
     plt.show()
+
 
 def get_grid_map(robot_x, robot_y, lines):
     """Returns a GridMap containing the room as we currently know it."""

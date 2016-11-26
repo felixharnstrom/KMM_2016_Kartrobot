@@ -10,7 +10,8 @@ angle = 0
 
 map = []
 
-map_room([x,y,angle], map)
+map_room(x,y,angle, map)
+print ("map",map)
 
 print(map)
 print(check_available_grid(map))
