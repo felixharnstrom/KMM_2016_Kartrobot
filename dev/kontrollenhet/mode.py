@@ -19,8 +19,8 @@ def get_mode():
     mode_enum = _mode
     _mode_lock.release()
     return mode_enum
-    
- def toggle_mode():
+
+def toggle_mode():
     global _mode
     _mode_lock.acquire()
     if(_mode == ControlModeEnums.AUTONOMOUS):

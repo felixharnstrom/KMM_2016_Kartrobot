@@ -27,7 +27,7 @@ def main():
         handle_command(Command.controller_information())
 
         # Autonomous step
-        if mode.getMode() == mode.ControlModeEnums.AUTONOMOUS:
+        if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
             autonomous_step()
 
         # Check mode switch logic

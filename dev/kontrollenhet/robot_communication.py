@@ -27,8 +27,8 @@ def init_UARTs():
     #Get serial com. names from system
     #Send dummy messages to find out which com port is assigned to which atmega
     #Set UART_motor and UART_sensor to the correct objects.
-    UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
-    UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+    UART_sensor = UART("ttyUSB0") #TODO: This is not always true!
+    UART_motor = UART("ttyUSB1") #TODO: This is not always true!
     return
 
 def close_UARTs():
