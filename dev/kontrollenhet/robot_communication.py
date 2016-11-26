@@ -138,12 +138,13 @@ def get_motor_diagnostics(command : Command):
     #Sorry for unreadable code!
     (left_direction, left_pwm, right_direction, right_pwm, servo_pwm_msb, servo_pwm_lsb) = UART_motor.receive_payload()
     send_motor_ack()
-    servo_angle = ((servo_pwm_msb*(2**8)+servo_pwm_lsb)-708)/8.45 #Formula for translating servo pwm to servo angle
-    print("LEFT: ", 
-          "forward " if left_direction else "backward ",  left_pwm/pwm_to_speed, "%\n",
-          "RIGHT: ",
-          "forward " if right_direction else "backward ", right_pwm/pwm_to_speed, "%\n",
-          "SERVO: ", servo_angle, " degrees\n")
+    servo_angle = ((servo_pwm_msb*(2**8)+servo_pwm_lsb)-773)/8.72 #Formula for translating servo pwm to servo angle
+    
+    #print("LEFT: ", 
+    #      "forward " if left_direction else "backward ",  left_pwm/pwm_to_speed, "%\n",
+    #      "RIGHT: ",
+    #      "forward " if right_direction else "backward ", right_pwm/pwm_to_speed, "%\n",
+    #      "SERVO: ", servo_angle, " degrees\n")
     motor_data["LEFT_SIDE_DIRECTION"] = left_direction
     motor_data["LEFT_SIDE_SPEED"] = left_pwm/pwm_to_speed
     motor_data["RIGHT_SIDE_DIRECTION"] = right_direction
@@ -205,9 +206,3 @@ def process_actions():
     """Process all actions on the input queue"""
     while process_action():
         pass
-
-
-            
-#while 1:
-#    process_action()
-        

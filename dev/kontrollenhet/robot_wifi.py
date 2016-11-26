@@ -28,9 +28,9 @@ def wifi_main(motor_data, sensor_data, motor_data_lock : threading.Lock,
             input_queue.put(("COMMAND", command))
         elif (data == "FORWARD_CTRL_INFO"):
             # Is this the intended way?
-            motor_data_lock.acquire()
+            #motor_data_lock.acquire()
             motor_data_cpy = motor_data.copy()
-            motor_data_lock.release()
+            #motor_data_lock.release()
             s.client.sendall(json.dumps(motor_data_cpy).encode())
         elif (data == "KEY_EVENT"):
             # Receive keyevent
