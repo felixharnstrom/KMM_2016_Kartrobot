@@ -1,7 +1,8 @@
 
 from robot_communication import *
-import gpio_shutdown as gpio
 from command import Command
+import gpio_buttons as gpio
+
 
 def autonomous_step():
     """Perform the next action decided by the autonomous mode."""
