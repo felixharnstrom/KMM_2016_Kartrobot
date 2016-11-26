@@ -95,7 +95,7 @@ def main():
                 send_command(command, robot.client, guit)
                 # TODO: Send periodically instead?
                 # This works but might be spammy
-                send_command("get_diagnostics", robot.client, guit)
+                #send_command("get_diagnostics", robot.client, guit)
 
 
         # Not yet used
