@@ -19,16 +19,18 @@ input_queue = queue.Queue() #Execute on robot
 
 #TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
 #This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
-UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
-UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+UART_sensor = None #TODO: This is not always true!
+UART_motor = None #TODO: This is not always true!
 #key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
 def init_UARTs():
+    global UART_sensor
+    global UART_motor
     #Get serial com. names from system
     #Send dummy messages to find out which com port is assigned to which atmega
     #Set UART_motor and UART_sensor to the correct objects.
-    UART_sensor = UART("ttyUSB0") #TODO: This is not always true!
-    UART_motor = UART("ttyUSB1") #TODO: This is not always true!
+    UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
+    UART_motor = UART("ttyUSB0") #TODO: This is not always true!
     return
 
 def close_UARTs():
