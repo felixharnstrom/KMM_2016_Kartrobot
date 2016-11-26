@@ -15,7 +15,7 @@ void initPWM(){
     TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
     TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
     OCR3A = 20000;    //Corresponds to 50Hz
-    OCR3B = 770; //The start value for the duty cycle
+    OCR3B = 1556; //The start value for the duty cycle (770, 0 deg | 1553, 90 deg)
     
     //Robot left side
     TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0B1) | (1 << COM0A1); //Com0B0 = 0 for inverted
@@ -90,7 +90,7 @@ void setServoAngle(uint8_t angle){
     if(angle > 180){
         angle = 180; //Otherwise we might hurt the servo
     }
-    OCR3B = 770 + (uint8_t)(8.45 * angle);
+    OCR3B = 773 + (uint16_t)(8.72 * angle);
 }
 
 void moveMS(direction_t direction, uint8_t speedPercentage, uint16_t sleepTime){
