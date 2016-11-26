@@ -17,7 +17,7 @@
 #include "UART.h"
 
 #ifndef BAUD
-#define BAUD 9600   // define baud
+#define BAUD 38400   // define baud
 #endif
 
 void comm_init(void){
