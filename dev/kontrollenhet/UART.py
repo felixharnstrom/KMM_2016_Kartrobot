@@ -44,7 +44,7 @@ class UART:
         """
         # Debug print
         #print(int.from_bytes(packet,byteorder = 'big'))
-        time.sleep(0.1)
+        #time.sleep(0.1)
         return self.ser.write(packet)
 
     def receive_packet(self):
