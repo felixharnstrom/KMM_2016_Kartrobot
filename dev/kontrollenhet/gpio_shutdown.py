@@ -17,6 +17,7 @@ def init():
     GPIO.setup(CHANGE_MODE_PIN, GPIO.IN)
 
 def change_mode_is_pressed():
+    #return GPIO.input(SHUTDOWN_PIN)
     return GPIO.input(CHANGE_MODE_PIN)
     
 def poll_shutdown():

@@ -17,7 +17,7 @@ def main():
     # Init
     init_UARTs()
     gpio.init()
-    #gpio.poll_shutdown_in_other_thread()
+    gpio.poll_shutdown_in_other_thread()
     init_wifi_thread()
     
     # Loop
@@ -34,7 +34,6 @@ def main():
 
         # Check mode switch logic
         if gpio.change_mode_is_pressed():
-            print("pressed")
             if not mode_toggle:
                 manual_mode = not manual_mode
             mode_toggle = True
