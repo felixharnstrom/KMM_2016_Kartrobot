@@ -7,7 +7,7 @@ import time
 class UART:
     def __init__(self, port : str):
         self.port = port
-        self.ser = serial.Serial('/dev/'+port, 9600)  # open serial port
+        self.ser = serial.Serial('/dev/'+port, 38400)  # open serial port
 
     def create_metapacket_hex(self, function : function.Function):
         """
