@@ -59,7 +59,7 @@ def send_command(command, socket, guit):
 def main():
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="localhost")
+    robot.start(ip="130.236.227.104")
 
     map = [[1,0,1],[0,1,1]]
 
@@ -77,7 +77,8 @@ def main():
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
     while True:
-        guit.draw_map(map)
+        # TODO: Update if map changed
+        #guit.draw_map(map)
         if not command_queue.empty():
             # There is a command. Lets get it.
             command = command_queue.get()
@@ -103,7 +104,7 @@ def main():
             # There is a command from the raspberry to the GUI. Lets get it
             command = response_queue.get()
             guit.receive_command(command)
-
+        time.sleep(0.01)
     # Reset settings
     os.system("xset r on")
     
