@@ -23,35 +23,27 @@ def wifi_main(motor_data, sensor_data, motor_data_lock : threading.Lock,
         s.client.sendall("ACK".encode())
         #Different cases can be handled by passing them to a different handler (or by passing an additional parameter to the current handler)
         if (data == "TRANSMIT"):
-            print ("Data")
             # Receive function
             command = receive_command(s.client)
             input_queue.put(("COMMAND", command))
         elif (data == "FORWARD_CTRL_INFO"):
             # Is this the intended way?
-            print ("Forward")
             motor_data_lock.acquire()
             motor_data_cpy = motor_data.copy()
             motor_data_lock.release()
             s.client.sendall(json.dumps(motor_data_cpy).encode())
         elif (data == "KEY_EVENT"):
             # Receive keyevent
-            print ("Keyevent")
             key_event = s.client.recv(4096).decode("utf-8")
             if(mode.get_mode() == mode.ControlModeEnums.MANUAL): #Otherwise discard manual command
                 #TODO: Notify client of this action?
-                print("Hej")
                 input_queue.put(("KEY_EVENT",key_event))
         elif (data == "TOGGLE_MODE"):
             new_mode = s.client.recv(4096).decode("utf-8")
-            print ("Toggle: ", new_mode)
             if (new_mode == "manual"):
-                print("Manual set")
+                print("Manual mode set")
                 mode.set_mode(mode.ControlModeEnums.MANUAL)
             elif (new_mode == "autonomous"):
-                print("Autonomous set")
-                mode.set_mode(mode.ControlModeEnums.AUTO)
-            #TODO: Make this change the mode to new_mode (using mode.py)
-            
-
-            
+                print("Autonomous mode set")
+                mode.set_mode(mode.ControlModeEnums.AUTONOMOUS)
+                

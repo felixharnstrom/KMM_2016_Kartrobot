@@ -1,8 +1,7 @@
-
 from robot_communication import *
 from command import Command
 import gpio_buttons as gpio
-
+import mode
 
 def autonomous_step():
     """Perform the next action decided by the autonomous mode."""
@@ -11,8 +10,6 @@ def autonomous_step():
 
 def main():
     """Main loop"""
-
-    manual_mode = True # False if autonomous
     mode_toggle = False # Changes to true whenever change mode is pressed
 
     # Init
@@ -30,13 +27,13 @@ def main():
         handle_command(Command.controller_information())
 
         # Autonomous step
-        if not manual_mode:
+        if mode.getMode() == mode.ControlModeEnums.AUTONOMOUS:
             autonomous_step()
 
         # Check mode switch logic
         if gpio.change_mode_is_pressed():
             if not mode_toggle:
-                manual_mode = not manual_mode
+                mode.toggle_mode()
             mode_toggle = True
         else:
             mode_toggle = False

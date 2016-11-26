@@ -176,13 +176,6 @@ def handle_command(command : Command):
             UART_motor.send_command(command)
             #ack = UART_motor.receive_packet() #Receive ack
     return
-#print("sent")
-#c2 = Command.side_speeds(1,90,1,70)
-#UART_motor.send_command(c2)
-#time.sleep(2)
-#c3 = Command.stop_motors()
-#UART_motor.send_command(c3)
-#print("sent")
 
 def process_action():
     """Process the next action on the input queue.
