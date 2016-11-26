@@ -142,14 +142,15 @@ def get_size(coordinates):
     max_y = 0
     if len(coordinates[0]) == 2:
         for x, y in coordinates:
-            check_size(x, min_x, max_x)
-            check_size(y, min_y, max_y)
+            min_x, max_x =check_size(x, min_x, max_x)
+            min_y, max_y =check_size(y, min_y, max_y)
     elif len(coordinates[0]) == 4:
         for x1, y1, x2, y2 in coordinates:
-            check_size(x1, min_x, max_x)
-            check_size(x2, min_x, max_x)
-            check_size(y1, min_y, max_y)
-            check_size(y2, min_y, max_y)
+            min_x, max_x = check_size(x1, min_x, max_x)
+            min_x, max_x =check_size(x2, min_x, max_x)
+            min_y, max_y =check_size(y1, min_y, max_y)
+            min_y, max_y =check_size(y2, min_y, max_y)
+    print (min_x,min_y,max_x,max_y)
 
     return [int((min_x//GRID_SIZE)-1), int((max_x//GRID_SIZE)+2), int((min_y//GRID_SIZE)-1), int((max_y//GRID_SIZE)+2)]
 
@@ -166,7 +167,7 @@ def check_size(val, min, max):
         min = val
     elif val > max:
         max = val
-
+    return min, max
 
 
 def get_horizontal_lines(coordinates, size):
@@ -261,9 +262,9 @@ def measure_lidar():
     :return: Measurements in [[degree1, dist1],[degree2, dist2], ...]
     """
 
-    uart = UART("COM4")
+    uart = UART("ttyUSB0")
 
-    sensorunit = UART("COM3")
+    sensorunit = UART("ttyUSB1")
     driveInstruction = Servo(0)
 
     degree_plot = []
