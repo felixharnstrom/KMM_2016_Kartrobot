@@ -20,7 +20,6 @@ POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be de
 MIN_MESURE = 1      # How many messurments should be in every like section
 POINTS_LINE = 3     # How many Linesections should have messures to be a line
 ACCURACY = 100      # How far from line is it ok for mesurments to be
-ANGEL_DIFF = -10    # How much the staring point of LIDAR scanner is off
 
 
 def map_room(x_position, y_position, angle, map):
@@ -238,8 +237,8 @@ def get_coordinates(mesurments, x_position, y_position, angle):
     coordinates = []
     print (mesurments)
     for degree, dist in mesurments:
-        x = (math.sin(math.radians(degree + angle + ANGEL_DIFF)) * dist) + x_position
-        y = (math.cos(math.radians(degree + angle + ANGEL_DIFF)) * dist) + y_position
+        x = (math.sin(math.radians(degree + angle)) * dist) + x_position
+        y = (math.cos(math.radians(degree + angle)) * dist) + y_position
         coordinates.append([x, y])
 
     return coordinates
