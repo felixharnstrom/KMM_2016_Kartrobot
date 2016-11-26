@@ -32,7 +32,7 @@ uint8_t getTransformSpeed(uint8_t speedPercentage);
  * _Parameters_
  * (uint32_t) ms: the milliseconds to sleep
  */
-void delay_ms(uint32_t ms);
+void delay_ms(uint16_t ms);
 
 /*
  * Sets the given pin under the given port to the value 0/1 given in direction_t.
@@ -93,7 +93,7 @@ void setServoAngle(uint8_t angle);
  * (uint8_t) speedPercentage: The speed at which the driving will be made. (0-100)
  * (uint32_t) sleepTime: The time in ms that the robot will move.
  */
-void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime);
+void moveMS(direction_t direction, uint8_t speedPercentage, uint16_t sleepTime);
 
 /*
  * Turns the robot in the given direction at the given speed for sleepTime milliseconds.
@@ -103,7 +103,7 @@ void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime);
  * (uint8_t) speedPercentage: The speed at which the turn will be made. (0-100)
  * (uint32_t) sleepTime: The time in ms that the robot will turn.
  */
-void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime);
+void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint16_t sleepTime);
 
 /*
  * Translates payload values and then moves the robot in the towards the given direction and the given speed.

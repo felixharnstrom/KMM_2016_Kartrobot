@@ -15,7 +15,7 @@ void initPWM(){
     TCCR3A |= (1 << WGM30) | (1 << WGM31) | (1 << COM3B1); //Com3B0 = 0 for inverted
     TCCR3B |= (1 << WGM32) | (1 << WGM33) | (1 << CS31); //WGM32 = 0 should yield Timer 0 -> Max and then reset (1 << WGM32)
     OCR3A = 20000;    //Corresponds to 50Hz
-    OCR3B = 708; //The start value for the duty cycle
+    OCR3B = 770; //The start value for the duty cycle
     
     //Robot left side
     TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0B1) | (1 << COM0A1); //Com0B0 = 0 for inverted
@@ -29,7 +29,7 @@ uint8_t getTransformSpeed(uint8_t speedPercentage){
 }
 
 
-void delay_ms(uint32_t ms){
+void delay_ms(uint16_t ms){
     while(ms > 0){
         _delay_ms(1);
         --ms;
@@ -90,16 +90,16 @@ void setServoAngle(uint8_t angle){
     if(angle > 180){
         angle = 180; //Otherwise we might hurt the servo
     }
-    OCR3B = 708 + (int)(8.45 * angle);
+    OCR3B = 770 + (uint8_t)(8.45 * angle);
 }
 
-void moveMS(direction_t direction, uint8_t speedPercentage, uint32_t sleepTime){
+void moveMS(direction_t direction, uint8_t speedPercentage, uint16_t sleepTime){
     move(direction, speedPercentage);
     delay_ms(sleepTime);
     stopMotors();
 }
 
-void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint32_t sleepTime){
+void turnDirectionMS(turn_t turn, uint8_t speedPercentage, uint16_t sleepTime){
     turnDirection(turn, speedPercentage);
     delay_ms(sleepTime);
     stopMotors();
@@ -304,7 +304,7 @@ int main(void)
     comm_init();
     //Set interrupts enabled
     sei();
-    _delay_ms(1000);
+    _delay_ms(500);
     PORTA |= (1 << PORTA0) | (1 << PORTA1);
     while(1){
         int adr;            //Not needed
