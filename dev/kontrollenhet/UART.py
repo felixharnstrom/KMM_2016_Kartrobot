@@ -33,7 +33,7 @@ class UART:
         :function: The function of which to send the arguments.
         """
         for value in command.arguments:
-            self.send_packet(bytes.fromhex('{:02X}'.format(value)))
+            self.send_packet(bytes.fromhex('{:02X}'.format(int(value))))
 
     def send_packet(self, packet : bytes):
         """
