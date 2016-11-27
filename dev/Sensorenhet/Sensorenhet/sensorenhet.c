@@ -143,59 +143,6 @@ void sendInt(int n) {
     uart_transmit('\n');
 }
 
-double readGyro() {
-    startADConversion(5);
-    waitForADConversion();
-    return getAdcVoltage();
-}
-
-double gyroOutputToAngularRate(double gyroOutput, double bias) {
-    static const double GAIN = 1.0 / (119.0 * 1.23); //TODO: may require further adjustment
-    return (gyroOutput - bias) / GAIN;
-}
-
-double calculateBias() {
-    static const int ITERATIONS = 10000;
-    double sum = 0;
-    for (int i = 0; i < ITERATIONS; ++i)
-        sum += readGyro();
-    return sum / ((double)ITERATIONS);
-}
-
-
-void calibrationTest() {
-    //Set up Timer1
-    //Note that the LIDAR is using the same timer
-    TCNT1 = 0;  //set timer to zero, may not be necessary. This register will count up over time.
-    TCCR1A = 0;    //normal counting up - output compare pins not used, initially zero so not necessary
-    TCCR1B |= ((1 << CS10) | (0 << CS11) | (1 << CS12)); // start the timer at 8MHz/1024
-        
-    double clockRate = 8000000.0 / 1024.0;
-    double timeToMax = 65535 / clockRate;
-    double clocksPerSec = 65535 / timeToMax;
-    
-    double bias = calculateBias();
-    
-    double angle = 0;
-    
-    while(1) {
-        //int vint = lidar_output_to_centimeters();
-        //int vint = readGyro();
-        int time = TCNT1;
-        TCNT1 = 0;
-        
-        double av = gyroOutputToAngularRate(readGyro(), bias);
-        double dif = av * (time / clocksPerSec);
-        angle += dif;
-        
-        //if (dif > 0.01)
-        //sendInt(1000*dif);
-        sendInt(100*angle);
-        //sendInt(gyroOutputToAngularRate(readGyro()) * 100);
-        
-        while(TCNT1 < clocksPerSec / 1000);
-    }
-}
 
 
 uint8_t lowestByte(unsigned int n) {
@@ -241,17 +188,73 @@ sensor_t msgTypeToSensor(t_msgType mst) {
     }
 }
 
+// Source http://www.avrfreaks.net/forum/mpu6050-and-atmega328p-peter-fleury-implementation-problem
+#define MPU6050  0xD0     // (0x68 << 1) I2C slave address
+unsigned char ret;        // return value
+uint16_t raw;             // raw sensor value
+uint16_t gyroZValue;          // x axis acceleration raw value
+void MPU6050_writereg(uint8_t reg, uint8_t val) {
+    i2c_start(MPU6050+I2C_WRITE);
+    i2c_write(reg);  // go to register e.g. 106 user control
+    i2c_write(val);  // set value e.g. to 0100 0000 FIFO enable
+    i2c_stop();      // set stop condition = release bus
+}
+
+
+uint16_t MPU6050_readreg(uint8_t reg)
+{
+    i2c_start_wait(MPU6050+I2C_WRITE);  // set device address and write mode
+    i2c_write(reg);                     // ACCEL_XOUT
+    i2c_rep_start(MPU6050+I2C_READ);    // set device address and read mode
+    raw = i2c_readAck();                // read one intermediate byte
+    raw = (raw<<8) | i2c_readNak();     // read last byte
+    i2c_stop();
+    return raw;
+} 
+
+
+void Init_MPU6050()
+{
+    i2c_init();     // init I2C interface
+    _delay_ms(200);  // Wait for 200 ms.
+
+    ret = i2c_start(MPU6050+I2C_WRITE);       // set device address and write mode
+    if ( ret ) {
+         /* failed to issue start condition, possibly no device found */
+         i2c_stop();
+         while(1) {;;}  // lock program here as sensor init failed
+    }
+    else {
+        /* issuing start condition ok, device accessible */
+        MPU6050_writereg(0x6B, 0x00); // go to register 107 set value to 0000 0000 and wake up sensor
+        MPU6050_writereg(0x19, 0x08); // go to register 25 sample rate divider set value to 0000 1000 for 1000 Hz
+        MPU6050_writereg(0x1C, 0x08); // go to register 28 acceleration configuration set value to 0000 1000 for 4g, normal line tension is 2,7g
+        MPU6050_writereg(0x23, 0xF8); // go to register 35 FIFO enable set value to 1111 1000 for all sensors not slave
+        MPU6050_writereg(0x37, 0x10); // go to register 55 interrupt configuration set value to 0001 0000 for logic level high and read clear
+        MPU6050_writereg(0x38, 0x01); // go to register 56 interrupt enable set value to 0000 0001 data ready creates interrupt
+        MPU6050_writereg(0x6A, 0x40); // go to register 106 user control set value to 0100 0000 FIFO enable
+	}
+}
+
 int main(void)
 {
     comm_init();
     sei();
     initLidar();
-    initAdc();
+    initAdc();    
+
+    DDRB  = 0xff;                              // use all pins on port B for output 
+    PORTB = 0xff;                              // (active low LED's )
+
+	DDRD = 0xff; // MPU-6050 as output
+	gyroZValue = 0;        // initial gyro value (z-axis)
+
+    Init_MPU6050();    // MPU-6050 init
+	
     
     _delay_ms(500);
     
-    double bias = calculateBias();
-    
+
     while(1) {
         /* Read client request */
         int dontCare1;
@@ -288,10 +291,8 @@ int main(void)
 				break;
                 
             case SENSOR_READ_GYRO:;
-                double gyroOutput = gyroOutputToAngularRate(readGyro(), bias);
-                int16_t perHektoSecond = gyroOutput * 100;
-                uint16_t usigned = (uint16_t) perHektoSecond;
-                sendReply(perHektoSecond);
+				gyroZValue = MPU6050_readreg(0x47);   // read raw X acceleration from fifo
+                sendReply(gyroZValue);
                 break;
                 
             default: 

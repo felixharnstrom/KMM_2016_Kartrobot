@@ -19,6 +19,8 @@
 #include <math.h>
 #include <avr/interrupt.h>
 #include "../../uart/Communication.h"
+#include "i2c/i2cmaster.h"
+
 
 #ifndef PACKET_SIZE
 #define PACKET_SIZE (1 << 7)
@@ -31,6 +33,9 @@
 #ifndef MAX_IR_DISTANCE_CM
 #define MAX_IR_DISTANCE_CM 30.0
 #endif
+
+
+
 
   /**
    @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
@@ -88,35 +93,6 @@ void waitForADConversion();
 void initLidar();
 
 /*
- * Returns the average gyro output over a number of iterations.
- * Intended to be used in standstill to acquire the bias for gyroOutputToAngularRate().
- *
- * _returns_
- * (double): the bias value.
- */
-double calculateBias();
-
-/*
- * Return the voltage output from the gyro.
- *
- * _returns_
- * (double): the gyro voltage output.
- */
-double readGyro();
-
-/*
- * Convert gyro voltage output to angular rate in degrees per second.
- *
- * _parameters_
- * (double) gyroOutput: the gyro voltage output
- * (double) bias: the gyro voltage in a standstill
- * 
- * _returns_
- * (double): the angular rate in degrees per second. Sign indicates direction. TODO: which direction is positive?
- */
-double gyroOutputToAngularRate(double gyroOutput, double bias);
-
-/*
  * Return the distance recorded by a given sensor.
  */
    /**
@@ -171,9 +147,31 @@ uint8_t lowestByte(unsigned int n);
 void sendInt(int n);
 
 /*
- * Continuously transmits the current angle of the gyro over UART.
- * Never terminates.
+ * Writes val to reg on MPU-6050
+ *
+ * _parameters_
+ * (uint8_t) reg: the register to write on
+ * (uint8_t) val: the value to write on reg
  */
-void calibrationTest();
+void MPU6050_writereg(uint8_t reg, uint8_t val);
+
+/*
+ * Reads from reg on MPU-6050
+ *
+ * _parameters_
+ * (uint8_t) reg: the register to read from (0x47 = gyro on z-axis)
+ * _returns_
+ * (uint16_t): the register value
+ */
+uint16_t MPU6050_readreg(uint8_t reg);
+
+/*
+ * Sets up the MPU-6050
+ * 
+ * See function and datasheet for setup values
+ */
+void Init_MPU6050();
+
+
 
 #endif /* SENSORENHET_H_ */
