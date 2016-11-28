@@ -31,9 +31,9 @@ def map_room(x_position, y_position, angle, map):
     :param map: Pevious mapping of the room
     :return: Returns new_lines, that is a list of tupels with line information [(x11, y11, x21, y21), (x12, y12...), ...]
     """
-    coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
+    #coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
 
-    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot)
+    coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), x_position, y_position, angle)
 
     # Gets size coordinate area in squares of GRID_SIZE
     # size = [min_x, max_x, min_y, max_y]
@@ -138,10 +138,8 @@ def get_size(coordinates):
     :param coordinates: Takes in a list of coordinates
     :return: [min_x, max_x, min_y, max_y] in number of areas with GRID_SIZE
     """
-    min_x = 0
-    max_x = 0
-    min_y = 0
-    max_y = 0
+    min_x, max_x, min_y, max_y = 0, 0, 0, 0
+
     if len(coordinates[0]) == 2:
         for x, y in coordinates:
             min_x, max_x =check_size(x, min_x, max_x)
@@ -153,7 +151,10 @@ def get_size(coordinates):
             min_y, max_y =check_size(y1, min_y, max_y)
             min_y, max_y =check_size(y2, min_y, max_y)
 
-    return [int((min_x//GRID_SIZE)-1), int((max_x//GRID_SIZE)+2), int((min_y//GRID_SIZE)-1), int((max_y//GRID_SIZE)+2)]
+    min_x, max_x = get_grid(min_x, max_x)
+    min_y, max_y = get_grid(min_y, max_y)
+
+    return [min_x, max_x, min_y, max_y]
 
 
 
@@ -169,6 +170,13 @@ def check_size(val, min, max):
     elif val > max:
         max = val
     return min, max
+
+
+def get_grid(min, max):
+    min_grid = min//GRID_SIZE
+    max_grid = max//GRID_SIZE + 1
+
+    return int(min_grid), int(max_grid)
 
 
 def get_horizontal_lines(coordinates, size):
@@ -327,36 +335,55 @@ def test_plot(map, coordinates, size):
 
 def get_grid_map(robot_x, robot_y, lines):
     """Returns a GridMap containing the room as we currently know it."""
-    # I exptect get_size to output to be the rectangle encapsulating
-    #   all lines, but it seems to be wrong.
-    min_x, max_x, min_y, max_y = [e*GRID_SIZE for e in get_size(lines)]
+    min_x, max_x, min_y, max_y = [e for e in get_size(lines)]
     # This could probably take a gridmap to modify instead
     rslt = GridMap()
     print("MIN", min_x, min_y)
+    print("MAX", max_x, max_y)
     # Translate each line endpoint to a cell
     # As each is GRID_SIZE long, this wont miss inbetween cells
-    for line in lines:
-        # Copy
-        linecpy = [coord for coord in line]
-        # Have coordinates originate from origin
-        linecpy[0] -= min_x
-        linecpy[1] -= min_y
-        linecpy[2] -= min_x
-        linecpy[3] -= min_y
-        print(linecpy)
-        # Adjust coordinates to align with center of a cell
-        for i, coord in enumerate(linecpy):
-            linecpy[i] = coord + GRID_SIZE//2
-            print(linecpy[i])
-        # Calculate grid indices
-        gx1, gy1, gx2, gy2 = [math.floor(coord/GRID_SIZE) for coord in linecpy]
-        print(gx1, gy1)
-        print(gx2, gy2)
-        print("")
-        rslt.set(gx1, gy1, CellType.WALL)
-        rslt.set(gx2, gy2, CellType.WALL)
-    # TODO: Update robot position in result (fairly trivial, same algorithm)
-    # TODO: Change discovered open cells from CellType.UNKNOWN to CellType.OPEN
+    # for line in lines:
+    #     # Copy
+    #     linecpy = [coord for coord in line]
+    #     # Have coordinates originate from origin
+    #     # linecpy[0] -= min_x
+    #     # linecpy[1] -= min_y
+    #     # linecpy[2] -= min_x
+    #     # linecpy[3] -= min_y
+    #     gx1, gy1 = get_grid(linecpy[0], linecpy[1])
+    #     gx2, gy2 = get_grid(linecpy[2], linecpy[3])
+    #     print(linecpy)
+    #     # Adjust coordinates to align with center of a cell
+    #     #for i, coord in enumerate(linecpy):
+    #     #    linecpy[i] = coord + GRID_SIZE//2
+    #     #     print(linecpy[i])
+    #     # # Calculate grid indices
+    #     # gx1, gy1, gx2, gy2 = [math.floor(coord/GRID_SIZE) for coord in linecpy]
+    #     # print(gx1, gy1)
+    #     # print(gx2, gy2)
+    #     # print("")
+    #     # check exactly how set works, how it regonizes a wall
+    #     rslt.set(gx1, gy1, CellType.WALL)
+    #     rslt.set(gx2, gy2, CellType.WALL)
+    # # TODO: Update robot position in result (fairly trivial, same algorithm)
+    # # TODO: Change discovered open cells from CellType.UNKNOWN to CellType.OPEN
+    # # TODO: I Think this will need a bit different way to represnet walls, we should know what wall arround a cell is occupied
+    for y in range (min_y, max_y):
+        for x in range (min_x, max_x):
+            x_next = x + 1
+            y_next = y + 1
+            if (x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE) in lines:
+                print((x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE))
+                print(x, y, "Wall")
+                rslt.set(x, y, CellType.WALL)
+            elif (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) in lines:
+                print((x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE))
+                print(x, y, "Wall")
+                rslt.set(x, y, CellType.WALL)
+            else:
+                print((x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y_next*GRID_SIZE))
+                print(x, y, "Open")
+                rslt.set(x, y, CellType.OPEN)
     return rslt
 
 # Test

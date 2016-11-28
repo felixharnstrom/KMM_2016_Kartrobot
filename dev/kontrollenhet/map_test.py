@@ -11,10 +11,12 @@ angle = 0
 map = []
 
 map_room(x,y,angle, map)
-print ("map",map)
+print("map",map)
 
 print(map)
 print(check_available_grid(map))
+
+get_grid_map(x, y, map)
 
 plt = plot_room(map)
 
