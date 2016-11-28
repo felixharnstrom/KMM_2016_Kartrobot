@@ -64,7 +64,7 @@ class Robot:
             #Use a reimann sum to add up all the gyro rates
             #Area = TimeDiff * turnRate 
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 100
+            turn_rate = self.read_sensor(Command.read_gyro()) / 130 + 1.5
             current_dir += (time.time() - clk) * turn_rate
 
             #print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
