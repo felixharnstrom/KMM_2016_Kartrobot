@@ -193,6 +193,15 @@ sensor_t msgTypeToSensor(t_msgType mst) {
 unsigned char ret;        // return value
 uint16_t raw;             // raw sensor value
 uint16_t gyroZValue;          // x axis acceleration raw value
+
+long calculateBias() {
+    static const int ITERATIONS = 10000;
+    long sum = 0;
+    for (long i = 0; i < ITERATIONS; ++i)
+        sum += MPU6050_readreg(0x43);
+    return sum / ITERATIONS;
+}
+
 void MPU6050_writereg(uint8_t reg, uint8_t val) {
     i2c_start(MPU6050+I2C_WRITE);
     i2c_write(reg);  // go to register e.g. 106 user control
@@ -250,8 +259,7 @@ int main(void)
 	gyroZValue = 0;        // initial gyro value (z-axis)
 
     Init_MPU6050();    // MPU-6050 init
-	
-    
+	int bias = (int) calculateBias();
     _delay_ms(500);
     
 
@@ -291,7 +299,7 @@ int main(void)
 				break;
                 
             case SENSOR_READ_GYRO:;
-				gyroZValue = MPU6050_readreg(0x47);   // read raw X acceleration from fifo
+				gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
                 sendReply(gyroZValue);
                 break;
                 

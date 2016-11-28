@@ -147,6 +147,15 @@ uint8_t lowestByte(unsigned int n);
 void sendInt(int n);
 
 /*
+ * Returns the average gyro output over a number of iterations.
+ * Intended to be used in standstill to acquire the bias for gyroOutputToAngularRate().
+ *
+ * _returns_
+ * (long): the bias value.
+ */
+long calculateBias();
+
+/*
  * Writes val to reg on MPU-6050
  *
  * _parameters_
