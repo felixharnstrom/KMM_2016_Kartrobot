@@ -3,10 +3,11 @@ import time
 import math
 from UART import UART
 from pid import Pid
+import numpy as np
 
 #Define your USB ports
-uart_sensorenhet = UART("ttyUSB0")
-uart_styrenhet = UART("ttyUSB1")
+uart_sensorenhet = UART("ttyUSB1")
+uart_styrenhet = UART("ttyUSB0")
 BLOCK_SIZE = 400 #millimeters
 
 #TODO: Use Daniels enum for MANUAL, AUTONOM
@@ -21,9 +22,8 @@ class Direction:
 
 class DriveStatus:
     OBSTACLE_DETECTED = 0
-    LEFT_CORRIDOR_DETECTED = 1
-    RIGHT_CORRIDOR_DETECTED = 2
-    DONE = 3
+    RIGHT_CORRIDOR_DETECTED = 1
+    DONE = 2
 
 class Robot:
     def __init__(self, mode : ControllerMode):
@@ -34,13 +34,13 @@ class Robot:
         self.path_queue = [] # (Blocks_To_Drive, Direction)
 
         #Initiatee PID controller
-        self.pid_controller = Pid() 
+        self.pid_controller = Pid()
         self.pid_controller.setpoint = 90
         self.pid_controller.output_data = 0
         self.pid_controller.set_tunings(1.4,0,0.3)
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50,50)
-        self.pid_controller.set_mode(1) 
+        self.pid_controller.set_mode(1)
 
     # Return a sensor value
     def read_sensor(self, sensor_instr : Command):
@@ -52,23 +52,34 @@ class Robot:
         lowest = uart_sensorenhet.receive_packet()
         return int.from_bytes(highest + lowest, byteorder="big", signed=True)
 
+    #Take a average value from a given sensor
+    def median_sensor(self, it : int, sensor_instr : Command):
+        distance = []
+        for i in range(it):
+            distance.append(self.read_sensor(sensor_instr))
+        if len(distance) == 1:
+            return distance[0]
+        else:
+            return np.median(distance)
+
     def turn(self, direction : Direction, degrees : int):
+        # TODO: Consider adjusting to wall if we have tomething on the side
         #Set the current direction to zero
         current_dir = 0
 
         #Set time to zero to turn untill stopped
-        turn_instr = Command.turn(direction, 30, 0)
+        standstill_rate = self.median_sensor(32, Command.read_gyro()) / 130
+        turn_instr = Command.turn(direction, 40, 0)
         uart_styrenhet.send_command(turn_instr)
 
         while (abs(current_dir) < degrees):
             #Use a reimann sum to add up all the gyro rates
-            #Area = TimeDiff * turnRate 
+            #Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 130 + 1.5
+            turn_rate = self.read_sensor(Command.read_gyro()) / 130 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
 
-            #print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
-            #print("")
+            print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
 
         #Turning is completed, stop the motors
         turn_instr = Command.stop_motors()
@@ -83,8 +94,8 @@ class Robot:
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def follow_wall_help(self, ratio : int, base_speed : int):
-            left_speed = base_speed / ratio
-            right_speed = base_speed * ratio
+            left_speed = max(min(base_speed / ratio, 100), 0)
+            right_speed = max(min(base_speed * ratio, 100), 0)
             drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
             uart_styrenhet.send_command(drive_instr)
             return
@@ -110,7 +121,7 @@ class Robot:
 
         #Wait fot LIDAR to be in position
         time.sleep(1)
-        
+
         #Read start values from sensors
         lidar = self.read_sensor(Command.read_lidar())
         start_lidar = self.read_sensor(Command.read_lidar())
@@ -118,37 +129,32 @@ class Robot:
         #Drive untill the wanted distance is reached
         while (start_lidar - lidar <= distance):
             # Get sensor values
-            ir_right_front = self.read_sensor(Command.read_right_front_ir())
-            ir_right_back = self.read_sensor(Command.read_right_back_ir())
-            ir_left_front = self.read_sensor(Command.read_left_front_ir())
-            ir_left_back = self.read_sensor(Command.read_left_back_ir())
-            lidar = self.read_sensor(Command.read_lidar())
+            MEDIAN_ITERATIONS = 3
+            ir_right_front = self.median_sensor(MEDIAN_ITERATIONS, Command.read_right_front_ir())
+            ir_right_back = self.median_sensor(MEDIAN_ITERATIONS, Command.read_right_back_ir())
+            ir_left_front = self.median_sensor(MEDIAN_ITERATIONS, Command.read_left_front_ir())
+            ir_left_back = self.median_sensor(MEDIAN_ITERATIONS, Command.read_left_back_ir())
+            lidar = self.median_sensor(MEDIAN_ITERATIONS, Command.read_lidar())
 
-            print ("IR_BACK: " + str(ir_right_back) + " IR_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front)
-            
-            #Obstacle detected
-            if(lidar < 150):
+            print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front)
+
+            #Detect corridor to the right
+            if (ir_right_front > 200):
+                #Save the given length driven
+                #self.wait_for_empty_corridor(Direction.RIGHT)
+                uart_styrenhet.send_command(Command.drive(1,30,0))
+                time.sleep(0.75)
+                uart_styrenhet.send_command(Command.stop_motors())
+                self.driven_distance += start_lidar - lidar
+                self.save_position()
+                return DriveStatus.RIGHT_CORRIDOR_DETECTED
+            # Obstacle detected, and no turn to the right
+            if(lidar < 200):
                 #Save the given length driven
                 uart_styrenhet.send_command(Command.stop_motors())
                 self.driven_distance += start_lidar - lidar
                 self.save_position()
                 return DriveStatus.OBSTACLE_DETECTED
-            #Detect corridor to the right
-            if (ir_right_front > 2* ir_right_back and ir_right_front > 200):
-                #Save the given length driven
-                self.wait_for_empty_corridor(Direction.RIGHT)
-                uart_styrenhet.send_command(Command.stop_motors())
-                self.driven_distance += start_lidar - lidar
-                self.save_position()
-                return DriveStatus.RIGHT_CORRIDOR_DETECTED
-            #Detect corridor to the left
-            elif (ir_left_front > 2 * ir_left_back and ir_left_front > 200):
-                #Save the given length driven
-                self.wait_for_empty_corridor(Direction.LEFT)
-                uart_styrenhet.send_command(Command.stop_motors())
-                self.driven_distance += start_lidar - lidar
-                self.save_position()
-                return DriveStatus.LEFT_CORRIDOR_DETECTED
 
             # We need to get the distance from the center of the robot perpendicular to the wall
             dist = (ir_right_front + ir_right_back) / 2
@@ -165,6 +171,18 @@ class Robot:
         self.save_position()
         return DriveStatus.DONE
 
+    def drive_until_wall_on_right(self):
+        cmd = Command.side_speeds(1, 30, 1, 30)
+        uart_styrenhet.send_command(cmd)
+        while True:
+            right_front = self.median_sensor(32, Command.read_right_front_ir())
+            right_back = self.median_sensor(32, Command.read_right_back_ir())
+            if right_front < 200 and right_back < 200:
+                break
+        uart_styrenhet.send_command(Command.stop_motors())
+        
+            
+    
     #TODO: Add the correct code for updating the path_queue when the code is ready
     #Updates path_queue
     def find_next_destination(self):
@@ -189,32 +207,46 @@ class Robot:
             lidar_distance = self.read_sensor(Command.read_lidar())
             recorded_data += [(i,lidar_distance)]
         return recorded_data
-    
+
     #Drive independent through the maze
     def autonom_mode(self):
         #Update the path_queue for positions to drive
         find_next_destination()
         return
 
+
+
+def sensor_test(robot):
+    while 1:
+        MEDIAN_ITERATIONS = 3
+        ir_right_front = robot.median_sensor(MEDIAN_ITERATIONS, Command.read_right_front_ir())
+        ir_right_back = robot.median_sensor(MEDIAN_ITERATIONS, Command.read_right_back_ir())
+        ir_left_front = robot.median_sensor(MEDIAN_ITERATIONS, Command.read_left_front_ir())
+        ir_left_back = robot.median_sensor(MEDIAN_ITERATIONS, Command.read_left_back_ir())
+        ir_back = robot.median_sensor(MEDIAN_ITERATIONS, Command.read_back_ir())
+        lidar = robot.median_sensor(1, Command.read_lidar())
+        
+        print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
+        #time.sleep(0.33)
+    
 robot = Robot(ControllerMode.MANUAL)
 
+#sensor_test(robot)
+    
 #Try driving in infinite loop around the maze
 while 1:
-	#Drive forward without crashing in wall
-	status = robot.follow_wall(1000)	
-	if (status == DriveStatus.OBSTACLE_DETECTED):
-		print ("---------- OBSTACLE DETECTED!")
-		print ("---------- TURNING 180 degrees")
-		robot.turn(Direction.LEFT, 90)
-		robot.turn(Direction.LEFT, 90)
-	elif (status == DriveStatus.LEFT_CORRIDOR_DETECTED):
-		print ("---------- DETECTED CORRIDOR TO LEFT!")
-		print ("---------- TURNING LEFT 90 degrees")
-		robot.turn(Direction.LEFT, 90)
-	elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
-		print ("---------- DETECTED CORRIDOR TO RIGHT!")
-		print ("---------- TURNING RIGHT 90 degrees")
-		robot.turn(Direction.RIGHT, 90)
+        #Drive forward without crashing in wall
+        status = robot.follow_wall(9999999)
+        if (status == DriveStatus.OBSTACLE_DETECTED):
+                print ("---------- OBSTACLE DETECTED!")
+                print ("---------- TURNING LEFT 90 degrees")
+                robot.turn(Direction.LEFT, 90)
+        elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
+                print ("---------- DETECTED CORRIDOR TO RIGHT!")
+                print ("---------- TURNING RIGHT 90 degrees")
+                robot.turn(Direction.RIGHT, 90)
+                robot.drive_until_wall_on_right()
+
 
 
 
