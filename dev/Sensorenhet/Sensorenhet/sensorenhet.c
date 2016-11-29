@@ -251,11 +251,7 @@ int main(void)
     sei();
     initLidar();
     initAdc();    
-
-    DDRB  = 0xff;                              // use all pins on port B for output 
-    PORTB = 0xff;                              // (active low LED's )
-
-	DDRD = 0xff; // MPU-6050 as output
+    
 	gyroZValue = 0;        // initial gyro value (z-axis)
 
     Init_MPU6050();    // MPU-6050 init
