@@ -21,10 +21,10 @@ GRID_SIZE = 400     # What si the Grid size
 POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be devided
 MIN_MESURE = 1      # How many messurments should be in every like section
 POINTS_LINE = 3     # How many Linesections should have messures to be a line
-ACCURACY = 200      # How far from line is it ok for mesurments to be
+ACCURACY = 100      # How far from line is it ok for mesurments to be
 
 
-def map_room(x_position, y_position, angle, map):
+def map_room(x_position, y_position, angle, lines):
     """
     This definition plots the room
     :param robot: A list with robot position and angle [x, y, angle]
@@ -33,30 +33,32 @@ def map_room(x_position, y_position, angle, map):
     """
     #coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
 
-    coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), x_position, y_position, angle)
+    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), x_position, y_position, angle)
+    coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
 
     # Gets size coordinate area in squares of GRID_SIZE
-    # size = [min_x, max_x, min_y, max_y]
-    size = get_size(coordinates)
+    x_min, x_max, y_min, y_max = get_size(coordinates)
 
     # Gets lists contaning all mesurements that  could be on horizontal lines and vertical lines
-    horizontal_lines = get_horizontal_lines(coordinates, size)
-    vertical_lines = get_vertical_lines(coordinates, size)
+    horizontal_lines = get_horizontal_lines(coordinates, x_min, x_max, y_min, y_max)
+    vertical_lines = get_vertical_lines(coordinates, x_min, x_max, y_min, y_max)
 
     new_lines = []
 
     # Loops over the entire area based on squares of GRID_SIZE
-    for n in range(size[2], size[3]):
+    # + 1 needed so that it always can call y_next, even in last grid
+    for n in range(y_min, y_max + 1):
         # Stores square position, start in y and end in y.
         y = GRID_SIZE * n
         y_next = GRID_SIZE * (n + 1)
-        y_pos = n - size[2]     # corrects that position values can be negative, but lists don't have neg values
+        y_pos = n - y_min        # corrects that position values can be negative, but lists don't have neg values
 
-        for m in range(size[0], size[1]):
-            # Stores square position, start in y and end in y.
+        # + 1 needed so that it always can call x_next, even in last grid
+        for m in range(x_min, x_max + 1):
+            # Stores square position, start in x and end in x.
             x = GRID_SIZE * m
             x_next = GRID_SIZE * (m + 1)
-            x_pos = m - size[0]     # corrects that position values can be negative, but lists don't have neg values
+            x_pos = m - x_min     # corrects that position values can be negative, but lists don't have neg values
 
             # Temp values for ammount of  Line sections with mesures
             tmp_horizontal = 0
@@ -73,17 +75,18 @@ def map_room(x_position, y_position, angle, map):
             # Checks if ammount of Lines sections are >= than POINTS_LINE
             if tmp_horizontal >= POINTS_LINE:
                 line = (x, y, x_next, y)            # create a tupel with line start and end point
-                if line not in map:
-                    map.append(line)
+                if line not in lines:
+                    lines.append(line)
                     new_lines.append(line)
+
             if tmp_vertical >= POINTS_LINE:
                 line = (x, y, x, y_next)            # create a tupel with line start and end point
-                if line not in map:
-                    map.append(line)
+                if line not in lines:
+                    lines.append(line)
                     new_lines.append(line)
 
     # If you don't want it to plot all lines and all mesuring points then uncomment this
-    test_plot(map, coordinates, size)
+    test_plot(lines, coordinates, x_min, x_max, y_min, y_max)
 
     return new_lines
 
@@ -113,14 +116,14 @@ def check_available_grid(map):
     :param map: A list with tupleres containing all walls
     :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
     """
-    size = get_size(map)
+    x_min, x_max, y_min, y_max = get_size(map)
     possible_squares = []
     corr = 0        # size correction, should it go outside known area or not, 0 = not, 1 = yes
 
-    for y in range(size[2], size[3] - 1 + corr):
+    for y in range(y_min, y_max - 1 + corr):
         y_next = y + 1
 
-        for x in range(size[0], size[1] - 1 + corr):
+        for x in range(x_min, x_max - 1 + corr):
             x_next = x + 1
 
             if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
@@ -142,19 +145,19 @@ def get_size(coordinates):
 
     if len(coordinates[0]) == 2:
         for x, y in coordinates:
-            min_x, max_x =check_size(x, min_x, max_x)
-            min_y, max_y =check_size(y, min_y, max_y)
+            min_x, max_x = check_size(x, min_x, max_x)
+            min_y, max_y = check_size(y, min_y, max_y)
     elif len(coordinates[0]) == 4:
         for x1, y1, x2, y2 in coordinates:
             min_x, max_x = check_size(x1, min_x, max_x)
-            min_x, max_x =check_size(x2, min_x, max_x)
-            min_y, max_y =check_size(y1, min_y, max_y)
-            min_y, max_y =check_size(y2, min_y, max_y)
+            min_x, max_x = check_size(x2, min_x, max_x)
+            min_y, max_y = check_size(y1, min_y, max_y)
+            min_y, max_y = check_size(y2, min_y, max_y)
 
     min_x, max_x = get_grid(min_x, max_x)
     min_y, max_y = get_grid(min_y, max_y)
 
-    return [min_x, max_x, min_y, max_y]
+    return min_x, max_x, min_y, max_y
 
 
 
@@ -164,6 +167,7 @@ def check_size(val, min, max):
     :param val: Value to chek if it is smaller than min or larger than max
     :param min: A min value to compare with and also the out value
     :param max: A max value to compare with and also the out value
+    :return: Minimum value and maximum value
     """
     if val < min:
         min = val
@@ -173,67 +177,73 @@ def check_size(val, min, max):
 
 
 def get_grid(min, max):
+    """
+    Changes the 400x400 grid to a 1x1 grid in 1D
+    :param min: Minimum value in 1D
+    :param max: Maximum value in 1D
+    :return: returns how many grids in 1D there is, as a mimum value toa maximum value
+    """
     min_grid = min//GRID_SIZE
     max_grid = max//GRID_SIZE + 1
 
     return int(min_grid), int(max_grid)
 
 
-def get_horizontal_lines(coordinates, size):
+def get_horizontal_lines(coordinates, x_min, x_max, y_min, y_max):
     """
     Gets a list of all mesurments on horizontal lines
     :param coordinates: A list with all coordinates
     :param size: [min_x, max_x, min_y, max_y]
     :return: Returns a list [[[ammount of mesures in nr of POINTS], [..]], [row 2 ..], [[..],[..]]]
     """
-    x_size = size[1] - size[0]
-    y_size = size[3] - size[2]
+    x_size = x_max - x_min + 1
+    y_size = y_max - y_min + 1
 
-    horizontal = np.array([[[0]*POINTS]*x_size]*y_size)
+    horizontal_lines = np.array([[[0]*POINTS]*x_size]*y_size)
 
     # Loops over al coordinates
     for x, y in coordinates:
-        pos_x = int(x//GRID_SIZE) - size[0]
+        pos_x = int(x//GRID_SIZE) - x_min
         pos_x_loc = int((x%GRID_SIZE)//int(GRID_SIZE/POINTS_LINE))
-        pos_y = int(y//GRID_SIZE) - size[2]
+        pos_y = int(y//GRID_SIZE) - y_min
         pos_y_dist = y%GRID_SIZE
 
         # Checks if a mesurement is within the selected area from line, area is +- ACCURACY from line
         if pos_y_dist < ACCURACY:
-            horizontal[pos_y][pos_x][pos_x_loc] += 1
+            horizontal_lines[pos_y][pos_x][pos_x_loc] += 1
         elif pos_y_dist > (GRID_SIZE - ACCURACY):
-            horizontal[pos_y+1][pos_x][pos_x_loc] += 1
+            horizontal_lines[pos_y+1][pos_x][pos_x_loc] += 1
 
-    return horizontal
+    return horizontal_lines
 
 
 
-def get_vertical_lines(coordinates, size):
+def get_vertical_lines(coordinates, x_min, x_max, y_min, y_max):
     """
     Gets a list of all mesurments on vertical lines
     :param coordinates: A list with all coordinates
     :param size: [min_x, max_x, min_y, max_y]
     :return: Returns a list [[[ammount of mesures in nr of POINTS], [..]], [colum 2 ..], [[..],[..]]]
     """
-    x_size = size[1] - size[0]
-    y_size = size[3] - size[2]
+    x_size = x_max - x_min + 1
+    y_size = y_max - y_min + 1
 
-    vertical = np.array([[[0]*POINTS]*x_size]*y_size)
+    vertical_lines = np.array([[[0]*POINTS]*x_size]*y_size)
 
     # Loops over al coordinates
     for x, y in coordinates:
-        pos_x = int(x//GRID_SIZE) - size[0]
+        pos_x = int(x//GRID_SIZE) - x_min
         pos_y_loc = int((y%GRID_SIZE)//int(GRID_SIZE/POINTS))
-        pos_y = int(y//GRID_SIZE) - size[2]
+        pos_y = int(y//GRID_SIZE) - y_min
         pos_x_dist = x%GRID_SIZE
 
         # Checks if a mesurement is within the selected area from line, area is +- ACCURACY from line
         if pos_x_dist < ACCURACY:
-            vertical[pos_y][pos_x][pos_y_loc] += 1
+            vertical_lines[pos_y][pos_x][pos_y_loc] += 1
         elif pos_x_dist > (GRID_SIZE - ACCURACY):
-            vertical[pos_y][pos_x+1][pos_y_loc] += 1
+            vertical_lines[pos_y][pos_x+1][pos_y_loc] += 1
 
-    return vertical
+    return vertical_lines
 
 
 
@@ -270,7 +280,6 @@ def measure_lidar():
     Turns servo 180 degrees while scanning and converts the scanned points to cordinates.
     :return: Measurements in [[degree1, dist1],[degree2, dist2], ...]
     """
-
     uart = UART("ttyUSB0")
 
     sensorunit = UART("ttyUSB1")
@@ -318,7 +327,7 @@ def measure_lidar():
 
 
 
-def test_plot(map, coordinates, size):
+def test_plot(map, coordinates, x_min, x_max, y_min, y_max):
     """
     A test plotting, that shows all mesuring points and walls on the same plot
     """
@@ -329,62 +338,49 @@ def test_plot(map, coordinates, size):
         x_plot.append(x)
         y_plot.append(y)
     plt.plot(x_plot, y_plot, '.')
-    plt.plot([(size[0] - 1) * GRID_SIZE, (size[1]) * GRID_SIZE], [(size[2] - 1) * GRID_SIZE, (size[3]) * GRID_SIZE], '.')
+    plt.plot([(x_min - 1) * GRID_SIZE, (x_max + 1) * GRID_SIZE], [(y_min) * GRID_SIZE, (y_max) * GRID_SIZE], '.')
     plt.show()
 
 
 def get_grid_map(robot_x, robot_y, lines):
     """Returns a GridMap containing the room as we currently know it."""
-    min_x, max_x, min_y, max_y = [e for e in get_size(lines)]
-    # This could probably take a gridmap to modify instead
+    min_x, max_x, min_y, max_y = get_size(lines)
+
     rslt = GridMap()
-    print("MIN", min_x, min_y)
-    print("MAX", max_x, max_y)
-    # Translate each line endpoint to a cell
-    # As each is GRID_SIZE long, this wont miss inbetween cells
-    # for line in lines:
-    #     # Copy
-    #     linecpy = [coord for coord in line]
-    #     # Have coordinates originate from origin
-    #     # linecpy[0] -= min_x
-    #     # linecpy[1] -= min_y
-    #     # linecpy[2] -= min_x
-    #     # linecpy[3] -= min_y
-    #     gx1, gy1 = get_grid(linecpy[0], linecpy[1])
-    #     gx2, gy2 = get_grid(linecpy[2], linecpy[3])
-    #     print(linecpy)
-    #     # Adjust coordinates to align with center of a cell
-    #     #for i, coord in enumerate(linecpy):
-    #     #    linecpy[i] = coord + GRID_SIZE//2
-    #     #     print(linecpy[i])
-    #     # # Calculate grid indices
-    #     # gx1, gy1, gx2, gy2 = [math.floor(coord/GRID_SIZE) for coord in linecpy]
-    #     # print(gx1, gy1)
-    #     # print(gx2, gy2)
-    #     # print("")
-    #     # check exactly how set works, how it regonizes a wall
-    #     rslt.set(gx1, gy1, CellType.WALL)
-    #     rslt.set(gx2, gy2, CellType.WALL)
-    # # TODO: Update robot position in result (fairly trivial, same algorithm)
-    # # TODO: Change discovered open cells from CellType.UNKNOWN to CellType.OPEN
-    # # TODO: I Think this will need a bit different way to represnet walls, we should know what wall arround a cell is occupied
+
+    rslt.set_robot_pos(robot_x, robot_y)
+
     for y in range (min_y, max_y):
         for x in range (min_x, max_x):
             x_next = x + 1
+            x_prev = x - 1
             y_next = y + 1
+            y_prev = y - 1
+
             if (x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE) in lines:
-                print((x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE))
-                print(x, y, "Wall")
-                rslt.set(x, y, CellType.WALL)
-            elif (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) in lines:
-                print((x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE))
-                print(x, y, "Wall")
-                rslt.set(x, y, CellType.WALL)
-            else:
-                print((x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y_next*GRID_SIZE))
+                if y > robot_y:
+                    print(x_next, y, "Wall")
+                    rslt.set(x, y_next, CellType.WALL)
+                elif y < robot_y:
+                    print(x, y_prev, "Wall")
+                    rslt.set(x, y_prev, CellType.WALL)
+
+            if (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) in lines:
+                if x > robot_x:
+                    print(x, y, "Wall")
+                    rslt.set(x, y, CellType.WALL)
+                    if not (rslt.get_relative(x, y) == CellType.WALL):
+                        print(x, y, "Open")
+                        rslt.set(x, y, CellType.OPEN)
+                elif x < robot_x:
+                    print(x_prev, y, "Wall")
+                    rslt.set(x_prev, y, CellType.WALL)
+            ## TODO: check why it is not setting the cell type to anything
+            if not (rslt.get_relative(x, y) == CellType.WALL):
                 print(x, y, "Open")
                 rslt.set(x, y, CellType.OPEN)
     return rslt
+
 
 # Test
 #get_grid_map(0,0,[(0, -400, 400, -400), (400, -400, 400, 0), (400, 0, 400, 400), (0, 400, 400, 400)]).debug_print()

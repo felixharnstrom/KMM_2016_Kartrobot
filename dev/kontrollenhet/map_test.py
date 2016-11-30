@@ -8,16 +8,16 @@ y = 0
 # robot angle
 angle = 0
 
-map = []
+lines = []
 
-map_room(x,y,angle, map)
-print("map",map)
+map_room(x,y,angle, lines)
+print("lines",lines)
 
-print(map)
-print(check_available_grid(map))
+print(lines)
+print(check_available_grid(lines))
 
-get_grid_map(x, y, map)
+get_grid_map(x, y, lines)
 
-plt = plot_room(map)
+plt = plot_room(lines)
 
 plt.show()
