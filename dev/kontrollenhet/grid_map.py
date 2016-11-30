@@ -157,17 +157,3 @@ class GridMap:
                     print("X", end="")
             print("")
 
-
-"""
-# Test
-m = Map()
-#m.expand_up()
-#m.expand_down()
-#m.expand_left()
-#m.expand_right()
-m.set_relative(-3, 0, CellType.WALL)
-m.debug_print()
-print(m.gui_drawable())
-print(m.get_relative(0,0))
-"""
-
