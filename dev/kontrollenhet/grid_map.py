@@ -23,6 +23,7 @@ class GridMap:
     Members:
     grid:list the internal representation of the map
     robot_pos:Position the position of the robot
+    origin:Index of origin. Used internally.
     width:int the current width of the map
     height:int the current height of the map
 
@@ -42,6 +43,7 @@ class GridMap:
         #self.height = 3
         # An empty grid:
         self.grid = []
+        self.origin = Position(0,0)
         self.robot_pos = Position(0,0)
         self.width = 0
         self.height = 0
@@ -55,7 +57,7 @@ class GridMap:
         """Add a new row at the top (y=0)."""
         self.height += 1
         self.grid.insert(0, [CellType.UNKNOWN for i in range(self.width)])
-        self.robot_pos.y += 1
+        self.origin.y += 1
 
     def expand_right(self):
         """Add a new column to the right."""
@@ -67,7 +69,7 @@ class GridMap:
         """Add a new column to the left."""
         for row in self.grid:
             row.insert(0, CellType.UNKNOWN)
-        self.robot_pos.x += 1
+        self.origin.x += 1
         self.width += 1
 
     def expand_to_fit(self, x:int, y:int):
@@ -89,26 +91,38 @@ class GridMap:
                 self.expand_up()
         return (xdif, ydif)
 
+    def pos_to_index(self, x:int, y:int):
+        """Convert coordinates to index.
+        Expands bounds as necessary.
+        Used internally."""
+        xa = x + self.origin.x
+        ya = y + self.origin.y
+        print("::", xa, ya)
+        xdif, ydif = self.expand_to_fit(xa, ya)
+        return (xa + xdif, ya + ydif)
+
     def get_robot_pos(self):
         """Get robot position."""
         return self.robot_pos
 
     def set_robot_pos(self, x:int, y:int):
         """Set robot pos. Accepts values outside of bounds; expands map."""
-        xdif, ydif = self.expand_to_fit(x, y)
-        newx, newy = x+xdif, y+ydif
+        newx, newy = self.pos_to_index(x, y)
         return self.grid[newy][newx]
+
+    def move_robot(self, xdif:int, ydif:int):
+        """Move robot. Acceps values outside of bounds; expands map."""
+        p = self.robot_pos
+        self.set_robot_pos(p.x + xdif, p.y + ydif)
 
     def get(self, x:int, y:int):
         """Get a cell value. Accepts values outside of bounds; expands map."""
-        xdif, ydif = self.expand_to_fit(x, y)
-        newx, newy = x+xdif, y+ydif
+        newx, newy = self.pos_to_index(x, y)
         return self.grid[newy][newx]
 
     def set(self, x:int, y:int, ctype:CellType):
         """Set a cell value. Accepts values outside of bounds; expands map."""
-        xdif, ydif = self.expand_to_fit(x, y)
-        newx, newy = x+xdif, y+ydif
+        newx, newy = self.pos_to_index(x, y)
         self.grid[newy][newx] = ctype
 
     def get_relative(self, x:int, y:int):
@@ -129,9 +143,12 @@ class GridMap:
         """Prints a readable version of the map."""
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                if (self.robot_pos.x == x and
-                    self.robot_pos.y == y):
+                if (self.robot_pos.x + self.origin.x == x and
+                    self.robot_pos.y + self.origin.y == y):
                     print("R", end="")
+                elif (self.origin.x == x and
+                      self.origin.y == y):
+                    print("O", end="")
                 elif cell == CellType.UNKNOWN:
                     print("?", end="")
                 elif cell == CellType.OPEN:
