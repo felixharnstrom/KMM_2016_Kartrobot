@@ -31,7 +31,7 @@ class Pid():
         time_now = datetime.now()
         diff = time_now - self.time_last
         time_change = diff.microseconds / 1000      # Time diff in millis
-        #if (time_change >= self.sample_time):
+        self.set_sample_time(time_change)
 
         # Error variables
         error = self.setpoint - self.input_data
