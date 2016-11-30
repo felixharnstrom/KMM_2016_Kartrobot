@@ -8,7 +8,7 @@
 #include "../../uart/Communication.h"
 
 typedef enum{LEFT_SIDE, RIGHT_SIDE} side_t; //What side of motors are we targeting?
-typedef enum {NONE, FORWARD, BACKWARD} direction_t; //What direction are the motors running in?
+typedef enum {NONE, FORWARD, BACKWARD, TOGGLE} direction_t; //What direction are the motors running in?
 typedef enum {LEFT_TURN, RIGHT_TURN} turn_t; //What way are we turning?
 
 /*

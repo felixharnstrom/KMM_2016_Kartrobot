@@ -44,6 +44,9 @@ void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction){
         case FORWARD:
             *port |= (1 << portnr);
         break;
+        case TOGGLE:
+            *port ^= (1  <<portnr);
+        break;
         default:
             //Do nothing (Also do this for value NONE)
         break;
@@ -51,6 +54,9 @@ void setPinValue(volatile uint8_t *port, uint8_t portnr, direction_t direction){
 }
 
 void stopMotors(){
+    setPinValue(&PORTB,PORTB5,TOGGLE);
+    setPinValue(&PORTB,PORTB6,TOGGLE);
+    _delay_ms(25);
     setSpeed(RIGHT_SIDE, NONE, 0);
     setSpeed(LEFT_SIDE, NONE, 0);
 }
