@@ -192,7 +192,7 @@ sensor_t msgTypeToSensor(t_msgType mst) {
 #define MPU6050  0xD0     // (0x68 << 1) I2C slave address
 unsigned char ret;        // return value
 uint16_t raw;             // raw sensor value
-uint16_t gyroZValue;          // x axis acceleration raw value
+int16_t gyroZValue;          // x axis acceleration raw value
 
 long calculateBias() {
     static const int ITERATIONS = 10000;
@@ -296,7 +296,7 @@ int main(void)
                 
             case SENSOR_READ_GYRO:;
 				gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
-                sendReply(gyroZValue);
+                sendReply(gyroZValue/1.3);
                 break;
                 
             default: 
