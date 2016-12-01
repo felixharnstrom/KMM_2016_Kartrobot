@@ -147,12 +147,6 @@ class Robot:
         # Add turned degrees to current_angle
         self.current_angle += degrees
 
-    def save_position(self):
-        """
-        Save the collected data to the trace list.
-        """
-        self.path_trace += [(self.current_angle, self.driven_distance)]
-
     def follow_wall_help(self, ratio : int, base_speed : int):
         """
         Calculate motor speeds and send drive instruction.
@@ -228,7 +222,7 @@ class Robot:
                 self.drive_distance(RIGHT_TURN_ENTRY_DIST, BASE_SPEED)
                 # Save the given length driven
                 self.driven_distance += start_lidar - lidar
-                self.save_position()
+                self._save_position()
                 self._last_dist = self._median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 return DriveStatus.RIGHT_CORRIDOR_DETECTED
 
@@ -237,7 +231,7 @@ class Robot:
                 # Save the given length driven
                 self.uart_styrenhet.send_command(Command.stop_motors())
                 self.driven_distance += start_lidar - lidar
-                self.save_position()
+                self._save_position()
                 return DriveStatus.OBSTACLE_DETECTED
 
             # We need to get the distance from the center of the robot perpendicular to the wall
@@ -260,7 +254,7 @@ class Robot:
         # Save the given length driven
         self.uart_styrenhet.send_command(Command.stop_motors())
         self.driven_distance += distance
-        self.save_position()
+        self._save_position()
         return DriveStatus.DONE
     
     # TODO: Add the correct code for updating the path_queue when the code is ready
@@ -344,6 +338,12 @@ class Robot:
             return values[0]
         else:
             return np.median(values)
+
+    def _save_position(self):
+        """
+        Save the collected data to the trace list.
+        """
+        self.path_trace += [(self.current_angle, self.driven_distance)]
 
 
 def sensor_test(robot):
