@@ -147,19 +147,6 @@ class Robot:
         # Add turned degrees to current_angle
         self.current_angle += degrees
 
-    def follow_wall_help(self, ratio : int, base_speed : int):
-        """
-        Calculate motor speeds and send drive instruction.
-
-        Args:
-            ratio (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
-            base_speed (int): Base speed that ratio will be applied to.
-        """
-        left_speed = max(min(base_speed / ratio, 100), 0)
-        right_speed = max(min(base_speed * ratio, 100), 0)
-        drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
-        self.uart_styrenhet.send_command(drive_instr)
-
     def drive_distance(self, dist : int, speed : int):
         """
         Drives the given distance at the given speed. Uses LIDAR for determining distance.
@@ -248,7 +235,7 @@ class Robot:
             self.pid_controller.input_data = perpendicular_dist_right - perpendicular_dist_left
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
-            self.follow_wall_help(self.pid_controller.output_data / 100, BASE_SPEED)
+            self._follow_wall_help(self.pid_controller.output_data / 100, BASE_SPEED)
             self._last_dist = self._median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
         # Save the given length driven
@@ -344,6 +331,19 @@ class Robot:
         Save the collected data to the trace list.
         """
         self.path_trace += [(self.current_angle, self.driven_distance)]
+
+    def _follow_wall_help(self, ratio : int, base_speed : int):
+        """
+        Calculate motor speeds and send drive instruction.
+
+        Args:
+            ratio (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
+            base_speed (int): Base speed that ratio will be applied to.
+        """
+        left_speed = max(min(base_speed / ratio, 100), 0)
+        right_speed = max(min(base_speed * ratio, 100), 0)
+        drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
+        self.uart_styrenhet.send_command(drive_instr)
 
 
 def sensor_test(robot):
