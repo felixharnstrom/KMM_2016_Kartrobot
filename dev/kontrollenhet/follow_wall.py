@@ -69,8 +69,12 @@ class Robot:
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
 
-    # Return a sensor value
     def read_sensor(self, sensor_instr : Command):
+        """
+        Return the current value of the given sensor.
+
+        :sensor_instr: A sensor command.
+        """
         self.uart_sensorenhet.send_command(sensor_instr)
         self.uart_sensorenhet.receive_packet()
         adress, length, typ = self.uart_sensorenhet.decode_metapacket(self.uart_sensorenhet.receive_packet())
@@ -79,15 +83,20 @@ class Robot:
         lowest = self.uart_sensorenhet.receive_packet()
         return int.from_bytes(highest + lowest, byteorder = "big", signed = True)
 
-    # Take a median value from a given sensor
     def median_sensor(self, it : int, sensor_instr : Command):
-        distance = []
+        """
+        Return the median value of the specified number of readings from the given sensor.
+
+        :it: Number of sensor values.
+        :sensor_instr: A sensor command.
+        """
+        values = []
         for i in range(it):
-            distance.append(self.read_sensor(sensor_instr))
-        if len(distance) == 1:
-            return distance[0]
+            values.append(self.read_sensor(sensor_instr))
+        if len(values) == 1:
+            return values[0]
         else:
-            return np.median(distance)
+            return np.median(values)
 
     def turn(self, direction : Direction, degrees : int, speed: int):
         """
@@ -228,28 +237,30 @@ class Robot:
         return DriveStatus.DONE
     
     # TODO: Add the correct code for updating the path_queue when the code is ready
-    # Updates path_queue
     def find_next_destination(self):
-        return [] #Return random path to drive
+        """
+        Find the next destionation and update path_queue.
+        """
+        return [] # Return random path to drive
 
     def scan(self):
         """
         Scan the room at this position and return the recorded data.
         """
-        recorded_data = [] #(Angle, distance)
-        #Place LIDAR to 0 degrees
+        recorded_data = [] # (Angle, distance)
+        # Turn LIDAR to 0 degrees
         servo_instr = Command.servo(0)
         self.uart_styrenhet.send_command(servo_instr)
 
-        #Sleep 1 second to wait for LIDAR to be in position
+        # Sleep 1 second to wait for LIDAR to be in position
         time.sleep(1)
 
         for i in range(180):
-            #Point LIDAR in the right angle
+            # Point LIDAR in the right angle
             servo_instr = Command.servo(i)
             self.uart_styrenhet.send_command(servo_instr)
 
-            #Read data from the LIDAR sensor
+            # Read data from the LIDAR sensor
             lidar_distance = self.read_sensor(Command.read_lidar())
             recorded_data += [(i,lidar_distance)]
 
