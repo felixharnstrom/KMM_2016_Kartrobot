@@ -12,7 +12,7 @@ Todo:
     * Add the correct code for updating the path_queue in find_next_destination().
     * Add cases for corridors, open rooms, crossings, etc.
     * Use the Direction class instead of hard-coded directions.
-    * Complete docstring for Robot class
+    * Complete docstrings.
 """
 from command import Command
 import time
@@ -97,7 +97,11 @@ class Robot:
         """
         Return the current value of the given sensor.
 
-        :sensor_instr: A sensor command.
+        Args:
+            sensor_instr (Command): A sensor command.
+
+        Returns:
+            (int): Distance in millimetres.
         """
         self.uart_sensorenhet.send_command(sensor_instr)
         self.uart_sensorenhet.receive_packet()
@@ -111,8 +115,12 @@ class Robot:
         """
         Return the median value of the specified number of readings from the given sensor.
 
-        :it: Number of sensor values.
-        :sensor_instr: A sensor command.
+        Args:
+            it (int): Number of sensor values.
+            sensor_instr (Command): A sensor command.
+
+        Returns:
+            (int): Median value.
         """
         values = []
         for i in range(it):
@@ -126,9 +134,10 @@ class Robot:
         """
         Turn a certain amount in the given direction at the given speed.
 
-        :direction: Direction to turn.
-        :degrees: Degrees to turn.
-        :speed: Speed as a percentage value between 0-100.
+        Args:
+            direction (Direction): Direction to turn.
+            degrees (int): Degrees to turn.
+            speed (int): Speed as a percentage value between 0-100.
         """
         # TODO: Consider adjusting to wall if we have something on the side
         # Set the current direction to zero
@@ -154,11 +163,10 @@ class Robot:
 
         # Add turned degrees to current_angle
         self.current_angle += degrees
-        return
 
     def save_position(self):
         """
-        Save the collected data to the trace list
+        Save the collected data to the trace list.
         """
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
@@ -166,8 +174,9 @@ class Robot:
         """
         Calculate motor speeds and send drive instruction.
 
-        :ratio: Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
-        :base_speed: Base speed that ratio will be applied to.
+        Args:
+            ratio (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
+            base_speed (int): Base speed that ratio will be applied to.
         """
         left_speed = max(min(base_speed / ratio, 100), 0)
         right_speed = max(min(base_speed * ratio, 100), 0)
@@ -178,8 +187,9 @@ class Robot:
         """
         Drives the given distance at the given speed. Uses LIDAR for determining distance.
 
-        :dist: Distance in millimetres.
-        :speed: Speed as a percentage value between 0-100.
+        Args:
+            dist (int): Distance in millimetres.
+            speed (int): Speed as a percentage value between 0-100.
         """
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         lidar_init = self.read_sensor(Command.read_lidar())
@@ -189,9 +199,13 @@ class Robot:
 
     def follow_wall(self, distance : int):
         """
-        Follow the wall to the right until the robot gets a unexpected stop command or the given distance to drive is reached.
+        Follow the wall to the right until the robot encounters a corner or obstacle, or the given distance to drive is reached.
 
-        :dist: Distance in millimetres.
+        Args:
+            dist (int): Distance in millimetres.
+
+        Returns:
+            (DriveStatus): Status when completed.
         """
         self._help_angle = 0
 
@@ -264,12 +278,18 @@ class Robot:
     def find_next_destination(self):
         """
         Find the next destionation and update path_queue.
+
+        Returns:
+            (list of ?): Path to drive. # TODO: What is this?
         """
         return [] # Return random path to drive
 
     def scan(self):
         """
         Scan the room at this position and return the recorded data.
+
+        Returns:
+            (list of ?): Recorded data. # TODO: What is this?
         """
         recorded_data = [] # (Angle, distance)
         # Turn LIDAR to 0 degrees
@@ -296,14 +316,14 @@ class Robot:
         """
         # Update the path_queue for positions to drive
         find_next_destination()
-        return
 
 
     def stand_perpendicular(self, side: str):
         """
         Turn to stand perpendicular to the wall at the given side.
 
-        :side: 'left' or 'right'
+        Args:
+            side (str): 'left' or 'right'
         """
         if side == "left":
             ir_front = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
