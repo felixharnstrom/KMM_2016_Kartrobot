@@ -97,7 +97,6 @@ class GridMap:
         Used internally."""
         xa = x + self.origin.x
         ya = y + self.origin.y
-        print("::", xa, ya)
         xdif, ydif = self.expand_to_fit(xa, ya)
         return (xa + xdif, ya + ydif)
 
