@@ -11,6 +11,8 @@ Todo:
     * Consider adjusting to wall to improve final heading after turn().
     * Add the correct code for updating the path_queue in find_next_destination().
     * Add cases for corridors, open rooms, crossings, etc.
+    * Use the Direction class instead of hard-coded directions.
+    * Complete docstring for Robot class
 """
 from command import Command
 import time
@@ -49,16 +51,38 @@ class DriveStatus:
     DONE = 2
 
 class Robot:
-    def __init__(self, mode : ControllerMode, sensorenhet_device : str, styrenhet_device : str):
+    """
+    Contains the robot's current state and several functions enabling the robot's high-level behaviour.
+
+    Args:
+        mode (ControllerMode): Whether it should start in manual or autonomous mode.
+        sensor_device (str): Device name of the USB<->Serial converter for the sensor unit.
+        control_device (str): Device name of the USB<->Serial converter for the control unit.
+
+    Attributes:
+        driven_distance (int): Driven distance thus far.
+        current_angle (int): Current angle against right wall.
+        control_mode (ControllerMode): Current controller mode.
+        path_trace (?): ? # TODO: What is this?
+        path_queue (?): ? # TODO: What is this?
+        uart_sensorenhet (str): Device name of the USB<->Serial converter for the sensor unit.
+        uart_styrenhet (str): Device name of the USB<->Serial converter for the control unit.
+        pid_controller (Pid): The PID controller in use.
+    """
+
+    def __init__(self, mode : ControllerMode, sensor_device : str, control_device : str):
+        # Public attributes
         self.driven_distance = 0
         self.current_angle = 0
-        self.help_angle = 0
         self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
-        self.last_dist = 0
-        self.uart_sensorenhet = UART(sensorenhet_device)
-        self.uart_styrenhet = UART(styrenhet_device)
+        self.uart_sensorenhet = UART(sensor_device)
+        self.uart_styrenhet = UART(control_device)
+
+        # Private attributes
+        self._help_angle = 0
+        self._last_dist = 0
 
         # Initialize PID controller
         self.pid_controller = Pid()
@@ -169,7 +193,7 @@ class Robot:
 
         :dist: Distance in millimetres.
         """
-        self.help_angle = 0
+        self._help_angle = 0
 
         # Set time to zero to turn untill stopped
         standstill_rate = self.median_sensor(GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 200
@@ -178,7 +202,7 @@ class Robot:
         lidar = self.read_sensor(Command.read_lidar())
         start_lidar = self.read_sensor(Command.read_lidar())
 
-        self.last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+        self._last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
         # Drive until the wanted distance is reached
         while (start_lidar - lidar <= distance):
@@ -187,7 +211,7 @@ class Robot:
             # Area = TimeDiff * turnRate
             clk = time.time()
             turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
-            self.help_angle += (time.time() - clk) * turn_rate
+            self._help_angle += (time.time() - clk) * turn_rate
 
             # Get sensor values
             ir_right_front = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -195,15 +219,15 @@ class Robot:
             ir_left_front = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
             ir_left_back = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             lidar = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_lidar())
-            print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self.help_angle))
+            print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self._help_angle))
 
              # Detect corridor to the right
-            if ((ir_right_front >= TURN_OVERRIDE_DIST) or (ir_right_front > TURN_MIN_DIST and ir_right_front > EDGE_SPIKE_FACTOR * self.last_dist)):
+            if ((ir_right_front >= TURN_OVERRIDE_DIST) or (ir_right_front > TURN_MIN_DIST and ir_right_front > EDGE_SPIKE_FACTOR * self._last_dist)):
                 self.drive_distance(RIGHT_TURN_ENTRY_DIST, BASE_SPEED)
                 # Save the given length driven
                 self.driven_distance += start_lidar - lidar
                 self.save_position()
-                self.last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+                self._last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 return DriveStatus.RIGHT_CORRIDOR_DETECTED
 
             # Obstacle detected, and no turn to the right
@@ -228,7 +252,7 @@ class Robot:
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
             self.follow_wall_help(self.pid_controller.output_data / 100, BASE_SPEED)
-            self.last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+            self._last_dist = self.median_sensor(IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
         # Save the given length driven
         self.uart_styrenhet.send_command(Command.stop_motors())
@@ -336,8 +360,8 @@ def main(argv):
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                     print ("---------- DETECTED CORRIDOR TO RIGHT!")
                     print ("---------- TURNING RIGHT 90 degrees")
-                    print (robot.help_angle)
-                    robot.turn(Direction.RIGHT, 90 + robot.help_angle, speed = ACCELERATED_SPEED)
+                    print (robot._help_angle)
+                    robot.turn(Direction.RIGHT, 90 + robot._help_angle, speed = ACCELERATED_SPEED)
                     robot.drive_distance(RIGHT_TURN_EXIT_DIST, ACCELERATED_SPEED)
                     robot.pid_controller.kp = 0
                     robot.pid_controller.ki = 0
