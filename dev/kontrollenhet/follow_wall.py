@@ -24,7 +24,7 @@ from command import Command
 from UART import UART
 from pid import Pid
 
-VERBOSITY = 1   # Global verbosity level.
+VERBOSITY = 1   # Default global verbosity level, can be set by command-line argument.
 
 # TODO: Use Daniel's enum for MANUAL, AUTONOM
 class ControllerMode:
@@ -80,8 +80,8 @@ class Robot:
         self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
-        #self.uart_sensorenhet = UART(sensor_device)
-        #self.uart_styrenhet = UART(control_device)
+        self.uart_sensorenhet = UART(sensor_device)
+        self.uart_styrenhet = UART(control_device)
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
@@ -384,7 +384,7 @@ def main(argv):
 
     # Turn LIDAR to 90 degrees
     servo_instr = Command.servo(90)
-    #robot.uart_styrenhet.send_command(servo_instr)
+    robot.uart_styrenhet.send_command(servo_instr)
 
     # Wait fot LIDAR to be in position
     time.sleep(1)
