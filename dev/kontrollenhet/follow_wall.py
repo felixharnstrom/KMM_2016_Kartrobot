@@ -129,14 +129,6 @@ class Robot:
         while(lidar_init - lidar_cur < dist):
             lidar_cur = self.read_sensor(Command.read_lidar())
 
-    def wait_for_empty_corridor(self):
-        uart_styrenhet.send_command(Command.drive(1,30,0))
-        lidar = self.read_sensor(Command.read_lidar())
-        while(lidar > 150):
-            lidar = self.read_sensor(Command.read_lidar())
-            continue
-        uart_styrenhet.send_command(Command.stop_motors())
-
     def follow_wall(self, distance : int):
         """
         Follow the wall to the right until the robot gets a unexpected stop command or the given distance to drive is reached.
@@ -174,9 +166,8 @@ class Robot:
 
             #Detect corridor to the right
             if ((ir_right_front == 300) or (ir_right_front > 100 and ir_right_front > 2 * self.last_dist)):
-                #Save the given length driven
-                #self.wait_for_empty_corridor()
                 self.drive_distance(100, 20)
+                #Save the given length driven
                 self.driven_distance += start_lidar - lidar
                 self.save_position()
                 self.last_dist = self.median_sensor(MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -209,17 +200,6 @@ class Robot:
         self.driven_distance += distance
         self.save_position()
         return DriveStatus.DONE
-
-    def drive_until_wall_on_right(self):
-        uart_styrenhet.send_command(Command.drive(1,30,0))
-        ir_right_back = self.read_sensor(Command.read_right_back_ir())
-        ir_right_front = self.read_sensor(Command.read_right_front_ir())
-        while((ir_right_back > 200) and (ir_right_front > 200)):
-            ir_right_back = self.read_sensor(Command.read_right_back_ir())
-            ir_right_front = self.read_sensor(Command.read_right_front_ir())
-        uart_styrenhet.send_command(Command.stop_motors())
-        self.last_dist = self.median_sensor(3, Command.read_right_front_ir())
-
     
     #TODO: Add the correct code for updating the path_queue when the code is ready
     #Updates path_queue
