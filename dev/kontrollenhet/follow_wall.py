@@ -46,31 +46,31 @@ class Robot:
     Contains the robot's current state and several functions enabling the robot's high-level behaviour.
 
     Args:
-        mode (ControllerMode): Whether it should start in manual or autonomous mode.
-        sensor_device (str): Device name of the USB<->Serial converter for the sensor unit.
-        control_device (str): Device name of the USB<->Serial converter for the control unit.
+        mode            (ControllerMode): Whether it should start in manual or autonomous mode.
+        sensor_device   (str): Device name of the USB<->Serial converter for the sensor unit.
+        control_device  (str): Device name of the USB<->Serial converter for the control unit.
 
     Attributes:
-        driven_distance (int): Driven distance thus far.
-        current_angle (int): Current angle against right wall.
-        control_mode (ControllerMode): Current controller mode.
-        path_trace (?): ? # TODO: What is this?
-        path_queue (?): ? # TODO: What is this?
-        uart_sensorenhet (str): Device name of the USB<->Serial converter for the sensor unit.
-        uart_styrenhet (str): Device name of the USB<->Serial converter for the control unit.
-        pid_controller (Pid): The PID controller in use.
-        BLOCK_SIZE (int): Block size in millimetres.
-        IR_MEDIAN_ITERATIONS (int): Number of values to get from IR sensors.
-        GYRO_MEDIAN_ITERATIONS (int): Number of values to get from gyro.
-        TURN_OVERRIDE_DIST (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
-        TURN_MIN_DIST (int): The minimum detected distance in that will trigger a right turn.
-        RIGHT_TURN_ENTRY_DIST (int): How far to drive into a corner before performing a 90° turn.
-        RIGHT_TURN_EXIT_DIST (int): How far to drive into a corridor after performing a 90° turn.
-        EDGE_SPIKE_FACTOR (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
-        OBSTACLE_DIST (int): The maximum distance until an obstacle ahead will trigger a turn.
-        SENSOR_SPACING (int): Distance between side sensors on the robot.
-        BASE_SPEED (int): The speed that seems to work best for the controller with fully charged batteries.
-        ACCELERATED_SPEED (int): Can be used when the controller is disengaged, otherwise too fast for the controller to handle.
+        driven_distance         (int): Driven distance thus far.
+        current_angle           (int): Current angle against right wall.
+        control_mode            (ControllerMode): Current controller mode.
+        path_trace              (?): ? # TODO: What is this?
+        path_queue              (?): ? # TODO: What is this?
+        uart_sensorenhet        (str): Device name of the USB<->Serial converter for the sensor unit.
+        uart_styrenhet          (str): Device name of the USB<->Serial converter for the control unit.
+        pid_controller          (Pid): The PID controller in use.
+        BLOCK_SIZE              (int): Block size in millimetres.
+        IR_MEDIAN_ITERATIONS    (int): Number of values to get from IR sensors.
+        GYRO_MEDIAN_ITERATIONS  (int): Number of values to get from gyro.
+        TURN_OVERRIDE_DIST      (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
+        TURN_MIN_DIST           (int): The minimum detected distance in that will trigger a right turn.
+        RIGHT_TURN_ENTRY_DIST   (int): How far to drive into a corner before performing a 90° turn.
+        RIGHT_TURN_EXIT_DIST    (int): How far to drive into a corridor after performing a 90° turn.
+        EDGE_SPIKE_FACTOR       (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
+        OBSTACLE_DIST           (int): The maximum distance until an obstacle ahead will trigger a turn.
+        SENSOR_SPACING          (int): Distance between side sensors on the robot.
+        BASE_SPEED              (int): The speed that seems to work best for the controller with fully charged batteries.
+        ACCELERATED_SPEED       (int): Can be used when the controller is disengaged, otherwise too fast for the controller to handle.
     """
 
     def __init__(self, mode : ControllerMode, sensor_device : str, control_device : str):
@@ -131,9 +131,9 @@ class Robot:
         Turn a certain amount in the given direction at the given speed.
 
         Args:
-            direction (Direction): Direction to turn.
-            degrees (int): Degrees to turn.
-            speed (int): Speed as a percentage value between 0-100.
+            direction   (Direction): Direction to turn.
+            degrees     (int): Degrees to turn.
+            speed       (int): Speed as a percentage value between 0-100.
         """
         # TODO: Consider adjusting to wall if we have something on the side
         # Set the current direction to zero
@@ -165,8 +165,8 @@ class Robot:
         Drives the given distance at the given speed. Uses LIDAR for determining distance.
 
         Args:
-            dist (int): Distance in millimetres.
-            speed (int): Speed as a percentage value between 0-100.
+            dist    (int): Distance in millimetres.
+            speed   (int): Speed as a percentage value between 0-100.
         """
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         lidar_init = self.read_sensor(Command.read_lidar())
@@ -325,8 +325,8 @@ class Robot:
         Return the median value of the specified number of readings from the given sensor.
 
         Args:
-            it (int): Number of sensor values.
-            sensor_instr (Command): A sensor command.
+            it              (int): Number of sensor values.
+            sensor_instr    (Command): A sensor command.
 
         Returns:
             (int): Median value.
@@ -350,8 +350,8 @@ class Robot:
         Calculate motor speeds and send drive instruction.
 
         Args:
-            ratio (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
-            base_speed (int): Base speed that ratio will be applied to.
+            ratio       (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
+            base_speed  (int): Base speed that ratio will be applied to.
         """
         left_speed = max(min(base_speed / ratio, 100), 0)
         right_speed = max(min(base_speed * ratio, 100), 0)

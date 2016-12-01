@@ -9,16 +9,16 @@ class Pid():
     PID controller.
 
     Attributes:
-        input_data (int): Input.
-        output_data (int): Output.
-        setpoint (int): Value we're aiming for.
-        kp (int): Proportional tuning parameter.
-        ki (int): Integrating tuning parameter.
-        kd (int): Derivative tuning parameter.
-        sample_time (int): Sample time in milliseconds.
-        automatic_mode (bool): True = PID on, False = PID off.
-        min_out (int): Will clamp output to at least this value.
-        max_out (int): Will clamp output to at most this value.
+        input_data      (int): Input.
+        output_data     (int): Output.
+        setpoint        (int): Value we're aiming for.
+        kp              (int): Proportional tuning parameter.
+        ki              (int): Integrating tuning parameter.
+        kd              (int): Derivative tuning parameter.
+        sample_time     (int): Sample time in milliseconds.
+        automatic_mode  (bool): True = PID on, False = PID off.
+        min_out         (int): Will clamp output to at least this value.
+        max_out         (int): Will clamp output to at most this value.
     """
 
     def __init__(self):
