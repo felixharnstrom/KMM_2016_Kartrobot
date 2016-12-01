@@ -64,21 +64,21 @@ class Robot:
         else:
             return np.median(distance)
 
-    def turn(self, direction : Direction, degrees : int):
+    def turn(self, direction : Direction, degrees : int, speed: int):
         # TODO: Consider adjusting to wall if we have tomething on the side
         #Set the current direction to zero
         current_dir = 0
 
         #Set time to zero to turn untill stopped
-        standstill_rate = self.median_sensor(32, Command.read_gyro()) / 130
-        turn_instr = Command.turn(direction, 40, 0)
+        standstill_rate = self.median_sensor(32, Command.read_gyro()) / 100
+        turn_instr = Command.turn(direction, speed, 0)
         uart_styrenhet.send_command(turn_instr)
 
         while (abs(current_dir) < degrees):
             #Use a reimann sum to add up all the gyro rates
             #Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 130 - standstill_rate
+            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
 
             #print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
@@ -126,7 +126,7 @@ class Robot:
         self.help_angle = 0
 
         #Set time to zero to turn untill stopped
-        standstill_rate = self.median_sensor(32, Command.read_gyro()) / 130
+        standstill_rate = self.median_sensor(32, Command.read_gyro()) / 200
 
         #Read start values from sensors
         lidar = self.read_sensor(Command.read_lidar())
@@ -140,7 +140,7 @@ class Robot:
             #Use a reimann sum to add up all the gyro rates
             #Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 130 - standstill_rate
+            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
             self.help_angle += (time.time() - clk) * turn_rate
 
             # Get sensor values
@@ -176,6 +176,7 @@ class Robot:
             dist_left = (ir_left_front + ir_left_back) / 2
             angle_left = math.atan2(ir_left_back - ir_left_front, 95)  # 95 = distance between sensors
             perpendicular_dist_left = dist_left * math.cos(angle_left)
+            print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right, "PERPENDICULAR DIST LEFT:", perpendicular_dist_left)
             self.pid_controller.input_data = perpendicular_dist_right - perpendicular_dist_left
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
@@ -231,6 +232,21 @@ class Robot:
         find_next_destination()
         return
 
+
+    def stand_perpendicular(self, side: str):
+        if side == "left":
+            ir_front = self.median_sensor(3, Command.read_left_front_ir())
+            ir_back = self.median_sensor(3, Command.read_left_back_ir())
+        else:
+            ir_front = self.median_sensor(3, Command.read_right_front_ir())
+            ir_back = self.median_sensor(3, Command.read_right_back_ir())
+        angle_left = math.atan2(ir_back - ir_front, 95)  # 95 = distance between sensors
+        print (int(math.degrees(angle_left)))
+        self.turn(math.degrees(angle_left)<0,abs(int(math.degrees(angle_left))), speed = 20)
+        time.sleep(10)
+
+
+
 def sensor_test(robot):
     while 1:
         MEDIAN_ITERATIONS = 3
@@ -270,7 +286,7 @@ while 1:
         if (status == DriveStatus.OBSTACLE_DETECTED):
                 print ("---------- OBSTACLE DETECTED!")
                 print ("---------- TURNING LEFT 90 degrees")
-                robot.turn(Direction.LEFT, 90)
+                robot.turn(Direction.LEFT, 90, speed = 40)
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
@@ -279,7 +295,7 @@ while 1:
                 print ("---------- DETECTED CORRIDOR TO RIGHT!")
                 print ("---------- TURNING RIGHT 90 degrees")
                 print (robot.help_angle)
-                robot.turn(Direction.RIGHT, 90 + robot.help_angle)
+                robot.turn(Direction.RIGHT, 90 + robot.help_angle, speed = 40)
                 robot.drive_distance(200, 20)
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
