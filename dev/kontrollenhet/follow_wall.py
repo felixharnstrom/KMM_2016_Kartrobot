@@ -237,13 +237,15 @@ class Robot:
         if side == "left":
             ir_front = self.median_sensor(3, Command.read_left_front_ir())
             ir_back = self.median_sensor(3, Command.read_left_back_ir())
-        else:
+            angle = math.atan2(ir_back - ir_front, 95)  # 95 = distance between sensors
+
+            self.turn(math.degrees(angle)>0,abs(int(math.degrees(angle))), speed = 30)
+        elif side == "right":
             ir_front = self.median_sensor(3, Command.read_right_front_ir())
             ir_back = self.median_sensor(3, Command.read_right_back_ir())
-        angle_left = math.atan2(ir_back - ir_front, 95)  # 95 = distance between sensors
-        print (int(math.degrees(angle_left)))
-        self.turn(math.degrees(angle_left)<0,abs(int(math.degrees(angle_left))), speed = 20)
-        time.sleep(10)
+            angle = math.atan2(ir_back - ir_front, 95)  # 95 = distance between sensors
+
+            self.turn(math.degrees(angle)<0,abs(int(math.degrees(angle))), speed = 30)
 
 
 
