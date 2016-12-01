@@ -271,15 +271,6 @@ uart_styrenhet.send_command(servo_instr)
 
 #Wait fot LIDAR to be in position
 time.sleep(1)
-
-while 0:
-    ir_right_front = robot.median_sensor(3, Command.read_right_front_ir())
-    ir_right_back = robot.median_sensor(3, Command.read_right_back_ir())
-    ir_left_front = robot.median_sensor(3, Command.read_left_front_ir())
-    ir_left_back = robot.median_sensor(3, Command.read_left_back_ir())
-    dist_left = (ir_left_front + ir_left_back) / 2
-    angle_left = math.atan2(ir_left_back - ir_left_front, 95)
-    print(math.degrees(angle_left))
     
 #Try driving in infinite loop around the maze
 while 1:
