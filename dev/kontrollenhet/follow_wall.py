@@ -15,13 +15,14 @@ Todo:
     * Use the Direction class instead of hard-coded directions.
     * Complete docstrings.
 """
-from command import Command
 import time
 import math
+import sys
+import argparse
+import numpy as np
+from command import Command
 from UART import UART
 from pid import Pid
-import numpy as np
-import sys, argparse
 
 BLOCK_SIZE = 400                # Block size in millimetres.
 IR_MEDIAN_ITERATIONS = 3        # Number of values to get from IR sensors.
@@ -363,7 +364,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--sensor", required = True, metavar = "SENSOR_DEVICE", help = "Device name of the USB<->serial converter for the sensor unit.")
     parser.add_argument("-c", "--control", required = True, metavar = "CONTROL_DEVICE", help = "Device name of the USB<->serial converter for the control unit.")
-    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices=range(0, 4), help = "Verbosity level. 0 is lowest and 3 highest. Default 1.")
+    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 4), help = "Verbosity level. 0 is lowest and 3 highest. Default 1.")
     args = parser.parse_args()
     VERBOSITY = args.verbosity
     robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
