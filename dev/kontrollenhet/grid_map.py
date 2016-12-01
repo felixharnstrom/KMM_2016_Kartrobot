@@ -105,9 +105,10 @@ class GridMap:
         return self.robot_pos
 
     def set_robot_pos(self, x:int, y:int):
-        """Set robot pos. Accepts values outside of bounds; expands map."""
-        newx, newy = self.pos_to_index(x, y)
-        return self.grid[newy][newx]
+        """Set robot pos. Accepts values outside of bounds; expands map.
+        The position will be marked as CellType.OPEN."""
+        self.robot_pos = Position(x, y)
+        self.set(x, y, CellType.OPEN)
 
     def move_robot(self, xdif:int, ydif:int):
         """Move robot. Acceps values outside of bounds; expands map."""
@@ -155,4 +156,31 @@ class GridMap:
                 elif cell == CellType.WALL:
                     print("X", end="")
             print("")
+    
+    def is_complete(self):
+        """Return True if all cells flooded from robot are known, 
+        i.e the robot is unable to move to any unknown cell."""
+
+        # Check for special case grids
+        start_cell_type = self.get(self.robot_pos.x, self.robot_pos.y)
+        if start_cell_type == CellType.WALL:
+            raise Exception("The robot is not allowed to be inside a wall when checking completeness.")
+        if start_cell_type == CellType.UNKNOWN:
+            return False # Something's fucky; Shouldn't happen unless members are messed with.
+
+        # DFS
+        visited, queue = set(), [(self.robot_pos.x, self.robot_pos.y)]
+        while queue: # If not empty
+            cell = queue.pop()
+            if cell not in visited:
+                x, y = cell
+                visited.add(cell)
+                neighbours = ((x+1,y), (x-1,y), (x,y+1), (x,y-1))
+                if self.get(x, y) == CellType.UNKNOWN:
+                    return False
+                for neighbour in neighbours:
+                    if self.get(neighbour[0], neighbour[1]) != CellType.WALL:
+                        queue.append(neighbour)
+        # We've searched the whole thing witout finding any UNKNOWN's
+        return True
 
