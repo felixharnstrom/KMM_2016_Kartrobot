@@ -39,9 +39,9 @@ class Robot:
         self.pid_controller = Pid()
         self.pid_controller.setpoint = 0
         self.pid_controller.output_data = 0
-        self.pid_controller.set_tunings(0.7,0,0.3)
+        self.pid_controller.set_tunings(0.7, 0, 0.3)
         self.pid_controller.set_sample_time(33)
-        self.pid_controller.set_output_limits(-50,50)
+        self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
 
     # Return a sensor value
