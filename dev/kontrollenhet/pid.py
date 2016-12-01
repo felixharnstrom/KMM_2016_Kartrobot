@@ -24,6 +24,9 @@ class Pid():
         self.time_last = datetime.now()     # Need this to calculate the first time diff in compute()
 
     def compute(self):
+        """
+        Compute output value from current input and PID terms. Does nothing if not in automatic mode.
+        """
         if (not self.automatic_mode):
             return
 
@@ -56,18 +59,36 @@ class Pid():
         self.time_last = time_now
 
     def set_tunings(self, p : float, i: float, d : float):
+        """
+        Sets the tuning parameters to be multiplied with the proportional, integrating, and derivative terms.
+
+        :p: Proportional tuning parameter.
+        :i: Integrating tuning parameter.
+        :d: Derivative tuning parameter.
+        """
         sample_time_in_sec = self.sample_time / 1000
         self.kp = p
         self.ki = i * sample_time_in_sec
         self.kd = d / sample_time_in_sec
 
     def set_sample_time(self, new_sample_time : int):
+        """
+        Sets the sampling time. Used to calculate the integrating and derivative term.
+
+        :new_sample_time: Sample time in milliseconds.
+        """
         ratio  = new_sample_time / self.sample_time
         self.ki *= ratio
         self.kd /= ratio
         self.sample_time = new_sample_time
 
     def set_output_limits(self, min_out : float, max_out : float):
+        """
+        Sets the minimun and maximum output values. The output as well as the integrating term will be clamped to these values.
+
+        :min_out: Minimum output.
+        :max_out: Maximum output.
+        """
         self.min_out = min_out
         self.max_out = max_out
 
@@ -84,6 +105,11 @@ class Pid():
             self.i_term = self.min_out
 
     def set_mode(self, mode : int):
+        """
+        Sets the controller to automatic or manual mode.
+
+        :mode: 0 for manual, 1 for automatic.
+        """
         new_mode = (mode == self.AUTOMATIC)
         if (new_mode and not self.automatic_mode):
             # From manual to auto
@@ -91,6 +117,9 @@ class Pid():
         self.automatic_mode = new_mode
 
     def initialize(self):
+        """
+        Initalization for bumpless transfer.
+        """
         self.last_input = self.input_data
         self.i_term = self.output_data
 
