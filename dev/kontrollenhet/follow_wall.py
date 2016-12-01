@@ -321,7 +321,7 @@ def main(argv):
                     robot.pid_controller.kp = 0
                     robot.pid_controller.ki = 0
                     robot.pid_controller.kd = 0
-                    robot.pid_controller.set_tunings(0.7, 0, 0.3)
+                    robot.pid_controller.initialize()
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                     print ("---------- DETECTED CORRIDOR TO RIGHT!")
                     print ("---------- TURNING RIGHT 90 degrees")
@@ -331,7 +331,7 @@ def main(argv):
                     robot.pid_controller.kp = 0
                     robot.pid_controller.ki = 0
                     robot.pid_controller.kd = 0
-                    robot.pid_controller.set_tunings(0.7, 0, 0.3)
+                    robot.pid_controller.initialize()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
