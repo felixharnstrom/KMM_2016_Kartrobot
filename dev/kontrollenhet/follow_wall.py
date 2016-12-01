@@ -63,7 +63,7 @@ class Robot:
         IR_MEDIAN_ITERATIONS    (int): Number of values to get from IR sensors.
         GYRO_MEDIAN_ITERATIONS  (int): Number of values to get from gyro.
         TURN_OVERRIDE_DIST      (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
-        TURN_MIN_DIST           (int): The minimum detected distance in that will trigger a right turn.
+        TURN_MIN_DIST           (int): The minimum detected distance that will trigger a right turn.
         RIGHT_TURN_ENTRY_DIST   (int): How far to drive into a corner before performing a 90° turn.
         RIGHT_TURN_EXIT_DIST    (int): How far to drive into a corridor after performing a 90° turn.
         EDGE_SPIKE_FACTOR       (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
