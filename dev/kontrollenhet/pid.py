@@ -134,7 +134,7 @@ class Pid():
         """
         new_mode = (mode == self._AUTOMATIC)
         if (new_mode and not self.automatic_mode):
-            # From _MANUAL to auto
+            # From manual to auto
             self.initialize()
         self.automatic_mode = new_mode
 
