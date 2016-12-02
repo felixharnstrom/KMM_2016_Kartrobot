@@ -86,9 +86,9 @@ class Robot:
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 300
-        self.TURN_MIN_DIST = 100
-        self.RIGHT_TURN_ENTRY_DIST = 100
-        self.RIGHT_TURN_EXIT_DIST = 200
+        self.TURN_MIN_DIST = 50
+        self.RIGHT_TURN_ENTRY_DIST = 170
+        self.RIGHT_TURN_EXIT_DIST = 150
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 200
         self.SENSOR_SPACING = 95
@@ -101,7 +101,7 @@ class Robot:
 
         # Initialize PID controller
         self.pid_controller = Pid()
-        self.pid_controller.setpoint = 0
+        self.pid_controller.setpoint = 90
         self.pid_controller.output_data = 0
         self.pid_controller.set_tunings(0.7, 0, 0.3)
         self.pid_controller.set_sample_time(33)
@@ -148,7 +148,7 @@ class Robot:
             # Use a reimann sum to add up all the gyro rates
             # Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
+            turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
             if (VERBOSITY >= 2):
                 print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
@@ -175,8 +175,8 @@ class Robot:
             print("LIDAR INIT: ", lidar_init)
         while(lidar_init - lidar_cur < dist):
             lidar_cur = self.read_sensor(Command.read_lidar())
-            if (VERBOSITY >= 2):
-                print("LIDAR CURRENT: ", lidar_cur)
+            #if (VERBOSITY >= 2):
+                #print("LIDAR CURRENT: ", lidar_cur)
 
     def follow_wall(self, distance : int):
         """
@@ -191,7 +191,7 @@ class Robot:
         self._help_angle = 0
 
         # Set time to zero to turn untill stopped
-        standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 200
+        standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100
 
         # Read start values from sensors
         lidar = self.read_sensor(Command.read_lidar())
@@ -205,7 +205,7 @@ class Robot:
             # Use a reimann sum to add up all the gyro rates
             # Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
+            turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
             self._help_angle += (time.time() - clk) * turn_rate
 
             # Get sensor values
@@ -240,12 +240,9 @@ class Robot:
             dist_right = (ir_right_front + ir_right_back) / 2
             angle_right = math.atan2(ir_right_back - ir_right_front, self.SENSOR_SPACING)
             perpendicular_dist_right = dist_right * math.cos(angle_right)
-            dist_left = (ir_left_front + ir_left_back) / 2
-            angle_left = math.atan2(ir_left_back - ir_left_front, self.SENSOR_SPACING)
-            perpendicular_dist_left = dist_left * math.cos(angle_left)
             if (VERBOSITY >= 3):
-                print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right, "PERPENDICULAR DIST LEFT:", perpendicular_dist_left)
-            self.pid_controller.input_data = perpendicular_dist_right - perpendicular_dist_left
+                print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
+            self.pid_controller.input_data = perpendicular_dist_right
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
             self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED)
@@ -312,13 +309,13 @@ class Robot:
             ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
             ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed = self.BASE_SPEED)
+            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
 
         elif side == "right":
             ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) < 0 , abs(int(math.degrees(angle))), speed = self.BASE_SPEED)
+            self.turn(math.degrees(angle) < 0 , abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
 
     def _median_sensor(self, it : int, sensor_instr : Command):
         """
@@ -397,22 +394,36 @@ def main(argv):
                 if (VERBOSITY >= 1):
                     print ("---------- OBSTACLE DETECTED!")
                     print ("---------- TURNING LEFT 90 degrees")
-                robot.turn(Direction.LEFT, 90, speed = robot.ACCELERATED_SPEED)
+                turn_instr = Command.stop_motors()
+                robot.uart_styrenhet.send_command(turn_instr)
+                time.sleep(1)
+                ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+                ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+                if (ir_right_front > ir_left_front):
+                    robot.stand_perpendicular('left')
+                    robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
+                else:
+                    robot.stand_perpendicular('right')
+                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
-                robot.pid_controller.initialize()
+                robot.pid_controller.set_tunings(0.7, 0, 0.3)
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                 if (VERBOSITY >= 1):
                     print ("---------- DETECTED CORRIDOR TO RIGHT!")
                     print ("---------- TURNING RIGHT 90 degrees")
-                    print (robot._help_angle)
-                robot.turn(Direction.RIGHT, 90 + robot._help_angle, speed = robot.ACCELERATED_SPEED)
-                robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.ACCELERATED_SPEED)
+                turn_instr = Command.stop_motors()
+                robot.uart_styrenhet.send_command(turn_instr)
+                time.sleep(1)
+                robot.stand_perpendicular('left')
+                robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
+                time.sleep(1)
+                robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
-                robot.pid_controller.initialize()
+                robot.pid_controller.set_tunings(0.7, 0, 0.3)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
