@@ -1,16 +1,11 @@
 
 from enum import Enum
+from geometry import Position
 
 class CellType(Enum):
     UNKNOWN = 0 # We don't know what's in the cell
     OPEN = 1 # There's open space in the cell
     WALL = 2 # There's a wall in the cell
-
-class Position:
-    """Position vector."""
-    def __init__(self, x:int, y:int):
-        self.x = x
-        self.y = y
 
 class GridMap:
     """A map representation with, indexed the following way:
@@ -22,8 +17,7 @@ class GridMap:
 
     Members:
     grid:list the internal representation of the map
-    robot_pos:Position the position of the robot
-    origin:Index of origin. Used internally.
+    origin:Position the index of origin. Used internally.
     width:int the current width of the map
     height:int the current height of the map
 
@@ -35,16 +29,15 @@ class GridMap:
     def __init__(self):
         """Constructor."""
         # The starting area as defined in the course spec
+        # Robot pos should be (1, 1)
         #self.grid = [[CellType.WALL, CellType.WALL, CellType.WALL],
         #             [CellType.WALL, CellType.OPEN, CellType.WALL],
         #             [CellType.UNKNOWN, CellType.OPEN, CellType.UNKNOWN]]
-        #self.robot_pos = Position(1,1)
         #self.width = 3
         #self.height = 3
         # An empty grid:
         self.grid = []
         self.origin = Position(0,0)
-        self.robot_pos = Position(0,0)
         self.width = 0
         self.height = 0
 
@@ -100,21 +93,6 @@ class GridMap:
         xdif, ydif = self.expand_to_fit(xa, ya)
         return (xa + xdif, ya + ydif)
 
-    def get_robot_pos(self):
-        """Get robot position."""
-        return self.robot_pos
-
-    def set_robot_pos(self, x:int, y:int):
-        """Set robot pos. Accepts values outside of bounds; expands map.
-        The position will be marked as CellType.OPEN."""
-        self.robot_pos = Position(x, y)
-        self.set(x, y, CellType.OPEN)
-
-    def move_robot(self, xdif:int, ydif:int):
-        """Move robot. Acceps values outside of bounds; expands map."""
-        p = self.robot_pos
-        self.set_robot_pos(p.x + xdif, p.y + ydif)
-
     def get(self, x:int, y:int):
         """Get a cell value. Accepts values outside of bounds; expands map."""
         newx, newy = self.pos_to_index(x, y)
@@ -124,14 +102,6 @@ class GridMap:
         """Set a cell value. Accepts values outside of bounds; expands map."""
         newx, newy = self.pos_to_index(x, y)
         self.grid[newy][newx] = ctype
-
-    def get_relative(self, x:int, y:int):
-        """Get relative to robot. Accepts values outside of bounds; expands map."""
-        return self.get(self.robot_pos.x + x, self.robot_pos.y + y)
-
-    def set_relative(self, x:int, y:int, ctype:CellType):
-        """Set relative to robot. Accepts values outside of bounds; expands map."""
-        return self.set(self.robot_pos.x + x, self.robot_pos.y + y, ctype)
 
     def gui_drawable(self):
         """Return a version as the GUI would like to see it."""
@@ -143,10 +113,7 @@ class GridMap:
         """Prints a readable version of the map."""
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                if (self.robot_pos.x + self.origin.x == x and
-                    self.robot_pos.y + self.origin.y == y):
-                    print("R", end="")
-                elif (self.origin.x == x and
+                if (self.origin.x == x and
                       self.origin.y == y):
                     print("O", end="")
                 elif cell == CellType.UNKNOWN:
@@ -157,19 +124,22 @@ class GridMap:
                     print("X", end="")
             print("")
     
-    def is_complete(self):
-        """Return True if all cells flooded from robot are known, 
-        i.e the robot is unable to move to any unknown cell."""
+    def is_complete(self, start_pos:Position):
+        """Return True if all cells flooded from start_pos are known, 
+        i.e it's impossible to find an unknown cell by moving from there."""
 
         # Check for special case grids
-        start_cell_type = self.get(self.robot_pos.x, self.robot_pos.y)
+        start_cell_type = self.get(start_pos.x, start_pos.y)
         if start_cell_type == CellType.WALL:
-            raise Exception("The robot is not allowed to be inside a wall when checking completeness.")
+            raise Exception("The start pos is not allowed to be inside a wall when checking completeness.")
         if start_cell_type == CellType.UNKNOWN:
-            return False # Something's fucky; Shouldn't happen unless members are messed with.
+            # Something's fucky; Shouldn't happen unless members are messed with.
+            # Still, the map is certainly not complete.
+            return False 
 
         # DFS
-        visited, queue = set(), [(self.robot_pos.x, self.robot_pos.y)]
+        visited = set() 
+        queue = [(start_pos.x, start_pos.y)]
         while queue: # If not empty
             cell = queue.pop()
             if cell not in visited:
