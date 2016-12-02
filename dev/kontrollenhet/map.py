@@ -2,6 +2,7 @@
 from UART import UART
 from modules import *
 from sensorenhet_functions import *
+from geometry import *
 import json
 import math, time
 import logging
@@ -9,109 +10,116 @@ import numpy as np
 import matplotlib.pyplot as plt
 from grid_map import GridMap, CellType
 
-
-
 logging.getLogger(__name__).setLevel(logging.INFO)
 
 
-grid = []
+"""The real-world size of a grid cell, in millimeters. Also the length of a line."""
+GRID_SIZE = 400
 
-# Constants for how accurate this system should be
-GRID_SIZE = 400     # What si the Grid size
-POINTS = 4          # Every line of GRID_SIZE, in how many parts should it be devided
-MIN_MESURE = 1      # How many messurments should be in every like section
-POINTS_LINE = 3     # How many Linesections should have messures to be a line
-ACCURACY = 100      # How far from line is it ok for mesurments to be
+"""The number of 'line segments per line."""
+POINTS = 4
+
+"""The number of votes per line section required for something to be considered a full line."""
+MIN_MESURE = 1
+
+"""The number of line sections that needs to be voted in for their line to be voted in."""
+POINTS_LINE = 3
+
+"""The length of a line segment."""
+ACCURACY = GRID_SIZE//POINTS
 
 
-def map_room(robot_x, robot_y, angle, grid_map):
+def coordinates_to_lines(coordinates, robot_pos:Position, grid_map:GridMap):
     """
-    This definition plots the room
-    :param robot: A list with robot position and angle [x, y, angle]
-    :param map: Pevious mapping of the room
-    :return: Returns new_lines, that is a list of tupels with line information [(x11, y11, x21, y21), (x12, y12...), ...]
+    Approximate coordinates to line segments.
+    :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+    :param robot_pos: The position of the robot
+    :param grid_map: The GridMap to append walls to.
+    :return: A list of Line's, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
     """
-    #coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
-
-    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot_x, robot_y, angle)
-    coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
-
     # Gets size coordinate area in squares of GRID_SIZE
-    x_min, x_max, y_min, y_max = get_size(coordinates)
+    top_left = top_left_grid_index(coordinates)
+    bottom_right = bottom_right_grid_index(coordinates)
 
-    # Gets lists contaning all mesurements that  could be on horizontal lines and vertical lines
-    horizontal_lines = get_horizontal_lines(coordinates, x_min, x_max, y_min, y_max)
-    vertical_lines = get_vertical_lines(coordinates, x_min, x_max, y_min, y_max)
+    # Get votes
+    horizontal_votes = get_votes_for_horizontal_line_segments(coordinates)
+    vertical_votes = get_votes_for_vertical_line_segments(coordinates)
 
-    new_lines = []
+    # Our return value
+    lines = []
 
-    # Loops over the entire area based on squares of GRID_SIZE
-    # + 1 needed so that it always can call y_next, even in last grid
-    for n in range(y_min, y_max + 1):
+    # Loop over y-indices for the grid
+    for y_index in range(top_left.y, bottom_right.y + 1):
         # Stores square position, start in y and end in y.
-        y = GRID_SIZE * n
-        y_next = GRID_SIZE * (n + 1)
-        y_pos = n - y_min        # corrects that position values can be negative, but lists don't have neg values
-
-        # + 1 needed so that it always can call x_next, even in last grid
-        for m in range(x_min, x_max + 1):
+        y = GRID_SIZE * y_index
+        y_next = y + GRID_SIZE
+        
+        # Loop over x-indices for the grid
+        for x_index in range(top_left.x, bottom_right.x + 1):
             # Stores square position, start in x and end in x.
-            x = GRID_SIZE * m
-            x_next = GRID_SIZE * (m + 1)
-            x_pos = m - x_min     # corrects that position values can be negative, but lists don't have neg values
+            x = GRID_SIZE * x_index
+            x_next = x + GRID_SIZE
 
-            # Temp values for ammount of  Line sections with mesures
-            tmp_horizontal = 0
-            tmp_vertical = 0
+            # correct that positions values can be negative, but lists don't have neg values
+            pos = Position(x_index - top_left.x, y_index - top_left.y)
 
-            # Counts how many Lines sections have >= than MIN_MESURE
-            for i in horizontal_lines[y_pos][x_pos]:
+            # The number of line segments with enough votes to be considered part of a full line
+            horizontal_line_segs = 0
+            vertical_line_segs = 0
+
+            # Count how many line segments have "enough" votes
+            for i in horizontal_votes[pos.y][pos.x]:
                 if i >= MIN_MESURE:
-                    tmp_horizontal += 1
-            for j in vertical_lines[y_pos][x_pos]:
+                    horizontal_line_segs += 1
+            for j in vertical_votes[pos.y][pos.x]:
                 if j >= MIN_MESURE:
-                    tmp_vertical += 1
+                    vertical_line_segs += 1
 
             grid_changed = False
 
-            # Checks if ammount of Lines sections are >= than POINTS_LINE
-            if tmp_horizontal >= POINTS_LINE:
-                line = (x, y, x_next, y)            # create a tupel with line start and end point
-                if not (grid_map.get_relative(x, y) == CellType.WALL):
-                    new_lines.append(line)
-                    grid_changed = change_grid_type(robot_x, robot_y, x, y, line, grid_map)
+            # Check if enough line segments making up a line have enough votes
+            # If they do, we have detected a full line
+            if horizontal_line_segs >= POINTS_LINE:
+                start = Position(x, y)
+                end = Position(x_next, y)
+                line = Line(start, end)
+                if line not in lines:
+                    lines.append(line)
+                    grid_changed = change_grid_type(robot_pos.x, robot_pos.y, x, y, line, grid_map)              
+            if vertical_line_segs >= POINTS_LINE:
+                start = Position(x, y)
+                end = Position(x, y_next)
+                line = Line(start, end)
+                if line not in lines:
+                    lines.append(line)
+                    grid_changed = change_grid_type(robot_pos.x, robot_pos.y, x, y, line, grid_map)
 
-            if tmp_vertical >= POINTS_LINE:
-                line = (x, y, x, y_next)            # create a tupel with line start and end point
-                if not (grid_map.get_relative(x, y) == CellType.WALL):
-                    new_lines.append(line)
-                    grid_changed = change_grid_type(robot_x, robot_y, x, y, line, grid_map)
         if grid_changed:
-            change_grid_type(robot_x, robot_y, x, y, (), grid_map)
+            change_grid_type(robot_pos.x, robot_pos.y, x, y, (), grid_map)
 
-        print("CELLTYPE", grid_map.get_relative(x, y), x, y)
-        print("CELLTYPE S", grid_map.get_relative(x + 1, y), x + 1, y)
-        print("CELLTYPE T", grid_map.get_relative(x, y + 1), x, y + 1)
-    return new_lines
+    # Debug plot
+    #debug_plot(lines, coordinates, top_left.x, bottom_right.x, top_left.y, bottom_right.y)
+    return lines
 
     
 
 
-def plot_room(lines):
+def plot_lines(lines):
     """
-    Plots the room and return the plot
-    :param map: Is a list of tupels that has the information about walls [(x11, y11, x21, y21), (x12, y12, ...), ...]
-    :return: A list of coordinates
+    Plot axis-aligned lines
+    :param lines: A list of axis-aligned lines
     """
-    for coord in lines:
-        if coord[1] == coord[3]:
-            line = np.linspace(coord[0], coord[2], POINTS)
-            plt.plot(line, [coord[1]] * POINTS)
-        if coord[0] == coord[2]:
-            line = np.linspace(coord[1], coord[3], POINTS)
-            plt.plot([coord[0]] * POINTS, line)
-    return plt
-
+    for line in lines:
+        start = line.start
+        end = line.end
+        # Horizontal lines
+        if start.x == end.x:
+            plot_line = np.linspace(start.y, end.y, POINTS)
+            plt.plot([start.x] * POINTS, plot_line)
+        # Vertical lines
+        elif start.y == end.y:
+            plot_line = np.linspace(start.x, end.x, POINTS)
+            plt.plot(plot_line, [start.y] * POINTS)
 
 
 def check_available_grid(x_min, x_max, y_min, y_max, grid_map):
@@ -120,142 +128,140 @@ def check_available_grid(x_min, x_max, y_min, y_max, grid_map):
     :param map: A list with tupleres containing all walls
     :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
     """
-
     possible_squares = []
-
     for y in range(y_min, y_max - 1):
         y_next = y + 1
-
         for x in range(x_min, x_max - 1):
             x_next = x + 1
-            if grid_map.get_relative(x, y) == CellType.OPEN:
-                if grid_map.get_relative(x + 1, y) == CellType.OPEN:
+            if grid_map.get(x, y) == CellType.OPEN:
+                if grid_map.get(x + 1, y) == CellType.OPEN:
                     possible_squares.append((x, y, x_next, y))
-                if grid_map.get_relative(x, y + 1) == CellType.OPEN:
+                if grid_map.get(x, y + 1) == CellType.OPEN:
                     possible_squares.append((x, y, x, y_next))
-
     return possible_squares
 
 
 
-def get_size(coordinates):
+
+def top_left_grid_index(coordinates):
+    """Return the top_left coordinates of an AABB enclosing all coordinates and origin,
+    scaled by 1/GRID_SIZE."""
+    top_left = Position(0, 0)
+    for x, y in coordinates:
+        top_left.x = min(top_left.x, int(x//GRID_SIZE))
+        top_left.y = min(top_left.y, int(y//GRID_SIZE))
+    return top_left
+
+def bottom_right_grid_index(coordinates):
+    """Return the bottom_right coordinates of an AABB enclosing all coordinates and origin,
+    scaled by 1/GRID_SIZE."""
+    bottom_right = Position(0, 0)
+    for x, y in coordinates:
+        bottom_right.x = max(bottom_right.x, int(x//GRID_SIZE + 1))
+        bottom_right.y = max(bottom_right.y, int(y//GRID_SIZE + 1))
+    return bottom_right
+
+
+def get_votes_for_axis_aligned_line_segments(coordinates, vertical:bool):
     """
-    Extracts number of Sqaures with the size of GRID_SIZE
-    :param coordinates: Takes in a list of coordinates
-    :return: [min_x, max_x, min_y, max_y] in number of areas with GRID_SIZE
+    For each possible line segment approximate each coordinate to the closest segment, and return the
+    number of coordinates approximated to fall in each line segment (the number of "votes"). A line segment 
+    is considered a line with a length of ACCURACY, while a full line has a length of GRID_SIZE.
+
+    Vertical determines if we attempt to approximate coordinates to vertical lines (True) or horizontal
+    ones (False).
+
+    :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+    :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
+
+    :return: a 3-dimensional list.
+    The first two indices indicates the starting point of a line, divided by GRID_SIZE. The third an offset
+    off n*ACCURACY, where n is the index (0 =< n < POINTS), on the x-axis or y-axis depending on if the
+    line is vertical or horizontal. The lines end-point will thus be offset by an 
+    additional (n+1)*ACCURACY. On that index we'll find the number of coordinates approximated to
+    fall on that line.
+
+    To be more specific, vertical being True or False determines if the last index causes us to move
+    along the x-axis (vertical=False) or the y-axis (vertical=True).
+
+    examples:
+    assuming not vertical, [0][0][0] contains votes for the line (0,0) -> (ACCURACY, 0)
+    assuming vertical,     [0][0][0] contains votes for the line (0,0) -> (0, ACCURACY)
+    assuming not vertical, [0][0][2] contains votes for the line (2*ACCURACY, 0) -> (3*ACCURACY, 0)
+    assuming not vertical, [1][0][0] contains votes for the line (1*GRID_SIZE, 0) -> (1*GRID_SIZE + 1*ACCURACY, 0)
     """
-    min_x, max_x, min_y, max_y = 0, 0, 0, 0
+    # The size of the AABB enclosing all coordinates
+    top_left = top_left_grid_index(coordinates)
+    bottom_right = bottom_right_grid_index(coordinates)
+    size = bottom_right.difference(top_left)
+    size.add(Size(1, 1))
+    # Array instead of list because list doesn't work as intended
+    # 3-dimensional
+    votes = np.array([[[0]*POINTS]*size.w]*size.h)
 
     for x, y in coordinates:
-        min_x, max_x = check_size(x, min_x, max_x)
-        min_y, max_y = check_size(y, min_y, max_y)
+        # Approximate position to grid
+        # Approximate the pair of coordinates to the grid
+        pos_x = int(x//GRID_SIZE - top_left.x)
+        pos_y = int(y//GRID_SIZE - top_left.y)
+        pos = Position(pos_x, pos_y)
+        
+        # 
+        pos_dist = Position(x%GRID_SIZE, y%GRID_SIZE)
+        relevant_dist = pos_dist.x if vertical else pos_dist.y
 
-    min_x, max_x = get_grid(min_x, max_x)
-    min_y, max_y = get_grid(min_y, max_y)
+        #
+        factor = int(GRID_SIZE/POINTS_LINE)
+        pos_loc = Position(pos_dist.x//factor, pos_dist.y//factor)
+        relevant_loc = pos_loc.y if vertical else pos_loc.x
+        
+        # Check if measurement is within +- ACCURACY from line
+        if relevant_dist < ACCURACY:
+            votes[pos.y][pos.x][relevant_loc] += 1
+        elif relevant_dist > (GRID_SIZE - ACCURACY):
+            if vertical:
+                votes[pos.y][pos.x+1][relevant_loc] += 1
+            else:
+                votes[pos.y+1][pos.x][relevant_loc] += 1
+    return votes
 
-    return min_x, max_x, min_y, max_y
 
-
-
-def check_size(val, min, max):
+def get_votes_for_horizontal_line_segments(coordinates):
     """
-    Checks if val is smaller than min value or larger than max value
-    :param val: Value to chek if it is smaller than min or larger than max
-    :param min: A min value to compare with and also the out value
-    :param max: A max value to compare with and also the out value
-    :return: Minimum value and maximum value
+    Performs get_votes_for_axis_aligned_line_segments(...), returning the votes for
+    all horizontal line segments.
+
+    See get_votes_for_axis_aligned_line_segments(...) for more information regarding return value.
     """
-    if val < min:
-        min = val
-    elif val > max:
-        max = val
-    return min, max
+    return get_votes_for_axis_aligned_line_segments(coordinates, False)
 
 
-def get_grid(min, max):
+
+def get_votes_for_vertical_line_segments(coordinates):
     """
-    Changes the 400x400 grid to a 1x1 grid in 1D
-    :param min: Minimum value in 1D
-    :param max: Maximum value in 1D
-    :return: returns how many grids in 1D there is, as a mimum value toa maximum value
+    Performs get_votes_for_axis_aligned_line_segments(...), returning the votes for
+    all vertical line segments.
+
+    See get_votes_for_axis_aligned_line_segments(...) for more information regarding return value.
     """
-    min_grid = min//GRID_SIZE
-    max_grid = max//GRID_SIZE + 1
-
-    return int(min_grid), int(max_grid)
+    return get_votes_for_axis_aligned_line_segments(coordinates, True)
 
 
-def get_horizontal_lines(coordinates, x_min, x_max, y_min, y_max):
+
+def convert_to_coordinates(measurements, x_position, y_position, angle):
     """
-    Gets a list of all mesurments on horizontal lines
-    :param coordinates: A list with all coordinates
-    :param size: [min_x, max_x, min_y, max_y]
-    :return: Returns a list [[[ammount of mesures in nr of POINTS], [..]], [row 2 ..], [[..],[..]]]
-    """
-    x_size = x_max - x_min + 1
-    y_size = y_max - y_min + 1
-
-    horizontal_lines = np.array([[[0]*POINTS]*x_size]*y_size)
-
-    # Loops over al coordinates
-    for x, y in coordinates:
-        pos_x = int(x//GRID_SIZE) - x_min
-        pos_x_loc = int((x%GRID_SIZE)//int(GRID_SIZE/POINTS_LINE))
-        pos_y = int(y//GRID_SIZE) - y_min
-        pos_y_dist = y%GRID_SIZE
-
-        # Checks if a mesurement is within the selected area from line, area is +- ACCURACY from line
-        if pos_y_dist < ACCURACY:
-            horizontal_lines[pos_y][pos_x][pos_x_loc] += 1
-        elif pos_y_dist > (GRID_SIZE - ACCURACY):
-            horizontal_lines[pos_y+1][pos_x][pos_x_loc] += 1
-
-    return horizontal_lines
-
-
-
-def get_vertical_lines(coordinates, x_min, x_max, y_min, y_max):
-    """
-    Gets a list of all mesurments on vertical lines
-    :param coordinates: A list with all coordinates
-    :param size: [min_x, max_x, min_y, max_y]
-    :return: Returns a list [[[ammount of mesures in nr of POINTS], [..]], [colum 2 ..], [[..],[..]]]
-    """
-    x_size = x_max - x_min + 1
-    y_size = y_max - y_min + 1
-
-    vertical_lines = np.array([[[0]*POINTS]*x_size]*y_size)
-
-    # Loops over al coordinates
-    for x, y in coordinates:
-        pos_x = int(x//GRID_SIZE) - x_min
-        pos_y_loc = int((y%GRID_SIZE)//int(GRID_SIZE/POINTS))
-        pos_y = int(y//GRID_SIZE) - y_min
-        pos_x_dist = x%GRID_SIZE
-
-        # Checks if a mesurement is within the selected area from line, area is +- ACCURACY from line
-        if pos_x_dist < ACCURACY:
-            vertical_lines[pos_y][pos_x][pos_y_loc] += 1
-        elif pos_x_dist > (GRID_SIZE - ACCURACY):
-            vertical_lines[pos_y][pos_x+1][pos_y_loc] += 1
-
-    return vertical_lines
-
-
-
-def get_coordinates(mesurments, x_position, y_position, angle):
-    """
-    Gets coordinates out of mesures
-    :param mesurments: A list of mesures, where a mesurement is [degree, distancs]
-    :param robot: Robot position and angle, [x, y, angle]
-    :return: A list of coordinates
+    Convert angle and distances to coordinates via polar projection
+    :param measurements: A list of tuples containing (angle, distance), where angle is degrees
+    :param x_position: The x-position of the robot
+    :param y_position: The y-position of the robot
+    :angle: The facing angle of the robot, in degrees
+    :return: A list of coordinates - tuples containing (x, y)
     """
     coordinates = []
-    for degree, dist in mesurments:
+    for degree, dist in measurements:
         x = (math.sin(math.radians(degree + angle)) * dist) + x_position
         y = (math.cos(math.radians(degree + angle)) * dist) + y_position
-        coordinates.append([x, y])
-
+        coordinates.append((x, y))
     return coordinates
 
 
@@ -266,7 +272,6 @@ def read_debug_data(file_name):
     """
     with open(file_name) as data_file:
         data = json.load(data_file)
-
     return data
 
 
@@ -277,7 +282,6 @@ def measure_lidar():
     :return: Measurements in [[degree1, dist1],[degree2, dist2], ...]
     """
     uart = UART("ttyUSB0")
-
     sensorunit = UART("ttyUSB1")
     driveInstruction = Servo(0)
 
@@ -303,15 +307,6 @@ def measure_lidar():
         lowest = sensorunit.receive_packet()
         dist = ord(lowest) + ord(highest) * (2 ** 8)
 
-        logging.info("distance", dist)
-        logging.info("move to", degree)
-
-        # Read controller info
-        # uart.send_function(ControllerInformation())
-        # for i in range(6):
-        #    lsb = uart.receive_packet()
-        # print (ord(lsb))
-
         x = math.sin(math.radians(degree)) * dist
         y = math.cos(math.radians(degree)) * dist
 
@@ -323,11 +318,11 @@ def measure_lidar():
 
 
 
-def test_plot(map, coordinates, x_min, x_max, y_min, y_max):
+def debug_plot(map, coordinates, x_min, x_max, y_min, y_max):
     """
     A test plotting, that shows all mesuring points and walls on the same plot
     """
-    plt = plot_room(map)
+    plot_lines(map)
     x_plot = []
     y_plot = []
     for x, y in coordinates:
@@ -345,20 +340,72 @@ def change_grid_type(robot_x, robot_y, x, y, line, grid_map):
     y_next = y + 1
     y_prev = y - 1
 
-    if (x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE) == line:
+    next_start = Position(x*GRID_SIZE, y*GRID_SIZE)
+    next_vertical_end = Position(x_next*GRID_SIZE, y*GRID_SIZE)
+    next_horizontal_end = Position(x*GRID_SIZE, y_next*GRID_SIZE)
+    next_vertical = Line(next_start, next_vertical_end)
+    next_horizontal = Line(next_start, next_horizontal_end)
+    
+    if line == next_vertical:
         if y > robot_y:
             grid_map.set(x, y_next, CellType.WALL)
         elif y < robot_y:
             grid_map.set(x, y_prev, CellType.WALL)
 
-    if (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) == line:
+    if line == next_horizontal:
         if x > robot_x:
             grid_map.set(x, y, CellType.WALL)
-            if not (grid_map.get_relative(x, y) == CellType.WALL):
+            if not (grid_map.get(x, y) == CellType.WALL):
                 grid_map.set(x, y, CellType.OPEN)
         elif x < robot_x:
             grid_map.set(x_prev, y, CellType.WALL)
 
-    if not (grid_map.get_relative(x, y) == CellType.WALL):
+    if not (grid_map.get(x, y) == CellType.WALL):
         grid_map.set(x, y, CellType.OPEN)
     return True
+
+def get_grid_map(robot_x, robot_y, lines):
+    """Returns a GridMap containing the room as we currently know it."""
+    min_x, max_x, min_y, max_y = get_size(lines)
+
+    rslt = GridMap()
+
+    rslt.set_robot_pos(robot_x, robot_y)
+
+    for y in range (min_y, max_y):
+        for x in range (min_x, max_x):
+            x_next = x + 1
+            x_prev = x - 1
+            y_next = y + 1
+            y_prev = y - 1
+
+            next_start = Position(x*GRID_SIZE, y*GRID_SIZE)
+            next_vertical_end = Position(x_next*GRID_SIZE, y*GRID_SIZE)
+            next_horizontal_end = Position(x*GRID_SIZE, y_next*GRID_SIZE)
+            next_vertical = Line(next_start, next_vertical_end)
+            next_horizontal = Line(next_start, next_horizontal_end)
+
+            if next_vertical in lines:
+                if y > robot_y:
+                    print(x_next, y, "Wall")
+                    rslt.set(x, y_next, CellType.WALL)
+                elif y < robot_y:
+                    print(x, y_prev, "Wall")
+                    rslt.set(x, y_prev, CellType.WALL)
+
+            if next_horizontal in lines:
+                if x > robot_x:
+                    print(x, y, "Wall")
+                    rslt.set(x, y, CellType.WALL)
+                    if not (rslt.get(x, y) == CellType.WALL):
+                        print(x, y, "Open")
+                        rslt.set(x, y, CellType.OPEN)
+                elif x < robot_x:
+                    print(x_prev, y, "Wall")
+                    rslt.set(x_prev, y, CellType.WALL)
+            ## TODO: check why it is not setting the cell type to anything
+            if not (rslt.get(x, y) == CellType.WALL):
+                print(x, y, "Open")
+                rslt.set(x, y, CellType.OPEN)
+    return rslt
+
