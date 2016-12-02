@@ -24,7 +24,7 @@ POINTS_LINE = 3     # How many Linesections should have messures to be a line
 ACCURACY = 100      # How far from line is it ok for mesurments to be
 
 
-def map_room(x_position, y_position, angle, lines):
+def map_room(robot_x, robot_y, angle, grid_map):
     """
     This definition plots the room
     :param robot: A list with robot position and angle [x, y, angle]
@@ -33,7 +33,7 @@ def map_room(x_position, y_position, angle, lines):
     """
     #coordinates = get_coordinates(measure_lidar(), x_position, y_position, angle)
 
-    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), x_position, y_position, angle)
+    #coordinates = get_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot_x, robot_y, angle)
     coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
 
     # Gets size coordinate area in squares of GRID_SIZE
@@ -72,34 +72,38 @@ def map_room(x_position, y_position, angle, lines):
                 if j >= MIN_MESURE:
                     tmp_vertical += 1
 
+            grid_changed = False
+
             # Checks if ammount of Lines sections are >= than POINTS_LINE
             if tmp_horizontal >= POINTS_LINE:
                 line = (x, y, x_next, y)            # create a tupel with line start and end point
-                if line not in lines:
-                    lines.append(line)
+                if not (grid_map.get_relative(x, y) == CellType.WALL):
                     new_lines.append(line)
+                    grid_changed = change_grid_type(robot_x, robot_y, x, y, line, grid_map)
 
             if tmp_vertical >= POINTS_LINE:
                 line = (x, y, x, y_next)            # create a tupel with line start and end point
-                if line not in lines:
-                    lines.append(line)
+                if not (grid_map.get_relative(x, y) == CellType.WALL):
                     new_lines.append(line)
+                    grid_changed = change_grid_type(robot_x, robot_y, x, y, line, grid_map)
+        if grid_changed:
+            change_grid_type(robot_x, robot_y, x, y, (), grid_map)
 
-    # If you don't want it to plot all lines and all mesuring points then uncomment this
-    test_plot(lines, coordinates, x_min, x_max, y_min, y_max)
-
+        print("CELLTYPE", grid_map.get_relative(x, y), x, y)
+        print("CELLTYPE S", grid_map.get_relative(x + 1, y), x + 1, y)
+        print("CELLTYPE T", grid_map.get_relative(x, y + 1), x, y + 1)
     return new_lines
 
     
 
 
-def plot_room(map):
+def plot_room(lines):
     """
     Plots the room and return the plot
     :param map: Is a list of tupels that has the information about walls [(x11, y11, x21, y21), (x12, y12, ...), ...]
     :return: A list of coordinates
     """
-    for coord in map:
+    for coord in lines:
         if coord[1] == coord[3]:
             line = np.linspace(coord[0], coord[2], POINTS)
             plt.plot(line, [coord[1]] * POINTS)
@@ -110,26 +114,25 @@ def plot_room(map):
 
 
 
-def check_available_grid(map):
+def check_available_grid(x_min, x_max, y_min, y_max, grid_map):
     """
     Checks all available arches between nodes the robot can go
     :param map: A list with tupleres containing all walls
     :return: A list of all posible grid -> grid [(fron_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
     """
-    x_min, x_max, y_min, y_max = get_size(map)
-    possible_squares = []
-    corr = 0        # size correction, should it go outside known area or not, 0 = not, 1 = yes
 
-    for y in range(y_min, y_max - 1 + corr):
+    possible_squares = []
+
+    for y in range(y_min, y_max - 1):
         y_next = y + 1
 
-        for x in range(x_min, x_max - 1 + corr):
+        for x in range(x_min, x_max - 1):
             x_next = x + 1
-
-            if ((x + 1) * GRID_SIZE, y * GRID_SIZE, (x + 1) * GRID_SIZE, y_next * GRID_SIZE) not in map:
-                possible_squares.append((x, y, x_next, y))
-            if (x * GRID_SIZE, (y + 1) * GRID_SIZE, x_next * GRID_SIZE, (y + 1) * GRID_SIZE) not in map:
-                possible_squares.append((x, y, x, y_next))
+            if grid_map.get_relative(x, y) == CellType.OPEN:
+                if grid_map.get_relative(x + 1, y) == CellType.OPEN:
+                    possible_squares.append((x, y, x_next, y))
+                if grid_map.get_relative(x, y + 1) == CellType.OPEN:
+                    possible_squares.append((x, y, x, y_next))
 
     return possible_squares
 
@@ -143,16 +146,9 @@ def get_size(coordinates):
     """
     min_x, max_x, min_y, max_y = 0, 0, 0, 0
 
-    if len(coordinates[0]) == 2:
-        for x, y in coordinates:
-            min_x, max_x = check_size(x, min_x, max_x)
-            min_y, max_y = check_size(y, min_y, max_y)
-    elif len(coordinates[0]) == 4:
-        for x1, y1, x2, y2 in coordinates:
-            min_x, max_x = check_size(x1, min_x, max_x)
-            min_x, max_x = check_size(x2, min_x, max_x)
-            min_y, max_y = check_size(y1, min_y, max_y)
-            min_y, max_y = check_size(y2, min_y, max_y)
+    for x, y in coordinates:
+        min_x, max_x = check_size(x, min_x, max_x)
+        min_y, max_y = check_size(y, min_y, max_y)
 
     min_x, max_x = get_grid(min_x, max_x)
     min_y, max_y = get_grid(min_y, max_y)
@@ -342,45 +338,27 @@ def test_plot(map, coordinates, x_min, x_max, y_min, y_max):
     plt.show()
 
 
-def get_grid_map(robot_x, robot_y, lines):
-    """Returns a GridMap containing the room as we currently know it."""
-    min_x, max_x, min_y, max_y = get_size(lines)
+def change_grid_type(robot_x, robot_y, x, y, line, grid_map):
+    """Changes the grid type to wall if it is a wall"""
+    x_next = x + 1
+    x_prev = x - 1
+    y_next = y + 1
+    y_prev = y - 1
 
-    rslt = GridMap()
+    if (x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE) == line:
+        if y > robot_y:
+            grid_map.set(x, y_next, CellType.WALL)
+        elif y < robot_y:
+            grid_map.set(x, y_prev, CellType.WALL)
 
-    rslt.set_robot_pos(robot_x, robot_y)
+    if (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) == line:
+        if x > robot_x:
+            grid_map.set(x, y, CellType.WALL)
+            if not (grid_map.get_relative(x, y) == CellType.WALL):
+                grid_map.set(x, y, CellType.OPEN)
+        elif x < robot_x:
+            grid_map.set(x_prev, y, CellType.WALL)
 
-    for y in range (min_y, max_y):
-        for x in range (min_x, max_x):
-            x_next = x + 1
-            x_prev = x - 1
-            y_next = y + 1
-            y_prev = y - 1
-
-            if (x*GRID_SIZE, y*GRID_SIZE, x_next*GRID_SIZE, y*GRID_SIZE) in lines:
-                if y > robot_y:
-                    print(x_next, y, "Wall")
-                    rslt.set(x, y_next, CellType.WALL)
-                elif y < robot_y:
-                    print(x, y_prev, "Wall")
-                    rslt.set(x, y_prev, CellType.WALL)
-
-            if (x*GRID_SIZE, y*GRID_SIZE, x*GRID_SIZE, y_next*GRID_SIZE) in lines:
-                if x > robot_x:
-                    print(x, y, "Wall")
-                    rslt.set(x, y, CellType.WALL)
-                    if not (rslt.get_relative(x, y) == CellType.WALL):
-                        print(x, y, "Open")
-                        rslt.set(x, y, CellType.OPEN)
-                elif x < robot_x:
-                    print(x_prev, y, "Wall")
-                    rslt.set(x_prev, y, CellType.WALL)
-            ## TODO: check why it is not setting the cell type to anything
-            if not (rslt.get_relative(x, y) == CellType.WALL):
-                print(x, y, "Open")
-                rslt.set(x, y, CellType.OPEN)
-    return rslt
-
-
-# Test
-#get_grid_map(0,0,[(0, -400, 400, -400), (400, -400, 400, 0), (400, 0, 400, 400), (0, 400, 400, 400)]).debug_print()
+    if not (grid_map.get_relative(x, y) == CellType.WALL):
+        grid_map.set(x, y, CellType.OPEN)
+    return True
