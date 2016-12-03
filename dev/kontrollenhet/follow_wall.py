@@ -297,6 +297,7 @@ class Robot:
             # Read data from the LIDAR sensor
             lidar_distance = self.read_sensor(Command.read_lidar())
             recorded_data += [(i,lidar_distance)]
+            time.sleep(0.005)
 
         return recorded_data
 
