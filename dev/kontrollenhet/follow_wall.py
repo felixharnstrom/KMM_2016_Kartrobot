@@ -88,7 +88,7 @@ class Robot:
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 50
         self.RIGHT_TURN_ENTRY_DIST = 170
-        self.RIGHT_TURN_EXIT_DIST = 150
+        self.RIGHT_TURN_EXIT_DIST = self.BLOCK_SIZE
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 200
         self.SENSOR_SPACING = 95
@@ -222,7 +222,7 @@ class Robot:
             ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
             if (VERBOSITY >= 3):
-                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self._help_angle))
+                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self._help_angle) + " _last_dist: " + str(self._last_dist))
 
              # Detect corridor to the right
             if ((ir_right_front >= self.TURN_OVERRIDE_DIST) or (ir_right_front > self.TURN_MIN_DIST and ir_right_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -466,9 +466,20 @@ def main(argv):
                 robot.stand_perpendicular('left')
                 robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
                 while robot._is_moving(threshold=20): pass
-                robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
-                while robot._is_moving(threshold=20): pass
                 robot.stand_perpendicular('left')
+
+                # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
+                if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
+                    if VERBOSITY >= 1:
+                        print("Not a corridor, moving back")
+                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
+                    while robot._is_moving(threshold=20): pass
+                else:
+                    # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower RIGHT_TURN_EXIT_DIST again.
+                    # As it is now, a right turn into a single square corridor does not work well.
+                    robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
+                    while robot._is_moving(threshold=20): pass
+                robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
