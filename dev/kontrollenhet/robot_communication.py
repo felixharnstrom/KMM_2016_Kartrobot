@@ -23,14 +23,14 @@ UART_sensor = None #TODO: This is not always true!
 UART_motor = None #TODO: This is not always true!
 #key_pressed = {"right":False, "left":False, "up":False, "down":False}
 
-def init_UARTs():
+def init_UARTs(sensor = "ttyUSB0", motor = "ttyUSB1"):
     global UART_sensor
     global UART_motor
     #Get serial com. names from system
     #Send dummy messages to find out which com port is assigned to which atmega
     #Set UART_motor and UART_sensor to the correct objects.
-    UART_sensor = UART("ttyUSB1") #TODO: This is not always true!
-    UART_motor = UART("ttyUSB0") #TODO: This is not always true!
+    UART_sensor = UART(sensor) #TODO: This is not always true!
+    UART_motor = UART(motor) #TODO: This is not always true!
     return
 
 def close_UARTs():
@@ -109,7 +109,7 @@ def get_sensor_dict_key(c_enum : CommandEnums):
 def read_ir_sensor(command : Command):
     c_enum = command.get_enum()
     UART_sensor.send_command(command)
-    #ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
     (ir_value_msb, ir_value_lsb) = UART_sensor.receive_payload()
     #send_sensor_ack()
     ir_value = ir_value_msb*(2**8)+ir_value_lsb
@@ -118,7 +118,7 @@ def read_ir_sensor(command : Command):
     
 def read_gyro_sensor(command : Command):
     UART_sensor.send_command(command)
-    #ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
+    ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
     (gyro_value_msb, gyro_value_lsb) = UART_sensor.receive_payload()
     #send_sensor_ack()
     #We need to cast it to signed int 16 bit (due to being a gyro)
