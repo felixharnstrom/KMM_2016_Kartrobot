@@ -356,6 +356,14 @@ class Robot:
         self.uart_styrenhet.send_command(drive_instr)
 
     def _is_moving(self, threshold=50, wait_time=0.2):
+        """
+        Checks for sensor changes above threshold within wait_time.
+        Args:
+            threshold   (int): How much the sensor values are allowed to change (mm)
+            wait_time   (int): How long to wait between sensor reads
+        Returns:
+            (bool): If the robot has moved more than threshold.
+        """
         ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
         ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
