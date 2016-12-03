@@ -162,11 +162,13 @@ class Robot:
 
     def drive_distance(self, dist : int, speed : int):
         """
-        Drives the given distance at the given speed. Uses LIDAR for determining distance.
+        Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
 
         Args:
             dist    (int): Distance in millimetres.
             speed   (int): Speed as a percentage value between 0-100.
+        Returns:
+            (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         lidar_init = self.read_sensor(Command.read_lidar())
@@ -175,8 +177,13 @@ class Robot:
             print("LIDAR INIT: ", lidar_init)
         while(lidar_init - lidar_cur < dist):
             lidar_cur = self.read_sensor(Command.read_lidar())
+            if lidar_cur < self.OBSTACLE_DIST:
+                self.uart_styrenhet.send_command(Command.stop_motors())
+                return False
             #if (VERBOSITY >= 2):
                 #print("LIDAR CURRENT: ", lidar_cur)
+        self.uart_styrenhet.send_command(Command.stop_motors())
+        return True
 
     def follow_wall(self, distance : int):
         """
