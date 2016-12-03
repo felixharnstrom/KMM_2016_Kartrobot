@@ -88,7 +88,7 @@ class Robot:
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 50
         self.RIGHT_TURN_ENTRY_DIST = 170
-        self.RIGHT_TURN_EXIT_DIST = self.BLOCK_SIZE
+        self.RIGHT_TURN_EXIT_DIST = 200
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 200
         self.SENSOR_SPACING = 95
@@ -466,20 +466,19 @@ def main(argv):
                 robot.stand_perpendicular('left')
                 robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
                 while robot._is_moving(threshold=20): pass
-                robot.stand_perpendicular('left')
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
                 if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
                     if VERBOSITY >= 1:
                         print("Not a corridor, moving back")
                     robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
+                    robot.stand_perpendicular('right')
                     while robot._is_moving(threshold=20): pass
                 else:
                     # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower RIGHT_TURN_EXIT_DIST again.
                     # As it is now, a right turn into a single square corridor does not work well.
                     robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
                     while robot._is_moving(threshold=20): pass
-                robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
