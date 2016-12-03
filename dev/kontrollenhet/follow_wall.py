@@ -355,6 +355,32 @@ class Robot:
         drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
         self.uart_styrenhet.send_command(drive_instr)
 
+    def _is_moving(self, threshold=50, wait_time=0.2):
+        ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
+        lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
+        ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+        ir_right_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+        ir_left_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+        ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+
+        time.sleep(wait_time)
+
+        ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir()))
+        lidar_diff = abs(lidar - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar()))
+        ir_right_front_diff = abs(ir_right_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir()))
+        ir_right_back_diff = abs(ir_right_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir()))
+        ir_left_back_diff = abs(ir_left_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir()))
+        ir_left_front_diff = abs(ir_left_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir()))
+
+        if (lidar_diff < threshold and ir_right_back_diff < threshold and
+            ir_right_front_diff < threshold and ir_back_diff < threshold and
+            ir_left_back_diff < threshold and ir_left_front_diff < threshold):
+            return False
+        else:
+            if VERBOSITY >= 2:
+                print("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
+            return True
+
 
 def sensor_test(robot):
     """
@@ -385,26 +411,32 @@ def main(argv):
 
     # Wait fot LIDAR to be in position
     time.sleep(1)
-        
+    
     # Try driving in infinite loop around the maze
     while 1:
             # Drive forward without crashing in wall
             status = robot.follow_wall(9999999)
+            if VERBOSITY >= 1:
+                print(robot.path_trace)
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 if (VERBOSITY >= 1):
                     print ("---------- OBSTACLE DETECTED!")
                     print ("---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
                 robot.uart_styrenhet.send_command(turn_instr)
-                time.sleep(1)
+                while robot._is_moving(threshold=20): pass
                 ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
                 if (ir_right_front > ir_left_front):
                     robot.stand_perpendicular('left')
                     robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
+                    while robot._is_moving(threshold=20): pass
+                    robot.stand_perpendicular('left')
                 else:
                     robot.stand_perpendicular('right')
                     robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
+                    while robot._is_moving(threshold=20): pass
+                    robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
@@ -415,11 +447,13 @@ def main(argv):
                     print ("---------- TURNING RIGHT 90 degrees")
                 turn_instr = Command.stop_motors()
                 robot.uart_styrenhet.send_command(turn_instr)
-                time.sleep(1)
+                while robot._is_moving(threshold=20): pass
                 robot.stand_perpendicular('left')
                 robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
-                time.sleep(1)
+                while robot._is_moving(threshold=20): pass
                 robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
+                while robot._is_moving(threshold=20): pass
+                robot.stand_perpendicular('left')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
