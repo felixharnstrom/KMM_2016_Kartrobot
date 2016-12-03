@@ -158,7 +158,10 @@ class Robot:
         self.uart_styrenhet.send_command(turn_instr)
 
         # Add turned degrees to current_angle
-        self.current_angle += degrees
+        if direction == Direction.LEFT:
+            self.current_angle -= degrees
+        else:
+            self.current_angle += degrees
 
     def drive_distance(self, dist : int, speed : int):
         """
