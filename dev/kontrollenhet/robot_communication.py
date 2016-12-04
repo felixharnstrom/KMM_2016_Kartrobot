@@ -228,7 +228,7 @@ def process_action():
     Processes the next action in the input queue.
     
     Returns:
-        :return (bool) True if an action was popped from the queue, False if there was nothing to pop.
+        :return (bool): True if an action was popped from the queue, False if there was nothing to pop.
     """
     if input_queue.empty():
         return False
