@@ -213,9 +213,10 @@ Alla instruktioner och svar påbörjas med ett metapaket på 8 bitar.
 % TODO: Skriv om acknowledge.
 
 \subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet}
+
 % TODO: Fixa upplägget med sektioner
 \paragraph{Drive}
-Drive-instruktionen kör roboten framåt eller bakåt enligt följande argument.
+Drive-instruktionen kör roboten framåt eller bakåt enligt följande argument. Kommandot har typnummer \texttt{1}.
 \begin{table}[h!]
     \centering
     \begin{tabular}{|l|l|l|}
@@ -229,7 +230,7 @@ Drive-instruktionen kör roboten framåt eller bakåt enligt följande argument.
 \end{table}
 
 \paragraph{Turn}
-Turn-instruktionen svänger roboten enligt följande argument.
+Turn-instruktionen svänger roboten enligt följande argument. Kommandot har typnummer \texttt{2}.
 \begin{table}[h!]
     \centering
     \begin{tabular}{|l|l|l|}
@@ -243,7 +244,7 @@ Turn-instruktionen svänger roboten enligt följande argument.
 \end{table}
 
 \paragraph{Side-speed}
-Side-speed-instruktionen sätter vänster och höger motorpar så som följande argument specifierar.
+Side-speed-instruktionen sätter vänster och höger motorpar så som följande argument specifierar. Kommandot har typnummer \texttt{3}.
 \begin{table}[h!]
     \centering
     \begin{tabular}{|l|l|l|}
@@ -259,7 +260,7 @@ Side-speed-instruktionen sätter vänster och höger motorpar så som följande 
 
 
 \paragraph{Servo}
-Servo-instruktionen sätter servot till en speciefierad vinkel.
+Servo-instruktionen sätter servot till en speciefierad vinkel. Kommandot har typnummer \texttt{4}.
 \begin{table}[h!]
     \centering
     \begin{tabular}{|l|l|l|}
@@ -268,6 +269,81 @@ Servo-instruktionen sätter servot till en speciefierad vinkel.
     	\textbf{Direction} & 1               & Servots vinkel, mellan 0 och 180 \\ \hline
     \end{tabular}
     \caption{Servo-instuktionens argument}
+\end{table}
+
+\paragraph{Stop-Motors}
+Stop-motors-instruktionen stannar båda motorerna. Kommandot har typnummer \texttt{5}.
+
+\paragraph{Controller-Information}
+Controller-Information-instruktionen ber styrenheten om diagnostisk data. Kommandot har typnummer \texttt{6}.
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument                 & Storlek (bytes) & Betydelse                                                                       \\ \hline
+    	\textbf{Left direction}  & 1               & 0 motsvarar framåt, 1 bakåt.                                                    \\
+    	\textbf{Left PWM}        & 1               & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående.          \\
+    	\textbf{Right direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                                    \\
+    	\textbf{Right PWM}       & 1               & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående.          \\
+    	\textbf{Servo PWM}       & 2               & Integer mellan 0 och 65535, där 773 är längst till vänster och 2343 till höger. \\ \hline
+    \end{tabular}
+    \caption{Returnvärden från controller-information-instruktionen}
+\end{table}
+
+\subsubsection{Kontrollenhet $\leftrightarrow$ Sensorenhet}
+\paragraph{Read-IR}
+IR-sensorer läses av med typnummer enligt tabell \ref{table:irtypes}. 
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|}
+    	\hline
+    	Typnummer  & Sensor       \\ \hline
+    	\textbf{1} & Vänster fram \\
+    	\textbf{2} & Vänster bak  \\
+    	\textbf{3} & Höger fram   \\
+    	\textbf{4} & Höger bak    \\
+    	\textbf{5} & Bak          \\ \hline
+    \end{tabular}
+    \caption{Typvärden för IR-avläsning \label{table:irtypes}}
+\end{table}
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
+    	\textbf{Avstånd} & 1               & Integer mellan 0 och 300. Avstånd i millimeter \\ \hline
+    \end{tabular}
+    \caption{Returnvärden från IR-avläsning}
+\end{table}
+
+\paragraph{Read-Lidar}
+Läser av lidar-sensorn. Kommandot har typnummer \texttt{6}.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
+        \textbf{Avstånd} & 1               & Integer mellan 0 och 65535. Avstånd i millimeter \\ \hline
+        \end{tabular}
+    \caption{Returnvärden från lidar-avläsning}
+\end{table}
+
+
+\paragraph{Read-Gyro}
+Läser av gyrots X-axel, vilket motsvaras av robotens z-axel. Kommandot har typnummer \texttt{7}.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
+        \textbf{Avstånd} & 1               & Integer mellan -25206 och 25205. Vinkelhastighet i centigrader/s. \\ \hline
+    \end{tabular}
+    \caption{Returnvärden från lidar-avläsning}
 \end{table}
 
 \subsection{WIFI-kommunikation}
