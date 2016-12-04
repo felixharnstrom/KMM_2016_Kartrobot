@@ -195,7 +195,7 @@ Här följer en lista på all gemensam hårdvara.
 \label{ssec:communication}
 
 \subsection{Seriell kommunikation}
-För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler.
+För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
 
 Alla instruktioner och svar påbörjas med ett metapaket på 8 bitar.
 \begin{table}[h]
@@ -347,7 +347,9 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel. Kommandot har typn
 \end{table}
 
 \subsection{WIFI-kommunikation}
-Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient. Kommandon skickas som json-objekt.
+Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Kontrollenheten ansluter automatiskt till \texttt{eduroam} och annonserar sin IP-adress till gruppen Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient. % TODO: Se till att mjukvaran faktiskt startar automatiskt, eller ändra formulering.
+
+Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett json-objekt.
 
 
 \clearpage
@@ -392,7 +394,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 
 \begin{HardwareList}
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
-\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}}{1}
+\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}. Körs i \SI{8}{\mega\hertz}}{1}
 \hardware{GP2D120}{IR-sensor.}{5}
 \hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
 \hardware{Resistor}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
@@ -459,7 +461,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 % TODO add hardware
 \begin{HardwareList}
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} 
-\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}.}{1}
+\hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}. Körs i \SI{8}{\mega\hertz}}{1}
 \hardware{Hobbyservo}{}{1}
 \end{HardwareList}
 
@@ -566,12 +568,12 @@ Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så finns e
 För strömförsörjning används en USB-kabel från robotplatformen.
 
 \subsubsection{Komponentbudget}
-Här följer en lista på all hårdvara som detta delsystem kräver.
+Här följer en lista på all hårdvara som detta delsystem använder.
 
 \begin{HardwareList}
 \hardware{Raspberry Pi 3}{Enkortsdator.}{1}
 \hardware{SD-kort}{SD-kort på minst 4GB används som lagringsenhet.}{1}
-\hardware{Tryckknapp}{För nedstängning av mjukvara.}{1}
+\hardware{Avstudsad tryckknapp}{För nedstängning av mjukvara.}{1}
 \hardware{Avstudsad tryckknapp}{För byte av styrläge.}{1}
 \end{HardwareList}
 
@@ -684,7 +686,7 @@ När roboten startar så initieras den med startvärden och hamnar i den huvudlo
 \clearpage
 
 \subsubsection{Manuellt läge}
-I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}) om hur den ska åka, mycket likt en radiostyrd bil. Dessa kommandon motsvarar piltangenterna på ett tangentbord och skickas direkt vidare till styrenheten.
+I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nertryckta som då översätts till styrkommandon och skickas vidare till styrenheten.
 
 
 \noindent
@@ -773,6 +775,9 @@ Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskad
 \label{fig:auto_flowchart}
 \end{figure}
 
+\subsubsection{Reglering}
+För att kunna köra rakt använder sig kontrollenheten av PD-reglering. Detta görs med hjälp av IR-sensorerna på sidan. Ett vinkelrät avstånd till väggen räknas ut genom att beräkna vinkeln till väggen och ta $ (frontDist+backDist)/2 \times cos(angle)$. Regleringen kommer att använda detta värde och ett målvärde för att beräkna avståndet till optimala placeringen. Detta används för att beräkna hur mycket roboten ska snurra med formeln $ TODO: PID-formel$.
+
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
 
@@ -802,7 +807,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \clearpage
 
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden ska vara skriven i Python 3, och ska följa \cite{pep8}.
+PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och ska följa \cite{pep8}. Den består av två trådar där den ena hanterar GUIt och den andra hanterar kommunikation med roboten via en socket och med GUIt via köer.
 
 \begin{figure}[h!]
 \centering
@@ -868,7 +873,7 @@ PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta använ
 %         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
 
 \subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från mus och tangentbord. 
+PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från användaren i form av knapptryck och tangentbordskommandon.
 
 \clearpage
 
@@ -876,9 +881,9 @@ PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenh
 Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
 
 \subsubsection{GUI}
-Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet ska användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se det hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
 
-Det grafiska gränssnittet byggs med grafikbiblioteket \cite{tkinter}.
+Det grafiska gränssnittet är byggt med grafikbiblioteket \cite{tkinter}.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
