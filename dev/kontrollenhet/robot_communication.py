@@ -1,93 +1,120 @@
-import server
 from command import *
 from communication import *
 from UART import UART
-import time
 import threading
 import robot_wifi
 import queue
 import mode
 
-#Contains all data for motors, servo and sensors
-motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0 ,"RIGHT_SIDE_DIRECTION":0, "RIGHT_SIDE_SPEED":0, "SERVO_ANGLE":0}
-motor_data_lock = threading.Lock()
-sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,"IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, "IR_BACK":0, "IR_LIDAR":0, "GYRO":0}
-sensor_data_lock = threading.Lock()
-key_pressed = {"right":False, "left":False, "up":False, "down":False}
-input_queue = queue.Queue() #Execute on robot
-
-
-#TODO: We need to grep and get the two serial interaces (uarts), as well as deciding which is which (by sending an echo for example)
-#This method will assign the correct UART object to UART_motor and UART_sensor for pain-free execution
-UART_sensor = None #TODO: This is not always true!
-UART_motor = None #TODO: This is not always true!
-#key_pressed = {"right":False, "left":False, "up":False, "down":False}
+UART_sensor = None          #The uninitiated UART object for sensor communication.
+UART_motor = None           #The uninitiated UART object for motor communication.
+input_queue = queue.Queue() #The Queue object which contains all the Commands enqueued from the wifi communication thread.
+key_pressed = {"right":False, "left":False,
+¨                "up":False, "down":False} #Contains the current pressed_down state for the different directions from the GUI.
+motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0, 
+                "RIGHT_SIDE_DIRECTION":0, "RIGHT_SIDE_SPEED":0, 
+                "SERVO_ANGLE":0} #Contains the last retrieved motor data from get_motor_diagnostics.
+sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
+                "IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, 
+                "IR_BACK":0, "IR_LIDAR":0, 
+                "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
 def init_UARTs(sensor = "ttyUSB0", motor = "ttyUSB1"):
+    """
+    Initiates the sensor and motor UART objects with the given serial communication port names.
+    
+    Args:
+        :param sensor (str): The name of the serial communication port used for the sensor UART.
+        :param motor (str): The name of the serial communication port used for the motor UART.
+    """
     global UART_sensor
     global UART_motor
-    #Get serial com. names from system
-    #Send dummy messages to find out which com port is assigned to which atmega
-    #Set UART_motor and UART_sensor to the correct objects.
-    UART_sensor = UART(sensor) #TODO: This is not always true!
-    UART_motor = UART(motor) #TODO: This is not always true!
+    UART_sensor = UART(sensor)
+    UART_motor = UART(motor)
     return
 
 def close_UARTs():
+    """
+    Closes the connection for the motor and sensor UART objects.
+    """
     UART_motor.close()
     UART_sensor.close()
-    s.close()
+    return
 
 def init_wifi_thread():
-    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,motor_data_lock,sensor_data_lock,input_queue)).start()
+    """
+    Initiates and executes a new thread which receives and transmits commands over wifi.
+    """
+    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,input_queue)).start()
 
 def adjust_speeds():
-    c = Command.stop_motors() #Dummy
+    """
+    Sets the speed and direction of the robot motors during manual mode depending on
+    what keys that are currently pressed down in keys_pressed, retrieved from the PC side.
+    """
+    command = Command.stop_motors() #Set to stop_motors as that is what we want to do if we get any 'illegal' combination of keys or if no keys are pressed
+    
     if key_pressed["up"]:
         if not key_pressed["left"] and not key_pressed["right"] and not key_pressed["down"]: #Forward
-            c = Command.drive(1,50,0)
-        elif key_pressed["left"] and not key_pressed["right"]:
-            c = Command.side_speeds(1,25,1,75)       
-        elif key_pressed["right"] and not key_pressed["left"]:
-            c = Command.side_speeds(1,75,1,25)
-        else:
-            c = Command.stop_motors() #Stop pressing like stupid
+            command = Command.drive(1,50,0)
+        elif key_pressed["left"] and not key_pressed["right"]: #Forward-left
+            command = Command.side_speeds(1,25,1,75)       
+        elif key_pressed["right"] and not key_pressed["left"]: #Forward-right
+            command = Command.side_speeds(1,75,1,25)
     elif key_pressed["down"]:
         if not key_pressed["left"] and not key_pressed["right"]: #Backward
-            c = Command.drive(0,50,0)
-        elif key_pressed["left"] and not key_pressed["right"]:
-            c = Command.side_speeds(0,75,0,25)       
-        elif key_pressed["right"] and not key_pressed["left"]:
-            c = Command.side_speeds(0,25,0,75)
-        else:
-            c = Command.stop_motors() #Stop pressing like stupid
+            command = Command.drive(0,50,0)
+        elif key_pressed["left"] and not key_pressed["right"]: #Backward-right
+            command = Command.side_speeds(0,75,0,25)       
+        elif key_pressed["right"] and not key_pressed["left"]: #Backward-left
+            command = Command.side_speeds(0,25,0,75)
     elif key_pressed["left"] and not key_pressed["right"]: #Left
-        c = Command.turn(0,50,0)
+        command = Command.turn(0,50,0)
     elif key_pressed["right"] and not key_pressed["left"]: #Right
-        c = Command.turn(1,50,0)
-    else:
-        c = Command.stop_motors() #Stop pressing like stupid
-    print("sendin")
-    handle_command(c)
+        command = Command.turn(1,50,0)
+    handle_command(command) #Execute the command
 
 def handle_key(key_event : str):
-    key = key_event[:-2] #All but the last 2 chars ex. "right" in "right_p"
-    key_e = key_event[-1:] #Only the last char ex. "p" in "right_p"
-    if key in key_pressed.keys() and key_e in ["p", "r"]:
+    """
+    Interprets the key-event string and then updates the corresponding key in key_pressed to reflect the event, 
+    after which it will adjust the speeds to the new key_pressed values.
+    For example "right_p" would mean that the right key is set to pressed.
+    
+    Args:
+        :param key_event (str): The key-event to interpret, eg. "right_p" or "left_r"
+    """
+    key = key_event[:-2]    #All but the last 2 chars eg. "right" in "right_p"
+    key_e = key_event[-1:]  #Only the last char eg. "p" in "right_p"
+    if key in key_pressed.keys() and key_e in ["p", "r"]: #Is the input legal?
         key_pressed[key] = (key_e == "p")
         adjust_speeds()
     
 def send_sensor_ack():
-    ack = Command.ack() #Create ack command
+    """
+    Transmits an ack Command over the sensor UART.
+    """
+    ack = Command.ack()           #Create ack command
     UART_sensor.send_command(ack) #Send it over uart
 
 def send_motor_ack():
-    ack = Command.ack() #Create ack command
+    """
+    Transmits an ack Command over the motor UART.
+    """
+    ack = Command.ack()          #Create ack command
     UART_motor.send_command(ack) #Send it over uart
 
-    
-#If someone finds a better way, please change this.
+
 def get_sensor_dict_key(c_enum : CommandEnums):
+    """
+    Retrieves the dictionary key for the sensor that data will be 
+    fetched for by executing the Command with the corresponding enum.
+    
+    Args:
+        :param c_enum (CommandEnums): The enum for the Command that we wish to sensor_data key from.
+    
+    Returns:
+        :return (str): The key for the sensor_data dictionary value that we will fetch new data for.
+    """
     if(c_enum == CommandEnums.READ_IR_LEFT_FRONT):
         return "IR_LEFT_FRONT"
     elif(c_enum == CommandEnums.READ_IR_LEFT_BACK):
@@ -103,10 +130,17 @@ def get_sensor_dict_key(c_enum : CommandEnums):
     elif(c_enum == CommandEnums.READ_GYRO):
         return "GYRO"
     else:
-        return False
+        return ""
         
-#Reads IR-sensor and sets corresponding sensor_data key.
 def read_ir_sensor(command : Command):
+    """
+    Transmits a command and receives data for an IR-sensor, using the sensor UART.
+    The data that is received is put into the sensor_data dictionary for the sensor 
+    that was intended by the executed Command.
+    
+    Args:
+        :param command (Command): The IR-sensor command to execute and receive data for.
+    """
     c_enum = command.get_enum()
     UART_sensor.send_command(command)
     ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
@@ -117,47 +151,58 @@ def read_ir_sensor(command : Command):
     return
     
 def read_gyro_sensor(command : Command):
+    """
+    Transmits a read_gyro command and receives data for the gyro, using the sensor UART.
+    The data that is received is put into the sensor_data dictionary under the "GYRO"-key.
+    
+    Args:
+        :param command (Command): A gyro command.
+    """
     UART_sensor.send_command(command)
     ack = UART_sensor.receive_packet() #Receive ack (TODO: implement response check/resend if we implement timeout on receive)
     (gyro_value_msb, gyro_value_lsb) = UART_sensor.receive_payload()
     #send_sensor_ack()
-    #We need to cast it to signed int 16 bit (due to being a gyro)
     gyro_value = gyro_value_msb*(2**8)+gyro_value_lsb
     if(gyro_value > 0x7fff): #unsigned 16-bit -> signed 16-bit 
         gyro_value -= 65536 #0x7000
     sensor_data["GYRO"] = gyro_value
     return   
 
-#Send command to controller to retrieve and return motor data
-def get_motor_diagnostics(command : Command):
+def retrieve_and_update_motor_diagnostics(command : Command):
+    """
+    Transmits a controller_information command and receives motor data, using the motor UART.
+    The data that is received is converted and put into the motor_data dictionary.
+    
+    Args:
+        :param command (Command): A controller_information Command.
+    """
     pwm_to_speed = 2.5 #Constant for getting motor pwm -> motor speed percentage
-    print(command)
-    print(UART)
     UART_motor.send_command(command)
     #ack = UART_motor.receive_packet() #Receive ack
-    #Sorry for unreadable code!
-    (left_direction, left_pwm, right_direction, right_pwm, servo_pwm_msb, servo_pwm_lsb) = UART_motor.receive_payload()
+    (left_direction, left_pwm, 
+    right_direction, right_pwm, 
+    servo_pwm_msb, servo_pwm_lsb) = UART_motor.receive_payload()
     send_motor_ack()
     servo_angle = ((servo_pwm_msb*(2**8)+servo_pwm_lsb)-773)/8.72 #Formula for translating servo pwm to servo angle
-    
-    #print("LEFT: ", 
-    #      "forward " if left_direction else "backward ",  left_pwm/pwm_to_speed, "%\n",
-    #      "RIGHT: ",
-    #      "forward " if right_direction else "backward ", right_pwm/pwm_to_speed, "%\n",
-    #      "SERVO: ", servo_angle, " degrees\n")
     motor_data["LEFT_SIDE_DIRECTION"] = left_direction
     motor_data["LEFT_SIDE_SPEED"] = left_pwm/pwm_to_speed
     motor_data["RIGHT_SIDE_DIRECTION"] = right_direction
     motor_data["RIGHT_SIDE_SPEED"] = right_pwm/pwm_to_speed
     motor_data["SERVO_ANGLE"] = servo_angle
+    #print(motor_data)
     return
 
-#We can handle pc -> rpi -> pc in shell methods (By adding command instructions for them but utilizing c_enums > 31)
 def handle_command(command : Command):
+    """
+    Sends the command over the correct UART and handles conversion and storing of return data for those commands that need it.
+    
+    Args:
+        :param command (Command): The command that we want to handle.
+    """
     c_enum = command.get_enum()
-    print("Getting enum", command.command_type)
+    print("Handling enum: ", command.command_type)
     if(c_enum == CommandEnums.CONTROLLER_INFORMATION):
-        get_motor_diagnostics(command)
+        retrieve_and_update_motor_diagnostics(command)
     elif(c_enum == CommandEnums.READ_IR_LEFT_FRONT or 
             c_enum == CommandEnums.READ_IR_LEFT_BACK or
             c_enum == CommandEnums.READ_IR_RIGHT_FRONT or
@@ -168,22 +213,23 @@ def handle_command(command : Command):
     elif(c_enum == CommandEnums.READ_GYRO):
         read_gyro_sensor(command)
     else:
-        #Temporary solution for all non-special commands (eg. just send)
+        #Handles all commands that does not need any special handling (eg. just send and ack)
         #Does >not< handle incorrectly parsed commands
         if (command.address == 1):
-            print("Sensor command")
             UART_sensor.send_command(command)
             #ack = UART_sensor.receive_packet() #Receive ack
         else:
-            print("Motor command")
             UART_motor.send_command(command)
             #ack = UART_motor.receive_packet() #Receive ack
     return
 
 def process_action():
-    """Process the next action on the input queue.
-
-    Returns True if an action was popped from the queue, false if not."""
+    """
+    Processes the next action in the input queue.
+    
+    Returns:
+        :return (bool) True if an action was popped from the queue, False if there was nothing to pop.
+    """
     if input_queue.empty():
         return False
     next_action = None
@@ -203,6 +249,8 @@ def process_action():
     return False
 
 def process_actions():
-    """Process all actions on the input queue"""
+    """
+    Process all actions in the input_queue until it's empty.
+    """"
     while process_action():
         pass
