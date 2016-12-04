@@ -157,9 +157,6 @@ Vidare monteras ett gyro (modell MPU6050) i mitten av roboten för att den ska k
 
 I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placering. Kopplingsscheman finns i bilaga \ref{schematics:styrenhet} till och med bilaga \ref{schematics:brain}.
 
-\subsection{Kommunikation}
-\label{ssec:communication}
-För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Vidare så kommunicerar Kommunikation- och kontrollenheten via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}).
 
 %Dessutom är en avbrottssignal mellan Sensorenheten och Styrenheten ett utökningsmål. Detta för att skicka en stoppsignal om sensorerna detekterar ett en kollision håller på att ske men kontrollenheten inte agerat.
 
@@ -192,6 +189,90 @@ Här följer en lista på all gemensam hårdvara.
 \hardware{7-segment-display}{7-segment-displayer för avlusning, en för vardera ATmega1284-processor.}{2}
 \end{HardwareList}
 \end{center}
+
+\clearpage
+\section{Kommunikation}
+\label{ssec:communication}
+
+\subsection{Seriell kommunikation}
+För kommunikation mellan Kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler.
+
+Alla instruktioner och svar påbörjas med ett metapaket på 8 bitar.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Bitar        & Namn    & Betydelse                                        \\ \hline
+        \textbf{0}   & Adress  & 0 motsvarar styrenhet, 1 motsvarar sensorenhet.  \\
+        \textbf{1-3} & Storlek & Antal paket med argument som följer metapaketet. \\
+        \textbf{4-7} & Typ     & Vilken typ av kommando/svar som skickas          \\ \hline
+    \end{tabular}
+    \caption{Metapaketets utformning}
+\end{table}
+
+% TODO: Skriv om acknowledge.
+
+\subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet}
+% TODO: Fixa upplägget med sektioner
+\paragraph{Drive}
+Drive-instruktionen kör roboten framåt eller bakåt enligt följande argument.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument           & Storlek (bytes) & Betydelse                                                                                  \\ \hline
+    	\textbf{Direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                                               \\
+    	\textbf{Speed}     & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående.                     \\
+    	\textbf{Time}      & 2               & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    \end{tabular}
+    \caption{Drive-instuktionens argument}
+\end{table}
+
+\paragraph{Turn}
+Turn-instruktionen svänger roboten enligt följande argument.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument           & Storlek (bytes) & Betydelse                                                                                  \\ \hline
+    	\textbf{Direction} & 1               & 0 motsvarar vänster, 1 höger.                                                              \\
+    	\textbf{Speed}     & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående.                     \\
+    	\textbf{Time}      & 2               & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    \end{tabular}
+    \caption{Turn-instuktionens argument}
+\end{table}
+
+\paragraph{Side-speed}
+Side-speed-instruktionen sätter vänster och höger motorpar så som följande argument specifierar.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument                 & Storlek (bytes) & Betydelse                                                              \\ \hline
+    	\textbf{Left direction}  & 1               & 0 motsvarar framåt, 1 bakåt.                                           \\
+    	\textbf{Left speed}      & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
+    	\textbf{Right direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                           \\
+    	\textbf{Right speed}      & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\ \hline
+    \end{tabular}
+    \caption{Turn-instuktionens argument}
+\end{table}
+
+
+\paragraph{Servo}
+Servo-instruktionen sätter servot till en speciefierad vinkel.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    	\hline
+    	Argument           & Storlek (bytes) & Betydelse                        \\ \hline
+    	\textbf{Direction} & 1               & Servots vinkel, mellan 0 och 180 \\ \hline
+    \end{tabular}
+    \caption{Servo-instuktionens argument}
+\end{table}
+
+\subsection{WIFI-kommunikation}
+Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient. Kommandon skickas som json-objekt.
+
 
 \clearpage
 \section{Sensorenhet} \label{sec:system1}
@@ -251,21 +332,21 @@ Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstan
 
 Programmet omvandlar sensordata till ett mer läsligt format, och skickar det vidare (se kapitel \ref{ssec:sensorInterface}), samt tar emot instruktioner om att läsa av en viss sensor. 
 
-Sensorenheten läser av en viss sensor direkt på uppmaning via UART. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna, medans övriga sensorvärden skickas tillbaka direkt.
+Sensorenheten läser av en viss sensor direkt på uppmaning via UART. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna, medan övriga sensorvärden skickas tillbaka direkt.
 
 \subsection{Gränssnitt} \label{ssec:sensorInterface}
 Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Sensorenheten tar emot uppmaningar om att starta en avläsning via samma seriell buss som används för att rapportera mätvärden vidare. Inget skickas utan att mätvärdet begärts över seriella bussen.
 
 \subsubsection{LIDAR}
-LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet.
+LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
 
 \clearpage
 
 \subsubsection{Gyro}
-MPU6050 läses av via I2C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det.
+MPU6050 läses av via I2C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel. Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det. Gyrot är inställt på att använda en maximal vinkelhastighet på 250 grader/s. Efter avläsning omvandlas vinkelhastigheten till centigrader/s.
 
 \subsubsection{IR-sensorer}
-IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}.
+IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}. Efter avläsning i form av spänningen, $v$, som går mellan 0 och 5 volt översätts detta med formeln $d = 10 \times (v/4.577) ^{(1/-0.634)}$ till ett avstånd, $d$, i millimeter.
 
 \subsubsection{Utvärden/Input}
 En seriell buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
