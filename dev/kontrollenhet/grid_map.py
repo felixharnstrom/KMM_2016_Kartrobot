@@ -41,6 +41,9 @@ class GridMap:
         self.width = 0
         self.height = 0
 
+        self.bottom_left = Position(0,0)
+        self.top_right = Position(0,0)
+
     def expand_down(self):
         """Add a new row at the bottom."""
         self.height += 1

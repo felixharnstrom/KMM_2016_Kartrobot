@@ -1,25 +1,36 @@
 from map import *
+from geometry import *
 import matplotlib.pyplot as plt
 
 # robot position
-x = 0
-y = 0
+robot_pos = Position(0,0)
 
 # robot angle
 angle = 0
 
 lines = []
+possible_paths = []
 
 grid_map = GridMap()
 
-map_room(x,y,angle, grid_map)
-print("lines",lines)
+grid = []
 
-print(lines)
-print(check_available_grid(lines))
+#coordinates = convert_to_coordinates(measure_lidar(), robot_pos, angle)
 
-#get_grid_map(x, y, lines)
+#coordinates = convert_to_coordinates(read_debug_data('demo_data/perfect_square_center_raw_data.json'), robot_pos, angle)
+coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.json')
 
-plt = plot_room(lines)
+lines = coordinates_to_lines(coordinates, robot_pos, grid_map)
 
-plt.show()
+for line in lines:
+    print("line(", line.start.x, line.start.y, line.end.x, line.end.y, ")")
+
+for y in range(grid_map.bottom_left.y, grid_map.top_right.y + 1):
+    for x in range(grid_map.bottom_left.x, grid_map.top_right.x + 1):
+        print("Grid(", grid_map.get(x, y), x, y, ")")
+
+grid = check_available_grid(grid_map)
+
+print(grid)
+
+debug_plot(grid_map, coordinates, lines)
