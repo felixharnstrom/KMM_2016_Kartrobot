@@ -96,7 +96,6 @@ class Robot:
         self.ACCELERATED_SPEED = 40
 
         # Private attributes
-        self._help_angle = 0
         self._last_dist = 0
 
         # Initialize PID controller
@@ -198,7 +197,6 @@ class Robot:
         Returns:
             (DriveStatus): Status when completed.
         """
-        self._help_angle = 0
 
         # Set time to zero to turn untill stopped
         standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100
@@ -216,7 +214,6 @@ class Robot:
             # Area = TimeDiff * turnRate
             clk = time.time()
             turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
-            self._help_angle += (time.time() - clk) * turn_rate
 
             # Get sensor values
             ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -225,7 +222,7 @@ class Robot:
             ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
             if (VERBOSITY >= 3):
-                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self._help_angle) + " _last_dist: " + str(self._last_dist))
+                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
              # Detect corridor to the right
             if ((ir_right_front >= self.TURN_OVERRIDE_DIST) or (ir_right_front > self.TURN_MIN_DIST and ir_right_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
