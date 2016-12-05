@@ -1,14 +1,13 @@
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 from math import cos, sin, radians
 
 
-def plot_movements(movements : list):
+def plot_movements(movements: list):
     """
     Create a plot of the robots movements. Each line is drawn individually, to separate them by color.
 
     Args:
-        :param movements (list): List of (current_angle, distance_since_start) of the robots movements
+        :param movements (list): List of (current_angle, distance_since_start) of the robots movements.
 
     Returns:
         :return (plt): A pyplot of the robots movements.
@@ -22,7 +21,7 @@ def plot_movements(movements : list):
         # Calculate distance moved since last savepoint
         current_distance = distance - last_distance
 
-        # Add lines ending (x2,y2) from last position (x1,y1)
+        # Add line ending (x2,y2), from last position (x1,y1)
         x_plot.append(x_plot[-1] + current_distance * sin(radians(angle)))
         y_plot.append(y_plot[-1] + current_distance * cos(radians(angle)))
 
@@ -34,7 +33,7 @@ def plot_movements(movements : list):
         plt.plot(x_plot, y_plot)
         last_distance = distance
 
-    # Extends the plot by 100 millimeters in each direction to avoid plots disapperaing into the borders.
+    # Extends the plot by 100 millimeters in each direction to avoid lines disapperaing at the borders.
     x_lim_lower, x_lim_upper = plt.xlim()
     plt.xlim(x_lim_lower-100, x_lim_upper + 100)
     y_lim_lower, y_lim_upper = plt.ylim()
