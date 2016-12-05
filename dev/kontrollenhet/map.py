@@ -34,8 +34,6 @@ def coordinates_to_lines(coordinates):
     """
     Approximate coordinates to line segments.
     :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
-    :param robot_pos: The position of the robot
-    :param grid_map: The GridMap to append walls to.
     :return: A list of Line's, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
     """
     # Gets size coordinate area in squares of GRID_SIZE
@@ -98,52 +96,52 @@ def coordinates_to_lines(coordinates):
 
 def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
     """
-    Approximate coordinates to line segments.
+    Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
     :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+    :param lines: A list of Line's as tuples (x_start, y_start, x_end, y_end), each being horizontal or vertical with lengths of GRID_SIZE millimeters
     :param robot_pos: The position of the robot
     :param grid_map: The GridMap to append walls to.
-    :return: A list of Line's, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
     """
     # Gets size coordinate area in squares of GRID_SIZE
     top_left = top_left_grid_index(coordinates)
     bottom_right = bottom_right_grid_index(coordinates)
 
-    grid_map.expand_to_fit(bottom_right.x-top_left.x, bottom_right.y-top_left.y)
-
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
-        # Stores square position, start in y and end in y.
+        # Stores square position, start in y and end in y as multiplied with GRID_SIZE.
         y = GRID_SIZE * y_index
         y_next = y + GRID_SIZE
 
         # Loop over x-indices for the grid
         for x_index in range(top_left.x, bottom_right.x + 1):
-            # Stores square position, start in x and end in x.
+            # Stores square position, start in x and end in x as multiplied with GRID_SIZE.
             x = GRID_SIZE * x_index
             x_next = x + GRID_SIZE
 
             grid_changed = False
+
+            #Position in grid coordinates
             grid_pos = Position(x_index, y_index)
-            # Check if enough line segments making up a line have enough votes
-            # If they do, we have detected a full line
+            # Creates a line with current grid, so that it can check if this line actually exists
             start = Position(x, y)
             end_horizontal = Position(x_next, y)
+            end_vertical = Position(x, y_next)
             line_horizontal = Line(start, end_horizontal)
+            line_vertical = Line(start, end_vertical)
+
+            #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
                 grid_changed = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
 
-            end_vertical = Position(x, y_next)
-            line_vertical = Line(start, end_vertical)
-
+            # Check if there exists a vertical line from current grid, if it exists create a WALL grid
             if line_vertical in lines:
                 grid_changed = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
 
+            # if there has not been created a WALL grid from current grid, then make it OPEN
             if not grid_changed:
                 # creating a line that never will exists, so that just this grid position can be mae open
                 no_line = Line(Position(0, 0), Position(0, 0))
                 change_grid_type(robot_pos, grid_pos, bottom_right, top_left, no_line, grid_map)
-
-    return True
 
     
 
@@ -294,29 +292,31 @@ def get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right):
 
 
 
-def change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line, grid_map):
-    """Changes the grid type to wall if it is a wall"""
+def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Position, top_left:Position, line:Line, grid_map:GridMap):
+    """Changes the grid type to WALL if it is a wall else make it OPEN if it is within the scanned area"""
     next_grid_pos = Position(grid_pos.x + 1, grid_pos.y + 1)
     prev_grid_pos = Position(grid_pos.x - 1, grid_pos.y - 1)
 
+    #create a line based on current grid position
     next_start = Position(grid_pos.x * GRID_SIZE, grid_pos.y * GRID_SIZE)
     next_vertical_end = Position(grid_pos.x * GRID_SIZE, next_grid_pos.y * GRID_SIZE)
     next_horizontal_end = Position(next_grid_pos.x * GRID_SIZE, grid_pos.y * GRID_SIZE)
     next_vertical = Line(next_start, next_vertical_end)
     next_horizontal = Line(next_start, next_horizontal_end)
 
+    #Check if there is a line at current grid position. It also checks on e´what side of teh line teh robot is at, so it knows with grid should be a WALL
     if line == next_vertical:
         if grid_pos.x >= robot_pos.x:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
         elif grid_pos.x < robot_pos.x:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
-
     if line == next_horizontal:
         if grid_pos.y >= robot_pos.y:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
         elif grid_pos.y < robot_pos.y:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
 
+    # if current grid is not a WALL and it is withing scanned area it will be made to CellType OPEN
     if not (grid_map.get(grid_pos.x, grid_pos.y) == CellType.WALL) and \
                     grid_pos.x < bottom_right.x and grid_pos.y < (bottom_right.y - 1) and \
                     grid_pos.x >= top_left.x and grid_pos.y > top_left.y:
