@@ -87,8 +87,8 @@ class Robot:
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 50
-        self.RIGHT_TURN_ENTRY_DIST = 170
-        self.RIGHT_TURN_EXIT_DIST = 200
+        self.RIGHT_TURN_ENTRY_DIST = 200
+        self.RIGHT_TURN_EXIT_DIST = 300
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 200
         self.SENSOR_SPACING = 95
@@ -480,6 +480,8 @@ def main(argv):
                     # As it is now, a right turn into a single square corridor does not work well.
                     robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
                     while robot._is_moving(threshold=20): pass
+                    robot.stand_perpendicular('right')
+                    robot.stand_perpendicular('left')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
