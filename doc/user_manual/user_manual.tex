@@ -111,5 +111,18 @@
 \setcounter{page}{1}
 \pagestyle{content}
 
-\section{Inledning}
+\section{Anslutning}
+Vid strömpåslag kommer roboten automatiskt starta upp och ansluta till \texttt{eduroam}. Dess IP-adress kommer postas till gruppens Slack-kanal, men kan också avläsas genom att koppla in en skärm till Raspberry Pi och köra kommandot \texttt{sudo ip addr}. Detta kan sedan användas för att ansluta med PC-mjukvaran, eller via SSH med användarnamn \texttt{pi} och lösenord \texttt{mpu6050}.
+
+\section{Uppstart}
+\begin{enumerate}
+    \item Det rekommenderas att starta om robotens AVR-processorer genom att trycka in den röda knappen på övre virkortet innan körning, för att kalibrera sensorer. Se till att roboten står stilla under kalibrering.
+    
+    \item Starta upp PC-mjukvaran genom ändra IP-adress i \texttt{main.py} och därefter köra \texttt{python3 main.py}. 
+\end{enumerate}
+
+
+\section{GUI}
+Det grafiska gränssnittet har knappar för att byta läge, samt för att stänga av programmet. I det manuella läget kan piltangenterna på tangentbordet användas för styrning. Även flera knappar samtidigt fungerar. Till vänster visas en karta i det autonoma läget. Till höger visas sensordata och i mitten visas aktuell motorstatus.
+
 \end{document}
