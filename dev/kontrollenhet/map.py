@@ -143,12 +143,13 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
                 no_line = Line(Position(0, 0), Position(0, 0))
                 change_grid_type(robot_pos, grid_pos, bottom_right, top_left, no_line, grid_map)
 
-    
+
 
 def plot_lines(lines):
     """
     Plot axis-aligned lines
     :param lines: A list of axis-aligned lines
+    :return the plot of teh type matplotlib
     """
     for line in lines:
         start = line.start
@@ -161,9 +162,12 @@ def plot_lines(lines):
         elif start.y == end.y:
             plot_line = np.linspace(start.x, end.x, POINTS)
             plt.plot(plot_line, [start.y] * POINTS)
+    return plt
 
 
 
+##TODO, KOlla om denna behövs. Den skapar bågar mellan koordinater. Alltså säger från vilken koordinat till vilken det går att gå.
+##TODO Jag tror inte denna behövs längre, så ifall du Hannes håller med mig, i sådanan fall radera detta.
 def check_available_grid(grid_map:GridMap, coordinates):
     """
     Checks all available arches between nodes the robot can go
@@ -306,12 +310,12 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Positio
 
     #Check if there is a line at current grid position. It also checks on e´what side of teh line teh robot is at, so it knows with grid should be a WALL
     if line == next_vertical:
-        if grid_pos.x >= robot_pos.x:
+        if grid_pos.x > robot_pos.x:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
         elif grid_pos.x < robot_pos.x:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
     if line == next_horizontal:
-        if grid_pos.y >= robot_pos.y:
+        if grid_pos.y > robot_pos.y:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
         elif grid_pos.y < robot_pos.y:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
@@ -398,7 +402,8 @@ def measure_lidar():
 
 def debug_plot(coordinates, lines):
     """
-    A test plotting, that shows all mesuring points and walls on the same plot
+    A test plotting, that shows all mesuring points and walls on the same plot. This is for debugging purpesus only.
+    This returns a plot with a dot for all mesured data and also draws out all lines/Walls
     """
     plot_lines(lines)
     top_left = top_left_grid_index(coordinates)
