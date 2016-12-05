@@ -213,7 +213,7 @@ Alla instruktioner och svar påbörjas med ett metapaket på 8 bitar.
 % TODO: Skriv om acknowledge.
 
 \subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet}
-
+\label{sec:controlCommunication}
 % TODO: Fixa upplägget med sektioner
 \paragraph{Drive}
 Drive-instruktionen kör roboten framåt eller bakåt enligt följande argument. Kommandot har typnummer \texttt{1}.
@@ -294,6 +294,7 @@ Controller-Information-instruktionen ber styrenheten om diagnostisk data. Komman
 
 \subsubsection{Kontrollenhet $\leftrightarrow$ Sensorenhet}
 \paragraph{Read-IR}
+\label{sec:sensorCommunication}
 IR-sensorer läses av med typnummer enligt tabell \ref{table:irtypes}. 
 
 \begin{table}[h!]
@@ -396,8 +397,8 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} %TODO: Eventuellt LP-filter till AVCC-porten. Finns ej i Anders föreläsning, men i många andra.
 \hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}. Körs i \SI{8}{\mega\hertz}}{1}
 \hardware{GP2D120}{IR-sensor.}{5}
-\hardware{Kondensator}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
-\hardware{Resistor}{Till LP-filter för IR. Storlek bestäms av frekvensen på störningarna.}{5}
+\hardware{Kondensator}{Till LP-filter för IR. \SI{18}{\kilo\ohm}}{5}
+\hardware{Resistor}{Till LP-filter för IR. \SI{100}{\nano\farad}}{5} % TODO: Visst använde vi vanhedens siffror?
 \hardware{LIDAR lite v2/v3}{Avancerad lasersensor.}{1}
 \hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
 \hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
@@ -427,7 +428,7 @@ MPU6050 läses av via I2C. Endast gyrot i robotens z-axel används, vilket motsv
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}. Efter avläsning i form av spänningen, $v$, som går mellan 0 och 5 volt översätts detta med formeln $d = 10 \times (v/4.577) ^{(1/-0.634)}$ till ett avstånd, $d$, i millimeter.
 
 \subsubsection{Utvärden/Input}
-En seriell buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas.
+En seriell buss via den inbyggda UART-hårdvaran används. Via denna buss tas avläsningsinstruktioner emot och sensordata skickas, enligt kapitel \ref{sec:sensorCommunication}.
 
 \newpage
 \section{Styrenhet} \label{sec:system2}
@@ -442,7 +443,7 @@ Styrenheten är ansvarig för robotens lågnivåstyrning. Den är länken mellan
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-Vi använder en ATmega1284-processor för styrmodulen. Processorn kommer totalt att kommunicera med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
+Vi använder en ATmega1284-processor för styrmodulen. Processorn kommunicerar med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
 
 \clearpage
 
@@ -453,7 +454,7 @@ Hobbyservot styrs med PWM. Svängvidden är 180 grader. Styrenheten tar emot sty
 
 
 \subsubsection{Hjulmotorer}
-Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen.
+Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen. Styrenheten tar emot hastigheter via seriella kommandon enligt kapitel \ref{sec:controlCommunication} och omvandlar dessa till PWM-signaler.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -934,6 +935,11 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \label{fig:placement}
 \end{figure}
 \end{appendices}
+
+\clearpage
+\section{Programlistning}
+
+
 
 \clearpage
 \addcontentsline{toc}{section}{Referenser} %append references section at this location to TOC
