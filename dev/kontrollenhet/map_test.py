@@ -23,12 +23,14 @@ coordinates = read_debug_data('demo_data/triple_sided_wall_with_imperfections.js
 top_left = top_left_grid_index(coordinates)
 bottom_right = bottom_right_grid_index(coordinates)
 
-lines = coordinates_to_lines(coordinates, robot_pos, grid_map)
+lines = coordinates_to_lines(coordinates)
 
 
 
 for line in lines:
     print("line(", line.start.x, line.start.y, line.end.x, line.end.y, ")")
+
+get_grid_map(coordinates, lines, robot_pos, grid_map)
 
 for y in range(top_left.y, bottom_right.y):
     for x in range(top_left.x, bottom_right.x + 1):
