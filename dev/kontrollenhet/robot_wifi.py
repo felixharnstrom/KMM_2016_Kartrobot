@@ -31,10 +31,14 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
             #Receive Command
             command = receive_command(s.client)
             input_queue.put(("COMMAND", command))
-        elif (data == "FORWARD_CTRL_INFO"):
+        elif (data == "FORWARD_MOTOR_INFO"):
             #Transmit motor data
             motor_data_cpy = motor_data.copy()
             s.client.sendall(json.dumps(motor_data_cpy).encode())
+        elif (data = "FORWARD_SENSOR_INFO"):
+            #Transmit sensor data
+            sensor_data_cpy = sensor_data.copy()
+            s.client.sendall(json.dumps(sensor_data_cpy).encode())
         elif (data == "KEY_EVENT"):
             #Receive keyevent
             key_event = s.client.recv(4096).decode("utf-8")
@@ -48,6 +52,7 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
                 print("Manual mode set")
                 mode.set_mode(mode.ControlModeEnums.MANUAL)
             elif (new_mode == "autonomous"):
+                input_queue.put(Command.stop_motors())
                 print("Autonomous mode set")
                 mode.set_mode(mode.ControlModeEnums.AUTONOMOUS)
                 
