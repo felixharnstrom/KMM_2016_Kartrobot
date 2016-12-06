@@ -74,7 +74,7 @@ def main():
     guit.start()
 
     # Prevent key press from spamming on linux
-    #os.system("xset r off")
+    os.system("xset r off")
     
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
@@ -108,7 +108,7 @@ def main():
             guit.receive_command(command)
         time.sleep(0.01)
     # Reset settings
-    #os.system("xset r on")
+    os.system("xset r on")
     
     print("exiting")
 

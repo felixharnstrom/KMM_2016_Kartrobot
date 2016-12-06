@@ -21,7 +21,7 @@ class gui_thread(threading.Thread):
         self.queue = queue_input
         self.gui = None
         self.pressed_keys = {"left":False, "right":False, "up":False, "down":False}
-
+ 
     def key_pressed(self, event):
         """Callback for key press."""
         button = event.keysym
@@ -75,7 +75,7 @@ class gui_thread(threading.Thread):
 
         # The usual gui setup.
         self.gui = tkinter.Tk()
-        self.gui.minsize(900, 500)
+        self.gui.minsize(800, 400)
         self.gui.grid()
 
         # Bind keys
@@ -94,20 +94,21 @@ class gui_thread(threading.Thread):
         window_height = self.gui.winfo_height()
 
         # Split the window into frames
-        canvas_frame = tkinter.Frame(self.gui, width=4*window_width/8, height=window_height/2)
-        canvas_frame.grid(row=0, column=0)
+        canvas_frame = tkinter.Frame(self.gui, width=window_width/2, height=window_height)
+        canvas_frame.grid(row=0, column=0, rowspan=2)
 
-        button_frame = tkinter.Frame(self.gui, width=window_width/8, height=window_height/2)
+        sensor_frame = tkinter.Frame(self.gui, width=window_width/4, height=window_height)
+        sensor_frame.grid(row=0, column=2, rowspan=2,sticky = tkinter.N)
+        self.gui.grid_columnconfigure(2, weight=1)
+
+        button_frame = tkinter.Frame(self.gui, width=window_width/4, height=window_height/2)
         button_frame.grid(row=0, column=1)
 
-        debug_frame = tkinter.Frame(self.gui, width=window_width/8, height=window_height/2)
+        debug_frame = tkinter.Frame(self.gui, width=window_width/4, height=window_height/2)
         debug_frame.grid(row=1, column=1)
 
-        #dummy_frame = tkinter.Frame(self.gui, width=(window_width / 4), height=window_height)
-        #dummy_frame.grid(row=1, column=1)
-
         # Place a canvas into canvas_frame
-        self.canvas = tkinter.Canvas(canvas_frame, width=4*window_width/8, height=window_height)
+        self.canvas = tkinter.Canvas(canvas_frame, width=window_width/2, height=window_height)
         self.canvas.place(relx=0.5, rely=1, anchor=tkinter.CENTER)
 
         # Create a bunch of buttons in the left frame.
@@ -131,7 +132,6 @@ class gui_thread(threading.Thread):
                                               from_=-100, to=100, state=tkinter.DISABLED)
         self.motor_left_scale.pack()
         self.insert_text(" Left Motor Speed ", debug_frame)
-        
 
         self.right_motor_speed = tkinter.DoubleVar()
         self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
@@ -145,29 +145,56 @@ class gui_thread(threading.Thread):
         self.servo_angle_scale.pack()
         self.insert_text(" Servo Angle ", debug_frame)
 
-        # Buttons for manual control
-        #forward_command_button = tkinter.Button(button_frame, text='Forward',
-        #                                     command=lambda message="forward": self.send_command(message))
-        #left_command_button = tkinter.Button(button_frame, text='Left',
-        #                                     command=lambda message="left": self.send_command(message))
-        #right_command_button = tkinter.Button(button_frame, text='Right',
-        #                                      command=lambda message="right": self.send_command(message))
-        #stop_command_button = tkinter.Button(button_frame, text='Stop',
-        #                                     command=lambda message="stop_motors": self.send_command(message))
-
         # Quit button
         quit_button = tkinter.Button(button_frame, text='QUIT',
                                      command=lambda message="quit": self.send_command(message))
-
-        # Place them into the UI
-        #forward_command_button.pack()
-        #left_command_button.pack()
-        #right_command_button.pack()
-        #stop_command_button.pack()
         quit_button.pack()
 
+        #Insert manual instructions
         self.insert_text("Use the arrow keys to\nmove in manual mode.", button_frame)
 
+        #Setup sensor frame
+        sensor_frame.grid_columnconfigure(1, weight=1)
+        
+        ir_front_text = tkinter.Label(sensor_frame,text="[IR sensors front]")
+        ir_front_text.grid(row=0, column=0, columnspan=2, pady = 10)
+        self.ir_front_left = tkinter.DoubleVar()
+        ir_front_left_lab = tkinter.Label(sensor_frame, textvariable=self.ir_front_left)
+        ir_front_left_lab.grid(row=1, column=0, padx = 18)
+        self.ir_front_right = tkinter.DoubleVar()
+        ir_front_right_lab = tkinter.Label(sensor_frame,textvariable=self.ir_front_right)
+        ir_front_right_lab.grid(row=1, column=1, padx= 18)
+
+        ir_back_text = tkinter.Label(sensor_frame,text="[IR sensors back]")
+        ir_back_text.grid(row=2, column=0, columnspan=2, pady = 10)
+        self.ir_back_left = tkinter.DoubleVar()
+        ir_back_left_lab = tkinter.Label(sensor_frame, textvariable=self.ir_back_left)
+        ir_back_left_lab.grid(row=3, column=0, padx = 18)
+        self.ir_back_right = tkinter.DoubleVar()
+        ir_back_right_lab = tkinter.Label(sensor_frame,textvariable=self.ir_back_right)
+        ir_back_right_lab.grid(row=3, column=1, padx= 18)
+
+        ir_behind_text = tkinter.Label(sensor_frame,text="[IR backside]")
+        ir_behind_text.grid(row=4, column=0, columnspan=2, pady = 10)
+        self.ir_behind = tkinter.DoubleVar()
+        ir_behind_lab = tkinter.Label(sensor_frame, textvariable=self.ir_behind)
+        ir_behind_lab.grid(row=5, column=0, columnspan=2, padx = 18)
+
+        lidar_text = tkinter.Label(sensor_frame,text="[LIDAR]")
+        lidar_text.grid(row=6, column=0, columnspan=2, pady = 10)
+        self.lidar = tkinter.DoubleVar()
+        lidar_lab = tkinter.Label(sensor_frame, textvariable=self.lidar)
+        lidar_lab.grid(row=7, column=0, columnspan=2, padx = 18)
+
+        gyro_text = tkinter.Label(sensor_frame,text="[GYRO]")
+        gyro_text.grid(row=8, column=0, columnspan=2, pady = 10)
+        self.gyro = tkinter.DoubleVar()
+        gyro_lab = tkinter.Label(sensor_frame, textvariable=self.gyro)
+        gyro_lab.grid(row=9, column=0, columnspan=2, padx = 18)
+
+
+
+        #Setup exit routine
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
 
         # Start tkinters mainloop
@@ -177,11 +204,11 @@ class gui_thread(threading.Thread):
         """Inserts and packs text on a target canvas. Supports multiline with \n in txt."""
         lines = txt.split("\n")
         longest_line_len = max(len(line) for line in lines)
-        self.left_motor_text = tkinter.Text(target, height=len(lines), width=longest_line_len)
+        text = tkinter.Text(target, height=len(lines), width=longest_line_len)
         for line in lines:
-            self.left_motor_text.insert(tkinter.INSERT, line)
-        self.left_motor_text.config(state=tkinter.DISABLED)
-        self.left_motor_text.pack()
+            text.insert(tkinter.INSERT, line)
+        text.config(state=tkinter.DISABLED, pady=5)
+        text.pack()
 
     def place_marker_on_canvas(self, x, y):
         self.canvas.create_rectangle(x - 5, y - 5,
