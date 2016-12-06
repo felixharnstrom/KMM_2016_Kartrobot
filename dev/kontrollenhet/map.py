@@ -194,7 +194,8 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
             x = CELL_SIZE * x_index
             x_next = x + CELL_SIZE
 
-            grid_changed = False
+            changed_pos_hor = None
+            changed_pos_ver = None
 
             #Position in grid coordinates
             grid_pos = Position(x_index, y_index)
@@ -207,19 +208,21 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
 
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
-                change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
-                grid_changed = True
+                changed_pos_hor = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
 
             # Check if there exists a vertical line from current grid, if it exists create a WALL grid
             if line_vertical in lines:
-                change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
-                grid_changed = True
-
-            # if there has not been created a WALL grid from current grid, then make it OPEN
-            if not grid_changed:
-                # creating a line that never will exists, so that just this grid position can be mae open
-                no_line = Line(Position(0, 0), Position(0, 0))
-                change_grid_type(robot_pos, grid_pos, bottom_right, top_left, no_line, grid_map)
+                changed_pos_ver = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
+            # Change all cells between the new walls and the robot to OPEN
+            # For each new wall
+            for changed_pos in (changed_pos_hor, changed_pos_ver):
+                # If we have a new wall
+                if changed_pos is not None:
+                    cells_between = bresenham(Line(robot_pos, changed_pos))
+                    for cell in cells_between:
+                        # If the cell isn't known, set it to OPEN
+                        if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
+                            grid_map.set(cell.x, cell.y, CellType.OPEN)
 
 
 
@@ -366,16 +369,17 @@ def get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right):
 
 
 
-def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Position, top_left:Position, line:Line, grid_map:GridMap):
+def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:GridMap):
     """
-    Updates a grid cell to CellType.WALL if it falls on the given wall line, CellType.OPEN if it's within the scanned area, or leaves it unchanged otherwise.
+    Updates a grid cell to CellType.WALL if it falls on the given wall line, or leaves it unchanged otherwise.
 
     Args:
         :param robot_pos (Position): The position of the robot as the line was scanned.
         :param grid_pos (Position): The grid cell to check.
-        :param bottom_right (Position): The bottom-right corner of the AABB enclosing the scanned area.
-        :param top_left (Position): The top-left corner of the AABB enclosing the scanned area.
         :param grid_map (GridMap): The GridMap to modify.
+
+    Returns:
+        :return (Position): The grid index that was changed. Can be None.
     """
     next_grid_pos = Position(grid_pos.x + 1, grid_pos.y + 1)
     prev_grid_pos = Position(grid_pos.x - 1, grid_pos.y - 1)
@@ -387,23 +391,22 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Positio
     next_vertical = Line(next_start, next_vertical_end)
     next_horizontal = Line(next_start, next_horizontal_end)
 
-    #Check if there is a line at current grid position. It also checks on e´what side of teh line teh robot is at, so it knows with grid should be a WALL
+    #Check if there is a line at current grid position.
     if line == next_vertical:
         if grid_pos.x > robot_pos.x:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
+            return Position(grid_pos.x, grid_pos.y)
         elif grid_pos.x < robot_pos.x:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
-    if line == next_horizontal:
+            return Position(prev_grid_pos.x, grid_pos.y)
+    elif line == next_horizontal:
         if grid_pos.y > robot_pos.y:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
+            return Position(grid_pos.x, grid_pos.y)
         elif grid_pos.y < robot_pos.y:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
-
-    # if current grid is not a WALL and it is withing scanned area it will be made to CellType OPEN
-    if not (grid_map.get(grid_pos.x, grid_pos.y) == CellType.WALL) and \
-                    grid_pos.x < bottom_right.x and grid_pos.y < (bottom_right.y - 1) and \
-                    grid_pos.x >= top_left.x and grid_pos.y > top_left.y:
-        grid_map.set(grid_pos.x, grid_pos.y, CellType.OPEN)
+            return Position(grid_pos.x, prev_grid_pos.y)
+    return None
 
 
 def convert_to_coordinates(measurements, robot_pos:Position, angle):
