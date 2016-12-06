@@ -13,28 +13,6 @@ def send_command(command, socket, guit):
     for a command, then waits for acknowledge.
 
     "command" are the strings from the gui thread."""
-    '''
-    if command == "forward":
-        socket.sendall("TRANSMIT".encode())
-        ack = socket.recv(4096)
-        transmit_command(Command.drive(0, 50, 0), socket)
-    elif command == "back":
-        socket.sendall("TRANSMIT".encode())
-        ack = socket.recv(4096)
-        transmit_command(Command.drive(1, 50, 0), socket)
-    elif command == "left":
-        socket.sendall("TRANSMIT".encode())
-        ack = socket.recv(4096)
-        transmit_command(Command.turn(0, 50, 0), socket)
-    elif command == "right":
-        socket.sendall("TRANSMIT".encode())
-        ack = socket.recv(4096)
-        transmit_command(Command.turn(1, 50, 0), socket)
-    elif command == "stop_motors":
-        socket.sendall("TRANSMIT".encode())
-        ack = socket.recv(4096)
-        transmit_command(Command.stop_motors(), socket)
-    '''
     if len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
         socket.sendall("KEY_EVENT".encode())
         ack = socket.recv(4096)
