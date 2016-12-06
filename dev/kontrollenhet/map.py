@@ -208,11 +208,11 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
 
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
-                changed_pos_hor = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
+                changed_pos_hor = change_grid_type(robot_pos, grid_pos, line_horizontal, grid_map)
 
             # Check if there exists a vertical line from current grid, if it exists create a WALL grid
             if line_vertical in lines:
-                changed_pos_ver = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
+                changed_pos_ver = change_grid_type(robot_pos, grid_pos, line_vertical, grid_map)
             # Change all cells between the new walls and the robot to OPEN
             # For each new wall
             for changed_pos in (changed_pos_hor, changed_pos_ver):
