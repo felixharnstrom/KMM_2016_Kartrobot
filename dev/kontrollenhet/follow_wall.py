@@ -107,7 +107,7 @@ class Robot:
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
-        init_UARTs(sensor=sensor_device, motor=control_device)
+        init_UARTs()
 
     def turn(self, direction : Direction, degrees : int, speed: int):
         """
@@ -419,6 +419,7 @@ def main(argv):
 
     # add ch to logger
     logger.addHandler(ch)
+    
     robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
 
     # Turn LIDAR to 90 degrees
@@ -483,4 +484,4 @@ def main(argv):
                 robot.pid_controller.set_tunings(3, 0, -200)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
