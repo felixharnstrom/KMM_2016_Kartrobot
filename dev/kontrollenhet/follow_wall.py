@@ -23,6 +23,7 @@ import numpy as np
 from command import Command
 from UART import UART
 from pid import Pid
+from robot_communication import handle_command, init_UARTs
 
 VERBOSITY = 1   # Default global verbosity level, can be set by command-line argument.
 
@@ -107,24 +108,7 @@ class Robot:
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
-
-    def read_sensor(self, sensor_instr : Command):
-        """
-        Return the current value of the given sensor.
-
-        Args:
-            sensor_instr (Command): A sensor command.
-
-        Returns:
-            (int): Distance in millimetres.
-        """
-        self.uart_sensorenhet.send_command(sensor_instr)
-        self.uart_sensorenhet.receive_packet()
-        adress, length, typ = self.uart_sensorenhet.decode_metapacket(self.uart_sensorenhet.receive_packet())
-
-        highest = self.uart_sensorenhet.receive_packet()
-        lowest = self.uart_sensorenhet.receive_packet()
-        return int.from_bytes(highest + lowest, byteorder = "big", signed = True)
+        init_UARTs(sensor=sensor_device, motor=control_device)
 
     def turn(self, direction : Direction, degrees : int, speed: int):
         """
@@ -174,12 +158,12 @@ class Robot:
             (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
-        lidar_init = self.read_sensor(Command.read_lidar())
+        lidar_init = handle_command(Command.read_lidar())
         lidar_cur = lidar_init
         if (VERBOSITY >= 2):
             print("LIDAR INIT: ", lidar_init)
         while(lidar_init - lidar_cur < dist):
-            lidar_cur = self.read_sensor(Command.read_lidar())
+            lidar_cur = handle_command(Command.read_lidar())
             if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
                 self.uart_styrenhet.send_command(Command.stop_motors())
                 return False
@@ -203,8 +187,8 @@ class Robot:
         standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100
 
         # Read start values from sensors
-        lidar = self.read_sensor(Command.read_lidar())
-        start_lidar = self.read_sensor(Command.read_lidar())
+        lidar = handle_command(Command.read_lidar())
+        start_lidar = handle_command(Command.read_lidar())
 
         self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
@@ -213,8 +197,6 @@ class Robot:
             # Keep track of current angle
             # Use a reimann sum to add up all the gyro rates
             # Area = TimeDiff * turnRate
-            clk = time.time()
-            turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
 
             # Get sensor values
             ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -296,7 +278,7 @@ class Robot:
             self.uart_styrenhet.send_command(servo_instr)
 
             # Read data from the LIDAR sensor
-            lidar_distance = self.read_sensor(Command.read_lidar())
+            lidar_distance = handle_command(Command.read_lidar())
             recorded_data += [(i,lidar_distance)]
             time.sleep(0.005)
 
@@ -342,7 +324,7 @@ class Robot:
         """
         values = []
         for i in range(it):
-            values.append(self.read_sensor(sensor_instr))
+            values.append(handle_command(sensor_instr))
         if len(values) == 1:
             return values[0]
         else:
