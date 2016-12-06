@@ -33,6 +33,72 @@ LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 
 
 
+def bresenham(line):
+    """
+    Source: http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm
+
+    Bresenham's Line Algorithm
+    Return a list of cell indices connecting the end-points of a given line, as few as possible, approximated to lay on the line as much as possible.
+    
+    Args:
+        :param line (Line): a line to find a path through.
+
+    Returns:
+        :return (list of Position): The cell indices the line passes through.
+    """
+
+
+    # Extract points
+    start = line.start
+    end = line.end
+    # Setup initial conditions
+    x1 = start.x
+    y1 = start.y
+    x2 = end.x
+    y2 = end.y
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Determine how steep the line is
+    is_steep = abs(dy) > abs(dx)
+ 
+    # Rotate line
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+ 
+    # Swap start and end points if necessary and store swap state
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
+ 
+    # Recalculate differentials
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Calculate error
+    error = int(dx / 2.0)
+    ystep = 1 if y1 < y2 else -1
+ 
+    # Iterate over bounding box generating points between start and end
+    y = y1
+    points = []
+    for x in range(x1, x2 + 1):
+        point = Position(y, x) if is_steep else Position(x, y)
+        points.append(point)
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+ 
+    # Reverse the list if the coordinates were swapped
+    if swapped:
+        points.reverse()
+    return points
+
+
 def coordinates_to_lines(coordinates):
     """
     Approximate coordinates to line segments.
