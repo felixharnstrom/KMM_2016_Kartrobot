@@ -51,26 +51,27 @@ class Robot:
         control_device  (str): Device name of the USB<->Serial converter for the control unit.
 
     Attributes:
-        driven_distance         (int): Driven distance thus far.
-        current_angle           (int): Current angle against right wall.
-        control_mode            (ControllerMode): Current controller mode.
-        path_trace              (?): ? # TODO: What is this?
-        path_queue              (?): ? # TODO: What is this?
-        uart_sensorenhet        (str): Device name of the USB<->Serial converter for the sensor unit.
-        uart_styrenhet          (str): Device name of the USB<->Serial converter for the control unit.
-        pid_controller          (Pid): The PID controller in use.
-        BLOCK_SIZE              (int): Block size in millimetres.
-        IR_MEDIAN_ITERATIONS    (int): Number of values to get from IR sensors.
-        GYRO_MEDIAN_ITERATIONS  (int): Number of values to get from gyro.
-        TURN_OVERRIDE_DIST      (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
-        TURN_MIN_DIST           (int): The minimum detected distance that will trigger a right turn.
-        RIGHT_TURN_ENTRY_DIST   (int): How far to drive into a corner before performing a 90° turn.
-        RIGHT_TURN_EXIT_DIST    (int): How far to drive into a corridor after performing a 90° turn.
-        EDGE_SPIKE_FACTOR       (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
-        OBSTACLE_DIST           (int): The maximum distance until an obstacle ahead will trigger a turn.
-        SENSOR_SPACING          (int): Distance between side sensors on the robot.
-        BASE_SPEED              (int): The speed that seems to work best for the controller with fully charged batteries.
-        ACCELERATED_SPEED       (int): Can be used when the controller is disengaged, otherwise too fast for the controller to handle.
+        driven_distance             (int): Driven distance thus far.
+        current_angle               (int): Current angle against right wall.
+        control_mode                (ControllerMode): Current controller mode.
+        path_trace                  (?): ? # TODO: What is this?
+        path_queue                  (?): ? # TODO: What is this?
+        uart_sensorenhet            (str): Device name of the USB<->Serial converter for the sensor unit.
+        uart_styrenhet              (str): Device name of the USB<->Serial converter for the control unit.
+        pid_controller              (Pid): The PID controller in use.
+        BLOCK_SIZE                  (int): Block size in millimetres.
+        IR_MEDIAN_ITERATIONS        (int): Number of values to get from IR sensors.
+        GYRO_MEDIAN_ITERATIONS      (int): Number of values to get from gyro.
+        TURN_OVERRIDE_DIST          (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
+        TURN_MIN_DIST               (int): The minimum detected distance that will trigger a right turn.
+        RIGHT_TURN_ENTRY_DIST       (int): How far to drive into a corner before performing a 90° turn.
+        RIGHT_TURN_EXIT_DIST        (int): How far to drive into a corridor after performing a 90° turn.
+        OBSTACLE_SAFETY_OVERRIDE    (int): The override distance that will trigger an immediate stop in drive_distance().
+        EDGE_SPIKE_FACTOR           (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
+        OBSTACLE_DIST               (int): The maximum distance until an obstacle ahead will trigger a turn.
+        SENSOR_SPACING              (int): Distance between side sensors on the robot.
+        BASE_SPEED                  (int): The speed that seems to work best for the controller with fully charged batteries.
+        ACCELERATED_SPEED           (int): Can be used when the controller is disengaged, otherwise too fast for the controller to handle.
     """
 
     def __init__(self, mode : ControllerMode, sensor_device : str, control_device : str):
@@ -419,7 +420,7 @@ def main(argv):
 
     # add ch to logger
     logger.addHandler(ch)
-    
+
     robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
 
     # Turn LIDAR to 90 degrees
