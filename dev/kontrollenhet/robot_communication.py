@@ -10,7 +10,7 @@ UART_sensor = None          #The uninitiated UART object for sensor communicatio
 UART_motor = None           #The uninitiated UART object for motor communication.
 input_queue = queue.Queue() #The Queue object which contains all the Commands enqueued from the wifi communication thread.
 key_pressed = {"right":False, "left":False,
-¨                "up":False, "down":False} #Contains the current pressed_down state for the different directions from the GUI.
+                "up":False, "down":False} #Contains the current pressed_down state for the different directions from the GUI.
 motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0, 
                 "RIGHT_SIDE_DIRECTION":0, "RIGHT_SIDE_SPEED":0, 
                 "SERVO_ANGLE":0} #Contains the last retrieved motor data from get_motor_diagnostics.
