@@ -20,17 +20,22 @@ class gui_thread(threading.Thread):
         # Make variables accessible to the whole class
         self.queue = queue_input
         self.gui = None
+        self.pressed_keys = {"left":False, "right":False, "up":False, "down":False}
 
     def key_pressed(self, event):
         """Callback for key press."""
         button = event.keysym
-        if button == "Left":
+        if button == "Left" and not self.pressed_keys["left"]:
+            self.pressed_keys["left"] = True
             self.send_command("key_left_p")
-        elif button == "Right":
+        elif button == "Right" and not self.pressed_keys["right"]:
+            self.pressed_keys["right"] = True
             self.send_command("key_right_p")
-        elif button == "Up":
+        elif button == "Up" and not self.pressed_keys["up"]:
+            self.pressed_keys["up"] = True
             self.send_command("key_up_p")
-        elif button == "Down":
+        elif button == "Down" and not self.pressed_keys["down"]:
+            self.pressed_keys["down"] = True
             self.send_command("key_down_p")
 
 
@@ -38,12 +43,16 @@ class gui_thread(threading.Thread):
         """Callback for key release."""
         button = event.keysym
         if button == "Left":
+            self.pressed_keys["left"] = False
             self.send_command("key_left_r")
         elif button == "Right":
+            self.pressed_keys["right"] = False
             self.send_command("key_right_r")
         elif button == "Up":
+            self.pressed_keys["up"] = False
             self.send_command("key_up_r")
         elif button == "Down":
+            self.pressed_keys["down"] = False
             self.send_command("key_down_r")
 
     def send_command(self, mode):

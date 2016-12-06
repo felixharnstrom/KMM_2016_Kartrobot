@@ -44,7 +44,7 @@ def send_command(command, socket, guit):
         ack = socket.recv(4096)
         socket.sendall(command[5:].encode())
     elif command == "get_diagnostics":
-        socket.sendall("FORWARD_CTRL_INFO".encode())
+        socket.sendall("FORWARD_MOTOR_INFO".encode())
         ack = socket.recv(4096)
         motor_data = json.loads(socket.recv(4096).decode("utf-8"))
         dir_mod_left = 1 if motor_data["LEFT_SIDE_DIRECTION"] else -1
@@ -53,13 +53,15 @@ def send_command(command, socket, guit):
         speed_right = motor_data["RIGHT_SIDE_SPEED"]*dir_mod_right
         guit.receive_command(["set_motors", speed_left, speed_right])
         guit.receive_command(["set_servo", motor_data["SERVO_ANGLE"]])
-        
-
+    elif command == "get_sensor_data":
+        socket.sendall("FORWARD_SENSOR_INFO".encode())
+        ack = socket.recv(4096)
+        sensor_data = json.loads(socket.recv(4096).decode("utf-8"))
 
 def main():
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="130.236.227.104")
+    robot.start(ip="130.236.227.194")
 
     map = [[1,0,1],[0,1,1]]
 
@@ -72,7 +74,7 @@ def main():
     guit.start()
 
     # Prevent key press from spamming on linux
-    os.system("xset r off")
+    #os.system("xset r off")
     
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
@@ -106,7 +108,7 @@ def main():
             guit.receive_command(command)
         time.sleep(0.01)
     # Reset settings
-    os.system("xset r on")
+    #os.system("xset r on")
     
     print("exiting")
 
