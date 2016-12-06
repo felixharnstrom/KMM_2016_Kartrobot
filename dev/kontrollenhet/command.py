@@ -30,7 +30,7 @@ class Command():
     @staticmethod
     def ack():
         return Command(CommandEnums.ACK)
-
+        
     @staticmethod
     def drive(direction : int, speed : int, time : int):
         time1, time2 = split_time(time)
@@ -99,4 +99,3 @@ def split_time(time):
 def get_executable_command(command_number : int, params = []):
     command_enum = CommandEnums(command_number)
     return Command(command_enum, params)
-
