@@ -777,7 +777,55 @@ Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskad
 \end{figure}
 
 \subsubsection{Reglering}
+\label{sec:pid}
+
 För att kunna köra rakt använder sig kontrollenheten av PD-reglering. Detta görs med hjälp av IR-sensorerna på sidan. Ett vinkelrät avstånd till väggen räknas ut genom att beräkna vinkeln till väggen och ta $ (frontDist+backDist)/2 \times cos(angle)$. Regleringen kommer att använda detta värde och ett målvärde för att beräkna avståndet till optimala placeringen. Detta används för att beräkna hur mycket roboten ska snurra med formeln $ TODO: PID-formel$.
+
+\subsubsection{Navigering}
+Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PID-regulering (se kapitel \ref{sec:pid}), tills ett hinder framåt upptäcks av lidarn, eller en korridor upptäcks med IR-sensorerna. 
+
+Efter igenkänning av ett hinder körs 
+
+\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+% 
+% Skiss:
+% Finns meddelande i kön? -Ja-> Utför rutin givet i meddelande
+%   |     ʌ     ʌ                       |
+%  Nej    |     |                       |
+%   |     |     -------------------------
+%   V     |
+%  Invänta meddelande, dummer!
+%
+\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
+\tikzstyle{arrow} = [thin,->,>=stealth]
+\tikzstyle{line} = [thin,>=stealth]
+% Nodes
+\node (start) [startstop] {Start};
+\node (irRead) [decision, below of=start, yshift=-40pt] {$ir\_right\_front > ir\_left\_front$};
+\node (calibRight) [process, left of=irRead, xshift=-170pt] {Stand perpendicular to right wall};
+\node (calibLeft) [process, right of=irRead, xshift=170pt] {Stand perpendicular to left wall};
+\node (turnR90) [process, below of=calibLeft] {Turn 90 degrees to the right};
+\node (turnL90) [process, below of=calibRight] {Turn 90 degrees to the left};
+\node (calibRight2) [process, below of=turnL90] {Stand perpendicular to right wall};
+\node (calibLeft2) [process, below of=turnR90] {Stand perpendicular to left wall};
+\node (end) [startstop, below of=start, yshift=-154pt] {Restart PID-controller};
+
+% Arrows
+\draw [arrow] (start) -- (irRead);
+\draw [arrow] (irRead) -- node[anchor=south] {No} (calibRight);
+\draw [arrow] (irRead) -- node[auto] {Yes} (calibLeft);
+\draw [arrow] (calibLeft) -- node[auto] {} (turnR90);
+\draw [arrow] (calibRight) -- node[auto] {} (turnL90);
+\draw [arrow] (turnL90) -- node[auto] {} (calibRight2);
+\draw [arrow] (turnR90) -- node[auto] {} (calibLeft2);
+\draw [arrow] (calibLeft2) -- node[anchor=west] {} (end);
+\draw [arrow] (calibRight2) -- node[auto] {} (end);
+
+\end{tikzpicture}
+
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
