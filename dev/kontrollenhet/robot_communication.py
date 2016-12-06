@@ -156,7 +156,7 @@ def read_ir_sensor(command : Command):
     #send_sensor_ack()
     ir_value = ir_value_msb*(2**8)+ir_value_lsb
     sensor_data[get_sensor_dict_key(c_enum)] = ir_value
-    return
+    return ir_value
     
 def read_gyro_sensor(command : Command):
     """
@@ -174,7 +174,7 @@ def read_gyro_sensor(command : Command):
     if(gyro_value > 0x7fff): #unsigned 16-bit -> signed 16-bit 
         gyro_value -= 65536 #0x7000
     sensor_data["GYRO"] = gyro_value
-    return   
+    return gyro_value
 
 def retrieve_and_update_motor_diagnostics(command : Command):
     """
@@ -216,9 +216,9 @@ def handle_command(command : Command):
             c_enum == CommandEnums.READ_IR_RIGHT_BACK or
             c_enum == CommandEnums.READ_IR_BACK or
             c_enum == CommandEnums.READ_LIDAR):
-        read_ir_sensor(command)      
+        return read_ir_sensor(command)
     elif(c_enum == CommandEnums.READ_GYRO):
-        read_gyro_sensor(command)
+        return read_gyro_sensor(command)
     else:
         #Handles all commands that does not need any special handling (eg. just send and ack)
         #Does >not< handle incorrectly parsed commands
