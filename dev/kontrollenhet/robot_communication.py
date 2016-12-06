@@ -4,7 +4,7 @@ from UART import UART
 import threading
 import robot_wifi
 import queue
-import mode
+from timeout import *
 
 UART_sensor = None          #The uninitiated UART object for sensor communication.
 UART_motor = None           #The uninitiated UART object for motor communication.
@@ -19,7 +19,8 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
                 "IR_BACK":0, "IR_LIDAR":0, 
                 "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
-def init_UARTs(sensor = "ttyUSB0", motor = "ttyUSB1"):
+
+def init_UARTs(sensor = "", motor = ""):
     """
     Initiates the sensor and motor UART objects with the given serial communication port names.
     
@@ -29,8 +30,13 @@ def init_UARTs(sensor = "ttyUSB0", motor = "ttyUSB1"):
     """
     global UART_sensor
     global UART_motor
-    UART_sensor = UART(sensor)
-    UART_motor = UART(motor)
+    if sensor == "":
+        serials = get_serials()
+        UART_sensor = UART(serials["sensor"])
+        UART_motor = UART(serials["control"])
+    else:
+        UART_sensor = UART(motor)
+        UART_motor = UART(sensor)
     return
 
 def close_UARTs():
@@ -263,3 +269,30 @@ def process_actions():
     """
     while process_action():
         pass
+
+
+@timeout(1)
+def try_reading_gyro():
+    """
+    Try to read a sensor with a uniqe msg_type.
+    Sensorunit will return instantly, controlunit will timeout.
+    """
+    handle_command(Command.read_gyro())
+
+
+def get_serials():
+    serials = []
+    # Read all USB serial ports.
+    # In practice, this will never be more than two, and will not work with more
+    for line in os.popen("ls -1 /dev/ttyUSB* | sed 's#.*/##'").read().split():
+        serials.append(line.rstrip())
+
+    init_UARTs(serials[0], serials[1])
+    try:
+        # If we get a valid response, the ports are correct.
+        try_reading_gyro()
+        return {"sensor": serials[0], "control": serials[1]}
+    except TimeoutError:
+        # If the request times out, the ports are reversed.
+        init_UARTs(serials[1], serials[0])
+        return {"sensor": serials[0], "control": serials[1]}

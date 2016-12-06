@@ -108,7 +108,7 @@ class Robot:
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
-        init_UARTs(sensor=sensor_device, motor=control_device)
+        init_UARTs()
 
     def turn(self, direction : Direction, degrees : int, speed: int):
         """
@@ -397,13 +397,8 @@ def sensor_test(robot):
         lidar = robot._median_sensor(1, Command.read_lidar())
         print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
     
-def main(argv):
+def main():
     global VERBOSITY
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--sensor", required = True, metavar = "SENSOR_DEVICE", help = "Device name of the USB<->serial converter for the sensor unit.")
-    parser.add_argument("-c", "--control", required = True, metavar = "CONTROL_DEVICE", help = "Device name of the USB<->serial converter for the control unit.")
-    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 4), help = "Verbosity level. 0 is lowest and 3 highest. Default 1.")
-    args = parser.parse_args()
     VERBOSITY = args.verbosity
     robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
 
@@ -475,4 +470,4 @@ def main(argv):
                 robot.pid_controller.set_tunings(3, 0, -200)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
