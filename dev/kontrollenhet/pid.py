@@ -1,5 +1,5 @@
 """
-A generic PID controller.
+A generic PID controller adapted from http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 """
 
 from datetime import datetime
