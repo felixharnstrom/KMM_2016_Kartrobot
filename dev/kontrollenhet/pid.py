@@ -19,6 +19,7 @@ class Pid():
         automatic_mode  (bool): True = PID on, False = PID off.
         min_out         (int): Will clamp output to at least this value.
         max_out         (int): Will clamp output to at most this value.
+        d_term          (int): The derivative term. Should in this implementation be current angle to wall.
     """
 
     def __init__(self):
