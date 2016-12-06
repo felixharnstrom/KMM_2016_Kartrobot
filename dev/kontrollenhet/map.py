@@ -16,8 +16,8 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 """The real-world size of a grid cell, in millimeters. Also the length of a line."""
 CELL_SIZE = 400
 
-"""The number of 'line segments per line."""
-POINTS = 4
+"""The number of line segments per line."""
+DIVISIONS_PER_LINE = 4
 
 """The number of votes per line section required for something to be considered a full line."""
 MIN_MESURE = 1
@@ -29,7 +29,7 @@ POINTS_LINE = 3
 ACCURACY = 130
 
 """The length of a line segment."""
-LINE_SEG_LENGTH = CELL_SIZE // POINTS
+LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 
 
 
@@ -172,12 +172,12 @@ def plot_lines(lines):
         end = line.end
         # Horizontal lines
         if start.x == end.x:
-            plot_line = np.linspace(start.y, end.y, POINTS)
-            plt.plot([start.x] * POINTS, plot_line)
+            plot_line = np.linspace(start.y, end.y, DIVISIONS_PER_LINE)
+            plt.plot([start.x] * DIVISIONS_PER_LINE, plot_line)
         # Vertical lines
         elif start.y == end.y:
-            plot_line = np.linspace(start.x, end.x, POINTS)
-            plt.plot(plot_line, [start.y] * POINTS)
+            plot_line = np.linspace(start.x, end.x, DIVISIONS_PER_LINE)
+            plt.plot(plot_line, [start.y] * DIVISIONS_PER_LINE)
     return plt
 
 
@@ -231,7 +231,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     Returns:
         :return (list of int): a 3-dimensional list.
         The first two indices indicates the starting point of a line, divided by CELL_SIZE. The third an offset
-        off n*ACCURACY, where n is the index (0 =< n < POINTS), on the x-axis or y-axis depending on if the
+        off n*ACCURACY, where n is the index (0 =< n < DIVISIONS_PER_LINE), on the x-axis or y-axis depending on if the
         line is vertical or horizontal. The lines end-point will thus be offset by an 
         additional (n+1)*ACCURACY. On that index we'll find the number of coordinates approximated to
         fall on that line.
@@ -250,7 +250,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     size.add(Size(1, 1))
     # Array instead of list because list doesn't work as intended
     # 3-dimensional
-    votes = np.array([[[0]*POINTS]*size.w]*size.h)
+    votes = np.array([[[0]*DIVISIONS_PER_LINE]*size.w]*size.h)
 
     for x, y in coordinates:
         # Approximate position to grid
