@@ -28,13 +28,20 @@ POINTS_LINE = 3
 """The thickness of a line segment."""
 ACCURACY = 130
 
+"""The length of a line segment."""
+LINE_SEG_LENGTH = GRID_SIZE // POINTS
+
 
 
 def coordinates_to_lines(coordinates):
     """
     Approximate coordinates to line segments.
-    :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
-    :return: A list of Line's, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
+
+    Args:
+        :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
+
+    Returns:
+        :return (list of Line's): Lines describing walls, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
     """
     # Gets size coordinate area in squares of GRID_SIZE
     top_left = top_left_grid_index(coordinates)
@@ -93,14 +100,17 @@ def coordinates_to_lines(coordinates):
 
     return lines
 
-
+# TODO: Coordinates are only used for min/max index
+# TODO: Non-DRY
 def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
     """
     Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
-    :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
-    :param lines: A list of Line's as tuples (x_start, y_start, x_end, y_end), each being horizontal or vertical with lengths of GRID_SIZE millimeters
-    :param robot_pos: The position of the robot
-    :param grid_map: The GridMap to append walls to.
+
+    Args:
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+        :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
+        :param robot_pos (Position): The position of the robot as the measurements was taken.
+        :param grid_map (GridMap): The GridMap to modify.
     """
     # Gets size coordinate area in squares of GRID_SIZE
     top_left = top_left_grid_index(coordinates)
@@ -131,11 +141,13 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
 
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
-                grid_changed = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
+                change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_horizontal, grid_map)
+                grid_changed = True
 
             # Check if there exists a vertical line from current grid, if it exists create a WALL grid
             if line_vertical in lines:
-                grid_changed = change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
+                change_grid_type(robot_pos, grid_pos, bottom_right, top_left, line_vertical, grid_map)
+                grid_changed = True
 
             # if there has not been created a WALL grid from current grid, then make it OPEN
             if not grid_changed:
@@ -147,9 +159,13 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
 
 def plot_lines(lines):
     """
-    Plot axis-aligned lines
-    :param lines: A list of axis-aligned lines
-    :return the plot of teh type matplotlib
+    Plot axis-aligned lines, and return the plot.
+
+    Args:
+        :param lines (list of Line): Axis axis-aligned lines to plot.
+
+    Returns:
+        :return (matplotlib): The plot.
     """
     for line in lines:
         start = line.start
@@ -165,37 +181,16 @@ def plot_lines(lines):
     return plt
 
 
-
-##TODO, KOlla om denna behövs. Den skapar bågar mellan koordinater. Alltså säger från vilken koordinat till vilken det går att gå.
-##TODO Jag tror inte denna behövs längre, så ifall du Hannes håller med mig, i sådanan fall radera detta.
-def check_available_grid(grid_map:GridMap, coordinates):
-    """
-    Checks all available arches between nodes the robot can go
-    :param map: A list with tupleres containing all walls
-    :return: A list of all posible grid -> grid [(from_x1, from_y1, to_x1, to_y1), (from_x2, from_y2, ...), ...]
-    """
-    possible_squares = []
-
-    top_left = top_left_grid_index(coordinates)
-    bottom_right = bottom_right_grid_index(coordinates)
-
-    for y in range(top_left.y, bottom_right.y - 1):
-        y_next = y + 1
-        for x in range(top_left.x, bottom_right.x - 1):
-            x_next = x + 1
-            if grid_map.get(x, y) == CellType.OPEN:
-                if grid_map.get(x + 1, y) == CellType.OPEN:
-                    possible_squares.append((x, y, x_next, y))
-                if grid_map.get(x, y + 1) == CellType.OPEN:
-                    possible_squares.append((x, y, x, y_next))
-
-    return possible_squares
-
-
-
 def top_left_grid_index(coordinates):
-    """Return the bottom_left coordinates of an AABB enclosing all coordinates and origin,
-    scaled by 1/GRID_SIZE."""
+    """
+    Return the top_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/GRID_SIZE.
+    
+    Args:
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+
+    Returns:
+        :return (Position): The top left position of said AABB.
+    """
     top_left = Position(0, 0)
     for x, y in coordinates:
         top_left.x = min(top_left.x, int(x//GRID_SIZE))
@@ -203,8 +198,15 @@ def top_left_grid_index(coordinates):
     return top_left
 
 def bottom_right_grid_index(coordinates):
-    """Return the top_right coordinates of an AABB enclosing all coordinates and origin,
-    scaled by 1/GRID_SIZE."""
+    """
+    Return the bottom_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/GRID_SIZE.
+    
+    Args:
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+
+    Returns:
+        :return (Position): The bottom left position of said AABB, scaled by 1/GRID_SIZE.
+    """
     bottom_right = Position(0, 0)
     for x, y in coordinates:
         bottom_right.x = max(bottom_right.x, int(x//GRID_SIZE + 1))
@@ -222,24 +224,26 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     Vertical determines if we attempt to approximate coordinates to vertical lines (True) or horizontal
     ones (False).
 
-    :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
-    :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
+    Args:
+        :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+        :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
 
-    :return: a 3-dimensional list.
-    The first two indices indicates the starting point of a line, divided by GRID_SIZE. The third an offset
-    off n*ACCURACY, where n is the index (0 =< n < POINTS), on the x-axis or y-axis depending on if the
-    line is vertical or horizontal. The lines end-point will thus be offset by an 
-    additional (n+1)*ACCURACY. On that index we'll find the number of coordinates approximated to
-    fall on that line.
+    Returns:
+        :return (list of int): a 3-dimensional list.
+        The first two indices indicates the starting point of a line, divided by GRID_SIZE. The third an offset
+        off n*ACCURACY, where n is the index (0 =< n < POINTS), on the x-axis or y-axis depending on if the
+        line is vertical or horizontal. The lines end-point will thus be offset by an 
+        additional (n+1)*ACCURACY. On that index we'll find the number of coordinates approximated to
+        fall on that line.
 
-    To be more specific, vertical being True or False determines if the last index causes us to move
-    along the x-axis (vertical=False) or the y-axis (vertical=True).
+        To be more specific, vertical being True or False determines if the last index causes us to move
+        along the x-axis (vertical=False) or the y-axis (vertical=True).
 
-    examples:
-    assuming not vertical, [0][0][0] contains votes for the line (0,0) -> (ACCURACY, 0)
-    assuming vertical,     [0][0][0] contains votes for the line (0,0) -> (0, ACCURACY)
-    assuming not vertical, [0][0][2] contains votes for the line (2*ACCURACY, 0) -> (3*ACCURACY, 0)
-    assuming not vertical, [1][0][0] contains votes for the line (1*GRID_SIZE, 0) -> (1*GRID_SIZE + 1*ACCURACY, 0)
+        examples:
+        assuming not vertical, [0][0][0] contains votes for the line (0,0) -> (ACCURACY, 0)
+        assuming vertical,     [0][0][0] contains votes for the line (0,0) -> (0, ACCURACY)
+        assuming not vertical, [0][0][2] contains votes for the line (2*ACCURACY, 0) -> (3*ACCURACY, 0)
+        assuming not vertical, [1][0][0] contains votes for the line (1*GRID_SIZE, 0) -> (1*GRID_SIZE + 1*ACCURACY, 0)
     """
     # The size of the AABB enclosing all coordinates
     size = bottom_right.difference(top_left)
@@ -297,7 +301,16 @@ def get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right):
 
 
 def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Position, top_left:Position, line:Line, grid_map:GridMap):
-    """Changes the grid type to WALL if it is a wall else make it OPEN if it is within the scanned area"""
+    """
+    Updates a grid cell to CellType.WALL if it falls on the given wall line, CellType.OPEN if it's within the scanned area, or leaves it unchanged otherwise.
+
+    Args:
+        :param robot_pos (Position): The position of the robot as the line was scanned.
+        :param grid_pos (Position): The grid cell to check.
+        :param bottom_right (Position): The bottom-right corner of the AABB enclosing the scanned area.
+        :param top_left (Position): The top-left corner of the AABB enclosing the scanned area.
+        :param grid_map (GridMap): The GridMap to modify.
+    """
     next_grid_pos = Position(grid_pos.x + 1, grid_pos.y + 1)
     prev_grid_pos = Position(grid_pos.x - 1, grid_pos.y - 1)
 
@@ -326,18 +339,18 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Positio
                     grid_pos.x >= top_left.x and grid_pos.y > top_left.y:
         grid_map.set(grid_pos.x, grid_pos.y, CellType.OPEN)
 
-    return True
-
-
 
 def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
-    Convert angle and distances to coordinates via polar projection
-    :param measurements: A list of tuples containing (angle, distance), where angle is degrees
-    :param x_position: The x-position of the robot
-    :param y_position: The y-position of the robot
-    :angle: The facing angle of the robot, in degrees
-    :return: A list of coordinates - tuples containing (x, y)
+    Convert angle and distances to coordinates via polar projection.
+    
+    Args:
+        :param measurements (list of length-2-tuple of float: Tuples containing (angle, distance to wall), where angle is degrees.
+        :param robot_pos (Position): The robot position; origin point of the measurements.
+        :angle (float): The angle of the robot, in degrees.
+    
+    Returns:
+        :return (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
     """
     coordinates = []
     for degree, dist in measurements:
@@ -350,7 +363,13 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
 
 def read_debug_data(file_name):
     """
-    Reads old measurements that have been saved to a json file
+    Reads measurement data from json.
+
+    Args:
+        :param file_name (str): file name of file to read from.
+
+    Returns:
+        :return (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
     """
     with open(file_name) as data_file:
         data = json.load(data_file)
@@ -358,19 +377,23 @@ def read_debug_data(file_name):
 
 
 
-def measure_lidar():
+def measure_lidar(motor_uart:UART, sensor_uart:UART):
     """
-    Turns servo 180 degrees while scanning and converts the scanned points to cordinates.
-    :return: Measurements in [[degree1, dist1],[degree2, dist2], ...]
+    Turn the laser 180 degrees, taking measurements. Return said measurements.
+
+    Args:
+        :param motor_uart (UART): The motor unit UART interface.
+        :param sensor_uart (UART): The sensor unit UART interface.
+
+    Returns:
+        :return: (list of length-2-tuple of float: Tuples containing (angle, distance to wall), where angle is degrees.
     """
-    uart = UART("ttyUSB0")
-    sensorunit = UART("ttyUSB1")
     driveInstruction = Servo(0)
 
     degree_plot = []
     distance_plot = []
 
-    uart.send_function(driveInstruction)
+    motor_uart.send_function(driveInstruction)
 
     time.sleep(1.5)
     degree = 0
@@ -378,15 +401,15 @@ def measure_lidar():
     measurements = []
 
     for degree in range(0, 180):
-        sensorunit.send_function(ReadLidar())
+        sensor_uart.send_function(ReadLidar())
 
-        if sensorunit.decode_metapacket(sensorunit.receive_packet())[2] != 0:
-            raise Exception("Incorrect acknowledge packet")
-        if sensorunit.decode_metapacket(sensorunit.receive_packet())[2] != 8:
-            raise Exception("Not a lidar value")
+        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 0:
+            raise RuntimeError("Incorrect acknowledge packet.")
+        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 8:
+            raise RuntimeError("Not a lidar value.")
 
-        highest = sensorunit.receive_packet()
-        lowest = sensorunit.receive_packet()
+        highest = sensor_uart.receive_packet()
+        lowest = sensor_uart.receive_packet()
         dist = ord(lowest) + ord(highest) * (2 ** 8)
 
         x = math.sin(math.radians(degree)) * dist
@@ -394,7 +417,7 @@ def measure_lidar():
 
         measurements.append([degree, dist])
 
-        uart.send_function(Servo(int(degree)))
+        motor_uart.send_function(Servo(int(degree)))
         time.sleep(0.005)
     return measurements
 

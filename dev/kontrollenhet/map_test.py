@@ -34,6 +34,9 @@ for line in lines:
 
 get_grid_map(coordinates, lines, robot_pos, grid_map)
 
+grid_map.debug_print()
+
+"""
 for y in range(top_left.y, bottom_right.y):
     for x in range(top_left.x, bottom_right.x + 1):
         print("Grid(", grid_map.get(x, y), x, y, ")")
@@ -41,5 +44,6 @@ for y in range(top_left.y, bottom_right.y):
 grid = check_available_grid(grid_map, coordinates)
 
 print(grid)
+"""
 
-debug_plot(coordinates, lines)
+#debug_plot(coordinates, lines)
