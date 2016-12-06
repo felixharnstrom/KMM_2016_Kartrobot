@@ -73,7 +73,15 @@ def adjust_speeds():
     elif key_pressed["right"] and not key_pressed["left"]: #Right
         command = Command.turn(1,50,0)
     handle_command(command) #Execute the command
-
+    
+    
+def reset_keys_pressed():
+    """
+    Sets all keys in key_pressed to false and updates speed accordingly
+    """
+    for key in key_pressed:
+        key_pressed[key] = False
+    
 def handle_key(key_event : str):
     """
     Interprets the key-event string and then updates the corresponding key in key_pressed to reflect the event, 
@@ -245,6 +253,8 @@ def process_action():
         elif next_action[0] == "KEY_EVENT":
             print("Handling", next_action)
             handle_key(next_action[1])
+        elif next_action[0] == "RESET_KEYS_PRESSED":
+            reset_keys_pressed() 
         return True
     return False
 

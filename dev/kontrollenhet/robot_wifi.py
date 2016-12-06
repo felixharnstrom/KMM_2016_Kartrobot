@@ -52,7 +52,7 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
                 print("Manual mode set")
                 mode.set_mode(mode.ControlModeEnums.MANUAL)
             elif (new_mode == "autonomous"):
-                input_queue.put(Command.stop_motors())
+                input_queue.put(("RESET_KEYS_PRESSED",))
                 print("Autonomous mode set")
                 mode.set_mode(mode.ControlModeEnums.AUTONOMOUS)
                 
