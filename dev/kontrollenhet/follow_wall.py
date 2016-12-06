@@ -19,13 +19,12 @@ import time
 import math
 import sys
 import argparse
+import logger
 import numpy as np
 from command import Command
 from UART import UART
 from pid import Pid
 from robot_communication import handle_command, init_UARTs
-
-VERBOSITY = 1   # Default global verbosity level, can be set by command-line argument.
 
 # TODO: Use Daniel's enum for MANUAL, AUTONOM
 class ControllerMode:
@@ -134,8 +133,7 @@ class Robot:
             clk = time.time()
             turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
-            if (VERBOSITY >= 2):
-                print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
+            logger.debug("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
 
         # Turning is completed, stop the motors
         turn_instr = Command.stop_motors()
@@ -160,15 +158,13 @@ class Robot:
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         lidar_init = handle_command(Command.read_lidar())
         lidar_cur = lidar_init
-        if (VERBOSITY >= 2):
-            print("LIDAR INIT: ", lidar_init)
+        logger.debug("LIDAR INIT: ", lidar_init)
         while(lidar_init - lidar_cur < dist):
             lidar_cur = handle_command(Command.read_lidar())
             if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
                 self.uart_styrenhet.send_command(Command.stop_motors())
                 return False
-            if (VERBOSITY >= 2):
-                print("LIDAR CURRENT: ", lidar_cur)
+            logger.debug("LIDAR CURRENT: ", lidar_cur)
         self.uart_styrenhet.send_command(Command.stop_motors())
         return True
 
@@ -204,8 +200,7 @@ class Robot:
             ir_left_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
             ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
-            if (VERBOSITY >= 3):
-                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
+            logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
              # Detect corridor to the right
             if ((ir_right_front >= self.TURN_OVERRIDE_DIST) or (ir_right_front > self.TURN_MIN_DIST and ir_right_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -230,13 +225,11 @@ class Robot:
             dist_right = (ir_right_front + ir_right_back) / 2
             angle_right = math.atan2(ir_right_back - ir_right_front, self.SENSOR_SPACING)
             perpendicular_dist_right = dist_right * math.cos(angle_right)
-            if (VERBOSITY >= 3):
-                print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
+            logger.debug("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
             self.pid_controller.input_data = perpendicular_dist_right
             self.pid_controller.d_term = angle_right
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
-            print (self.pid_controller.output_data)
             self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED)
             
             self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -379,8 +372,7 @@ class Robot:
             ir_left_back_diff < threshold and ir_left_front_diff < threshold):
             return False
         else:
-            if VERBOSITY >= 2:
-                print("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
+            logger.debug("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
             return True
 
 
@@ -398,13 +390,35 @@ def sensor_test(robot):
         print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
     
 def main(argv):
-    global VERBOSITY
+    # create logger
+    logger = logging.getLogger()
+    ch = logging.StreamHandler()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--sensor", required = True, metavar = "SENSOR_DEVICE", help = "Device name of the USB<->serial converter for the sensor unit.")
     parser.add_argument("-c", "--control", required = True, metavar = "CONTROL_DEVICE", help = "Device name of the USB<->serial converter for the control unit.")
-    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 4), help = "Verbosity level. 0 is lowest and 3 highest. Default 1.")
+    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 3), help = "Verbosity level. 0 is lowest and 2 highest. Default 1.")
     args = parser.parse_args()
-    VERBOSITY = args.verbosity
+
+    verbosity = args.verbosity
+    if (verbosity == 0):
+        logger.disabled = True
+        ch.disabled = True
+    elif (verbosity == 1):
+        logger.setLevel(logging.INFO)
+        ch.setLevel(logging.INFO)
+    elif (verbosity == 2):
+        logger.setLevel(logging.DEBUG)
+        ch.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    # add formatter to ch
+    ch.setFormatter(formatter)
+
+    # add ch to logger
+    logger.addHandler(ch)
     robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
 
     # Turn LIDAR to 90 degrees
@@ -418,12 +432,9 @@ def main(argv):
     while 1:
             # Drive forward without crashing in wall
             status = robot.follow_wall(9999999)
-            if VERBOSITY >= 1:
-                print(robot.path_trace)
+            logger.info(robot.path_trace)
             if (status == DriveStatus.OBSTACLE_DETECTED):
-                if (VERBOSITY >= 1):
-                    print ("---------- OBSTACLE DETECTED!")
-                    print ("---------- TURNING LEFT 90 degrees")
+                logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
                 robot.uart_styrenhet.send_command(turn_instr)
                 while robot._is_moving(): pass
@@ -444,9 +455,7 @@ def main(argv):
                 robot.pid_controller.kd = 0
                 robot.pid_controller.set_tunings(3, 0, -200)
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
-                if (VERBOSITY >= 1):
-                    print ("---------- DETECTED CORRIDOR TO RIGHT!")
-                    print ("---------- TURNING RIGHT 90 degrees")
+                logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
                 turn_instr = Command.stop_motors()
                 robot.uart_styrenhet.send_command(turn_instr)
                 while robot._is_moving(): pass
@@ -457,8 +466,7 @@ def main(argv):
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
                 if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
-                    if VERBOSITY >= 1:
-                        print("Not a corridor, moving back")
+                    logger.info("Not a corridor, moving back")
                     robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
                     robot.stand_perpendicular('right')
                     while robot._is_moving(threshold = 20): pass
