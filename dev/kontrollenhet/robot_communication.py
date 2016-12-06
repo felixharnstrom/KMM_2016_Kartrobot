@@ -133,7 +133,7 @@ def get_sensor_dict_key(c_enum : CommandEnums):
         return "IR_RIGHT_BACK"
     elif(c_enum == CommandEnums.READ_IR_BACK):
         return "IR_BACK"
-    elif(c_enum == CommandEnums.READ_IR_LIDAR):
+    elif(c_enum == CommandEnums.READ_LIDAR):
         return "IR_LIDAR"
     elif(c_enum == CommandEnums.READ_GYRO):
         return "GYRO"
@@ -210,7 +210,7 @@ def handle_command(command : Command):
     c_enum = command.get_enum()
     if(c_enum == CommandEnums.CONTROLLER_INFORMATION):
         retrieve_and_update_motor_diagnostics(command)
-    elif(c_enum == CommandEnums.READ_IR_LEFT_FRONT or 
+    elif(c_enum == CommandEnums.READ_IR_LEFT_FRONT or
             c_enum == CommandEnums.READ_IR_LEFT_BACK or
             c_enum == CommandEnums.READ_IR_RIGHT_FRONT or
             c_enum == CommandEnums.READ_IR_RIGHT_BACK or
