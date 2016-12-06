@@ -261,6 +261,6 @@ def process_action():
 def process_actions():
     """
     Process all actions in the input_queue until it's empty.
-    """"
+    """
     while process_action():
         pass
