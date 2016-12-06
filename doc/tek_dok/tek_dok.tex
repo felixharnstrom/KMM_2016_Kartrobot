@@ -803,7 +803,7 @@ Efter igenkänning av ett hinder körs
 \tikzstyle{arrow} = [thin,->,>=stealth]
 \tikzstyle{line} = [thin,>=stealth]
 % Nodes
-\node (start) [startstop] {Start};
+\node (start) [startstop] {Obstacle detected};
 \node (irRead) [decision, below of=start, yshift=-40pt] {$ir\_right\_front > ir\_left\_front$};
 \node (calibRight) [process, left of=irRead, xshift=-170pt] {Stand perpendicular to right wall};
 \node (calibLeft) [process, right of=irRead, xshift=170pt] {Stand perpendicular to left wall};
