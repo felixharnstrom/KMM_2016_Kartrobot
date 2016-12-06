@@ -14,7 +14,7 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 
 
 """The real-world size of a grid cell, in millimeters. Also the length of a line."""
-GRID_SIZE = 400
+CELL_SIZE = 400
 
 """The number of 'line segments per line."""
 POINTS = 4
@@ -29,7 +29,7 @@ POINTS_LINE = 3
 ACCURACY = 130
 
 """The length of a line segment."""
-LINE_SEG_LENGTH = GRID_SIZE // POINTS
+LINE_SEG_LENGTH = CELL_SIZE // POINTS
 
 
 
@@ -41,9 +41,9 @@ def coordinates_to_lines(coordinates):
         :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
 
     Returns:
-        :return (list of Line's): Lines describing walls, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
+        :return (list of Line's): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
     """
-    # Gets size coordinate area in squares of GRID_SIZE
+    # Gets size coordinate area in squares of CELL_SIZE
     top_left = top_left_grid_index(coordinates)
     bottom_right = bottom_right_grid_index(coordinates)
     # Get votes
@@ -58,14 +58,14 @@ def coordinates_to_lines(coordinates):
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
         # Stores square position, start in y and end in y.
-        y = GRID_SIZE * y_index
-        y_next = y + GRID_SIZE
+        y = CELL_SIZE * y_index
+        y_next = y + CELL_SIZE
         
         # Loop over x-indices for the grid
         for x_index in range(top_left.x, bottom_right.x + 1):
             # Stores square position, start in x and end in x.
-            x = GRID_SIZE * x_index
-            x_next = x + GRID_SIZE
+            x = CELL_SIZE * x_index
+            x_next = x + CELL_SIZE
 
             # correct that positions values can be negative, but lists don't have neg values
             pos = Position(x_index - top_left.x, y_index - top_left.y)
@@ -108,25 +108,25 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
 
     Args:
         :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
-        :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of GRID_SIZE millimeters.
+        :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
         :param robot_pos (Position): The position of the robot as the measurements was taken.
         :param grid_map (GridMap): The GridMap to modify.
     """
-    # Gets size coordinate area in squares of GRID_SIZE
+    # Gets size coordinate area in squares of CELL_SIZE
     top_left = top_left_grid_index(coordinates)
     bottom_right = bottom_right_grid_index(coordinates)
 
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
-        # Stores square position, start in y and end in y as multiplied with GRID_SIZE.
-        y = GRID_SIZE * y_index
-        y_next = y + GRID_SIZE
+        # Stores square position, start in y and end in y as multiplied with CELL_SIZE.
+        y = CELL_SIZE * y_index
+        y_next = y + CELL_SIZE
 
         # Loop over x-indices for the grid
         for x_index in range(top_left.x, bottom_right.x + 1):
-            # Stores square position, start in x and end in x as multiplied with GRID_SIZE.
-            x = GRID_SIZE * x_index
-            x_next = x + GRID_SIZE
+            # Stores square position, start in x and end in x as multiplied with CELL_SIZE.
+            x = CELL_SIZE * x_index
+            x_next = x + CELL_SIZE
 
             grid_changed = False
 
@@ -183,7 +183,7 @@ def plot_lines(lines):
 
 def top_left_grid_index(coordinates):
     """
-    Return the top_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/GRID_SIZE.
+    Return the top_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
         :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
@@ -193,24 +193,24 @@ def top_left_grid_index(coordinates):
     """
     top_left = Position(0, 0)
     for x, y in coordinates:
-        top_left.x = min(top_left.x, int(x//GRID_SIZE))
-        top_left.y = min(top_left.y, int(y//GRID_SIZE))
+        top_left.x = min(top_left.x, int(x//CELL_SIZE))
+        top_left.y = min(top_left.y, int(y//CELL_SIZE))
     return top_left
 
 def bottom_right_grid_index(coordinates):
     """
-    Return the bottom_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/GRID_SIZE.
+    Return the bottom_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
         :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
 
     Returns:
-        :return (Position): The bottom left position of said AABB, scaled by 1/GRID_SIZE.
+        :return (Position): The bottom left position of said AABB, scaled by 1/CELL_SIZE.
     """
     bottom_right = Position(0, 0)
     for x, y in coordinates:
-        bottom_right.x = max(bottom_right.x, int(x//GRID_SIZE + 1))
-        bottom_right.y = max(bottom_right.y, int(y//GRID_SIZE + 1))
+        bottom_right.x = max(bottom_right.x, int(x//CELL_SIZE + 1))
+        bottom_right.y = max(bottom_right.y, int(y//CELL_SIZE + 1))
     return bottom_right
 
 
@@ -219,7 +219,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     """
     For each possible line segment approximate each coordinate to the closest segment, and return the
     number of coordinates approximated to fall in each line segment (the number of "votes"). A line segment 
-    is considered a line with a length of ACCURACY, while a full line has a length of GRID_SIZE.
+    is considered a line with a length of LINE_SEG_LENGTH, while a full line has a length of CELL_SIZE.
 
     Vertical determines if we attempt to approximate coordinates to vertical lines (True) or horizontal
     ones (False).
@@ -230,7 +230,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
 
     Returns:
         :return (list of int): a 3-dimensional list.
-        The first two indices indicates the starting point of a line, divided by GRID_SIZE. The third an offset
+        The first two indices indicates the starting point of a line, divided by CELL_SIZE. The third an offset
         off n*ACCURACY, where n is the index (0 =< n < POINTS), on the x-axis or y-axis depending on if the
         line is vertical or horizontal. The lines end-point will thus be offset by an 
         additional (n+1)*ACCURACY. On that index we'll find the number of coordinates approximated to
@@ -243,7 +243,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
         assuming not vertical, [0][0][0] contains votes for the line (0,0) -> (ACCURACY, 0)
         assuming vertical,     [0][0][0] contains votes for the line (0,0) -> (0, ACCURACY)
         assuming not vertical, [0][0][2] contains votes for the line (2*ACCURACY, 0) -> (3*ACCURACY, 0)
-        assuming not vertical, [1][0][0] contains votes for the line (1*GRID_SIZE, 0) -> (1*GRID_SIZE + 1*ACCURACY, 0)
+        assuming not vertical, [1][0][0] contains votes for the line (1*CELL_SIZE, 0) -> (1*CELL_SIZE + 1*ACCURACY, 0)
     """
     # The size of the AABB enclosing all coordinates
     size = bottom_right.difference(top_left)
@@ -255,23 +255,23 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     for x, y in coordinates:
         # Approximate position to grid
         # Approximate the pair of coordinates to the grid
-        pos_x = int(x//GRID_SIZE - top_left.x)
-        pos_y = int(y//GRID_SIZE - top_left.y)
+        pos_x = int(x//CELL_SIZE - top_left.x)
+        pos_y = int(y//CELL_SIZE - top_left.y)
         pos = Position(pos_x, pos_y)
         
         # 
-        pos_dist = Position(x%GRID_SIZE, y%GRID_SIZE)
+        pos_dist = Position(x%CELL_SIZE, y%CELL_SIZE)
         relevant_dist = pos_dist.x if vertical else pos_dist.y
 
         #
-        factor = int(GRID_SIZE/POINTS_LINE)
+        factor = int(CELL_SIZE/POINTS_LINE)
         pos_loc = Position(pos_dist.x//factor, pos_dist.y//factor)
         relevant_loc = pos_loc.y if vertical else pos_loc.x
         
         # Check if measurement is within +- ACCURACY from line
         if relevant_dist < ACCURACY:
             votes[pos.y][pos.x][relevant_loc] += 1
-        elif relevant_dist > (GRID_SIZE - ACCURACY):
+        elif relevant_dist > (CELL_SIZE - ACCURACY):
             if vertical:
                 votes[pos.y][pos.x+1][relevant_loc] += 1
             else:
@@ -315,9 +315,9 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, bottom_right:Positio
     prev_grid_pos = Position(grid_pos.x - 1, grid_pos.y - 1)
 
     #create a line based on current grid position
-    next_start = Position(grid_pos.x * GRID_SIZE, grid_pos.y * GRID_SIZE)
-    next_vertical_end = Position(grid_pos.x * GRID_SIZE, next_grid_pos.y * GRID_SIZE)
-    next_horizontal_end = Position(next_grid_pos.x * GRID_SIZE, grid_pos.y * GRID_SIZE)
+    next_start = Position(grid_pos.x * CELL_SIZE, grid_pos.y * CELL_SIZE)
+    next_vertical_end = Position(grid_pos.x * CELL_SIZE, next_grid_pos.y * CELL_SIZE)
+    next_horizontal_end = Position(next_grid_pos.x * CELL_SIZE, grid_pos.y * CELL_SIZE)
     next_vertical = Line(next_start, next_vertical_end)
     next_horizontal = Line(next_start, next_horizontal_end)
 
@@ -437,6 +437,6 @@ def debug_plot(coordinates, lines):
         x_plot.append(x)
         y_plot.append(y)
     plt.plot(x_plot, y_plot, '.')
-    plt.plot([(top_left.x - 1) * GRID_SIZE, (bottom_right.x + 1) * GRID_SIZE],
-             [(top_left.y) * GRID_SIZE, (bottom_right.y) * GRID_SIZE], '.')
+    plt.plot([(top_left.x - 1) * CELL_SIZE, (bottom_right.x + 1) * CELL_SIZE],
+             [(top_left.y) * CELL_SIZE, (bottom_right.y) * CELL_SIZE], '.')
     plt.show()
