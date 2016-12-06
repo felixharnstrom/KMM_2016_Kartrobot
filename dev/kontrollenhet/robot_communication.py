@@ -208,7 +208,6 @@ def handle_command(command : Command):
         :param command (Command): The command that we want to handle.
     """
     c_enum = command.get_enum()
-    print("Handling enum: ", command.command_type)
     if(c_enum == CommandEnums.CONTROLLER_INFORMATION):
         retrieve_and_update_motor_diagnostics(command)
     elif(c_enum == CommandEnums.READ_IR_LEFT_FRONT or 

@@ -35,7 +35,7 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
             #Transmit motor data
             motor_data_cpy = motor_data.copy()
             s.client.sendall(json.dumps(motor_data_cpy).encode())
-        elif (data = "FORWARD_SENSOR_INFO"):
+        elif (data == "FORWARD_SENSOR_INFO"):
             #Transmit sensor data
             sensor_data_cpy = sensor_data.copy()
             s.client.sendall(json.dumps(sensor_data_cpy).encode())
