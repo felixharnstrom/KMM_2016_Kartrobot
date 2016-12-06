@@ -262,9 +262,9 @@ class Robot:
         Scan the room at this position and return the recorded data.
 
         Returns:
-            (list of ?): Recorded data. # TODO: What is this?
+            (list): Recorded data in a list of distances, where the index is the servo degree
         """
-        recorded_data = [] # (Angle, distance)
+        recorded_data = []  # (Angle, distance)
         # Turn LIDAR to 0 degrees
         servo_instr = Command.servo(0)
         self.uart_styrenhet.send_command(servo_instr)
@@ -279,7 +279,7 @@ class Robot:
 
             # Read data from the LIDAR sensor
             lidar_distance = handle_command(Command.read_lidar())
-            recorded_data += [(i,lidar_distance)]
+            recorded_data.append(lidar_distance)
             time.sleep(0.005)
 
         return recorded_data
