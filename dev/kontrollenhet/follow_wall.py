@@ -88,22 +88,22 @@ class Robot:
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 100
         self.RIGHT_TURN_ENTRY_DIST = 100
-        self.RIGHT_TURN_EXIT_DIST = 200
+        self.RIGHT_TURN_EXIT_DIST = 300
+        self.OBSTACLE_SAFETY_OVERRIDE = 120
         self.EDGE_SPIKE_FACTOR = 2
-        self.OBSTACLE_DIST = 200
+        self.OBSTACLE_DIST = 170
         self.SENSOR_SPACING = 95
         self.BASE_SPEED = 20
         self.ACCELERATED_SPEED = 40
 
         # Private attributes
-        self._help_angle = 0
         self._last_dist = 0
 
         # Initialize PID controller
         self.pid_controller = Pid()
-        self.pid_controller.setpoint = 0
+        self.pid_controller.setpoint = 80
         self.pid_controller.output_data = 0
-        self.pid_controller.set_tunings(0.7, 0, 0.3)
+        self.pid_controller.set_tunings(3, 0, -200)
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
@@ -148,7 +148,7 @@ class Robot:
             # Use a reimann sum to add up all the gyro rates
             # Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
+            turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
             if (VERBOSITY >= 2):
                 print("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
@@ -158,15 +158,20 @@ class Robot:
         self.uart_styrenhet.send_command(turn_instr)
 
         # Add turned degrees to current_angle
-        self.current_angle += degrees
+        if direction == Direction.LEFT:
+            self.current_angle -= degrees
+        else:
+            self.current_angle += degrees
 
     def drive_distance(self, dist : int, speed : int):
         """
-        Drives the given distance at the given speed. Uses LIDAR for determining distance.
+        Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
 
         Args:
             dist    (int): Distance in millimetres.
             speed   (int): Speed as a percentage value between 0-100.
+        Returns:
+            (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         lidar_init = self.read_sensor(Command.read_lidar())
@@ -175,8 +180,13 @@ class Robot:
             print("LIDAR INIT: ", lidar_init)
         while(lidar_init - lidar_cur < dist):
             lidar_cur = self.read_sensor(Command.read_lidar())
+            if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
+                self.uart_styrenhet.send_command(Command.stop_motors())
+                return False
             if (VERBOSITY >= 2):
                 print("LIDAR CURRENT: ", lidar_cur)
+        self.uart_styrenhet.send_command(Command.stop_motors())
+        return True
 
     def follow_wall(self, distance : int):
         """
@@ -188,10 +198,9 @@ class Robot:
         Returns:
             (DriveStatus): Status when completed.
         """
-        self._help_angle = 0
 
         # Set time to zero to turn untill stopped
-        standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 200
+        standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100
 
         # Read start values from sensors
         lidar = self.read_sensor(Command.read_lidar())
@@ -205,8 +214,7 @@ class Robot:
             # Use a reimann sum to add up all the gyro rates
             # Area = TimeDiff * turnRate
             clk = time.time()
-            turn_rate = self.read_sensor(Command.read_gyro()) / 100 - standstill_rate
-            self._help_angle += (time.time() - clk) * turn_rate
+            turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
 
             # Get sensor values
             ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -215,7 +223,7 @@ class Robot:
             ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
             if (VERBOSITY >= 3):
-                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " GYRO: " + str(self._help_angle))
+                print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT: " + str(ir_right_front) + " IR_LEFT_BACK: " + str(ir_left_back) + " IR_LEFT_FRONT: " + str(ir_left_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
              # Detect corridor to the right
             if ((ir_right_front >= self.TURN_OVERRIDE_DIST) or (ir_right_front > self.TURN_MIN_DIST and ir_right_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -240,15 +248,15 @@ class Robot:
             dist_right = (ir_right_front + ir_right_back) / 2
             angle_right = math.atan2(ir_right_back - ir_right_front, self.SENSOR_SPACING)
             perpendicular_dist_right = dist_right * math.cos(angle_right)
-            dist_left = (ir_left_front + ir_left_back) / 2
-            angle_left = math.atan2(ir_left_back - ir_left_front, self.SENSOR_SPACING)
-            perpendicular_dist_left = dist_left * math.cos(angle_left)
             if (VERBOSITY >= 3):
-                print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right, "PERPENDICULAR DIST LEFT:", perpendicular_dist_left)
-            self.pid_controller.input_data = perpendicular_dist_right - perpendicular_dist_left
+                print ("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
+            self.pid_controller.input_data = perpendicular_dist_right
+            self.pid_controller.d_term = angle_right
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
+            print (self.pid_controller.output_data)
             self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED)
+            
             self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
         # Save the given length driven
@@ -290,6 +298,7 @@ class Robot:
             # Read data from the LIDAR sensor
             lidar_distance = self.read_sensor(Command.read_lidar())
             recorded_data += [(i,lidar_distance)]
+            time.sleep(0.005)
 
         return recorded_data
 
@@ -312,13 +321,13 @@ class Robot:
             ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
             ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed = self.BASE_SPEED)
+            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
 
         elif side == "right":
             ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) < 0 , abs(int(math.degrees(angle))), speed = self.BASE_SPEED)
+            self.turn(math.degrees(angle) < 0 , abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
 
     def _median_sensor(self, it : int, sensor_instr : Command):
         """
@@ -358,6 +367,40 @@ class Robot:
         drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
         self.uart_styrenhet.send_command(drive_instr)
 
+    def _is_moving(self, threshold = 30, wait_time = 0.2):
+        """
+        Checks for sensor changes above threshold within wait_time.
+        Args:
+            threshold   (int): How much the sensor values are allowed to change (mm)
+            wait_time   (int): How long to wait between sensor reads
+        Returns:
+            (bool): If the robot has moved more than threshold.
+        """
+        ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
+        lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
+        ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+        ir_right_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+        ir_left_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+        ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+
+        time.sleep(wait_time)
+
+        ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir()))
+        lidar_diff = abs(lidar - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar()))
+        ir_right_front_diff = abs(ir_right_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir()))
+        ir_right_back_diff = abs(ir_right_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir()))
+        ir_left_back_diff = abs(ir_left_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir()))
+        ir_left_front_diff = abs(ir_left_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir()))
+
+        if (lidar_diff < threshold and ir_right_back_diff < threshold and
+            ir_right_front_diff < threshold and ir_back_diff < threshold and
+            ir_left_back_diff < threshold and ir_left_front_diff < threshold):
+            return False
+        else:
+            if VERBOSITY >= 2:
+                print("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
+            return True
+
 
 def sensor_test(robot):
     """
@@ -388,31 +431,66 @@ def main(argv):
 
     # Wait fot LIDAR to be in position
     time.sleep(1)
-        
+    
     # Try driving in infinite loop around the maze
     while 1:
             # Drive forward without crashing in wall
             status = robot.follow_wall(9999999)
+            if VERBOSITY >= 1:
+                print(robot.path_trace)
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 if (VERBOSITY >= 1):
                     print ("---------- OBSTACLE DETECTED!")
                     print ("---------- TURNING LEFT 90 degrees")
-                robot.turn(Direction.LEFT, 90, speed = robot.ACCELERATED_SPEED)
+                turn_instr = Command.stop_motors()
+                robot.uart_styrenhet.send_command(turn_instr)
+                while robot._is_moving(): pass
+                ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+                ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+                if (ir_right_front > ir_left_front):
+                    robot.stand_perpendicular('left')
+                    robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
+                    while robot._is_moving(): pass
+                    robot.stand_perpendicular('left')
+                else:
+                    robot.stand_perpendicular('right')
+                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
+                    while robot._is_moving(): pass
+                    robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
-                robot.pid_controller.initialize()
+                robot.pid_controller.set_tunings(3, 0, -200)
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                 if (VERBOSITY >= 1):
                     print ("---------- DETECTED CORRIDOR TO RIGHT!")
                     print ("---------- TURNING RIGHT 90 degrees")
-                    print (robot._help_angle)
-                robot.turn(Direction.RIGHT, 90 + robot._help_angle, speed = robot.ACCELERATED_SPEED)
-                robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.ACCELERATED_SPEED)
+                turn_instr = Command.stop_motors()
+                robot.uart_styrenhet.send_command(turn_instr)
+                while robot._is_moving(): pass
+                #robot.stand_perpendicular('left')
+                robot.drive_distance(robot.RIGHT_TURN_ENTRY_DIST, robot.BASE_SPEED)
+                robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED)
+                while robot._is_moving(threshold = 20): pass
+
+                # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
+                if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
+                    if VERBOSITY >= 1:
+                        print("Not a corridor, moving back")
+                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED)
+                    robot.stand_perpendicular('right')
+                    while robot._is_moving(threshold = 20): pass
+                else:
+                    # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower RIGHT_TURN_EXIT_DIST again.
+                    # As it is now, a right turn into a single square corridor does not work well.
+                    robot.drive_distance(robot.RIGHT_TURN_EXIT_DIST, robot.BASE_SPEED)
+                    while robot._is_moving(): pass
+                    robot.stand_perpendicular('right')
+                    robot.stand_perpendicular('left')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
-                robot.pid_controller.initialize()
+                robot.pid_controller.set_tunings(3, 0, -200)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

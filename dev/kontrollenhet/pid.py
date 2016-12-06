@@ -33,6 +33,7 @@ class Pid():
         self.automatic_mode = False 
         self.min_out = 0
         self.max_out = 0
+        self.d_term = 0
 
         # Private attributes
         self._i_term = 0                    # Integration term
@@ -65,7 +66,7 @@ class Pid():
             self._i_term = self.min_out
         d_input = (self.input_data - self._last_input)
 
-        self.output_data = (self.kp * error) + self._i_term - (self.kd * d_input)
+        self.output_data = (self.kp * error) + self._i_term - (self.kd * self.d_term)
 
         # Clamping output to min/max values
         if (self.output_data > self.max_out):
