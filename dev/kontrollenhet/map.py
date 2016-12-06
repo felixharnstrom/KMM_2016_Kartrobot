@@ -22,8 +22,8 @@ DIVISIONS_PER_LINE = 4
 """The number of votes per line section required for something to be considered a full line."""
 MIN_MESURE = 1
 
-"""The number of line sections that needs to be voted in for their line to be voted in."""
-POINTS_LINE = 3
+"""The number of line segments that needs to be voted in for their line to be voted in."""
+SEGMENTS_REQUIRED = 3
 
 """The thickness of a line segment."""
 ACCURACY = 130
@@ -84,14 +84,14 @@ def coordinates_to_lines(coordinates):
 
             # Check if enough line segments making up a line have enough votes
             # If they do, we have detected a full line
-            if horizontal_line_segs >= POINTS_LINE:
+            if horizontal_line_segs >= SEGMENTS_REQUIRED:
                 start = Position(x, y)
                 end = Position(x_next, y)
                 line = Line(start, end)
                 if line not in lines:
                     lines.append(line)
 
-            if vertical_line_segs >= POINTS_LINE:
+            if vertical_line_segs >= SEGMENTS_REQUIRED:
                 start = Position(x, y)
                 end = Position(x, y_next)
                 line = Line(start, end)
@@ -264,7 +264,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
         relevant_dist = pos_dist.x if vertical else pos_dist.y
 
         #
-        factor = int(CELL_SIZE/POINTS_LINE)
+        factor = int(CELL_SIZE/SEGMENTS_REQUIRED)
         pos_loc = Position(pos_dist.x//factor, pos_dist.y//factor)
         relevant_loc = pos_loc.y if vertical else pos_loc.x
         
