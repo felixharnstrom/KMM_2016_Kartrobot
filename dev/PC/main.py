@@ -15,6 +15,7 @@ def send_command(command, socket, guit):
         for a command, then waits for acknowledge.
         command" are the strings from the gui thread.
     """
+    print("sending: ", command)
     if len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
         socket.sendall("KEY_EVENT".encode())
         ack = socket.recv(4096)
@@ -25,8 +26,8 @@ def send_command(command, socket, guit):
         socket.sendall(command[5:].encode())
     elif command == "get_motor_data":
         socket.sendall("FORWARD_MOTOR_INFO".encode())
-        ack = socket.recv(4096)
-        motor_data = json.loads(socket.recv(4096).decode("utf-8"))
+        ack = receive_msg(socket)
+        motor_data = json.loads(receive_msg(socket))
         dir_mod_left = 1 if motor_data["LEFT_SIDE_DIRECTION"] else -1
         dir_mod_right = 1 if motor_data["RIGHT_SIDE_DIRECTION"] else -1
         speed_left = motor_data["LEFT_SIDE_SPEED"]*dir_mod_left
@@ -35,14 +36,14 @@ def send_command(command, socket, guit):
         guit.receive_command(["set_servo", motor_data["SERVO_ANGLE"]])
     elif command == "get_sensor_data":
         socket.sendall("FORWARD_SENSOR_INFO".encode())
-        ack = socket.recv(4096)
-        sensor_data = json.loads(socket.recv(4096).decode("utf-8"))
+        ack = receive_msg(socket)
+        sensor_data = json.loads(receive_msg(socket))
         guit.receive_command(["set_sensors", sensor_data])
 
 def main():
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="130.236.227.194")
+    robot.start(ip="130.236.226.193")
 
     map = [[1,0,1],[0,1,1]]
 
@@ -69,6 +70,7 @@ def main():
         diff = (current_time - last_time).total_seconds()
         if(diff >= diff_time_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
+            print("Time diff: ", diff)
             last_time = current_time
             send_command("get_motor_data", robot.client, guit)
             send_command("get_sensor_data", robot.client, guit)

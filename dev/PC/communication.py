@@ -19,3 +19,15 @@ def receive_command(socket : socket):
     data = socket.recv(4096).decode("utf-8")
     json_msg = json.loads(data)
     return construct_command(json_msg)
+
+def receive_msg(socket : socket):
+    """
+    Receives a message seperated by a \n character. >DOES NOT< take UTF-8 into consideration.
+    """
+    msg = ""
+    while True:
+        c = socket.recv(1).decode("utf-8")
+        if c == "\n":
+            break
+        msg += c
+    return msg
