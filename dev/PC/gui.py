@@ -60,15 +60,26 @@ class gui_thread(threading.Thread):
         self.queue.put(mode)
 
     def receive_command(self, command):
-        if type(command)==list and command[0] == "draw":
-            # It was a draw command.
-            # Instruct the gui to place a marker on its canvas at the point specified in "command"
-            self.place_marker_on_canvas(command[1], command[2])
-        elif type(command) == list and command[0] == "set_motors":
-            self.left_motor_speed.set(command[1])
-            self.right_motor_speed.set(command[2])
-        elif type(command) == list and command[0] == "set_servo":
-            self.servo_angle.set(command[1])
+        if type(command)==list:
+            if command[0] == "draw":
+                # It was a draw command.
+                # Instruct the gui to place a marker on its canvas at the point specified in "command"
+                self.place_marker_on_canvas(command[1], command[2])
+            elif command[0] == "set_motors":
+                self.left_motor_speed.set(command[1])
+                self.right_motor_speed.set(command[2])
+            elif command[0] == "set_servo":
+                self.servo_angle.set(command[1])
+            elif command[0] == "set_sensors":
+                sensor_data_dict = command[1]
+                self.ir_front_left.set(sensor_data_dict["IR_LEFT_FRONT"])
+                self.ir_front_right.set(sensor_data_dict["IR_RIGHT_FRONT"])
+                self.ir_back_left.set(sensor_data_dict["IR_LEFT_BACK"])
+                self.ir_back_right.set(sensor_data_dict["IR_RIGHT_BACK"])
+                self.ir_behind.set(sensor_data_dict["IR_BACK"])
+                self.lidar.set(sensor_data_dict["LIDAR"])
+                self.gyro(sensor_data_dict["GYRO"])
+        return
 
     def run(self):
         """Initiates the GUI with previously specified queues."""
