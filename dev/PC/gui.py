@@ -78,7 +78,7 @@ class gui_thread(threading.Thread):
                 self.ir_back_right.set(sensor_data_dict["IR_RIGHT_BACK"])
                 self.ir_behind.set(sensor_data_dict["IR_BACK"])
                 self.lidar.set(sensor_data_dict["LIDAR"])
-                self.gyro(sensor_data_dict["GYRO"])
+                self.gyro.set(sensor_data_dict["GYRO"])
         return
 
     def run(self):
