@@ -103,6 +103,14 @@ class GridMap:
         newx, newy = self.pos_to_index(x, y)
         self.grid[newy][newx] = ctype
 
+    def top_left(self):
+        """Return the top left index of the grid."""
+        return Position(-self.origin.x, -self.origin.y)
+
+    def bottom_right(self):
+        """Return the bottom right index of the grid."""
+        return Position(self.width - self.origin.x, self.height - self.origin.y)
+
     def gui_drawable(self):
         """Return a version as the GUI would like to see it."""
         def row_to_drawable(row):

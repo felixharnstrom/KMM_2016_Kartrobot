@@ -31,23 +31,17 @@ ACCURACY = 130
 """The length of a line segment."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 
-
-
 def bresenham(line):
     """
     Source: http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm
-
     Bresenham's Line Algorithm
     Return a list of cell indices connecting the end-points of a given line, as few as possible, approximated to lay on the line as much as possible.
     
     Args:
         :param line (Line): a line to find a path through.
-
     Returns:
         :return (list of Position): The cell indices the line passes through.
     """
-
-
     # Extract points
     start = line.start
     end = line.end
@@ -166,6 +160,34 @@ def coordinates_to_lines(coordinates):
 
     return lines
 
+def open_missed_corners(grid_map:GridMap):
+    """
+    Change unknown tiles surrounded by known tiles to OPEN.
+    Repeat this until no unknown tiles are surrounded.
+
+    Args:
+        :param grid_map (GridMap): The GridMap to modify.
+    """
+    # TODO: Worst case is O(W*W*H*H)
+    # Pretty dang slow.
+
+    if grid_map.width < 3 or grid_map.height < 3:
+        # No tiles are surrounded
+        return
+
+    tl = grid_map.top_left()
+    br = grid_map.bottom_right()
+    for x in range(tl.x + 1, br.x - 1):
+        for y in range(tl.y + 1, br.y - 1):
+            neighbours = ((x+1, y), (x-1, y), (x, y+1), (x, y-1))
+            unknown_n = sum(grid_map.get(nx, ny) == CellType.UNKNOWN for nx, ny in neighbours)
+            if unknown_n == 0 and grid_map.get(x, y) == CellType.UNKNOWN:
+                grid_map.set(x, y, CellType.OPEN)
+                # Recursive call
+                open_missed_corners(grid_map)
+                return
+                
+
 # TODO: Coordinates are only used for min/max index
 # TODO: Non-DRY
 def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
@@ -213,6 +235,7 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
             # Check if there exists a vertical line from current grid, if it exists create a WALL grid
             if line_vertical in lines:
                 changed_pos_ver = change_grid_type(robot_pos, grid_pos, line_vertical, grid_map)
+
             # Change all cells between the new walls and the robot to OPEN
             # For each new wall
             for changed_pos in (changed_pos_hor, changed_pos_ver):
@@ -224,6 +247,9 @@ def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
                         if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
                             grid_map.set(cell.x, cell.y, CellType.OPEN)
 
+    # Bresenham can miss a few points on large maps.
+    # This takes care of those.
+    open_missed_corners(grid_map)
 
 
 def plot_lines(lines):
