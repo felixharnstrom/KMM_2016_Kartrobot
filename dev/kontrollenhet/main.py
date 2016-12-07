@@ -22,7 +22,7 @@ def main():
     while True:
         # Process messages
         process_actions()
-
+        
         # Update motor diagnostics values
         handle_command(Command.controller_information())
 

@@ -26,19 +26,17 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
         data = s.client.recv(4096).decode("utf-8")
         print ("Data received from PC: ", data)
         # Acknowledge client
-        s.client.sendall("ACK".encode())
+        s.client.sendall("ACK\n".encode())
         if (data == "TRANSMIT"):
             #Receive Command
             command = receive_command(s.client)
             input_queue.put(("COMMAND", command))
         elif (data == "FORWARD_MOTOR_INFO"):
             #Transmit motor data
-            motor_data_cpy = motor_data.copy()
-            s.client.sendall(json.dumps(motor_data_cpy).encode())
+            s.client.sendall(json.dumps(motor_data).encode()+"\n".encode())
         elif (data == "FORWARD_SENSOR_INFO"):
             #Transmit sensor data
-            sensor_data_cpy = sensor_data.copy()
-            s.client.sendall(json.dumps(sensor_data_cpy).encode())
+            s.client.sendall(json.dumps(sensor_data).encode()+"\n".encode())
         elif (data == "KEY_EVENT"):
             #Receive keyevent
             key_event = s.client.recv(4096).decode("utf-8")
