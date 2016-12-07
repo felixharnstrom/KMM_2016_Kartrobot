@@ -16,7 +16,7 @@ motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0,
                 "SERVO_ANGLE":0} #Contains the last retrieved motor data from get_motor_diagnostics.
 sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
                 "IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, 
-                "IR_BACK":0, "IR_LIDAR":0, 
+                "IR_BACK":0, "LIDAR":0, 
                 "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
 
@@ -140,7 +140,7 @@ def get_sensor_dict_key(c_enum : CommandEnums):
     elif(c_enum == CommandEnums.READ_IR_BACK):
         return "IR_BACK"
     elif(c_enum == CommandEnums.READ_LIDAR):
-        return "IR_LIDAR"
+        return "LIDAR"
     elif(c_enum == CommandEnums.READ_GYRO):
         return "GYRO"
     else:
