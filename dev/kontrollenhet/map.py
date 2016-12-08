@@ -5,13 +5,9 @@ from sensorenhet_functions import *
 from geometry import *
 import json
 import math, time
-import logging
 import numpy as np
 import matplotlib.pyplot as plt
 from grid_map import GridMap, CellType
-
-logging.getLogger(__name__).setLevel(logging.INFO)
-
 
 """The real-world size of a grid cell, in millimeters. Also the length of a line."""
 CELL_SIZE = 400
@@ -34,6 +30,7 @@ LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 def bresenham(line):
     """
     Source: http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm
+
     Bresenham's Line Algorithm
     Return a list of cell indices connecting the end-points of a given line, as few as possible, approximated to lay on the line as much as possible.
     
@@ -324,7 +321,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
         :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
 
     Returns:
-        :return (list of int): a 3-dimensional list.
+        :return (numpy.array of int): a 3-dimensional list.
         The first two indices indicates the starting point of a line, divided by CELL_SIZE. The third an offset
         off n*ACCURACY, where n is the index (0 =< n < DIVISIONS_PER_LINE), on the x-axis or y-axis depending on if the
         line is vertical or horizontal. The lines end-point will thus be offset by an 
@@ -481,7 +478,7 @@ def measure_lidar(motor_uart:UART, sensor_uart:UART):
         :param sensor_uart (UART): The sensor unit UART interface.
 
     Returns:
-        :return: (list of length-2-tuple of float: Tuples containing (angle, distance to wall), where angle is degrees.
+        :return: (list of length-2-tuple of float): Tuples containing (angle, distance to wall), where angle is degrees.
     """
     driveInstruction = Servo(0)
 
