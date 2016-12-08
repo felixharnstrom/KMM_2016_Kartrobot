@@ -2,6 +2,17 @@ from command import *
 import socket
 import json
 
+def send_data(socket: socket, msg : str)
+    """
+    Simple wrapper for socket.sendall with a delimiter.
+    
+    Args:
+        :param socket (socket): Socket to send on.
+        :param msg (str): The message to send.
+    
+    """
+    socket.sendall((msg+"\n").encode())
+
 def construct_msg(command : Command):
     """
     Construct a JSON message with the given command to transmit over WIFI.
@@ -14,6 +25,21 @@ def construct_msg(command : Command):
     """
     return json.dumps([command.address, command.command_type, command.arguments])
 
+def receive_data(socket : socket):
+    """
+    Receives the next data delimited by '\n' from the given socket.
+    
+    Args:
+        :param socket (socket): Socket to read data from.
+    """
+    data_list = []
+    while True:
+        c = socket.recv(1)
+        if c == "\n" or c == "":
+            break
+        data_list.append(c)
+    return ''.join(data_list)
+    
 def construct_command(msg : list):
     """
     Construct a command from the given message.
@@ -38,7 +64,7 @@ def transmit_command(command : Command, socket : socket):
         :param socket   (socket):   Socket to use when transmitting.
     """
     json_msg = construct_msg(command)
-    socket.sendall(json_msg.encode())
+    send_data(socket, json_msg)
 
 def receive_command(socket : socket):
     """
@@ -47,6 +73,7 @@ def receive_command(socket : socket):
     Args:
         :param socket (socket): Socket to receive command from.
     """
-    data = socket.recv(4096).decode("utf-8")
+    data = receive_data(socket)
     json_msg = json.loads(data)
     return construct_command(json_msg)
+    

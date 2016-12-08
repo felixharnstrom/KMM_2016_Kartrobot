@@ -25,6 +25,8 @@ class CommandEnums(Enum):
     READ_IR_BACK = 21
     READ_LIDAR = 22
     READ_GYRO = 23
+    READ_REFLEX_LEFT = 25
+    READ_REFLEX_RIGHT = 26
 
 class Command():
     """
@@ -209,6 +211,27 @@ class Command():
             :return (Command): Read gyro command.
         """
         return Command(CommandEnums.READ_GYRO)
+
+    @staticmethod
+    def read_reflex_left():
+        """
+        Query current gyrovalue.
+
+        Returns:
+            :return (Command): Read gyro command.
+        """
+        return Command(CommandEnums.READ_REFLEX_LEFT)
+
+    @staticmethod
+    def read_reflex_right():
+        """
+        Query current gyrovalue.
+
+        Returns:
+            :return (Command): Read gyro command.
+        """
+        return Command(CommandEnums.READ_REFLEX_RIGHT)
+
 
     def get_enum(self):
         """
