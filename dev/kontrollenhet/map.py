@@ -188,21 +188,21 @@ def open_missed_corners(grid_map:GridMap):
                 return
                 
 
-# TODO: Coordinates are only used for min/max index
 # TODO: Non-DRY
-def get_grid_map(coordinates, lines, robot_pos:Position, grid_map:GridMap):
+def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     """
     Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
 
     Args:
-        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
         :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
         :param robot_pos (Position): The position of the robot as the measurements was taken.
         :param grid_map (GridMap): The GridMap to modify.
     """
     # Gets size coordinate area in squares of CELL_SIZE
-    top_left = top_left_grid_index(coordinates)
-    bottom_right = bottom_right_grid_index(coordinates)
+    line_positions = [line.start for line in lines] + [line.end for line in lines]
+    line_coordinates = [(pos.x, pos.y) for pos in line_positions]
+    top_left = top_left_grid_index(line_coordinates)
+    bottom_right = bottom_right_grid_index(line_coordinates)
 
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):

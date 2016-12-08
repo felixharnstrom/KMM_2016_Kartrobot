@@ -32,7 +32,7 @@ lines = [Line(Position(0, -400), Position(400, -400)), Line(Position(400, -400),
 for line in lines:
     print("line(", line.start.x, line.start.y, line.end.x, line.end.y, ")")
 
-get_grid_map(coordinates, lines, robot_pos, grid_map)
+get_grid_map(lines, robot_pos, grid_map)
 
 grid_map.debug_print()
 
