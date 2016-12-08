@@ -26,6 +26,12 @@ class Size:
         return not self == other
 
     def add(self, other):
+        """
+        Add a size to this one.
+
+        Args:
+            :param other (Size): The size to add to this one.
+        """
         self.w += other.w
         self.h += other.h
 
@@ -56,6 +62,15 @@ class Position:
         return not self == other
 
     def difference(self, other):
+        """
+        Return the difference in x-position and y-position.
+
+        Args:
+            :param other (Position): The position to compare to.
+
+        Returns:
+            :return (Size): The difference in x- and y-position.
+        """
         return Size(self.x - other.x, self.y - other.y)
 
 class Line:
