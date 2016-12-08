@@ -17,17 +17,17 @@ def send_command(command, socket, guit):
     """
     print("sending: ", command)
     if len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
-        socket.sendall("KEY_EVENT".encode())
-        ack = socket.recv(4096)
-        socket.sendall(command[4:].encode())
+        send_data(socket, "KEY_EVENT")
+        ack = receive_data(socket)
+        send_data(socket, command[4:])
     elif len(command) > 4 and command [:5] == "mode_":
-        socket.sendall("TOGGLE_MODE".encode())
-        ack = socket.recv(4096)
-        socket.sendall(command[5:].encode())
+        send_data(socket, "TOGGLE_MODE")
+        ack = receive_data(socket)
+        send_data(socket, command[5:])
     elif command == "get_motor_data":
-        socket.sendall("FORWARD_MOTOR_INFO".encode())
-        ack = receive_msg(socket)
-        motor_data = json.loads(receive_msg(socket))
+        send_data(socket, "FORWARD_MOTOR_INFO")
+        ack = receive_data(socket)
+        motor_data = json.loads(receive_data(socket))
         dir_mod_left = 1 if motor_data["LEFT_SIDE_DIRECTION"] else -1
         dir_mod_right = 1 if motor_data["RIGHT_SIDE_DIRECTION"] else -1
         speed_left = motor_data["LEFT_SIDE_SPEED"]*dir_mod_left
@@ -35,9 +35,9 @@ def send_command(command, socket, guit):
         guit.receive_command(["set_motors", speed_left, speed_right])
         guit.receive_command(["set_servo", motor_data["SERVO_ANGLE"]])
     elif command == "get_sensor_data":
-        socket.sendall("FORWARD_SENSOR_INFO".encode())
-        ack = receive_msg(socket)
-        sensor_data = json.loads(receive_msg(socket))
+        send_data(socket, "FORWARD_SENSOR_INFO")
+        ack = receive_data(socket)
+        sensor_data = json.loads(receive_data(socket))
         guit.receive_command(["set_sensors", sensor_data])
 
 def main():
