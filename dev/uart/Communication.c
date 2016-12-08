@@ -160,6 +160,12 @@ int msgTypeEncode(t_msgType* msgType){
 		case SENSOR_DATA :
 			return 8;
 			break;
+        case SENSOR_READ_REFLEX_LEFT:
+            return 9;
+            break;
+        case SENSOR_READ_REFLEX_RIGHT:
+            return 10;
+            break;
 		/* general */
         case DONE :
             return 15;
@@ -227,6 +233,12 @@ t_msgType msgTypeDecode(int msgType, t_unitType unitType){
 			case 8:
 				return SENSOR_DATA;
 				break;
+            case 9:
+                return SENSOR_READ_REFLEX_LEFT;
+                break;
+            case 10:
+                return SENSOR_READ_REFLEX_RIGHT;
+                break;
 			case 15 :
 				return DONE;
 				break;

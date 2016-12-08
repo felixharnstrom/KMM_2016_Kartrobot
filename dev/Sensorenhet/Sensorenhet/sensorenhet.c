@@ -14,6 +14,21 @@
  */
 volatile uint16_t lidarCounter;
 
+/*
+ * Global variable that counts every time the wheels have
+ * turned 1/4 of a circle.
+ */
+volatile uint16_t reflexCounterLeft;
+volatile uint16_t reflexCounterRight;
+
+/*
+ * Global toggle variables that keeps
+ * track on the current state for the reflexes.
+ * Is 1 if reflex > 3.0, 0 if reflex < 1.0
+ */
+volatile uint8_t reflexHighLeft;
+volatile uint8_t reflexHighRight;
+
 void startADConversion(uint8_t channel) {
     //The channel value can never be greater than 7
     channel &= 0x07;
@@ -88,15 +103,69 @@ ISR (INT2_vect)
     }
 }
 
+/*
+ *  Interrupt issued by watchdog to read reflex sensors on
+ *  both sides.
+ */
+ISR (WDT_vect)
+{
+    double reflexLeft = getReflexVoltage(REFLEX_LEFT);
+    //reflexCounterLeft = (uint16_t)(getReflexVoltage(REFLEX_LEFT));
+    double reflexRight = getReflexVoltage(REFLEX_RIGHT);
+    
+    if (reflexLeft > 2.0 && reflexHighLeft == 0)
+    {
+        reflexCounterLeft++;
+        reflexHighLeft = 1;
+    } 
+    else if (reflexLeft < 1.5 && reflexHighLeft == 1)
+    {
+        reflexCounterLeft++;
+        reflexHighLeft = 0;
+    }
+    else if (reflexRight > 2.0 && reflexHighRight == 0)
+    {
+        reflexCounterRight++;
+        reflexHighRight = 1;
+    }
+    else if (reflexRight < 1.5 && reflexHighRight == 1)
+    {
+        reflexCounterRight++;
+        reflexHighRight = 0;
+    }
+}
+
+/*
+ *  Initiate watchdog interrupt for reflex sensors
+ */
+void initReflex()
+{
+    //Set the reflex counters to zero
+    reflexCounterLeft = 0;
+    reflexCounterRight = 0;
+    
+    //Initiate start values for reflex togglers
+    reflexHighLeft = 0;
+    reflexHighRight = 0;
+    cli();
+    wdt_reset();
+    
+    //Enable watchdog interrupts and reset everytime
+    //the counter overflows.
+    WDTCSR |= (1<<WDCE) |(0<<WDE) | (1<<WDIE);
+    
+    //Set the oscillator prescaler so that the interrupt
+    //is issued every 32 ms.
+    WDTCSR |= (1<<WDP0) | (0<<WDP1) | (0<<WDP2);
+    sei();
+}
+
 void initLidar()
 {
     //Set up Timer1
     TCNT1 = 0;  //set timer to zero, may not be necessary. This register will count up over time.
     TCCR1A = 0;    //normal counting up - output compare pins not used, initially zero so not necessary
     TCCR1B |= ((1 << CS10) | (0 << CS11) | (0 << CS12)); // start the timer with no prescaler
-    
-    //Enable interrupts
-    sei();
     
     //PortB2: LIDAR input
     //PortB3: LIDAR trigger
@@ -113,10 +182,25 @@ void initLidar()
     EIFR |= (1<<INTF2);
 }
 
+//Read the given reflex sensor voltage
+double getReflexVoltage(sensor_t s)
+{
+    if (s == REFLEX_LEFT)
+    {
+        startADConversion(6);
+    }
+    else if (s == REFLEX_RIGHT)
+    {
+        startADConversion(7);
+    }
+    waitForADConversion();
+    return getAdcVoltage();
+}
+
 double readSensor(sensor_t s)
 {
     switch(s) {
-        case LIDAR: return getLidarDistance();
+        case LIDAR: return getLidarDistance(); break;
         case IR_LEFT_BACK: startADConversion(0); break;
         case IR_RIGHT_BACK: startADConversion(1); break;
         case IR_LEFT_FRONT: startADConversion(2); break;
@@ -142,8 +226,6 @@ void sendInt(int n) {
     uart_transmit(vstr[i]);
     uart_transmit('\n');
 }
-
-
 
 uint8_t lowestByte(unsigned int n) {
     return (n & 0xFF);
@@ -179,6 +261,10 @@ sensor_t msgTypeToSensor(t_msgType mst) {
             return IR_RIGHT_FRONT;
         case SENSOR_READ_IR_RIGHT_BACK:
             return IR_RIGHT_BACK;
+        case SENSOR_READ_REFLEX_LEFT:
+            return REFLEX_LEFT;
+        case SENSOR_READ_REFLEX_RIGHT:
+            return REFLEX_RIGHT;
         case SENSOR_READ_IR_BACK:
             return IR_BACK;
         case SENSOR_READ_LIDAR:
@@ -248,9 +334,11 @@ void Init_MPU6050()
 int main(void)
 {
     comm_init();
+    //Initiate interrupts
     sei();
     initLidar();
-    initAdc();    
+    initAdc();
+    initReflex();
     
 	gyroZValue = 0;        // initial gyro value (z-axis)
 
@@ -298,7 +386,12 @@ int main(void)
 				gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
                 sendReply(gyroZValue/1.3);
                 break;
-                
+            case SENSOR_READ_REFLEX_LEFT:;
+                sendReply(reflexCounterLeft);
+                break;
+            case SENSOR_READ_REFLEX_RIGHT:;
+                sendReply(reflexCounterRight);
+                break;
             default: 
                 sendError();
                 break;

@@ -20,6 +20,7 @@
 #include <avr/interrupt.h>
 #include "../../uart/Communication.h"
 #include "i2c/i2cmaster.h"
+#include <avr/wdt.h>
 
 
 #ifndef PACKET_SIZE
@@ -40,7 +41,7 @@
   /**
    @brief   A enum type with all the distance sensor types taht can be read and they are in the format sensor_t
 */
-typedef enum {IR_LEFT_BACK, IR_LEFT_FRONT, IR_RIGHT_BACK, IR_RIGHT_FRONT, IR_BACK, LIDAR} sensor_t;
+typedef enum {IR_LEFT_BACK, IR_LEFT_FRONT, IR_RIGHT_BACK, IR_RIGHT_FRONT, IR_BACK, LIDAR, REFLEX_LEFT, REFLEX_RIGHT} sensor_t;
 
  /**
    @brief   Starts AD conversion on a specific chanel
@@ -181,6 +182,20 @@ uint16_t MPU6050_readreg(uint8_t reg);
  */
 void Init_MPU6050();
 
+/*
+ * Initiates the reflex sensors on both left and
+ * right side.
+ */
+void initReflex();
 
+/*
+ * Returns the voltage for a given reflex sensor
+ * 
+ * _parameters_
+ * (sensor_t) s: The sensor type, can only be REFLEX_LEFT or REFLEX_RIGHT
+ * _returns_
+ * (double): The voltage from chosen reflex
+ */
+double getReflexVoltage(sensor_t s);
 
 #endif /* SENSORENHET_H_ */
