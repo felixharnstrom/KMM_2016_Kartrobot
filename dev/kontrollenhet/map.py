@@ -171,7 +171,7 @@ def open_missed_corners(grid_map:GridMap):
     # TODO: Worst case is O(W*W*H*H)
     # Pretty dang slow.
 
-    if grid_map.width < 3 or grid_map.height < 3:
+    if grid_map.width() < 3 or grid_map.height() < 3:
         # No tiles are surrounded
         return
 
