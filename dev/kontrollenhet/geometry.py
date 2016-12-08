@@ -1,6 +1,16 @@
 
 class Size:
-    """Size vector."""
+    """
+    Size vector.
+
+    Attributes:
+        :attribute w (int): Width.
+        :attribute h (int): Height.
+
+    Args:
+        :param w (int): Width.
+        :param h (int): Height.
+    """
 
     def __init__(self, w:int, h:int):
         self.w = int(w)
@@ -20,7 +30,17 @@ class Size:
         self.h += other.h
 
 class Position:
-    """Position vector."""
+    """
+    Size vector.
+
+    Attributes:
+        :attribute x (int): X position.
+        :attribute y (int): Y position
+
+    Args:
+        :param x (int): X position.
+        :param y (int): Y position
+    """
 
     def __init__(self, x:int, y:int):
         self.x = int(x)
@@ -39,7 +59,19 @@ class Position:
         return Size(self.x - other.x, self.y - other.y)
 
 class Line:
-    """2D line."""
+    """
+    2D line.
+    Wether a point is its start or end point indicates nothing; they are interchangeable.
+
+    Attributes:
+        :attribute start (Position): Starting point of Line.
+        :attribute end (Position): End point of Line.
+
+    Args:
+        :param start (Position): Starting point of Line.
+        :param end (Position): End point of Line.
+    """
+
     def __init__(self, start:Position, end:Position):
         self.start = start
         self.end = end
