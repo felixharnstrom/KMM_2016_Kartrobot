@@ -21,10 +21,10 @@ MIN_MESURE = 1
 """The number of line segments that needs to be voted in for their line to be voted in."""
 SEGMENTS_REQUIRED = 3
 
-"""The thickness of a line segment."""
+"""The thickness of a line segment in millimeters."""
 ACCURACY = 130
 
-"""The length of a line segment."""
+"""The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 
 def bresenham(line):
@@ -95,10 +95,10 @@ def coordinates_to_lines(coordinates):
     Approximate coordinates to line segments.
 
     Args:
-        :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y), in millimeters.
 
     Returns:
-        :return (list of Line's): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
+        :return (list of Line's): Lines with end-points in millimeters describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
     """
     # Gets size coordinate area in squares of CELL_SIZE
     top_left = top_left_grid_index(coordinates)
@@ -188,7 +188,7 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
 
     Args:
         :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
-        :param robot_pos (Position): The position of the robot as the measurements was taken.
+        :param robot_pos (Position): The position of the robot as the measurements was taken, in millimeters.
         :param grid_map (GridMap): The GridMap to modify.
     """
     # Gets size coordinate area in squares of CELL_SIZE
@@ -274,10 +274,10 @@ def top_left_grid_index(coordinates):
     Return the top_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
-        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y), in millemeters.
 
     Returns:
-        :return (Position): The top left position of said AABB.
+        :return (Position): The top left position of said AABB, scaled by 1/CELL_SIZE (i.e an offset of 1 is an offset of CELL_SIZE millimeters).
     """
     top_left = Position(0, 0)
     for x, y in coordinates:
@@ -290,10 +290,10 @@ def bottom_right_grid_index(coordinates):
     Return the bottom_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
-        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y), in millimeters.
 
     Returns:
-        :return (Position): The bottom left position of said AABB, scaled by 1/CELL_SIZE.
+        :return (Position): The bottom right position of said AABB, scaled by 1/CELL_SIZE (i.e an offset of 1 is an offset of CELL_SIZE millimeters).
     """
     bottom_right = Position(0, 0)
     for x, y in coordinates:
@@ -313,7 +313,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     ones (False).
 
     Args:
-        :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+        :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates in millimeters.
         :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
 
     Returns:
@@ -393,7 +393,7 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
     Updates a grid cell to CellType.WALL if it falls on the given wall line, or leaves it unchanged otherwise.
 
     Args:
-        :param robot_pos (Position): The position of the robot as the line was scanned.
+        :param robot_pos (Position): The position of the robot as the line was scanned in millimeters.
         :param grid_pos (Position): The grid cell to check.
         :param grid_map (GridMap): The GridMap to modify.
 
@@ -434,7 +434,7 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     
     Args:
         :param measurements (list of length-2-tuple of float: Tuples containing (angle, distance to wall), where angle is degrees.
-        :param robot_pos (Position): The robot position; origin point of the measurements.
+        :param robot_pos (Position): The robot position in millimeters; origin point of the measurements.
         :angle (float): The angle of the robot, in degrees.
     
     Returns:
