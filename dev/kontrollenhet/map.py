@@ -107,8 +107,6 @@ def coordinates_to_lines(coordinates):
     horizontal_votes = get_votes_for_horizontal_line_segments(coordinates, top_left, bottom_right)
     vertical_votes = get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right)
 
-    #grid_map.expand_to_fit(bottom_right.x-top_left.x, bottom_right.y-top_left.y)
-
     # Our return value
     lines = []
 
@@ -147,14 +145,12 @@ def coordinates_to_lines(coordinates):
                 line = Line(start, end)
                 if line not in lines:
                     lines.append(line)
-
             if vertical_line_segs >= SEGMENTS_REQUIRED:
                 start = Position(x, y)
                 end = Position(x, y_next)
                 line = Line(start, end)
                 if line not in lines:
                     lines.append(line)
-
     return lines
 
 def open_missed_corners(grid_map:GridMap):
