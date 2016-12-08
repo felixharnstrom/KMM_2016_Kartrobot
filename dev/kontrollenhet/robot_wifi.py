@@ -1,6 +1,7 @@
 import server
 from command import *
 from communication import *
+from grid_map import *
 import threading
 import queue
 import mode
@@ -43,6 +44,10 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
             if(mode.get_mode() == mode.ControlModeEnums.MANUAL): #If we are not in manual mode, discard the key_event.
                 #TODO: Notify client of this action? Also, stop the the robot from moving.
                 input_queue.put(("KEY_EVENT",key_event))
+        elif (data == "SEND_MAP"):
+            map_lock.acquire()
+            s.client.sendall(grid_map.gui_drawable().encode() + "\n".encode())
+            map_lock.release()
         elif (data == "TOGGLE_MODE"):
             #Change the mode
             new_mode = s.client.recv(4096).decode("utf-8")
