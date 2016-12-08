@@ -24,33 +24,33 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
 
     while 1:
         # The messages are made with json which appends extra "" - cut them off
-        data = s.client.recv(4096).decode("utf-8")
+        data = receive_data(s.client)
         print ("Data received from PC: ", data)
         # Acknowledge client
-        s.client.sendall("ACK\n".encode())
+        send_data(s.client, "ACK")
         if (data == "TRANSMIT"):
             #Receive Command
             command = receive_command(s.client)
             input_queue.put(("COMMAND", command))
         elif (data == "FORWARD_MOTOR_INFO"):
             #Transmit motor data
-            s.client.sendall(json.dumps(motor_data).encode()+"\n".encode())
+            send_data(s.client, json.dumps(motor_data))
         elif (data == "FORWARD_SENSOR_INFO"):
             #Transmit sensor data
-            s.client.sendall(json.dumps(sensor_data).encode()+"\n".encode())
+            send_data(s.client, json.dumps(sensor_data))
         elif (data == "KEY_EVENT"):
             #Receive keyevent
-            key_event = s.client.recv(4096).decode("utf-8")
+            key_event = receive_data(s.client)
             if(mode.get_mode() == mode.ControlModeEnums.MANUAL): #If we are not in manual mode, discard the key_event.
                 #TODO: Notify client of this action? Also, stop the the robot from moving.
                 input_queue.put(("KEY_EVENT",key_event))
         elif (data == "SEND_MAP"):
             map_lock.acquire()
-            s.client.sendall(grid_map.gui_drawable().encode() + "\n".encode())
+            send_data(s.client, grid_map.gui_drawable())
             map_lock.release()
         elif (data == "TOGGLE_MODE"):
             #Change the mode
-            new_mode = s.client.recv(4096).decode("utf-8")
+            new_mode = receive_data(s.client)
             if (new_mode == "manual"):
                 print("Manual mode set")
                 mode.set_mode(mode.ControlModeEnums.MANUAL)
