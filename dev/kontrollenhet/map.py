@@ -507,6 +507,23 @@ def measure_lidar(motor_uart:UART, sensor_uart:UART):
     return measurements
 
 
+def scan_and_update_grid(robot_pos:Position, robot_angle:float,
+                         uart_motor:UART, uart_sensor:UART,
+                         grid_map:GridMap):
+    """
+    Scan the room and update grid_map with walls an open spaces found.
+
+    Args:
+        :param robot_pos (Position): The position of the robot, in millimeters.
+        :param robot_angle (float): The facing angle of the robot, in degrees.
+        :uart_motor (UART): The UART interface for the motors.
+        :uart_sensor (UART): The UART interface for the sensors.
+        :grid_map (GridMap): The GridMap to insert the results into.
+    """
+    measurements = measure_lidar(uart_motor, uart_sensor)
+    lines = coordinates_to_lines(convert_to_coordinates(measurements, robot_pos, robot_angle))
+    update_grid_map(lines, robot_pos, grid_map)    
+
 
 def debug_plot(coordinates, lines):
     """
