@@ -14,16 +14,23 @@ CELL_SIZE = 400
 DIVISIONS_PER_LINE = 4
 
 """The number of votes per line section required for something to be considered a full line."""
-MIN_MESURE = 1
+MIN_MESURE = 3
 
 """The number of line segments that needs to be voted in for their line to be voted in."""
 SEGMENTS_REQUIRED = 3
 
 """The thickness of a line segment in millimeters."""
-ACCURACY = 130
+ACCURACY = 150
 
 """The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
+
+"""The sleep time when moving the servo to 0."""
+LIDAR_INITIAL_SLEEP = 1.5
+
+"""The sleep time when moving the servo 1 degree."""
+LIDAR_SLEEP = 0.015
+
 
 def bresenham(line):
     """
@@ -479,7 +486,7 @@ def measure_lidar():
 
     handle_command(Command.servo(0))
 
-    time.sleep(1.5)
+    time.sleep(LIDAR_INITIAL_SLEEP)
     degree = 0
 
     measurements = []
@@ -488,7 +495,7 @@ def measure_lidar():
         dist = handle_command(Command.read_lidar())
         measurements.append([degree, dist])
         handle_command(Command.servo(int(degree)))
-        time.sleep(0.005)
+        time.sleep(LIDAR_SLEEP)
     return measurements
 
 
@@ -500,20 +507,22 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
         :param robot_pos (Position): The position of the robot, in millimeters.
         :param robot_angle (float): The facing angle of the robot, in degrees..
         :grid_map (GridMap): The GridMap to insert the results into.
+        :passes (int): The number of times we rotate the LIDAR to measure.
     """
     measurements = measure_lidar()
     coordinates = convert_to_coordinates(measurements, robot_pos, robot_angle)
-    #print(measurements)
     lines = coordinates_to_lines(coordinates)
-    #debug_plot(coordinates, lines)
-    #for line in lines:
-    #    print(line)
-    update_grid_map(lines, robot_pos, grid_map)    
+#    for line in lines:
+#        print(line)
+    update_grid_map(lines, robot_pos, grid_map)
+#    grid_map.debug_print()
+    debug_plot(coordinates, lines)
 
+    
 
 def debug_plot(coordinates, lines):
     """
-    A test plotting, that shows all mesuring points and walls on the same plot. This is for debugging purpesus only.
+    A test plotting, that shows all meuring points and walls on the same plot. This is for debugging purpesus only.
     This returns a plot with a dot for all mesured data and also draws out all lines/Walls
     """
     plot_lines(lines)
