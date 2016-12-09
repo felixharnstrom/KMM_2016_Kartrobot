@@ -182,7 +182,7 @@ def open_missed_corners(grid_map:GridMap):
                 
 
 # TODO: Non-DRY
-def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
+def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     """
     Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
 
