@@ -13,7 +13,6 @@ def send_data(socket: socket, msg : str):
         :param msg (str): The message to send.
     
     """
-    print("sending data: ",msg)
     socket.sendall((msg+"\n").encode())
 
 def construct_msg(command : Command):
@@ -29,6 +28,13 @@ def construct_msg(command : Command):
     return json.dumps([command.address, command.command_type, command.arguments])
 
 def _retrieve_message_from_buffer():
+    """
+    Retrieves a message from the _input_buffer if there is one waiting,
+    otherwise return empty.
+
+    Returns:
+        :return (str): The received message without delimiter, if there was a message.
+    """
     global _input_buffer
     delimiter_index = 0
     #Do we already have a message in the buffer?
@@ -43,7 +49,8 @@ def _retrieve_message_from_buffer():
     
 def receive_data(socket : socket):
     """
-    Receives the next data delimited by '\n' from the given socket.
+    Receives the next data from the buffer,
+    if there is no message - retrieve it from the socket.
     
     Args:
         :param socket (socket): Socket to read data from.
