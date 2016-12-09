@@ -2,7 +2,7 @@ from command import *
 import socket
 import json
 
-def send_data(socket: socket, msg : str)
+def send_data(socket: socket, msg : str):
     """
     Simple wrapper for socket.sendall with a delimiter.
     
@@ -11,6 +11,7 @@ def send_data(socket: socket, msg : str)
         :param msg (str): The message to send.
     
     """
+    print("sending data: ", msg)
     socket.sendall((msg+"\n").encode())
 
 def construct_msg(command : Command):
@@ -32,12 +33,14 @@ def receive_data(socket : socket):
     Args:
         :param socket (socket): Socket to read data from.
     """
+    print("Trying to receive data")
     data_list = []
     while True:
-        c = socket.recv(1)
-        if c == "\n" or c == "":
+        c = socket.recv(1).decode()
+        if c == '\n':
             break
         data_list.append(c)
+    print("received data: ", ''.join(data_list))
     return ''.join(data_list)
     
 def construct_command(msg : list):

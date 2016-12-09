@@ -24,7 +24,7 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
 grid_map = GridMap()
 
 """The lock for map."""
-map_lock = threading.lock()
+map_lock = threading.Lock()
 
 def init_UARTs(sensor = "", motor = ""):
     """
@@ -57,7 +57,7 @@ def init_wifi_thread():
     """
     Initiates and executes a new thread which receives and transmits commands over wifi.
     """
-    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data,input_queue)).start()
+    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data, map_lock, grid_map, input_queue)).start()
 
 def adjust_speeds():
     """
