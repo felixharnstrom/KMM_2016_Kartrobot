@@ -442,8 +442,8 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
     coordinates = []
     for degree, dist in measurements:
-        x = (math.sin(math.radians(degree + angle)) * dist) + robot_pos.x
-        y = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.y
+        x = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.x
+        y = (-math.sin(math.radians(degree + angle)) * dist) + robot_pos.y
         coordinates.append((x, y))
     return coordinates
 
@@ -499,9 +499,6 @@ def measure_lidar(motor_uart:UART, sensor_uart:UART):
         highest = sensor_uart.receive_packet()
         lowest = sensor_uart.receive_packet()
         dist = ord(lowest) + ord(highest) * (2 ** 8)
-
-        x = math.sin(math.radians(degree)) * dist
-        y = math.cos(math.radians(degree)) * dist
 
         measurements.append([degree, dist])
 
