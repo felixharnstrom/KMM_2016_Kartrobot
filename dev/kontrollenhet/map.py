@@ -516,7 +516,7 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
 #        print(line)
     update_grid_map(lines, robot_pos, grid_map)
 #    grid_map.debug_print()
-    debug_plot(coordinates, lines)
+#    debug_plot(coordinates, lines)
 
     
 
