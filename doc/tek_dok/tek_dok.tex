@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[swedish]{babel}
 \usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage[table]{xcolor}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{pdfpages}
@@ -220,12 +221,14 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 
 \begin{table}[h]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|l|}
+        \rowcolor{gray!50}
         \hline
-        Bitar        & Namn    & Betydelse                                        \\ \hline
-        \textbf{0}   & Adress  & 0 motsvarar styrenhet, 1 motsvarar sensorenhet.  \\
-        \textbf{1-3} & Storlek & Antal paket med argument som följer metapaketet. \\
-        \textbf{4-7} & Typ     & Vilken typ av kommando/svar som skickas          \\ \hline
+        \textbf{Bitar} & \textbf{Namn} & \textbf{Betydelse} \\ \hline
+        \texttt{0} & Adress & 0 motsvarar styrenhet, 1 motsvarar sensorenhet. \\
+        \texttt{1-3} & Storlek & Antal paket med argument som följer metapaketet. \\
+        \texttt{4-7} & Typ & Vilken typ av kommando/svar som skickas. \\ \hline
     \end{tabular}
     \caption{Metapaketets utformning.}
     \label{tab:meta_packet}
@@ -240,12 +243,14 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \texttt{Drive}-instruktionen kör roboten framåt eller bakåt enligt argumenten som beskrivs i tabell \ref{tab:drive}. Kommandot har typnummer \texttt{1}.
 \begin{table}[h!]
     \centering
-    \begin{tabular}{|l|l|l|}
+    \rowcolors{2}{gray!25}{white}
+    \begin{tabular}{|l|l|L{300pt}|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument           & Storlek (bytes) & Betydelse                                                                                  \\ \hline
-    	\textbf{Direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                                               \\
-    	\textbf{Speed}     & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående.                     \\
-    	\textbf{Time}      & 2               & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+    	\texttt{Direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
+    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
+    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
     \end{tabular}
     \caption{\texttt{Drive}-instruktionens argument.}
     \label{tab:drive}
@@ -255,12 +260,14 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \texttt{Turn}-instruktionen svänger roboten enligt argumenten som beskrivs i tabell \ref{tab:turn}. Kommandot har typnummer \texttt{2}.
 \begin{table}[h!]
     \centering
-    \begin{tabular}{|l|l|l|}
+    \rowcolors{2}{gray!25}{white}
+    \begin{tabular}{|l|l|L{300pt}|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument           & Storlek (bytes) & Betydelse                                                                                  \\ \hline
-    	\textbf{Direction} & 1               & 0 motsvarar vänster, 1 höger.                                                              \\
-    	\textbf{Speed}     & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående.                     \\
-    	\textbf{Time}      & 2               & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+    	\texttt{Direction} & 1  & 0 motsvarar vänster, 1 höger. \\
+    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
+    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
     \end{tabular}
     \caption{\texttt{Turn}-instruktionens argument.}
     \label{tab:turn}
@@ -270,13 +277,15 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \texttt{Side-speed}-instruktionen sätter vänster och höger motorpar enligt argumenten som beskrivs i tabell \ref{tab:side_speeds}. Kommandot har typnummer \texttt{3}.
 \begin{table}[h!]
     \centering
-    \begin{tabular}{|l|l|l|}
+    \rowcolors{2}{gray!25}{white}
+    \begin{tabular}{|l|l|L{250pt}|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument                 & Storlek (bytes) & Betydelse                                                              \\ \hline
-    	\textbf{Left direction}  & 1               & 0 motsvarar framåt, 1 bakåt.                                           \\
-    	\textbf{Left speed}      & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
-    	\textbf{Right direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                           \\
-    	\textbf{Right speed}      & 1               & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\ \hline
+    	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+    	\texttt{Left direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
+    	\texttt{Left speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
+    	\texttt{Right direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
+    	\texttt{Right speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\ \hline
     \end{tabular}
     \caption{\texttt{Side-speeds}-instruktionens argument.}
     \label{tab:side_speeds}
@@ -287,10 +296,12 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \texttt{Servo}-instruktionen sätter servot till en specificerad vinkel enligt argumentet som beskrivs i tabell \ref{tab:servo}. Kommandot har typnummer \texttt{4}.
 \begin{table}[h!]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|l|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument           & Storlek (bytes) & Betydelse                        \\ \hline
-    	\textbf{Direction} & 1               & Servots vinkel, mellan 0 och 180 \\ \hline
+      \textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+      \texttt{Direction} & 1 & Servots vinkel, mellan 0 och 180 \\ \hline
     \end{tabular}
     \caption{\texttt{Servo}-instruktionens argument.}
     \label{tab:servo}
@@ -305,14 +316,16 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 
 \begin{table}[h!]
     \centering
-    \begin{tabular}{|l|l|l|}
+    \rowcolors{2}{gray!25}{white}
+    \begin{tabular}{|l|l|L{250pt}|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument                 & Storlek (bytes) & Betydelse                                                                       \\ \hline
-    	\textbf{Left direction}  & 1               & 0 motsvarar framåt, 1 bakåt.                                                    \\
-    	\textbf{Left PWM}        & 1               & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående.          \\
-    	\textbf{Right direction} & 1               & 0 motsvarar framåt, 1 bakåt.                                                    \\
-    	\textbf{Right PWM}       & 1               & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående.          \\
-    	\textbf{Servo PWM}       & 2               & Integer mellan 0 och 65535, där 773 är längst till vänster och 2343 till höger. \\ \hline
+    	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+    	\texttt{Left direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
+    	\texttt{Left PWM}  & 1 & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående. \\
+    	\texttt{Right direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
+    	\texttt{Right PWM} & 1 & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående. \\
+    	\texttt{Servo PWM} & 2 & Integer mellan 0 och 65535, där 773 är längst till vänster och 2343 till höger. \\ \hline
     \end{tabular}
     \caption{Returvärden från \texttt{Controller-Information}-instruktionen.}
     \label{tab:controller_information}
@@ -325,14 +338,16 @@ IR-sensorer läses av med typnummer enligt tabell \ref{table:irtypes} och return
 
 \begin{table}[h!]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|}
+    \rowcolor{gray!50}
     	\hline
-    	Typnummer  & Sensor       \\ \hline
-    	\textbf{1} & Vänster fram \\
-    	\textbf{2} & Vänster bak  \\
-    	\textbf{3} & Höger fram   \\
-    	\textbf{4} & Höger bak    \\
-    	\textbf{5} & Bak          \\ \hline
+    \textbf{Typnummer} & \textbf{Sensor} \\ \hline
+    \texttt{1} & Vänster fram \\
+    \texttt{2} & Vänster bak \\
+    \texttt{3} & Höger fram \\
+    \texttt{4} & Höger bak  \\
+    \texttt{5} & Bak \\ \hline
     \end{tabular}
     \caption{Typvärden för IR-avläsning.}
     \label{table:irtypes}
@@ -341,10 +356,12 @@ IR-sensorer läses av med typnummer enligt tabell \ref{table:irtypes} och return
 
 \begin{table}[h!]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|l|}
+    \rowcolor{gray!50}
     	\hline
-    	Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
-    	\textbf{Avstånd} & 1               & Integer mellan 0 och 300. Avstånd i millimeter \\ \hline
+    	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+    	\texttt{Avstånd} & 1 & Integer mellan 0 och 300. Avstånd i millimeter \\ \hline
     \end{tabular}
     \caption{Returvärden från IR-avläsning.}
     \label{tab:ir}
@@ -354,10 +371,12 @@ IR-sensorer läses av med typnummer enligt tabell \ref{table:irtypes} och return
 Läser av LIDAR-sensorn och returneras dess värde såsom specificerat i tabell \ref{tab:lidar}. Kommandot har typnummer \texttt{6}.
 \begin{table}[h!]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|l|}
+    \rowcolor{gray!50}
         \hline
-        Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
-        \textbf{Avstånd} & 1               & Integer mellan 0 och 65535. Avstånd i millimeter \\ \hline
+        \textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+        \texttt{Avstånd} & 1 & Integer mellan 0 och 65535. Avstånd i millimeter \\ \hline
         \end{tabular}
     \caption{Returvärden från LIDAR-avläsning.}
     \label{tab:lidar}
@@ -368,10 +387,12 @@ Läser av LIDAR-sensorn och returneras dess värde såsom specificerat i tabell 
 Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras dess värde såsom specificerat i tabell \ref{tab:gyro}. Kommandot har typnummer \texttt{7}.
 \begin{table}[h!]
     \centering
+    \rowcolors{2}{gray!25}{white}
     \begin{tabular}{|l|l|l|}
+    \rowcolor{gray!50}
         \hline
-        Argument         & Storlek (bytes) & Betydelse                                      \\ \hline
-        \textbf{Avstånd} & 1               & Integer mellan -25206 och 25205. Vinkelhastighet i centigrader/s. \\ \hline
+        \textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
+        \texttt{Avstånd} & 1 & Integer mellan -25206 och 25205. Vinkelhastighet i centigrader/s. \\ \hline
     \end{tabular}
     \caption{Returvärden från gyro-avläsning.}
     \label{tab:gyro}
