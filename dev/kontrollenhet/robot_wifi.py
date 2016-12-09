@@ -8,7 +8,7 @@ import mode
 
 #output_queue = queue.Queue() #What should we send to the pc
 
-def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
+def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Queue):
     """
     Continously retrieves messages from and transmits messages to the PC. Messages from the PC are interpreted and handled depending on their meta-message.
     This functions prime purpose is to make the PC able to communicate with the robot, and messages may therefor be used to affect its function.
