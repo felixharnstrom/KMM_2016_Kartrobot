@@ -346,6 +346,7 @@ int main(void)
 	int bias = (int) calculateBias();
     _delay_ms(500);
     
+    uint16_t reflex;
 
     while(1) {
         /* Read client request */
@@ -386,12 +387,17 @@ int main(void)
 				gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
                 sendReply(gyroZValue/1.3);
                 break;
+                
             case SENSOR_READ_REFLEX_LEFT:;
-                sendReply(reflexCounterLeft);
+                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterLeft / 2);
+                sendReply(reflex);
                 break;
+                
             case SENSOR_READ_REFLEX_RIGHT:;
-                sendReply(reflexCounterRight);
+                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterRight / 2);
+                sendReply(reflex);
                 break;
+                
             default: 
                 sendError();
                 break;
