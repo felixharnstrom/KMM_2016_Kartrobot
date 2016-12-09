@@ -1,8 +1,6 @@
 
-from UART import UART
-from modules import *
-from sensorenhet_functions import *
 from geometry import *
+from robot_communication import *
 import json
 import math, time
 import numpy as np
@@ -197,6 +195,9 @@ def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     top_left = top_left_grid_index(line_coordinates)
     bottom_right = bottom_right_grid_index(line_coordinates)
 
+    # Robot pos in grid
+    robot_grid_pos = Position(robot_pos.x//CELL_SIZE, robot_pos.y//CELL_SIZE)
+    
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
         # Stores square position, start in y and end in y as multiplied with CELL_SIZE.
@@ -220,7 +221,7 @@ def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             end_vertical = Position(x, y_next)
             line_horizontal = Line(start, end_horizontal)
             line_vertical = Line(start, end_vertical)
-
+            
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
                 changed_pos_hor = change_grid_type(robot_pos, grid_pos, line_horizontal, grid_map)
@@ -234,7 +235,8 @@ def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             for changed_pos in (changed_pos_hor, changed_pos_ver):
                 # If we have a new wall
                 if changed_pos is not None:
-                    cells_between = bresenham(Line(robot_pos, changed_pos))
+                    cells_between = bresenham(Line(robot_grid_pos, changed_pos))
+                    #print(robot_grid_pos, "->", changed_pos, ":", len(cells_between))
                     for cell in cells_between:
                         # If the cell isn't known, set it to OPEN
                         if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
@@ -465,23 +467,17 @@ def read_debug_data(file_name):
 
 
 
-def measure_lidar(motor_uart:UART, sensor_uart:UART):
+def measure_lidar():
     """
     Turn the laser 180 degrees, taking measurements. Return said measurements.
-
-    Args:
-        :param motor_uart (UART): The motor unit UART interface.
-        :param sensor_uart (UART): The sensor unit UART interface.
 
     Returns:
         :return: (list of length-2-tuple of float): Tuples containing (angle, distance to wall), where angle is degrees.
     """
-    driveInstruction = Servo(0)
-
     degree_plot = []
     distance_plot = []
 
-    motor_uart.send_function(driveInstruction)
+    handle_command(Command.servo(0))
 
     time.sleep(1.5)
     degree = 0
@@ -489,39 +485,27 @@ def measure_lidar(motor_uart:UART, sensor_uart:UART):
     measurements = []
 
     for degree in range(0, 180):
-        sensor_uart.send_function(ReadLidar())
-
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 0:
-            raise RuntimeError("Incorrect acknowledge packet.")
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 8:
-            raise RuntimeError("Not a lidar value.")
-
-        highest = sensor_uart.receive_packet()
-        lowest = sensor_uart.receive_packet()
-        dist = ord(lowest) + ord(highest) * (2 ** 8)
-
+        dist = handle_command(Command.read_lidar())
         measurements.append([degree, dist])
-
-        motor_uart.send_function(Servo(int(degree)))
+        handle_command(Command.servo(int(degree)))
         time.sleep(0.005)
     return measurements
 
 
-def scan_and_update_grid(robot_pos:Position, robot_angle:float,
-                         uart_motor:UART, uart_sensor:UART,
-                         grid_map:GridMap):
+def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap):
     """
     Scan the room and update grid_map with walls an open spaces found.
 
     Args:
         :param robot_pos (Position): The position of the robot, in millimeters.
-        :param robot_angle (float): The facing angle of the robot, in degrees.
-        :uart_motor (UART): The UART interface for the motors.
-        :uart_sensor (UART): The UART interface for the sensors.
+        :param robot_angle (float): The facing angle of the robot, in degrees..
         :grid_map (GridMap): The GridMap to insert the results into.
     """
-    measurements = measure_lidar(uart_motor, uart_sensor)
+    measurements = measure_lidar()
+    print(measurements)
     lines = coordinates_to_lines(convert_to_coordinates(measurements, robot_pos, robot_angle))
+    for line in lines:
+        print(line)
     update_grid_map(lines, robot_pos, grid_map)    
 
 
