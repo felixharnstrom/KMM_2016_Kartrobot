@@ -196,7 +196,7 @@ def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     bottom_right = bottom_right_grid_index(line_coordinates)
 
     # Robot pos in grid
-    robot_grid_pos = Position(robot_pos.x//CELL_SIZE, robot_pos.y//CELL_SIZE)
+    robot_grid_pos = Position(math.floor(robot_pos.x/CELL_SIZE), math.floor(robot_pos.y/CELL_SIZE))
     
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
@@ -414,17 +414,17 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
 
     #Check if there is a line at current grid position.
     if line == next_vertical:
-        if grid_pos.x > robot_pos.x:
+        if grid_pos.x > robot_pos.x / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.x < robot_pos.x:
+        elif grid_pos.x < robot_pos.x / CELL_SIZE:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(prev_grid_pos.x, grid_pos.y)
     elif line == next_horizontal:
-        if grid_pos.y > robot_pos.y:
+        if grid_pos.y > robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.y < robot_pos.y:
+        elif grid_pos.y < robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, prev_grid_pos.y)
     return None
@@ -444,8 +444,8 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
     coordinates = []
     for degree, dist in measurements:
-        x = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.x
-        y = (-math.sin(math.radians(degree + angle)) * dist) + robot_pos.y
+        x = (math.sin(math.radians(degree + angle)) * dist) + robot_pos.x
+        y = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.y
         coordinates.append((x, y))
     return coordinates
 
@@ -502,10 +502,12 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
         :grid_map (GridMap): The GridMap to insert the results into.
     """
     measurements = measure_lidar()
-    print(measurements)
-    lines = coordinates_to_lines(convert_to_coordinates(measurements, robot_pos, robot_angle))
-    for line in lines:
-        print(line)
+    coordinates = convert_to_coordinates(measurements, robot_pos, robot_angle)
+    #print(measurements)
+    lines = coordinates_to_lines(coordinates)
+    #debug_plot(coordinates, lines)
+    #for line in lines:
+    #    print(line)
     update_grid_map(lines, robot_pos, grid_map)    
 
 
