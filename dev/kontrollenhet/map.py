@@ -1,8 +1,6 @@
 
-from UART import UART
-from modules import *
-from sensorenhet_functions import *
 from geometry import *
+from robot_communication import *
 import json
 import math, time
 import numpy as np
@@ -16,16 +14,23 @@ CELL_SIZE = 400
 DIVISIONS_PER_LINE = 4
 
 """The number of votes per line section required for something to be considered a full line."""
-MIN_MESURE = 1
+MIN_MESURE = 3
 
 """The number of line segments that needs to be voted in for their line to be voted in."""
 SEGMENTS_REQUIRED = 3
 
 """The thickness of a line segment in millimeters."""
-ACCURACY = 130
+ACCURACY = 150
 
 """The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
+
+"""The sleep time when moving the servo to 0."""
+LIDAR_INITIAL_SLEEP = 1.5
+
+"""The sleep time when moving the servo 1 degree."""
+LIDAR_SLEEP = 0.015
+
 
 def bresenham(line):
     """
@@ -182,7 +187,7 @@ def open_missed_corners(grid_map:GridMap):
                 
 
 # TODO: Non-DRY
-def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
+def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     """
     Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
 
@@ -197,6 +202,9 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     top_left = top_left_grid_index(line_coordinates)
     bottom_right = bottom_right_grid_index(line_coordinates)
 
+    # Robot pos in grid
+    robot_grid_pos = Position(math.floor(robot_pos.x/CELL_SIZE), math.floor(robot_pos.y/CELL_SIZE))
+    
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
         # Stores square position, start in y and end in y as multiplied with CELL_SIZE.
@@ -220,7 +228,7 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             end_vertical = Position(x, y_next)
             line_horizontal = Line(start, end_horizontal)
             line_vertical = Line(start, end_vertical)
-
+            
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
                 changed_pos_hor = change_grid_type(robot_pos, grid_pos, line_horizontal, grid_map)
@@ -234,7 +242,8 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             for changed_pos in (changed_pos_hor, changed_pos_ver):
                 # If we have a new wall
                 if changed_pos is not None:
-                    cells_between = bresenham(Line(robot_pos, changed_pos))
+                    cells_between = bresenham(Line(robot_grid_pos, changed_pos))
+                    #print(robot_grid_pos, "->", changed_pos, ":", len(cells_between))
                     for cell in cells_between:
                         # If the cell isn't known, set it to OPEN
                         if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
@@ -412,17 +421,17 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
 
     #Check if there is a line at current grid position.
     if line == next_vertical:
-        if grid_pos.x > robot_pos.x:
+        if grid_pos.x > robot_pos.x / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.x < robot_pos.x:
+        elif grid_pos.x < robot_pos.x / CELL_SIZE:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(prev_grid_pos.x, grid_pos.y)
     elif line == next_horizontal:
-        if grid_pos.y > robot_pos.y:
+        if grid_pos.y > robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.y < robot_pos.y:
+        elif grid_pos.y < robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, prev_grid_pos.y)
     return None
@@ -442,8 +451,8 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
     coordinates = []
     for degree, dist in measurements:
-        x = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.x
-        y = (-math.sin(math.radians(degree + angle)) * dist) + robot_pos.y
+        x = (math.sin(math.radians(degree + angle)) * dist) + robot_pos.x
+        y = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.y
         coordinates.append((x, y))
     return coordinates
 
@@ -465,52 +474,55 @@ def read_debug_data(file_name):
 
 
 
-def measure_lidar(motor_uart:UART, sensor_uart:UART):
+def measure_lidar():
     """
     Turn the laser 180 degrees, taking measurements. Return said measurements.
-
-    Args:
-        :param motor_uart (UART): The motor unit UART interface.
-        :param sensor_uart (UART): The sensor unit UART interface.
 
     Returns:
         :return: (list of length-2-tuple of float): Tuples containing (angle, distance to wall), where angle is degrees.
     """
-    driveInstruction = Servo(0)
-
     degree_plot = []
     distance_plot = []
 
-    motor_uart.send_function(driveInstruction)
+    handle_command(Command.servo(0))
 
-    time.sleep(1.5)
+    time.sleep(LIDAR_INITIAL_SLEEP)
     degree = 0
 
     measurements = []
 
     for degree in range(0, 180):
-        sensor_uart.send_function(ReadLidar())
-
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 0:
-            raise RuntimeError("Incorrect acknowledge packet.")
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 8:
-            raise RuntimeError("Not a lidar value.")
-
-        highest = sensor_uart.receive_packet()
-        lowest = sensor_uart.receive_packet()
-        dist = ord(lowest) + ord(highest) * (2 ** 8)
-
+        dist = handle_command(Command.read_lidar())
         measurements.append([degree, dist])
-
-        motor_uart.send_function(Servo(int(degree)))
-        time.sleep(0.005)
+        handle_command(Command.servo(int(degree)))
+        time.sleep(LIDAR_SLEEP)
     return measurements
 
 
+def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap):
+    """
+    Scan the room and update grid_map with walls an open spaces found.
+
+    Args:
+        :param robot_pos (Position): The position of the robot, in millimeters.
+        :param robot_angle (float): The facing angle of the robot, in degrees..
+        :grid_map (GridMap): The GridMap to insert the results into.
+        :passes (int): The number of times we rotate the LIDAR to measure.
+    """
+    measurements = measure_lidar()
+    coordinates = convert_to_coordinates(measurements, robot_pos, robot_angle)
+    lines = coordinates_to_lines(coordinates)
+#    for line in lines:
+#        print(line)
+    update_grid_map(lines, robot_pos, grid_map)
+#    grid_map.debug_print()
+#    debug_plot(coordinates, lines)
+
+    
 
 def debug_plot(coordinates, lines):
     """
-    A test plotting, that shows all mesuring points and walls on the same plot. This is for debugging purpesus only.
+    A test plotting, that shows all meuring points and walls on the same plot. This is for debugging purpesus only.
     This returns a plot with a dot for all mesured data and also draws out all lines/Walls
     """
     plot_lines(lines)
