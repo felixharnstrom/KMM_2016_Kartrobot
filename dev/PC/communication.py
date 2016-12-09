@@ -2,7 +2,9 @@ from command import *
 import socket
 import json
 
-def send_data(socket: socket, msg : str)
+_input_buffer = bytearray()
+
+def send_data(socket: socket, msg : str):
     """
     Simple wrapper for socket.sendall with a delimiter.
     
@@ -11,6 +13,7 @@ def send_data(socket: socket, msg : str)
         :param msg (str): The message to send.
     
     """
+    print("sending data: ",msg)
     socket.sendall((msg+"\n").encode())
 
 def construct_msg(command : Command):
@@ -25,6 +28,19 @@ def construct_msg(command : Command):
     """
     return json.dumps([command.address, command.command_type, command.arguments])
 
+def _retrieve_message_from_buffer():
+    global _input_buffer
+    delimiter_index = 0
+    #Do we already have a message in the buffer?
+    try:
+        delimiter_index = _input_buffer.index(b'\n')
+    except ValueError:
+        #No message to be found
+        return ""
+    msg = _input_buffer[:delimiter_index]
+    _input_buffer = _input_buffer[delimiter_index+1:]
+    return msg.decode()
+    
 def receive_data(socket : socket):
     """
     Receives the next data delimited by '\n' from the given socket.
@@ -32,13 +48,17 @@ def receive_data(socket : socket):
     Args:
         :param socket (socket): Socket to read data from.
     """
-    data_list = []
+    global _input_buffer
+    msg = _retrieve_message_from_buffer()
+    if msg:
+        return msg
+    #If a message isn't in buffer, we will retrieve it.
     while True:
-        c = socket.recv(1)
-        if c == "\n" or c == "":
-            break
-        data_list.append(c)
-    return ''.join(data_list)
+        data = socket.recv(4096)
+        _input_buffer.extend(data)
+        msg = _retrieve_message_from_buffer()
+        if msg:
+            return msg
     
 def construct_command(msg : list):
     """
