@@ -20,7 +20,7 @@ MIN_MESURE = 3
 SEGMENTS_REQUIRED = 3
 
 """The thickness of a line segment in millimeters."""
-ACCURACY = 150
+ACCURACY = 200
 
 """The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
@@ -496,6 +496,7 @@ def measure_lidar():
         measurements.append([degree, dist])
         handle_command(Command.servo(int(degree)))
         time.sleep(LIDAR_SLEEP)
+    handle_command(Command.servo(90))
     return measurements
 
 
@@ -516,7 +517,7 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
 #        print(line)
     update_grid_map(lines, robot_pos, grid_map)
 #    grid_map.debug_print()
-#    debug_plot(coordinates, lines)
+    debug_plot(coordinates, lines)
 
     
 

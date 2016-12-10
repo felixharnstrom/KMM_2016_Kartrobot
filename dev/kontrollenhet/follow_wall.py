@@ -27,6 +27,14 @@ from UART import UART
 from pid import Pid
 from robot_communication import handle_command, init_UARTs
 
+
+import map
+import grid_map
+from geometry import Position
+import time
+
+
+
 # TODO: Use Daniel's enum for MANUAL, AUTONOM
 class ControllerMode:
     MANUAL = 0
@@ -90,13 +98,13 @@ class Robot:
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 100
-        self.RIGHT_TURN_ENTRY_DIST = 100
+        self.RIGHT_TURN_ENTRY_DIST = 50
         self.RIGHT_TURN_EXIT_DIST = 300
         self.OBSTACLE_SAFETY_OVERRIDE = 120
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 170
         self.SENSOR_SPACING = 95
-        self.BASE_SPEED = 20
+        self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
 
@@ -106,7 +114,7 @@ class Robot:
 
         # Initialize PID controller
         self.pid_controller = Pid()
-        self.pid_controller.setpoint = 80
+        self.pid_controller.setpoint = 50
         self.pid_controller.output_data = 0
         self.pid_controller.set_tunings(3, 0, -200)
         self.pid_controller.set_sample_time(33)
@@ -115,8 +123,8 @@ class Robot:
         init_UARTs()
 
         #Read start values for X and Y
-        self._x_start = self._median_sensor(5, Command.read_left_back_ir())
-        self._y_start = self._median_sensor(5, Command.read_back_ir())
+        self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
+        self._y_start = self._median_sensor(5, Command.read_back_ir())+150
 
     def turn(self, direction : Direction, degrees : int, speed: int, save_new_angle=False):
         """
@@ -151,9 +159,9 @@ class Robot:
         # Add turned degrees to current_angle if save_new_angle is true
         if save_new_angle:
             if direction == Direction.LEFT:
-                self.current_angle -= degrees + 10
+                self.current_angle -= degrees + 5
             else:
-                self.current_angle += degrees + 10
+                self.current_angle += degrees + 5
 
     def get_position(self):
         """
@@ -201,16 +209,36 @@ class Robot:
         elif (self.current_angle < 0):
             return 360 - abs(self.current_angle) % 360
 
-    def update_map(self):
+    def update_map(self, turndir):
         """
         Update the gridmap with new scan data.
         """
+        
         position = self.get_position()
         angle = self.get_angle() 
-        scan_and_update_grid(position, angle, self._grid_map)
+        if turndir == "left":
+            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+            angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING) 
+        elif turndir == "right":
+            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+            angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
+        scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
         servo_instr = Command.servo(90)
         self.uart_styrenhet.send_command(servo_instr)
         
+
+    def get_angle(self):
+        """
+        Return the angle in the intervall 0 <= angle <= 360.
+        Returns:
+            (int): The current angle in the given intervall above.
+        """
+        if (self.current_angle >= 0):
+            return self.current_angle % 360
+        elif (self.current_angle < 0):
+            return 360 - abs(self.current_angle) % 360
 
     def drive_distance(self, dist : int, speed : int, save_new_distance = False):
         """
@@ -463,6 +491,83 @@ def sensor_test(robot):
         lidar = robot._median_sensor(1, Command.read_lidar())
         print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
     
+
+def unknown_in_view(location: Position, angle: int, g: grid_map.GridMap):
+    if angle == 0 or angle == 180:
+        print (g.top_left())
+        print (g.bottom_right())
+
+        # Scan one row forwards
+        if angle == 0:
+            scancolumn = location.x+1
+        elif angle == 180:
+            scancolumn = location.x-1
+        print ("ScanColumn",scancolumn)
+
+        if g.get(scancolumn,location.y) == grid_map.CellType.WALL:
+            raise ValueError("Robot will stand on wall")
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for y in range(location.y, g.bottom_right().y):
+            print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == grid_map.CellType.UNKNOWN:
+                return True
+                pass
+            if g.get(scancolumn, y) == grid_map.CellType.WALL:
+                break
+        print (location.y, g.top_left().y)
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for y in range(location.y, g.top_left().y-1, -1):
+            print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == grid_map.CellType.UNKNOWN:
+                return True
+            if g.get(scancolumn, y) == grid_map.CellType.WALL:
+                break
+            # print (g.get(location.x, y))
+        return False
+    elif angle == 90 or angle == 270:
+        # Moving on y-axis.
+        # Assuming up is 90 degrees, down is 270 degrees.
+        # Scan one row forwards
+        if angle == 90:
+            scanrow = location.y-1
+        elif angle == 270:
+            scanrow = location.y+1
+
+        print ("ScanRow", scanrow)
+
+        if g.get(location.x, scanrow) == grid_map.CellType.WALL:
+            raise Exception("Robot will stand on wall")
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for x in range( location.x, g.bottom_right().x):
+            print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == grid_map.CellType.UNKNOWN:
+                return True
+                pass
+            if g.get(x, scanrow) == grid_map.CellType.WALL:
+                print ("met wall")
+                break
+        print (location.x, g.top_left().x)
+        print ( (location.x, g.top_left().x-1, -1))
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for x in range(location.x, g.top_left().x-1, -1):
+            print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == grid_map.CellType.UNKNOWN:
+                return True
+            if g.get(x, scanrow) == grid_map.CellType.WALL:
+                break
+        return False
+
+
+
+
+
 def main(argv):
     # create logger
     logger = logging.getLogger()
@@ -503,13 +608,23 @@ def main(argv):
     # Wait fot LIDAR to be in position
     time.sleep(1)
     
+    g = grid_map.GridMap()
+
+    print (robot.get_position())
+    robot.update_map("left")
+
+
+    g.debug_print()
+#    time.sleep(10)
     # Try driving in infinite loop around the maze
     while 1:
             # Drive forward without crashing in wall
             status = robot.follow_wall(9999999)
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
-            robot._grid_map.debug_print()
+            
+
+
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
@@ -519,36 +634,38 @@ def main(argv):
                 ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
                 if (ir_right_front > ir_left_front):
                     robot.stand_perpendicular('left')
-                    robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                    robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('left')
+                    robot.update_map("right")
                 else:
                     robot.stand_perpendicular('right')
-                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                    robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('right')
+                    robot.update_map("left")
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
                 robot.pid_controller.set_tunings(3, 0, -200)
                 #Test the map functionality
-                robot.update_map()
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                 logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
                 turn_instr = Command.stop_motors()
                 robot.uart_styrenhet.send_command(turn_instr)
                 while robot._is_moving(): pass
                 #robot.stand_perpendicular('left')
+                robot.update_map("left")
                 robot.drive_distance(robot.RIGHT_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
-                robot.turn(Direction.RIGHT, 80, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                while robot._is_moving(threshold = 20): pass
+                robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
                 if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
                     logger.info("Not a corridor, moving back")
-                    robot.turn(Direction.LEFT, 80, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                    robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('right')
-                    while robot._is_moving(threshold = 20): pass
+                    while robot._is_moving(threshold = 30): pass
                 else:
                     # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower RIGHT_TURN_EXIT_DIST again.
                     # As it is now, a right turn into a single square corridor does not work well.
@@ -560,6 +677,7 @@ def main(argv):
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
                 robot.pid_controller.set_tunings(3, 0, -200)
+            robot._grid_map.debug_print()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

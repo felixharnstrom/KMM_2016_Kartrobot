@@ -13,6 +13,8 @@ class CellType(Enum):
     """There's walls around the cell."""
     WALL = 2
 
+    LOCATION = 3
+
 class GridMap:
     """A map representation with, indexed the following way:
     (0,0) (1,0) ...
@@ -198,6 +200,8 @@ class GridMap:
                     print(" ", end="")
                 elif cell == CellType.WALL:
                     print("X", end="")
+                elif cell == CellType.LOCATION:
+                    print("-", end="")
             print("")
     
     def is_complete(self, start_pos:Position):
