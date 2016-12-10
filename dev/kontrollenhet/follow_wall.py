@@ -20,6 +20,7 @@ import math
 import sys
 import argparse
 import logging
+from map import *
 import numpy as np
 from command import Command
 from UART import UART
@@ -101,6 +102,7 @@ class Robot:
 
         # Private attributes
         self._last_dist = 0
+        self._grid_map = GridMap()
 
         # Initialize PID controller
         self.pid_controller = Pid()
@@ -158,7 +160,7 @@ class Robot:
         Calculates your x and y coordinates from path_trace.
 
         Returns:
-            (bool): Tuple with coordinates (x, y).
+            (Position): Contains the x and y position.
         """
         x = self._x_start
         y = self._y_start
@@ -186,7 +188,29 @@ class Robot:
 
             last_distance = path[1]
 
-        return (x, y)
+        return Position(x,y)
+
+    def get_angle(self):
+        """
+        Return the angle in the intervall 0 <= angle <= 360.
+        Returns:
+            (int): The current angle in the given intervall above.
+        """
+        if (self.current_angle >= 0):
+            return self.current_angle % 360
+        elif (self.current_angle < 0):
+            return 360 - abs(self.current_angle) % 360
+
+    def update_map(self):
+        """
+        Update the gridmap with new scan data.
+        """
+        position = self.get_position()
+        angle = self.get_angle() 
+        scan_and_update_grid(position, angle, self._grid_map)
+        servo_instr = Command.servo(90)
+        self.uart_styrenhet.send_command(servo_instr)
+        
 
     def drive_distance(self, dist : int, speed : int, save_new_distance = False):
         """
@@ -485,6 +509,7 @@ def main(argv):
             status = robot.follow_wall(9999999)
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
+            robot._grid_map.debug_print()
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
@@ -506,6 +531,8 @@ def main(argv):
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
                 robot.pid_controller.set_tunings(3, 0, -200)
+                #Test the map functionality
+                robot.update_map()
             elif (status == DriveStatus.RIGHT_CORRIDOR_DETECTED):
                 logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
                 turn_instr = Command.stop_motors()
