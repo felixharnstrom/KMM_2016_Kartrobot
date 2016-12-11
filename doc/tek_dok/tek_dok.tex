@@ -405,11 +405,11 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
 
 \begin{description}
     \item [TRANSMIT] Utför nästa UART-command som skickas.
-    \item [FORWARD_MOTOR_INFO] Svara med motorenhetsdata (dict), kodat med JSON.
-    \item [FORWARD_SENSOR_INFO] Svara med sensorenhetsdata (dict), kodat med JSON.
-    \item [KEY_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent. Tangenten som skickas därefter är en sträng som innehåller "left", "right, "up", eller "down".
-    \item [SEND_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
-    \item [TOGGLE_MODE] Om vi är i det manuella läget: byte till autonomnt. Annars: byt till manuellt.
+    \item [FORWARD\_MOTOR\_INFO] Svara med motorenhetsdata (\texttt{dict}), kodat med JSON.
+    \item [FORWARD\_SENSOR\_INFO] Svara med sensorenhetsdata (\texttt{dict}), kodat med JSON.
+    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent. Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}''.
+    \item [SEND\_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
+    \item [TOGGLE\_MODE] Om vi är i det manuella läget: byte till autonomt. Annars: byt till manuellt.
 \end{description}
 
 
