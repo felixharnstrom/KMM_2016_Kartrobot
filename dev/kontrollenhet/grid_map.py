@@ -187,12 +187,18 @@ class GridMap:
             return [(1 if cell == CellType.WALL else 0) for cell in row]
         return [row_to_drawable(row) for row in self._grid]
 
-    def debug_print(self):
-        """Prints a human-readable version of the map."""
+    def debug_print(self, print_origin=False):
+        """
+        Prints a human-readable version of the map.
+
+        Args:
+            :argument print_origin (bool): True if (0,0) should be printed as an O, False otherwise.
+        """
         for y, row in enumerate(self._grid):
             for x, cell in enumerate(row):
-                if (self._origin.x == x and
-                      self._origin.y == y):
+                if (print_origin and
+                    self._origin.x == x and
+                    self._origin.y == y):
                     print("O", end="")
                 elif cell == CellType.UNKNOWN:
                     print("?", end="")
