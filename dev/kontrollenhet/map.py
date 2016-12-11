@@ -517,7 +517,7 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
 #        print(line)
     update_grid_map(lines, robot_pos, grid_map)
 #    grid_map.debug_print()
-    debug_plot(coordinates, lines)
+#    debug_plot(coordinates, lines)
 
     
 
@@ -538,3 +538,131 @@ def debug_plot(coordinates, lines):
     plt.plot([(top_left.x - 1) * CELL_SIZE, (bottom_right.x + 1) * CELL_SIZE],
              [(top_left.y) * CELL_SIZE, (bottom_right.y) * CELL_SIZE], '.')
     plt.show()
+
+
+def get_cell(start_pos, pos, resolution=1):
+    """
+    Convert a real-world position (in mm) to a cell position (in CELL_SIZE/resolution mm).
+
+    Args:
+        :param start_pos (Position): The position the robot is initially placed in, in mm.
+        :param pos (Position): The position to convert, in mm.
+        :param resolution (float, >= 1): The amount to scale the result up with. 
+
+    Returns:
+        :return (Position): The cell indices the pos represents, in CELL_SIZE/resolution mm.
+
+    """
+    dx = pos.x - start_pos.x
+    dy = pos.y - start_pos.y
+    return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
+
+def movement_lines_to_cells(start_pos, lines, resolution=1):
+    """
+    Return the cells that a list of real-world lines passes through.
+
+    Args:
+        :param start_pos (Position): The position the robot is initially placed in, in mm.
+        :param lines (list of Line): Lines indicating path of movement, in mm.
+        :param resolution (float, >= 1): The amount to scale the result up with. Primarily for debugging.
+
+    Returns:
+        :return (list of Position): A list of cell indices the lines passes through, in CELL_SIZE/resolution mm.
+    """
+    grid_points = []
+    for line in lines:
+        start = get_cell(start_pos, line.start, resolution)
+        end = get_cell(start_pos, line.end, resolution)
+        between = bresenham(Line(start, end))[1:]
+        grid_points += between
+    return grid_points
+
+
+def movement_to_lines(movements: list):
+    """
+    Convert a list of movements (angles and distances) to lines indicating path of movement
+
+    Args:
+        :param movements (list): List of (current_angle_in_degrees, distance_since_start_in_mm) of the robots movements.
+
+    Returns:
+        :return (list of Line): The path of movement represented by lines.
+    """
+    # Start first line at (0,0). (The second pair will be popped before use)
+    x_plot = [0, 0]
+    y_plot = [0, 0]
+
+    lines = []
+    
+    last_distance = 0
+    for angle, distance in movements:
+        # Calculate distance moved since last savepoint
+        current_distance = distance - last_distance
+
+        # Add line ending (x2,y2), from last position (x1,y1)
+        x_plot.append(x_plot[-1] + current_distance * math.sin(math.radians(angle)))
+        y_plot.append(y_plot[-1] + current_distance * math.cos(math.radians(angle)))
+
+        # Add current line to plot
+        last_distance = distance
+
+    last = None
+    for i in range(len(x_plot)):
+        current = Position(x_plot[i], y_plot[i])
+        if i != 0:
+            lines.append(Line(last, current))
+        last = Position(x_plot[i], y_plot[i])
+    return lines
+
+def make_open(cells, grid_map):
+    """
+    Set all cell indices given to OPEN.
+
+    Args:
+        :param cells (list of Position): The cell indices to set.
+        :param grid_map (GridMap): The GridMap to modify.
+    """
+    for cell in cells:
+        grid_map.set(cell.x, cell.y, CellType.OPEN)
+
+def set_to_wall_if_unknown(x, y, grid_map):
+    """
+    Set a cell to WALL if it is UNKNOWN.
+
+    Args:
+       :param x (int): The x-index to set.
+       :param y (int): The y-index to set.
+       :param grid_map (GridMap): The GridMap to modify.
+    """
+    if grid_map.get(x, y) == CellType.UNKNOWN:
+        grid_map.set(x, y, CellType.WALL)
+
+def add_walls(open_cells, grid_map):
+    """
+    Pad open cells with walls to the right.
+
+    Args:
+        :param open_cells (list of Position): The grid indices containing open cells to pad.
+        :param grid_map (GridMap): The GridMap to modify.
+    """
+    last_dir = None
+    for i in range(len(open_cells)-1):
+        start = open_cells[i]
+        end = open_cells[i+1]
+        direction = Position(end.x - start.x, end.y - start.y)
+        if end.x > start.x:
+            set_to_wall_if_unknown(end.x, end.y-1, grid_map)
+            set_to_wall_if_unknown(start.x, start.y-1, grid_map)
+        if end.x < start.x:
+            set_to_wall_if_unknown(end.x, end.y+1, grid_map)
+            set_to_wall_if_unknown(start.x, start.y+1, grid_map)
+        if end.y > start.y:
+            set_to_wall_if_unknown(end.x+1, end.y, grid_map)
+            set_to_wall_if_unknown(start.x+1, start.y, grid_map)
+        if end.y < start.y:
+            set_to_wall_if_unknown(end.x-1, end.y, grid_map)
+            set_to_wall_if_unknown(start.x-1, start.y, grid_map)
+        # Now available in animation
+#        grid_map.debug_print()
+#        time.sleep(0.1)
+        last_dir = direction
