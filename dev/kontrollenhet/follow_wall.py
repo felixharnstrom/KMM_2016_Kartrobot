@@ -128,6 +128,15 @@ class Robot:
         self._y_start = self._median_sensor(5, Command.read_back_ir())+150
 
     def read_ir_side(self, side: Direction):
+        """
+        Returs the median of IR_MEDIAN_ITERATIONS reads of the specified ir sensor pair.
+
+        Args:
+            :side    (Direction): Which side to read.
+        Returns:
+            (int, int): Back and front sensor readings.
+        """
+
         if side == Direction.RIGHT:
             ir_side_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
