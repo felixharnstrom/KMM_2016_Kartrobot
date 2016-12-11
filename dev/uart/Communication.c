@@ -1,13 +1,9 @@
-﻿/*
- * communication.c
- *
- * Created: 11/5/2016 11:04:13 AM
- *  Author: felha423
+﻿/**
+ * @brief 8MHz clock speed.
  */
-
- #ifndef F_CPU
- #define F_CPU 8000000UL
- #endif
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
 
 #include <avr/io.h>
 #include <stdio.h>
@@ -16,8 +12,11 @@
 #include "Communication.h"
 #include "UART.h"
 
+/**
+ * @brief Baud rate.
+ */
 #ifndef BAUD
-#define BAUD 38400   // define baud
+#define BAUD 38400
 #endif
 
 void comm_init(void){

@@ -236,3 +236,6 @@ dev/Sensorenhet/Sensorenhet/*
 !*.c
 !*.h
 !*.cproj
+
+## Doxygen dir
+dev/doc

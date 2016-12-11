@@ -3,30 +3,40 @@
  *
  * Created: 11/4/2016 4:08:27 PM
  *  Author: emino969
- */ 
+ */
 
 #include "sensorenhet.h"
 
 
-/*
- * Global variable that keeps track of the LIDAR counter.
+/**
+ * @brief Global variable that keeps track of the LIDAR counter.
+ *
  * Read-only.
  */
 volatile uint16_t lidarCounter;
 
-/*
- * Global variable that counts every time the wheels have
- * turned 1/4 of a circle.
+/**
+ * @brief Global variable that counts every time the left back wheel have turned 1/4 of a circle.
  */
 volatile uint16_t reflexCounterLeft;
+
+/**
+ * @brief Global variable that counts every time the right back wheel have turned 1/4 of a circle.
+ */
 volatile uint16_t reflexCounterRight;
 
-/*
- * Global toggle variables that keeps
- * track on the current state for the reflexes.
+/**
+ * @brief Global toggle variables that keeps track on the current state for the left reflex sensor.
+ * 
  * Is 1 if reflex > 3.0, 0 if reflex < 1.0
  */
 volatile uint8_t reflexHighLeft;
+
+/**
+ * @brief Global toggle variables that keeps track on the current state for the right reflex sensor.
+ * 
+ * Is 1 if reflex > 3.0, 0 if reflex < 1.0
+ */
 volatile uint8_t reflexHighRight;
 
 void startADConversion(uint8_t channel) {
@@ -84,8 +94,8 @@ void waitForADConversion() {
     while(ADCSRA & (1<<ADSC));
 }
 
-/*
- *  Interrupt vector that's triggered when LIDAR monitor value is changed
+/**
+ * @brief Interrupt vector that's triggered when LIDAR monitor value is changed.
  */
 ISR (INT2_vect)
 {
@@ -103,9 +113,8 @@ ISR (INT2_vect)
     }
 }
 
-/*
- *  Interrupt issued by watchdog to read reflex sensors on
- *  both sides.
+/**
+ * @brief Interrupt issued by watchdog to read reflex sensors on both sides.
  */
 ISR (WDT_vect)
 {
@@ -274,11 +283,19 @@ sensor_t msgTypeToSensor(t_msgType mst) {
     }
 }
 
-// Source http://www.avrfreaks.net/forum/mpu6050-and-atmega328p-peter-fleury-implementation-problem
-#define MPU6050  0xD0     // (0x68 << 1) I2C slave address
-unsigned char ret;        // return value
-uint16_t raw;             // raw sensor value
-int16_t gyroZValue;          // x axis acceleration raw value
+/**
+ * @brief I2C slave address.
+ *
+ * Source: http://www.avrfreaks.net/forum/mpu6050-and-atmega328p-peter-fleury-implementation-problem
+ */
+#define MPU6050  0xD0   // (0x68 << 1) I2C slave address
+
+/** @brief Return value. */
+unsigned char ret;
+/** @brief Raw sensor value. */
+uint16_t raw;
+/** @brief X-axis acceleration raw value. */
+int16_t gyroZValue;
 
 long calculateBias() {
     static const int ITERATIONS = 10000;
@@ -328,9 +345,12 @@ void Init_MPU6050()
         MPU6050_writereg(0x37, 0x10); // go to register 55 interrupt configuration set value to 0001 0000 for logic level high and read clear
         MPU6050_writereg(0x38, 0x01); // go to register 56 interrupt enable set value to 0000 0001 data ready creates interrupt
         MPU6050_writereg(0x6A, 0x40); // go to register 106 user control set value to 0100 0000 FIFO enable
-	}
+    }
 }
 
+/**
+ * @brief Main loop.
+ */
 int main(void)
 {
     comm_init();
@@ -340,10 +360,10 @@ int main(void)
     initAdc();
     initReflex();
     
-	gyroZValue = 0;        // initial gyro value (z-axis)
+    gyroZValue = 0;        // initial gyro value (z-axis)
 
     Init_MPU6050();    // MPU-6050 init
-	int bias = (int) calculateBias();
+    int bias = (int) calculateBias();
     _delay_ms(500);
     
     uint16_t reflex;
@@ -369,22 +389,22 @@ int main(void)
             case SENSOR_READ_IR_RIGHT_FRONT:
             case SENSOR_READ_IR_RIGHT_BACK:
             case SENSOR_READ_IR_BACK:;
-				double sum = 0;
-				for (int i = 0; i<5; i++){
-					double sensorOutput = readSensor(msgTypeToSensor(msg));
-					uint16_t mmRounded = sensorOutput * 10;
-					sum = sum + mmRounded;
-				}
-				sendReply(sum/5);
-				break;
+                double sum = 0;
+                for (int i = 0; i<5; i++){
+                    double sensorOutput = readSensor(msgTypeToSensor(msg));
+                    uint16_t mmRounded = sensorOutput * 10;
+                    sum = sum + mmRounded;
+                }
+                sendReply(sum/5);
+                break;
             case SENSOR_READ_LIDAR:;
-				double sensorOutput = readSensor(msgTypeToSensor(msg));
-				uint16_t mmRounded = sensorOutput * 10;
-				sendReply(mmRounded);
-				break;
+                double sensorOutput = readSensor(msgTypeToSensor(msg));
+                uint16_t mmRounded = sensorOutput * 10;
+                sendReply(mmRounded);
+                break;
                 
             case SENSOR_READ_GYRO:;
-				gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
+                gyroZValue = MPU6050_readreg(0x43)-bias;   // read raw X acceleration from fifo
                 sendReply(gyroZValue/1.3);
                 break;
                 
