@@ -25,6 +25,9 @@ class Size:
     def __ne__(self, other): 
         return not self == other
 
+    def __hash__(self):
+        return hash(repr(self))
+
     def add(self, other):
         """
         Add a size to this one.
@@ -60,6 +63,10 @@ class Position:
 
     def __ne__(self, other): 
         return not self == other
+
+    def __hash__(self):
+        return hash(repr(self))
+
 
     def difference(self, other):
         """
