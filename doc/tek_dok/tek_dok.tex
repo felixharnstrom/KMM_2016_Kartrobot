@@ -575,9 +575,6 @@ I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funkt
 \subsubsection{Processer}
 Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det program som körs så behövs inte mer än en process för styrenheten.
 
-\subsection{Reglering}
-Eftersom att styrenheten inte har tillgång till data i sensorenheten så blir det kontrollenheten som ansvarar för roboten kör rakt. Styrsignalerna kommer därför innehålla ganska korta sträckor att köra så roboten hinner reglera sin position innan den kör in i en vägg. 
-
 \clearpage
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
@@ -828,7 +825,14 @@ Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskad
 \subsubsection{Reglering}
 \label{sec:pid}
 
-För att kunna köra rakt använder sig kontrollenheten av PD-reglering. Detta görs med hjälp av IR-sensorerna på sidan. Ett vinkelrät avstånd till väggen räknas ut genom att beräkna vinkeln till väggen och ta $ (frontDist+backDist)/2 \times cos(angle)$. Regleringen kommer att använda detta värde och ett målvärde för att beräkna avståndet till optimala placeringen. Detta används för att beräkna hur mycket roboten ska snurra med formeln $ TODO: PID-formel$.
+För att kunna köra rakt använder sig kontrollenheten av PD-reglering. Detta görs med hjälp av IR-sensorerna på sidan. Ett vinkelrät avstånd till väggen räknas ut genom att beräkna vinkeln till väggen och beräkna $ (frontDist+backDist)/2 \times cos(angle)$. Regleringen kommer att använda detta avstånd, den nuvarande vinkeln till väggen, och ett målvärde för att beräkna avståndet till optimala placeringen. Detta används för att beräkna hur roboten ska justera motorerna. Utdatan från PD-regulatorn beräknas enligt formel \ref{eq:pid_output}
+\begin{equation}\label{eq:pid_output}
+output = 3 \times perpendicular\_dist - 200 \times current\_angle
+\end{equation}
+där $perpendicular\_dist$ är det vinkelräta avståndet från väggen och $current\_angle$ är den nuvarande vinkeln till väggen.
+\texttt{\meaning\frown}
+
+Utdatan är begränsad till $\pm 50$, där värden som faller utanför dessa gränser helt enkelt begränsas till extremvärdena. Till utdatan adderas sedan $100$ följt av att divideras med $100$, vilket i praktiken ger att utdatan går i intervallet mellan $0,5$ och $1,5$. Den vänstra motorn divideras sedan med detta värde, och den högra motorn multipliceras med detta värde. Detta låter oss ta skarpa svängar, då den ena motorns hastighet kan dubbleras medan den andra motorns hastighet halveras. Vi kan alltså få ett $4:1$ förhållande mellan våra motorer.
 
 \subsubsection{Navigering}
 Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PID-regulering (se kapitel \ref{sec:pid}), tills ett hinder framåt upptäcks av lidarn, eller en korridor upptäcks med IR-sensorerna. 
