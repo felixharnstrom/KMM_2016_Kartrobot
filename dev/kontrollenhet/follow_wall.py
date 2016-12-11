@@ -127,6 +127,15 @@ class Robot:
         self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
         self._y_start = self._median_sensor(5, Command.read_back_ir())+150
 
+    def read_ir_side(self, side: Direction):
+        if side == Direction.RIGHT:
+            ir_side_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+            ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+        else:
+            ir_side_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
+            ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+        return ir_side_back, ir_side_front
+
     def turn(self, direction : Direction, degrees : int, speed: int, save_new_angle=False):
         """
         Turn a certain amount in the given direction at the given speed.
@@ -228,21 +237,9 @@ class Robot:
         scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
         servo_instr = Command.servo(90)
         self.uart_styrenhet.send_command(servo_instr)
-        """
-        
+        """      
 
-    def get_angle(self):
-        """
-        Return the angle in the intervall 0 <= angle <= 360.
-        Returns:
-            (int): The current angle in the given intervall above.
-        """
-        if (self.current_angle >= 0):
-            return self.current_angle % 360
-        elif (self.current_angle < 0):
-            return 360 - abs(self.current_angle) % 360
-
-    def drive_distance(self, dist : int, speed : int, save_new_distance = False):
+    def drive_distance(self, dist: int, speed: int, save_new_distance=False):
         """
         Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
 
@@ -255,7 +252,7 @@ class Robot:
         self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = reflex_right_start
-        #logger.debug("LIDAR INIT: ", lidar_init)
+        # logger.debug("LIDAR INIT: ", lidar_init)
         while(reflex_right - reflex_right_start < dist):
             reflex_right = handle_command(Command.read_reflex_right())
             lidar_cur = handle_command(Command.read_lidar())
@@ -264,7 +261,7 @@ class Robot:
                 if save_new_distance:
                     self._save_position(reflex_right - reflex_right_start)
                 return False
-            #logger.debug("LIDAR CURRENT: ", lidar_cur)
+            # logger.debug("LIDAR CURRENT: ", lidar_cur)
         self.uart_styrenhet.send_command(Command.stop_motors())
         if save_new_distance:
             self._save_position(reflex_right - reflex_right_start)
@@ -295,16 +292,15 @@ class Robot:
             # Get sensor values
             reflex_right = handle_command(Command.read_reflex_right())
             if side == "right":
-                ir_side_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-                ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+                ir_side_back, ir_side_front = self.read_ir_side(Direction.RIGHT)
             else:
-                ir_side_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-                ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+                ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
+
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
-            
+
             print("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
-             # Detect corridor to the right
+            # Detect corridor to the right
             if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
                 self.drive_distance(self.CORRIDOR_TURN_ENTRY_DIST, self.BASE_SPEED, True)
                 # Save the given length driven
@@ -328,7 +324,7 @@ class Robot:
             dist_side = (ir_side_front + ir_side_back) / 2
             angle_side = math.atan2(ir_side_back - ir_side_front, self.SENSOR_SPACING)
             perpendicular_dist_side = dist_side * math.cos(angle_side)
-            #logger.debug("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
+            # logger.debug("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
             self.pid_controller.input_data = perpendicular_dist_side
             self.pid_controller.d_term = angle_side
             self.pid_controller.compute()
@@ -343,7 +339,7 @@ class Robot:
         self.uart_styrenhet.send_command(Command.stop_motors())
         self._save_position(reflex_right - reflex_right_start)
         return DriveStatus.DONE
-    
+
     # TODO: Add the correct code for updating the path_queue when the code is ready
     def find_next_destination(self):
         """
@@ -397,16 +393,14 @@ class Robot:
             side (str): 'left' or 'right'
         """
         if side == "left":
-            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+            ir_back, ir_front = self.read_ir_side(Direction.LEFT)
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
+            self.turn(math.degrees(angle) > 0, abs(int(math.degrees(angle))), speed=self.BASE_SPEED+10)
 
         elif side == "right":
-            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
+            ir_back, ir_front = self.read_ir_side(Direction.RIGHT)
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-            self.turn(math.degrees(angle) < 0 , abs(int(math.degrees(angle))), speed = self.BASE_SPEED+10)
+            self.turn(math.degrees(angle) < 0, abs(int(math.degrees(angle))), speed=self.BASE_SPEED+10)
 
     def _median_sensor(self, it : int, sensor_instr : Command):
         """
@@ -464,10 +458,8 @@ class Robot:
         """
         ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
-        ir_right_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-        ir_right_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
-        ir_left_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-        ir_left_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+        ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
+        ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
 
         time.sleep(wait_time)
 
@@ -483,7 +475,7 @@ class Robot:
             ir_left_back_diff < threshold and ir_left_front_diff < threshold):
             return False
         else:
-            #logger.debug("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
+            # logger.debug("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
             return True
 
 
@@ -492,10 +484,8 @@ def sensor_test(robot):
     Continuously get all sensor values and print these.
     """
     while 1:
-        ir_right_front = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-        ir_right_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
-        ir_left_front = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-        ir_left_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
+        ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
+        ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
         ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
         print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
