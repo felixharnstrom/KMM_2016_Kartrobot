@@ -399,9 +399,18 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
 \end{table}
 
 \subsection{WIFI-kommunikation}
-Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Kontrollenheten ansluter automatiskt till \texttt{eduroam} och annonserar sin IP-adress till gruppen Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient. % TODO: Se till att mjukvaran faktiskt startar automatiskt, eller ändra formulering.
+Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
-Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt.
+Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
+
+\begin{description}
+    \item [TRANSMIT] Utför nästa UART-command som skickas.
+    \item [FORWARD_MOTOR_INFO] Svara med motorenhetsdata (dict), kodat med JSON.
+    \item [FORWARD_SENSOR_INFO] Svara med sensorenhetsdata (dict), kodat med JSON.
+    \item [KEY_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent. Tangenten som skickas därefter är en sträng som innehåller "left", "right, "up", eller "down".
+    \item [SEND_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
+    \item [TOGGLE_MODE] Om vi är i det manuella läget: byte till autonomnt. Annars: byt till manuellt.
+\end{description}
 
 
 \clearpage
