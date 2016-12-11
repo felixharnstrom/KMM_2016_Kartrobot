@@ -5,6 +5,7 @@ from grid_map import *
 import threading
 import robot_wifi
 import queue
+import math
 from timeout import *
 
 UART_sensor = None          #The uninitiated UART object for sensor communication.
@@ -205,10 +206,10 @@ def retrieve_and_update_motor_diagnostics(command : Command):
     send_motor_ack()
     servo_angle = ((servo_pwm_msb*(2**8)+servo_pwm_lsb)-773)/8.72 #Formula for translating servo pwm to servo angle
     motor_data["LEFT_SIDE_DIRECTION"] = left_direction
-    motor_data["LEFT_SIDE_SPEED"] = left_pwm/pwm_to_speed
+    motor_data["LEFT_SIDE_SPEED"] = math.ceil(left_pwm/pwm_to_speed)
     motor_data["RIGHT_SIDE_DIRECTION"] = right_direction
-    motor_data["RIGHT_SIDE_SPEED"] = right_pwm/pwm_to_speed
-    motor_data["SERVO_ANGLE"] = servo_angle
+    motor_data["RIGHT_SIDE_SPEED"] = math.ceil(right_pwm/pwm_to_speed)
+    motor_data["SERVO_ANGLE"] = math.ceil(servo_angle)
     #print(motor_data)
     return
 

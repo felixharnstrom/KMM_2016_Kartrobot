@@ -1,5 +1,6 @@
 from robot_communication import *
 from command import Command
+from datetime import datetime
 import gpio_buttons as gpio
 import mode
 
@@ -18,13 +19,22 @@ def main():
     gpio.poll_shutdown_in_other_thread()
     init_wifi_thread()
     
+    
+    current_time = datetime.now()     
+    last_time = current_time     
+    diff_time_trigger = 0.5 #Trigger every 0.4s (To not make the)
     # Loop
     while True:
         # Process messages
         process_actions()
-        
-        # Update motor diagnostics values
-        handle_command(Command.controller_information())
+    
+        current_time = datetime.now()         
+        diff = (current_time - last_time).total_seconds()         
+        if (diff >= diff_time_trigger): 
+            last_time = current_time
+            handle_command(Command.controller_information())
+            # Update motor diagnostics values
+
 
         # Autonomous step
         if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
