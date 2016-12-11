@@ -197,7 +197,7 @@ def retrieve_and_update_motor_diagnostics(command : Command):
     Args:
         :param command (Command): A controller_information Command.
     """
-    pwm_to_speed = 2.5 #Constant for getting motor pwm -> motor speed percentage
+    pwm_to_speed = 2.52 #Constant for getting motor pwm -> motor speed percentage
     UART_motor.send_command(command)
     #ack = UART_motor.receive_packet() #Receive ack
     (left_direction, left_pwm, 
