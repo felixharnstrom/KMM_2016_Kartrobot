@@ -80,6 +80,8 @@ class gui_thread(threading.Thread):
                 self.ir_behind.set(sensor_data_dict["IR_BACK"])
                 self.lidar.set(sensor_data_dict["LIDAR"])
                 self.gyro.set(sensor_data_dict["GYRO"])
+                #TODO: Send this from PC in the sensor_data dict
+                #self.distance.set(sensor_data_dict["DISTANCE"])
         return
 
     def run(self):
@@ -132,7 +134,7 @@ class gui_thread(threading.Thread):
                          command=lambda message="mode_manual": self.send_command(message))
         R1.pack()
 
-        R2 = tkinter.Radiobutton(button_frame, text="Automnomous", variable=mode_var, value=2,
+        R2 = tkinter.Radiobutton(button_frame, text="Autonomous", variable=mode_var, value=2,
                          command=lambda message="mode_autonomous": self.send_command(message))
         R2.pack()
 
