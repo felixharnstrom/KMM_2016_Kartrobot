@@ -174,7 +174,7 @@ class GridMap:
         Returns:
             :return (Position): The top-left external index of the GridMap.
         """
-        return Position(self._width - self._origin.x, self._height - self._origin.y)
+        return Position(self._width - self._origin.x - 1, self._height - self._origin.y - 1)
 
     def gui_drawable(self):
         """

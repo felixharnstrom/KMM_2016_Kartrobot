@@ -1,3 +1,6 @@
+"""
+This file contains the functions necessary for setting/detecting which mode that the robot currently is in.
+"""
 import threading
 from enum import Enum
 
@@ -8,8 +11,10 @@ class ControlModeEnums(Enum):
     AUTONOMOUS = 0
     MANUAL = 1
 
-_mode = ControlModeEnums.MANUAL     #The current mode which we are in
-_mode_lock = threading.Lock()       #Lock used for reading/editing our current mode
+"""The current mode which we are in."""
+_mode = ControlModeEnums.MANUAL
+"""Lock used for reading/editing our current mode"""
+_mode_lock = threading.Lock()
     
 def set_mode(new_mode : ControlModeEnums):
     """

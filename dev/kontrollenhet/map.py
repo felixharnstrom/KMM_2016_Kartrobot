@@ -513,11 +513,7 @@ def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap
     measurements = measure_lidar()
     coordinates = convert_to_coordinates(measurements, robot_pos, robot_angle)
     lines = coordinates_to_lines(coordinates)
-#    for line in lines:
-#        print(line)
     update_grid_map(lines, robot_pos, grid_map)
-#    grid_map.debug_print()
-#    debug_plot(coordinates, lines)
 
     
 
@@ -540,7 +536,7 @@ def debug_plot(coordinates, lines):
     plt.show()
 
 
-def get_cell(start_pos, pos, resolution=1):
+def approximate_to_cell(start_pos, pos, resolution=1):
     """
     Convert a real-world position (in mm) to a cell position (in CELL_SIZE/resolution mm).
 
@@ -571,8 +567,8 @@ def movement_lines_to_cells(start_pos, lines, resolution=1):
     """
     grid_points = []
     for line in lines:
-        start = get_cell(start_pos, line.start, resolution)
-        end = get_cell(start_pos, line.end, resolution)
+        start = approximate_to_cell(start_pos, line.start, resolution)
+        end = approximate_to_cell(start_pos, line.end, resolution)
         between = bresenham(Line(start, end))[1:]
         grid_points += between
     return grid_points
@@ -589,30 +585,33 @@ def movement_to_lines(movements: list):
         :return (list of Line): The path of movement represented by lines.
     """
     # Start first line at (0,0). (The second pair will be popped before use)
-    x_plot = [0, 0]
-    y_plot = [0, 0]
+    points_x = [0, 0]
+    points_y = [0, 0]
 
     lines = []
-    
+
+    # Convert to points
     last_distance = 0
     for angle, distance in movements:
         # Calculate distance moved since last savepoint
         current_distance = distance - last_distance
 
         # Add line ending (x2,y2), from last position (x1,y1)
-        x_plot.append(x_plot[-1] + current_distance * math.sin(math.radians(angle)))
-        y_plot.append(y_plot[-1] + current_distance * math.cos(math.radians(angle)))
+        points_x.append(points_x[-1] + current_distance * math.sin(math.radians(angle)))
+        points_y.append(points_y[-1] + current_distance * math.cos(math.radians(angle)))
 
         # Add current line to plot
         last_distance = distance
 
+    # Convert to lines
     last = None
-    for i in range(len(x_plot)):
-        current = Position(x_plot[i], y_plot[i])
-        if i != 0:
+    for i in range(len(points_x)):
+        current = Position(points_x[i], points_y[i])
+        if last is not None:
             lines.append(Line(last, current))
-        last = Position(x_plot[i], y_plot[i])
+        last = current
     return lines
+
 
 def make_open(cells, grid_map):
     """
@@ -625,6 +624,7 @@ def make_open(cells, grid_map):
     for cell in cells:
         grid_map.set(cell.x, cell.y, CellType.OPEN)
 
+        
 def set_to_wall_if_unknown(x, y, grid_map):
     """
     Set a cell to WALL if it is UNKNOWN.
@@ -637,6 +637,7 @@ def set_to_wall_if_unknown(x, y, grid_map):
     if grid_map.get(x, y) == CellType.UNKNOWN:
         grid_map.set(x, y, CellType.WALL)
 
+        
 def add_walls(open_cells, grid_map):
     """
     Pad open cells with walls to the right.
@@ -662,7 +663,7 @@ def add_walls(open_cells, grid_map):
         if end.y < start.y:
             set_to_wall_if_unknown(end.x-1, end.y, grid_map)
             set_to_wall_if_unknown(start.x-1, start.y, grid_map)
-        # Now available in animation
+        # Now available in animation!
 #        grid_map.debug_print()
 #        time.sleep(0.1)
         last_dir = direction
