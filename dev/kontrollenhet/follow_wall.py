@@ -98,7 +98,7 @@ class Robot:
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 100
-        self.RIGHT_TURN_ENTRY_DIST = 50
+        self.RIGHT_TURN_ENTRY_DIST = 40
         self.RIGHT_TURN_EXIT_DIST = 300
         self.OBSTACLE_SAFETY_OVERRIDE = 120
         self.EDGE_SPIKE_FACTOR = 2
@@ -213,7 +213,7 @@ class Robot:
         """
         Update the gridmap with new scan data.
         """
-        
+        """
         position = self.get_position()
         angle = self.get_angle() 
         if turndir == "left":
@@ -227,6 +227,7 @@ class Robot:
         scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
         servo_instr = Command.servo(90)
         self.uart_styrenhet.send_command(servo_instr)
+        """
         
 
     def get_angle(self):
@@ -490,41 +491,51 @@ def sensor_test(robot):
         ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
         print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
-    
 
-def unknown_in_view(location: Position, angle: int, g: grid_map.GridMap):
+
+def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
+    """
+    Checks if there are unknowns in the row or column in front of the location.
+
+    Args:
+        :param location (Position): The robots current location
+        :param angle (int): In which direction the robot is looking (0 == Right, 90 == Up, ...)7
+        :param move_forward (int): How many cells in front of the robots current location to check. (0 == current row/column)
+
+    Returns:
+        :return (bool): If there is a unknow cell in the row/column specified.
+    """
+
+    angle = angle % 360
     if angle == 0 or angle == 180:
-        print (g.top_left())
-        print (g.bottom_right())
-
         # Scan one row forwards
         if angle == 0:
-            scancolumn = location.x+1
+            scancolumn = location.x+move_forward
         elif angle == 180:
-            scancolumn = location.x-1
-        print ("ScanColumn",scancolumn)
+            scancolumn = location.x-move_forward
+        # print("ScanColumn", scancolumn)
 
-        if g.get(scancolumn,location.y) == grid_map.CellType.WALL:
+        if g.get(scancolumn, location.y) == CellType.WALL:
             raise ValueError("Robot will stand on wall")
 
         # Loop through current y-axis (since we are moving on the x-axis)
         # From current location to either unknow or a blocking wall.
         for y in range(location.y, g.bottom_right().y):
-            print("LOOKING at x:", scancolumn, "y:", y)
-            if g.get(scancolumn, y) == grid_map.CellType.UNKNOWN:
+            # print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == CellType.UNKNOWN:
                 return True
                 pass
-            if g.get(scancolumn, y) == grid_map.CellType.WALL:
+            if g.get(scancolumn, y) == CellType.WALL:
                 break
-        print (location.y, g.top_left().y)
+        # print(location.y, g.top_left().y)
 
         # Loop through current y-axis (since we are moving on the x-axis)
         # From current location to either unknow or a blocking wall.
         for y in range(location.y, g.top_left().y-1, -1):
-            print("LOOKING at x:", scancolumn, "y:", y)
-            if g.get(scancolumn, y) == grid_map.CellType.UNKNOWN:
+            # print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == CellType.UNKNOWN:
                 return True
-            if g.get(scancolumn, y) == grid_map.CellType.WALL:
+            if g.get(scancolumn, y) == CellType.WALL:
                 break
             # print (g.get(location.x, y))
         return False
@@ -533,34 +544,34 @@ def unknown_in_view(location: Position, angle: int, g: grid_map.GridMap):
         # Assuming up is 90 degrees, down is 270 degrees.
         # Scan one row forwards
         if angle == 90:
-            scanrow = location.y-1
+            scanrow = location.y-move_forward
         elif angle == 270:
-            scanrow = location.y+1
+            scanrow = location.y+move_forward
 
-        print ("ScanRow", scanrow)
+        # print("ScanRow", scanrow)
 
-        if g.get(location.x, scanrow) == grid_map.CellType.WALL:
+        if g.get(location.x, scanrow) == CellType.WALL:
             raise Exception("Robot will stand on wall")
 
         # Loop through current y-axis (since we are moving on the x-axis)
         # From current location to either unknow or a blocking wall.
-        for x in range( location.x, g.bottom_right().x):
-            print("LOOKING at x:", x, "y:", scanrow)
-            if g.get(x, scanrow) == grid_map.CellType.UNKNOWN:
+        for x in range(location.x, g.bottom_right().x):
+            # print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == CellType.UNKNOWN:
                 return True
                 pass
-            if g.get(x, scanrow) == grid_map.CellType.WALL:
-                print ("met wall")
+            if g.get(x, scanrow) == CellType.WALL:
+                # print("met wall")
                 break
-        print (location.x, g.top_left().x)
-        print ( (location.x, g.top_left().x-1, -1))
+        # print(location.x, g.top_left().x)
+        # print((location.x, g.top_left().x-1, -1))
         # Loop through current y-axis (since we are moving on the x-axis)
         # From current location to either unknow or a blocking wall.
         for x in range(location.x, g.top_left().x-1, -1):
-            print("LOOKING at x:", x, "y:", scanrow)
-            if g.get(x, scanrow) == grid_map.CellType.UNKNOWN:
+            # print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == CellType.UNKNOWN:
                 return True
-            if g.get(x, scanrow) == grid_map.CellType.WALL:
+            if g.get(x, scanrow) == CellType.WALL:
                 break
         return False
 
