@@ -203,8 +203,12 @@ class gui_thread(threading.Thread):
         self.gyro = tkinter.DoubleVar()
         gyro_lab = tkinter.Label(sensor_frame, textvariable=self.gyro)
         gyro_lab.grid(row=9, column=0, columnspan=2, padx = 18)
-
-
+        
+        distance_text = tkinter.Label(sensor_frame,text="[Distance Traveled]")
+        distance_text.grid(row=10, column=0, columnspan=2, pady = 10)
+        self.distance = tkinter.DoubleVar()
+        distance_lab = tkinter.Label(sensor_frame, textvariable=self.distance)
+        distance_lab.grid(row=11, column=0, columnspan=2, padx = 18)
 
         #Setup exit routine
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
