@@ -28,8 +28,39 @@ LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
 """The sleep time when moving the servo to 0."""
 LIDAR_INITIAL_SLEEP = 1.5
 
+
 """The sleep time when moving the servo 1 degree."""
 LIDAR_SLEEP = 0.015
+
+def raytrace(line):
+    # Stolen from
+    x0 = line.start.x
+    y0 = line.start.y
+    x1 = line.end.x
+    y1 = line.end.y
+    dx = abs(x1 - x0)
+    dy = abs(y1- y0)
+    x = x0
+    y = y0
+    n = 1 + dx + dy
+    x_inc = 1 if x1 > x0 else -1
+    y_inc = 1 if y1 > y0 else -1
+    error = dx - dy
+    dx *= 2
+    dy *= 2
+
+    result = []
+    
+    while n > 0:
+        result.append(Position(x, y))
+        if error > 0:
+            x += x_inc
+            error -= dy
+        else:
+            y += y_inc
+            error += dx
+        n -= 1
+    return result
 
 def bresenham(line):
     """
@@ -667,6 +698,18 @@ def add_walls(open_cells, grid_map):
 #        time.sleep(0.1)
         last_dir = direction
 
+def get_cells_passed(grid_pos:Position, angle:float):
+    grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
+    # A line can be at most the length of the diagonal of the GridMap
+    dx = grid_map.width()
+    dy = grid_map.height()
+    diagonal = math.sqrt(dx*dx + dy*dy)
+    line_end = Position(grid_pos.x + diagonal*math.sin(math.radians(angle)),
+                        grid_pos.y + diagonal*math.cos(math.radians(angle)))
+    line = Line(grid_pos, line_end)
+    # Find the cells line passes through
+    return raytrace(line)
+
 def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
     """
     Return the index of the first cell in grid_map matching ctype on a line from grid_pos
@@ -681,24 +724,40 @@ def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:
     Returns:
         :return (Position): The cell index the celltype was first found on, or None if it doesn't exist.
     """
-    grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
-    # A line can be at most the length of the diagonal of the GridMap
-    dx = grid_map.width()
-    dy = grid_map.height()
-    diagonal = math.sqrt(dx*dx + dy*dy)
-    line_end = Position(grid_pos.x + diagonal*math.cos(math.radians(angle)),
-                        grid_pos.y + diagonal*math.sin(math.radians(angle)))
-    line = Line(grid_pos, line_end)
-    # Find the cells line passes through
-    cells = bresenham(line)
+    cells = get_cells_passed(grid_pos, angle)
     # Look for cell of type
     for cell in cells:
+        #print(cell)
         if not grid_map.is_within_bounds(cell.x, cell.y):
             return None
         elif grid_map.get(cell.x, cell.y) == ctype:
             return cell
     return None
 
+def passes_through_unknown_before_wall(grid_pos:Position, angle:float, grid_map:GridMap):
+    """
+    Return True if iterating over all cells covering a line in a certain angle
+    encounters an UNKNOWN cell before a WALL.
+
+    Args:
+        :param position (Position): The position to start at.
+        :param angle (float): The angle to iterate in, in degrees.
+        :param grid_map (GridMap): The grid_map to read from.
+
+    Returns:
+        :return (bool): True if UNKNOWN was encountered first.
+    """
+    cells = get_cells_passed(grid_pos, angle)
+    # Look for cell of type
+    for cell in cells:
+        if not grid_map.is_within_bounds(cell.x, cell.y):
+            return True
+        if grid_map.get(cell.x, cell.y) == CellType.WALL:
+            return False
+        if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
+            return True
+    return True
+    
 def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angle:float,
                              measurements:list, grid_map:GridMap):
     """
@@ -709,25 +768,43 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
         :param start_pos (Position): The position in the maze the robot started at.
         :param robot_pos (Position): The current position of the robot, in millimeters.
         :param facing_angle (float): The current facing of the robot, in degrees.
-        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
+        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (0 to +180), and dist is the distance to a wall, in millimeters.
         :param grid_map (GridMap): A GridMap of previously detected walls.
 
     Returns:
         :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
     """
     SMALL_FLOAT = 0.01 # For float comparison, just to be safe
+    FAST = True # Ignore less expensive checks
+    
     grid_pos = approximate_to_cell(start_pos, robot_pos)
     with_island = [] # Result
     for angle, dist in measurements:
+        #input()
+
         # Check if the measurement coincides with the wall behind it at that angle
-        actual_angle = facing_angle + angle
+        actual_angle = facing_angle + angle - 90
         wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
-        
-        scanned_pos = Position(robot_pos.x + dist*math.sin(math.radians(actual_angle)),
-                               robot_pos.y + dist*math.cos(math.radians(actual_angle)))
+        #grid_map.debug_print(print_origin=True)
+        #print(wall_there)
+        #time.sleep(0.1)
+        dif = Position(dist*math.sin(math.radians(actual_angle)),
+                       dist*math.cos(math.radians(actual_angle)))
+        scanned_pos = Position(robot_pos.x + dif.x,
+                               robot_pos.y + dif.y)
         scanned_grid_pos = approximate_to_cell(start_pos, scanned_pos)
-        if wall_there is not None and scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
-            with_island.append((angle, dist))
+        """print(actual_angle, dist, dif.x/CELL_SIZE, dif.y/CELL_SIZE)
+        print(grid_pos, wall_there)
+        print(scanned_pos, scanned_grid_pos)
+        if wall_there is not None:
+            print(scanned_grid_pos.dist_to_squared(wall_there))"""
+        if (wall_there is not None and
+            wall_there != grid_pos and
+            scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT):
+            # More expensive checks
+            if FAST or passes_through_unknown_before_wall(robot_pos, actual_angle, grid_map):
+                #print("ISLAND")
+                with_island.append((angle, dist))
     return with_island
 
 def find_island(minimum_measurements:int,
