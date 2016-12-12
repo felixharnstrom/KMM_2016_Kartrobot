@@ -11,18 +11,14 @@ def autonomous_step():
 
 def main():
     """Main loop"""
-    mode_toggle = False # Changes to true whenever change mode is pressed
-
     # Init
     init_UARTs()
-    gpio.init()
-    gpio.poll_shutdown_in_other_thread()
+    gpio.launch_poll_threads()
     init_wifi_thread()
-    
-    
+        
     current_time = datetime.now()     
     last_time = current_time     
-    diff_time_trigger = 0.5 #Trigger every 0.4s (To not make the)
+    diff_time_trigger = 0.3 #Trigger every 0.3s
     # Loop
     while True:
         # Process messages
@@ -33,20 +29,21 @@ def main():
         if (diff >= diff_time_trigger): 
             last_time = current_time
             handle_command(Command.controller_information())
-            # Update motor diagnostics values
-
-
+            handle_command(Command.read_gyro())
+            handle_command(Command.read_lidar())
+            handle_command(Command.read_back_ir())
+            handle_command(Command.read_left_front_ir())
+            handle_command(Command.read_left_back_ir())
+            handle_command(Command.read_right_front_ir())
+            handle_command(Command.read_right_back_ir())
+            print("Time took:", (datetime.now()-last_time).total_seconds())
+            #handle_command(Command.read_reflex_left())
+            #handle_command(Command.read_reflex_right())
+            # Update motor and sensor values
+            
         # Autonomous step
         if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
             autonomous_step()
-
-        # Check mode switch logic
-        if gpio.change_mode_is_pressed():
-            if not mode_toggle:
-                mode.toggle_mode()
-            mode_toggle = True
-        else:
-            mode_toggle = False
             
     close_UARTs()
     
