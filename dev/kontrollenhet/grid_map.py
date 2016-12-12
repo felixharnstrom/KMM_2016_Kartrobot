@@ -40,10 +40,10 @@ class GridMap:
         #self._width = 3
         #self._height = 3
         # An empty grid:
-        self._grid = []
+        self._grid = [[CellType.UNKNOWN]]
         self._origin = Position(0,0)
-        self._width = 0
-        self._height = 0
+        self._width = 1
+        self._height = 1
 
     def _expand_down(self):
         """Add a new row at the bottom."""
