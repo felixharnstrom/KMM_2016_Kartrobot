@@ -80,6 +80,8 @@ class gui_thread(threading.Thread):
                 self.ir_behind.set(sensor_data_dict["IR_BACK"])
                 self.lidar.set(sensor_data_dict["LIDAR"])
                 self.gyro.set(sensor_data_dict["GYRO"])
+                #TODO: Send this from PC in the sensor_data dict
+                #self.distance.set(sensor_data_dict["DISTANCE"])
         return
 
     def run(self):
@@ -132,7 +134,7 @@ class gui_thread(threading.Thread):
                          command=lambda message="mode_manual": self.send_command(message))
         R1.pack()
 
-        R2 = tkinter.Radiobutton(button_frame, text="Automnomous", variable=mode_var, value=2,
+        R2 = tkinter.Radiobutton(button_frame, text="Autonomous", variable=mode_var, value=2,
                          command=lambda message="mode_autonomous": self.send_command(message))
         R2.pack()
 
@@ -203,8 +205,12 @@ class gui_thread(threading.Thread):
         self.gyro = tkinter.DoubleVar()
         gyro_lab = tkinter.Label(sensor_frame, textvariable=self.gyro)
         gyro_lab.grid(row=9, column=0, columnspan=2, padx = 18)
-
-
+        
+        distance_text = tkinter.Label(sensor_frame,text="[Distance Traveled]")
+        distance_text.grid(row=10, column=0, columnspan=2, pady = 10)
+        self.distance = tkinter.DoubleVar()
+        distance_lab = tkinter.Label(sensor_frame, textvariable=self.distance)
+        distance_lab.grid(row=11, column=0, columnspan=2, padx = 18)
 
         #Setup exit routine
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))

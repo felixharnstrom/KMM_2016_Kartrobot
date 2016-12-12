@@ -70,7 +70,6 @@ def main():
         diff = (current_time - last_time).total_seconds()
         if(diff >= diff_time_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
-            print("Time diff: ", diff)
             last_time = current_time
             send_command("get_motor_data", robot.client, guit)
             send_command("get_sensor_data", robot.client, guit)
