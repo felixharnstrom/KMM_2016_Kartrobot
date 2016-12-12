@@ -60,7 +60,6 @@ class gui_thread(threading.Thread):
         self.queue.put(mode)
 
     def receive_command(self, command):
-        print("Receiving: ", command)
         if type(command)==list:
             if command[0] == "draw":
                 # It was a draw command.

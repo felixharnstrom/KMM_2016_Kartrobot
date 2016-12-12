@@ -15,7 +15,6 @@ def send_command(command, socket, guit):
         for a command, then waits for acknowledge.
         command" are the strings from the gui thread.
     """
-    print("sending: ", command)
     if len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
         send_data(socket, "KEY_EVENT")
         ack = receive_data(socket)
@@ -43,7 +42,7 @@ def send_command(command, socket, guit):
 def main():
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="130.236.226.193")
+    robot.start(ip="130.236.226.142")
 
     map = [[1,0,1],[0,1,1]]
 
