@@ -535,7 +535,7 @@ def debug_plot(coordinates, lines):
     plt.show()
 
 
-def approximate_to_cell(start_pos, pos, resolution=1):
+def approximate_to_cell(pos, resolution=1):
     """
     Convert a real-world position (in mm) to a cell position (in CELL_SIZE/resolution mm).
 
@@ -548,8 +548,8 @@ def approximate_to_cell(start_pos, pos, resolution=1):
         :return (Position): The cell indices the pos represents, in CELL_SIZE/resolution mm.
 
     """
-    dx = pos.x - start_pos.x
-    dy = pos.y - start_pos.y
+    dx = pos.x 
+    dy = pos.y 
     return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
 
 def movement_lines_to_cells(start_pos, lines, resolution=1):
@@ -566,14 +566,14 @@ def movement_lines_to_cells(start_pos, lines, resolution=1):
     """
     grid_points = []
     for line in lines:
-        start = approximate_to_cell(start_pos, line.start, resolution)
-        end = approximate_to_cell(start_pos, line.end, resolution)
-        between = bresenham(Line(start, end))[1:]
+        start = approximate_to_cell(line.start, resolution)
+        end = approximate_to_cell(line.end, resolution)
+        between = bresenham(Line(start, end))
         grid_points += between
     return grid_points
 
 
-def movement_to_lines(movements: list):
+def movement_to_lines(movements: list, start):
     """
     Convert a list of movements (angles and distances) to lines indicating path of movement
 
@@ -584,8 +584,8 @@ def movement_to_lines(movements: list):
         :return (list of Line): The path of movement represented by lines.
     """
     # Start first line at (0,0). (The second pair will be popped before use)
-    points_x = [0, 0]
-    points_y = [0, 0]
+    points_x = [start.x, start.x]
+    points_y = [start.y, start.y]
 
     lines = []
 
@@ -663,8 +663,8 @@ def add_walls(open_cells, grid_map):
             set_to_wall_if_unknown(end.x-1, end.y, grid_map)
             set_to_wall_if_unknown(start.x-1, start.y, grid_map)
         # Now available in animation!
-#        grid_map.debug_print()
-#        time.sleep(0.1)
+        # grid_map.debug_print()
+        # time.sleep(0.1)
         last_dir = direction
 
 def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
@@ -716,7 +716,7 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
         :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
     """
     SMALL_FLOAT = 0.01 # For float comparison, just to be safe
-    grid_pos = approximate_to_cell(start_pos, robot_pos)
+    grid_pos = approximate_to_cell(robot_pos)
     with_island = [] # Result
     for angle, dist in measurements:
         # Check if the measurement coincides with the wall behind it at that angle
@@ -725,7 +725,7 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
         
         scanned_pos = Position(robot_pos.x + dist*math.sin(math.radians(actual_angle)),
                                robot_pos.y + dist*math.cos(math.radians(actual_angle)))
-        scanned_grid_pos = approximate_to_cell(start_pos, scanned_pos)
+        scanned_grid_pos = approximate_to_cell(scanned_pos)
         if wall_there is not None and scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
             with_island.append((angle, dist))
     return with_island
