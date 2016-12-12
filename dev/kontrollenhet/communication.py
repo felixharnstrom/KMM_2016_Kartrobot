@@ -4,6 +4,13 @@ import json
 
 _input_buffer = bytearray()
 
+def clear_input_buffer():
+    """
+    Clears the input buffer, useful when recovering after a disconnect and want to discard old data.
+    """
+    global _input_buffer
+    _input_buffer = bytearray()
+
 def send_data(socket: socket, msg : str):
     """
     Simple wrapper for socket.sendall with a delimiter.
@@ -54,6 +61,8 @@ def receive_data(socket : socket):
     #If a message isn't in buffer, we will retrieve it.
     while True:
         data = socket.recv(4096)
+        if not data:
+            raise OSError("Socket closed on other side.")
         _input_buffer.extend(data)
         msg = _retrieve_message_from_buffer()
         if msg:
