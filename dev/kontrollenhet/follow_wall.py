@@ -85,7 +85,7 @@ class Robot:
         WHEEL_RADIUS                (int): Radius for a wheel on the robot in cm.
     """
 
-    def __init__(self, mode : ControllerMode):
+    def __init__(self, mode: ControllerMode, logger):
         # Public attributes
         self.driven_distance = 0
         self.current_angle = 0
@@ -106,7 +106,7 @@ class Robot:
         self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
-
+        self.logger = logger
         # Private attributes
         self._last_dist = 0
         self._grid_map = GridMap()
@@ -244,22 +244,20 @@ class Robot:
         scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
         servo_instr = Command.servo(90)
         handle_command(servo_instr)
-        """      
-        print ("ORIGIN-CELL: ", map.approximate_to_cell(Position(self._x_start, self._y_start)))
+        """
         lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
         cells = movement_lines_to_cells(Position(self._x_start, self._y_start), lines, 1)
         if len(cells) > 0:
             g = GridMap()
             make_open(cells, g)
             g.debug_print()
-            print("---------")
+            self.logger.info("---------")
             add_walls(cells, g)
             g.set(0,0, CellType.LOCATION)
             g.debug_print(print_origin = True)
-            print("STOP")
-            print (cells)
+            self.logger.info("STOP")
             if cells[-1] == cells[0]:
-                print ("In garage")
+                self.logger.info("In garage")
 
 
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
@@ -321,7 +319,7 @@ class Robot:
 
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
 
-            #print("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
+            self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
             # Detect corridor to the right
             if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -511,7 +509,7 @@ def sensor_test(robot):
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
         ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
-        print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
+        robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
 
 def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
@@ -586,7 +584,7 @@ def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: in
                 break
         # print(location.x, g.top_left().x)
         # print((location.x, g.top_left().x-1, -1))
-        # Loop through current y-axis (since we are moving on the x-axis)
+        # Loop through current y-axis (since we are moving on the x-arobotxis)
         # From current location to either unknow or a blocking wall.
         for x in range(location.x, g.top_left().x-1, -1):
             # print("LOOKING at x:", x, "y:", scanrow)
@@ -629,7 +627,7 @@ def main(argv):
     # add ch to logger
     logger.addHandler(ch)
 
-    robot = Robot(ControllerMode.MANUAL)
+    robot = Robot(ControllerMode.MANUAL, logger)
 
     # Turn LIDAR to 90 degrees
     servo_instr = Command.servo(90)
