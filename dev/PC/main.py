@@ -60,7 +60,7 @@ def main():
     #Timestamps to update sensor/motor values every diff_time_trigger seconds.
     current_time = datetime.now()
     last_time = current_time
-    diff_time_trigger = 1.0 #Trigger every 1.0s
+    diff_time_trigger = 0.5 #Trigger every 1.0s
     
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
