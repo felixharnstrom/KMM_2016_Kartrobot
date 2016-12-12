@@ -1,5 +1,14 @@
-
+from enum import Enum
 import math
+
+
+class Direction(Enum):
+    LEFT = 0
+    RIGHT = 1
+    DOWN = 2
+    UP = 3
+    NONE = 4
+
 
 class Size:
     """
@@ -53,9 +62,10 @@ class Position:
         :param y (int): Y position
     """
 
-    def __init__(self, x:int, y:int):
-        self.x = int(x)
-        self.y = int(y)
+    def __init__(self, x:int, y:int, direction: Direction = Direction.NONE):
+        self.x = round(x)
+        self.y = round(y)
+        self.direction = direction
 
     def __str__(self):
         return str(self.__dict__)
