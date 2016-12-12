@@ -1,4 +1,6 @@
 
+import math
+
 class Size:
     """
     Size vector.
@@ -68,6 +70,32 @@ class Position:
         return hash(repr(self))
 
 
+    def dist_to_squared(self, other):
+        """
+        Return euclidian distance squared to other Position.
+
+        Args:
+            :param other(Position): Pos to measure to
+
+        Returns:
+            :return (float): distance squared.
+        """
+        dx = self.x - other.x
+        dy = self.y - other.y
+        return dx*dx + dy*dy
+
+    def dist(self, other):
+        """
+        Return euclidian distance squared to other Position.
+
+        Args:
+            :param other(Position): Pos to measure to
+
+        Returns:
+            :return (float): distance squared.
+        """
+        return math.sqrt(self.dist_to_squared(other))
+        
     def difference(self, other):
         """
         Return the difference in x-position and y-position.

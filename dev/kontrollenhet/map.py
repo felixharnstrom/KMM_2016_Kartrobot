@@ -31,7 +31,6 @@ LIDAR_INITIAL_SLEEP = 1.5
 """The sleep time when moving the servo 1 degree."""
 LIDAR_SLEEP = 0.015
 
-
 def bresenham(line):
     """
     Source: http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm
@@ -667,3 +666,98 @@ def add_walls(open_cells, grid_map):
 #        grid_map.debug_print()
 #        time.sleep(0.1)
         last_dir = direction
+
+def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
+    """
+    Return the index of the first cell in grid_map matching ctype on a line from grid_pos
+    at angle degrees, or None if no such cell exists.
+
+    Args:
+        :param grid_pos (Position): The position in the grid to originate from.
+        :param angle (float): The angle to check at, in degrees.
+        :param ctype (CellType): The cell type to look for.
+        :param grid_map (GridMap): The Gridmap to read in.
+
+    Returns:
+        :return (Position): The cell index the celltype was first found on, or None if it doesn't exist.
+    """
+    grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
+    # A line can be at most the length of the diagonal of the GridMap
+    dx = grid_map.width()
+    dy = grid_map.height()
+    diagonal = math.sqrt(dx*dx + dy*dy)
+    line_end = Position(grid_pos.x + diagonal*math.cos(math.radians(angle)),
+                        grid_pos.y + diagonal*math.sin(math.radians(angle)))
+    line = Line(grid_pos, line_end)
+    # Find the cells line passes through
+    cells = bresenham(line)
+    # Look for cell of type
+    for cell in cells:
+        if not grid_map.is_within_bounds(cell.x, cell.y):
+            return None
+        elif grid_map.get(cell.x, cell.y) == ctype:
+            return cell
+    return None
+
+def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angle:float,
+                             measurements:list, grid_map:GridMap):
+    """
+    Return the measurements detecting an island: a previously undetected wall that seems to be
+    at least one tile from a previously detected wall behind it.
+
+    Not tested.
+
+    Args:
+        :param start_pos (Position): The position in the maze the robot started at.
+        :param robot_pos (Position): The current position of the robot, in millimeters.
+        :param facing_angle (float): The current facing of the robot, in degrees.
+        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
+        :param grid_map (GridMap): A GridMap of previously detected walls.
+
+    Returns:
+        :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
+    """
+    SMALL_FLOAT = 0.01 # For float comparison, just to be safe
+    grid_pos = approximate_to_grid(start_pos, robot_pos)
+    with_island = [] # Result
+    for angle, dist in measurements:
+        # Check if the measurement coincides with the wall behind it at that angle
+        actual_angle = facing_angle + angle
+        wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
+        
+        scanned_pos = Position(robot_pos + dist*math.sin(math.radians(actual_angle)),
+                               robot_pos + dist*math.cos(math.radians(actual_angle)))
+        scanned_grid_pos = approximate_to_grid(start_pos, scanned_pos)
+        if scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
+            with_island.append((angle, dist))
+    return with_island
+
+def find_island(minimum_measurements:int,
+                start_pos:Position, robot_pos:Position, facing_angle:float,
+                measurements:list, grid_map:GridMap):
+    """
+    Return a tuple (angle, dist), which leads to an island, or None, if measurements doesn't indicate that an island exist. An island is considered a wall not in grid_map, which is at least one full tile away from the wall behind it.
+
+    Not tested.
+
+    Args:
+        :param minimum_measurements (int): The minimum number of measurements that considers something an island in order for an island to be considered detected.
+        :param start_pos (Position): The position in the maze the robot started at.
+        :param robot_pos (Position): The current position of the robot, in millimeters.
+        :param facing_angle (float): The current facing of the robot, in degrees.
+        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
+        :param grid_map (GridMap): A GridMap of previously detected walls.
+
+    Returns:
+        :return (tuple): A tuple containing (angle, dist), where angle is the angle the robot must turn to face the island, and dist the distance it has to drive to reach it. Or None, if no island is detected.
+    """
+    with_island = measurements_with_island(start_pos, robot_pos, facing_angle, measurements, grid_map)
+    # Did enough measurements think it was an island?
+    if len(with_island) >= minimum_measurements:
+        # Returns median value - should be about the center of the part of the island we see
+        with_island = sorted(with_island, key=lambda e: e[0])
+        middle = math.floor(len(with_island)/2)
+        return with_island[middle]
+    return None
+        
+    

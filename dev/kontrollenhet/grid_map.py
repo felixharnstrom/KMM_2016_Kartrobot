@@ -140,6 +140,22 @@ class GridMap:
         new_pos = self._pos_to_index(x, y)
         self._grid[new_pos.y][new_pos.x] = ctype
 
+    def is_within_bounds(self, x:int, y:int):
+        """
+        Return True if the position is in the current bounds.
+
+        Args:
+            :param x (int): The x-position to read.
+            :param y (int): The y-position to read.
+
+        Returns:
+            :return (bool): True if it is.
+        """
+        return (x >= self.top_left().x and
+                y >= self.top_left().y and
+                x <= self.bottom_right().x and
+                y <= self.bottom_right().y)
+        
     def width(self):
         """
         Return the current width of the map.
