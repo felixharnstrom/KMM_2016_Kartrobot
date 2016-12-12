@@ -18,7 +18,8 @@ motor_data = {"LEFT_SIDE_DIRECTION":0, "LEFT_SIDE_SPEED":0,
                 "SERVO_ANGLE":0} #Contains the last retrieved motor data from get_motor_diagnostics.
 sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
                 "IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, 
-                "IR_BACK":0, "LIDAR":0, 
+                "IR_BACK":0, "LIDAR":0,
+                "REFLEX_RIGHT":0, "REFLEX_LEFT":0,
                 "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
 """The internal representation of the map."""
@@ -150,6 +151,10 @@ def get_sensor_dict_key(c_enum : CommandEnums):
         return "LIDAR"
     elif(c_enum == CommandEnums.READ_GYRO):
         return "GYRO"
+    elif(c_enum == CommandEnums.READ_REFLEX_LEFT):
+        return "REFLEX_LEFT"
+    elif(c_enum == CommandEnums.READ_REFLEX_RIGHT):
+        return "REFLEX_RIGHT"
     else:
         return ""
         
@@ -261,11 +266,10 @@ def process_action():
         next_action = None
     #Then we have a command!
     if next_action != None:
-        print(next_action)
+        print("Executing on robot:",next_action)
         if next_action[0] == "COMMAND":
             handle_command(next_action[1])
         elif next_action[0] == "KEY_EVENT":
-            print("Handling", next_action)
             handle_key(next_action[1])
         elif next_action[0] == "RESET_KEYS_PRESSED":
             reset_keys_pressed() 
