@@ -1,9 +1,9 @@
-/*
-* Styrenhet.c
-*
-*  Author: danma344
-*/
-#define F_CPU 8000000UL    //8MHz
+/**
+ * @brief 8MHz clock speed.
+ */
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -302,6 +302,9 @@ void executeFunction(t_msgType function, char* payload){
     }
 }
 
+/**
+ * @brief Main loop.
+ */
 int main(void)
 {
     DDRA = 0xFF;    //All pins on port A as output

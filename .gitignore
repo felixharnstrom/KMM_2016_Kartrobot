@@ -236,3 +236,6 @@ dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h
 Styrenhet.c
+
+## Doxygen dir
+dev/doc
