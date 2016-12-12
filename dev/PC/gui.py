@@ -56,7 +56,6 @@ class gui_thread(threading.Thread):
             self.send_command("key_down_r")
 
     def send_command(self, mode):
-        print("Command", mode, "put into queue.")
         self.queue.put(mode)
 
     def receive_command(self, command):
@@ -154,7 +153,7 @@ class gui_thread(threading.Thread):
         
         self.servo_angle = tkinter.DoubleVar()
         self.servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
-                                               from_=-90, to=90, state=tkinter.DISABLED)
+                                                 to=180, state=tkinter.DISABLED)
         self.servo_angle_scale.pack()
         self.insert_text(" Servo Angle ", debug_frame)
 
