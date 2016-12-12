@@ -705,8 +705,6 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
     Return the measurements detecting an island: a previously undetected wall that seems to be
     at least one tile from a previously detected wall behind it.
 
-    Not tested.
-
     Args:
         :param start_pos (Position): The position in the maze the robot started at.
         :param robot_pos (Position): The current position of the robot, in millimeters.
@@ -718,17 +716,17 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
         :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
     """
     SMALL_FLOAT = 0.01 # For float comparison, just to be safe
-    grid_pos = approximate_to_grid(start_pos, robot_pos)
+    grid_pos = approximate_to_cell(start_pos, robot_pos)
     with_island = [] # Result
     for angle, dist in measurements:
         # Check if the measurement coincides with the wall behind it at that angle
         actual_angle = facing_angle + angle
         wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
         
-        scanned_pos = Position(robot_pos + dist*math.sin(math.radians(actual_angle)),
-                               robot_pos + dist*math.cos(math.radians(actual_angle)))
-        scanned_grid_pos = approximate_to_grid(start_pos, scanned_pos)
-        if scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
+        scanned_pos = Position(robot_pos.x + dist*math.sin(math.radians(actual_angle)),
+                               robot_pos.y + dist*math.cos(math.radians(actual_angle)))
+        scanned_grid_pos = approximate_to_cell(start_pos, scanned_pos)
+        if wall_there is not None and scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
             with_island.append((angle, dist))
     return with_island
 
