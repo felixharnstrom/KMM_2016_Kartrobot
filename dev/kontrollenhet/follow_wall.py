@@ -85,15 +85,13 @@ class Robot:
         WHEEL_RADIUS                (int): Radius for a wheel on the robot in cm.
     """
 
-    def __init__(self, mode : ControllerMode, sensor_device : str, control_device : str):
+    def __init__(self, mode: ControllerMode, logger):
         # Public attributes
         self.driven_distance = 0
         self.current_angle = 0
         self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
-        self.uart_sensorenhet = UART(sensor_device)
-        self.uart_styrenhet = UART(control_device)
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
@@ -108,7 +106,7 @@ class Robot:
         self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
-
+        self.logger = logger
         # Private attributes
         self._last_dist = 0
         self._grid_map = GridMap()
@@ -161,7 +159,7 @@ class Robot:
         # Set time to zero to turn untill stopped
         standstill_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100
         turn_instr = Command.turn(direction, speed, 0)
-        self.uart_styrenhet.send_command(turn_instr)
+        handle_command(turn_instr)
 
         while (abs(current_dir) < degrees):
             # Use a reimann sum to add up all the gyro rates
@@ -173,7 +171,7 @@ class Robot:
 
         # Turning is completed, stop the motors
         turn_instr = Command.stop_motors()
-        self.uart_styrenhet.send_command(turn_instr)
+        handle_command(turn_instr)
 
         # Add turned degrees to current_angle if save_new_angle is true
         if save_new_angle:
@@ -245,8 +243,22 @@ class Robot:
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
         scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
         servo_instr = Command.servo(90)
-        self.uart_styrenhet.send_command(servo_instr)
-        """      
+        handle_command(servo_instr)
+        """
+        lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
+        cells = movement_lines_to_cells(Position(self._x_start, self._y_start), lines, 1)
+        if len(cells) > 0:
+            g = GridMap()
+            make_open(cells, g)
+            g.debug_print()
+            self.logger.info("---------")
+            add_walls(cells, g)
+            g.set(0,0, CellType.LOCATION)
+            g.debug_print(print_origin = True)
+            self.logger.info("STOP")
+            if cells[-1] == cells[0]:
+                self.logger.info("In garage")
+
 
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
         """
@@ -258,7 +270,7 @@ class Robot:
         Returns:
             (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
-        self.uart_styrenhet.send_command(Command.drive(1, speed, 0))
+        handle_command(Command.drive(1, speed, 0))
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = reflex_right_start
         # logger.debug("LIDAR INIT: ", lidar_init)
@@ -266,12 +278,12 @@ class Robot:
             reflex_right = handle_command(Command.read_reflex_right())
             lidar_cur = handle_command(Command.read_lidar())
             if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
-                self.uart_styrenhet.send_command(Command.stop_motors())
+                handle_command(Command.stop_motors())
                 if save_new_distance:
                     self._save_position(reflex_right - reflex_right_start)
                 return False
             # logger.debug("LIDAR CURRENT: ", lidar_cur)
-        self.uart_styrenhet.send_command(Command.stop_motors())
+        handle_command(Command.stop_motors())
         if save_new_distance:
             self._save_position(reflex_right - reflex_right_start)
         return True
@@ -307,7 +319,7 @@ class Robot:
 
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
 
-            print("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
+            self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
             # Detect corridor to the right
             if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -323,7 +335,7 @@ class Robot:
             # Obstacle detected, and no turn to the right
             elif(lidar < self.OBSTACLE_DIST):
                 # Save the given length driven
-                self.uart_styrenhet.send_command(Command.stop_motors())
+                handle_command(Command.stop_motors())
                 self._save_position(reflex_right - reflex_right_start)
                 return DriveStatus.OBSTACLE_DETECTED
 
@@ -345,7 +357,7 @@ class Robot:
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
 
         # Save the given length driven
-        self.uart_styrenhet.send_command(Command.stop_motors())
+        handle_command(Command.stop_motors())
         self._save_position(reflex_right - reflex_right_start)
         return DriveStatus.DONE
 
@@ -369,7 +381,7 @@ class Robot:
         recorded_data = []  # (Angle, distance)
         # Turn LIDAR to 0 degrees
         servo_instr = Command.servo(0)
-        self.uart_styrenhet.send_command(servo_instr)
+        handle_command(servo_instr)
 
         # Sleep 1 second to wait for LIDAR to be in position
         time.sleep(1)
@@ -377,11 +389,11 @@ class Robot:
         for i in range(180):
             # Point LIDAR in the right angle
             servo_instr = Command.servo(i)
-            self.uart_styrenhet.send_command(servo_instr)
+            handle_command(servo_instr)
 
             # Read data from the LIDAR sensor
             lidar_distance = handle_command(Command.read_lidar())
-            recorded_data.append(lidar_distance)
+            recorded_data.append([i, lidar_distance])
             time.sleep(0.005)
 
         return recorded_data
@@ -454,7 +466,7 @@ class Robot:
             drive_instr = Command.side_speeds(1, round(left_speed), 1, round(right_speed))
         else:
             drive_instr = Command.side_speeds(1, round(right_speed), 1, round(left_speed))
-        self.uart_styrenhet.send_command(drive_instr)
+        handle_command(drive_instr)
 
     def _is_moving(self, threshold = 30, wait_time = 0.2):
         """
@@ -497,7 +509,7 @@ def sensor_test(robot):
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
         ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
-        print ("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
+        robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
 
 def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
@@ -572,7 +584,7 @@ def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: in
                 break
         # print(location.x, g.top_left().x)
         # print((location.x, g.top_left().x-1, -1))
-        # Loop through current y-axis (since we are moving on the x-axis)
+        # Loop through current y-axis (since we are moving on the x-arobotxis)
         # From current location to either unknow or a blocking wall.
         for x in range(location.x, g.top_left().x-1, -1):
             # print("LOOKING at x:", x, "y:", scanrow)
@@ -592,8 +604,6 @@ def main(argv):
     ch = logging.StreamHandler()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--sensor", required = True, metavar = "SENSOR_DEVICE", help = "Device name of the USB<->serial converter for the sensor unit.")
-    parser.add_argument("-c", "--control", required = True, metavar = "CONTROL_DEVICE", help = "Device name of the USB<->serial converter for the control unit.")
     parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 3), help = "Verbosity level. 0 is lowest and 2 highest. Default 1.")
     args = parser.parse_args()
 
@@ -617,21 +627,21 @@ def main(argv):
     # add ch to logger
     logger.addHandler(ch)
 
-    robot = Robot(ControllerMode.MANUAL, args.sensor, args.control)
+    robot = Robot(ControllerMode.MANUAL, logger)
 
     # Turn LIDAR to 90 degrees
     servo_instr = Command.servo(90)
-    robot.uart_styrenhet.send_command(servo_instr)
+    handle_command(servo_instr)
 
     # Wait fot LIDAR to be in position
     time.sleep(1)
-    
+
     g = grid_map.GridMap()
 
     print (robot.get_position())
     robot.update_map("left")
 
-
+    #print("lidar", robot.scan())
     g.debug_print()
 #    time.sleep(10)
     # Try driving in infinite loop around the maze
@@ -646,7 +656,7 @@ def main(argv):
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
-                robot.uart_styrenhet.send_command(turn_instr)
+                handle_command(turn_instr)
                 while robot._is_moving(): pass
                 ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
@@ -670,7 +680,7 @@ def main(argv):
             elif (status == DriveStatus.CORRIDOR_DETECTED_RIGHT):
                 logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
                 turn_instr = Command.stop_motors()
-                robot.uart_styrenhet.send_command(turn_instr)
+                handle_command(turn_instr)
                 while robot._is_moving(): pass
                 #robot.stand_perpendicular('left')
                 robot.update_map("left")
@@ -698,7 +708,7 @@ def main(argv):
             elif (status == DriveStatus.CORRIDOR_DETECTED_LEFT):
                 logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
-                robot.uart_styrenhet.send_command(turn_instr)
+                handle_command(turn_instr)
                 while robot._is_moving(): pass
                 robot.drive_distance(robot.CORRIDOR_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
                 robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)

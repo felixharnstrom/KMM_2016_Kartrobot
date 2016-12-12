@@ -566,12 +566,11 @@ def debug_plot(coordinates, lines):
     plt.show()
 
 
-def approximate_to_cell(start_pos, pos, resolution=1):
+def approximate_to_cell(pos, resolution=1):
     """
     Convert a real-world position (in mm) to a cell position (in CELL_SIZE/resolution mm).
 
     Args:
-        :param start_pos (Position): The position the robot is initially placed in, in mm.
         :param pos (Position): The position to convert, in mm.
         :param resolution (float, >= 1): The amount to scale the result up with. 
 
@@ -579,16 +578,15 @@ def approximate_to_cell(start_pos, pos, resolution=1):
         :return (Position): The cell indices the pos represents, in CELL_SIZE/resolution mm.
 
     """
-    dx = pos.x - start_pos.x
-    dy = pos.y - start_pos.y
+    dx = pos.x 
+    dy = pos.y 
     return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
 
-def movement_lines_to_cells(start_pos, lines, resolution=1):
+def movement_lines_to_cells(lines, resolution=1):
     """
     Return the cells that a list of real-world lines passes through.
 
     Args:
-        :param start_pos (Position): The position the robot is initially placed in, in mm.
         :param lines (list of Line): Lines indicating path of movement, in mm.
         :param resolution (float, >= 1): The amount to scale the result up with. Primarily for debugging.
 
@@ -597,14 +595,14 @@ def movement_lines_to_cells(start_pos, lines, resolution=1):
     """
     grid_points = []
     for line in lines:
-        start = approximate_to_cell(start_pos, line.start, resolution)
-        end = approximate_to_cell(start_pos, line.end, resolution)
-        between = bresenham(Line(start, end))[1:]
+        start = approximate_to_cell(line.start, resolution)
+        end = approximate_to_cell(line.end, resolution)
+        between = bresenham(Line(start, end))
         grid_points += between
     return grid_points
 
 
-def movement_to_lines(movements: list):
+def movement_to_lines(movements: list, start):
     """
     Convert a list of movements (angles and distances) to lines indicating path of movement
 
@@ -615,8 +613,8 @@ def movement_to_lines(movements: list):
         :return (list of Line): The path of movement represented by lines.
     """
     # Start first line at (0,0). (The second pair will be popped before use)
-    points_x = [0, 0]
-    points_y = [0, 0]
+    points_x = [start.x, start.x]
+    points_y = [start.y, start.y]
 
     lines = []
 
@@ -680,7 +678,16 @@ def add_walls(open_cells, grid_map):
     for i in range(len(open_cells)-1):
         start = open_cells[i]
         end = open_cells[i+1]
-        direction = Position(end.x - start.x, end.y - start.y)
+        if end.x == start.x and end.y == start.y:
+            if len(open_cells) > i + 2:
+                if open_cells[i+2].x > end.x:
+                    set_to_wall_if_unknown(end.x-1, end.y, grid_map)
+                elif open_cells[i+2].x < end.x:
+                    set_to_wall_if_unknown(end.x+1, end.y, grid_map)
+                elif open_cells[i+2].y > end.y:
+                    set_to_wall_if_unknown(end.x, end.y-1, grid_map)
+                elif open_cells[i+2].y < end.y:
+                    set_to_wall_if_unknown(end.x, end.y+1, grid_map)
         if end.x > start.x:
             set_to_wall_if_unknown(end.x, end.y-1, grid_map)
             set_to_wall_if_unknown(start.x, start.y-1, grid_map)
@@ -694,9 +701,8 @@ def add_walls(open_cells, grid_map):
             set_to_wall_if_unknown(end.x-1, end.y, grid_map)
             set_to_wall_if_unknown(start.x-1, start.y, grid_map)
         # Now available in animation!
-#        grid_map.debug_print()
-#        time.sleep(0.1)
-        last_dir = direction
+        # grid_map.debug_print()
+        # time.sleep(0.1)
 
 def get_cells_passed(grid_pos:Position, angle:float):
     grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
@@ -704,8 +710,10 @@ def get_cells_passed(grid_pos:Position, angle:float):
     dx = grid_map.width()
     dy = grid_map.height()
     diagonal = math.sqrt(dx*dx + dy*dy)
-    line_end = Position(grid_pos.x + diagonal*math.sin(math.radians(angle)),
-                        grid_pos.y + diagonal*math.cos(math.radians(angle)))
+    #print("GCELLS ANGLE:", angle)
+    line_end = Position(grid_pos.x + diagonal*math.cos(math.radians(angle)),
+                        grid_pos.y + diagonal*math.sin(math.radians(angle)))
+    #print("END:", line_end)
     line = Line(grid_pos, line_end)
     # Find the cells line passes through
     return raytrace(line)
@@ -776,27 +784,27 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
     """
     SMALL_FLOAT = 0.01 # For float comparison, just to be safe
     FAST = True # Ignore less expensive checks
-    
-    grid_pos = approximate_to_cell(start_pos, robot_pos)
+    grid_pos = approximate_to_cell(robot_pos)
     with_island = [] # Result
     for angle, dist in measurements:
-        #input()
+#        input()
 
         # Check if the measurement coincides with the wall behind it at that angle
-        actual_angle = facing_angle + angle - 90
+        actual_angle = facing_angle + 90 - angle
         wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
         #grid_map.debug_print(print_origin=True)
         #print(wall_there)
         #time.sleep(0.1)
-        dif = Position(dist*math.sin(math.radians(actual_angle)),
-                       dist*math.cos(math.radians(actual_angle)))
+        dif = Position(dist*math.cos(math.radians(actual_angle)),
+                       dist*math.sin(math.radians(actual_angle)))
         scanned_pos = Position(robot_pos.x + dif.x,
                                robot_pos.y + dif.y)
-        scanned_grid_pos = approximate_to_cell(start_pos, scanned_pos)
-        """print(actual_angle, dist, dif.x/CELL_SIZE, dif.y/CELL_SIZE)
+        scanned_grid_pos = approximate_to_cell(scanned_pos)
+        """print(angle, actual_angle, dist, dif)
         print(grid_pos, wall_there)
         print(scanned_pos, scanned_grid_pos)
         if wall_there is not None:
+            print(wall_there)
             print(scanned_grid_pos.dist_to_squared(wall_there))"""
         if (wall_there is not None and
             wall_there != grid_pos and
