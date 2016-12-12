@@ -649,7 +649,16 @@ def add_walls(open_cells, grid_map):
     for i in range(len(open_cells)-1):
         start = open_cells[i]
         end = open_cells[i+1]
-        direction = Position(end.x - start.x, end.y - start.y)
+        if end.x == start.x and end.y == start.y:
+            if len(open_cells) > i + 2:
+                if open_cells[i+2].x > end.x:
+                    set_to_wall_if_unknown(end.x-1, end.y, grid_map)
+                elif open_cells[i+2].x < end.x:
+                    set_to_wall_if_unknown(end.x+1, end.y, grid_map)
+                elif open_cells[i+2].y > end.y:
+                    set_to_wall_if_unknown(end.x, end.y-1, grid_map)
+                elif open_cells[i+2].y < end.y:
+                    set_to_wall_if_unknown(end.x, end.y+1, grid_map)
         if end.x > start.x:
             set_to_wall_if_unknown(end.x, end.y-1, grid_map)
             set_to_wall_if_unknown(start.x, start.y-1, grid_map)
@@ -665,7 +674,6 @@ def add_walls(open_cells, grid_map):
         # Now available in animation!
         # grid_map.debug_print()
         # time.sleep(0.1)
-        last_dir = direction
 
 def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
     """
