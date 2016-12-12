@@ -582,6 +582,12 @@ def approximate_to_cell(pos, resolution=1):
     dy = pos.y 
     return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
 
+def mark_all_cells_direction(cells, direction):
+    print(direction)
+    for cell in cells:
+        cell.direction = direction
+
+
 def movement_lines_to_cells(lines, resolution=1):
     """
     Return the cells that a list of real-world lines passes through.
@@ -594,10 +600,21 @@ def movement_lines_to_cells(lines, resolution=1):
         :return (list of Position): A list of cell indices the lines passes through, in CELL_SIZE/resolution mm.
     """
     grid_points = []
+    print ("LINES",len(lines))
     for line in lines:
         start = approximate_to_cell(line.start, resolution)
         end = approximate_to_cell(line.end, resolution)
         between = bresenham(Line(start, end))
+        print (line.start, line.end)
+        if line.end.x > line.start.x:
+            mark_all_cells_direction(between, Direction.LEFT)
+        if line.end.x < line.start.x:
+            mark_all_cells_direction(between, Direction.RIGHT)
+        if line.end.y > line.start.y:
+            mark_all_cells_direction(between, Direction.UP)
+        if line.end.y < line.start.y:
+            mark_all_cells_direction(between, Direction.DOWN)
+
         grid_points += between
     return grid_points
 
@@ -677,32 +694,23 @@ def add_walls(open_cells, grid_map):
     last_dir = None
     for i in range(len(open_cells)-1):
         start = open_cells[i]
-        end = open_cells[i+1]
-        if end.x == start.x and end.y == start.y:
-            if len(open_cells) > i + 2:
-                if open_cells[i+2].x > end.x:
-                    set_to_wall_if_unknown(end.x-1, end.y, grid_map)
-                elif open_cells[i+2].x < end.x:
-                    set_to_wall_if_unknown(end.x+1, end.y, grid_map)
-                elif open_cells[i+2].y > end.y:
-                    set_to_wall_if_unknown(end.x, end.y-1, grid_map)
-                elif open_cells[i+2].y < end.y:
-                    set_to_wall_if_unknown(end.x, end.y+1, grid_map)
-        if end.x > start.x:
-            set_to_wall_if_unknown(end.x, end.y-1, grid_map)
-            set_to_wall_if_unknown(start.x, start.y-1, grid_map)
-        if end.x < start.x:
-            set_to_wall_if_unknown(end.x, end.y+1, grid_map)
+        
+        print (open_cells[i].direction)
+        if open_cells[i].direction == Direction.RIGHT:
             set_to_wall_if_unknown(start.x, start.y+1, grid_map)
-        if end.y > start.y:
-            set_to_wall_if_unknown(end.x+1, end.y, grid_map)
-            set_to_wall_if_unknown(start.x+1, start.y, grid_map)
-        if end.y < start.y:
-            set_to_wall_if_unknown(end.x-1, end.y, grid_map)
+            #set_to_wall_if_unknown(start.x, start.y-1, grid_map)
+        if open_cells[i].direction == Direction.LEFT:
+            set_to_wall_if_unknown(start.x, start.y-1, grid_map)
+            #set_to_wall_if_unknown(start.x, start.y+1, grid_map)
+        if open_cells[i].direction == Direction.DOWN:
             set_to_wall_if_unknown(start.x-1, start.y, grid_map)
+            #set_to_wall_if_unknown(start.x+1, start.y, grid_map)
+        if open_cells[i].direction == Direction.UP:
+            set_to_wall_if_unknown(start.x+1, start.y, grid_map)
+            #set_to_wall_if_unknown(start.x-1, start.y, grid_map)
         # Now available in animation!
-        # grid_map.debug_print()
-        # time.sleep(0.1)
+        grid_map.debug_print()
+        time.sleep(0.1)
 
 def get_cells_passed(grid_pos:Position, angle:float):
     grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
