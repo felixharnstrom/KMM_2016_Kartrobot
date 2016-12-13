@@ -473,6 +473,15 @@ ATmega1284 används som processormodell, då den är kraftfull utan att ta det t
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
 Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placacering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40x40cm.
 
+\subsubsection{LP-filter}
+De sensorer som skickar en analog signal kommer att få med sig endel brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så går sensorer med analoga signaler (förrutom reflex sensorer) till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggranheten i avläsningen betydligt.
+
+\begin{figure}[h!]
+	\makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{lp-filter.png}}
+	\caption{LP-filtrets konstruktion.}
+	\label{fig:lpFilter}
+\end{figure}
+
 \subsubsection{LIDAR} \label{sssec:lidar}
 LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med komponenten via en trigger-pin; tiden som signaler är höga är linjära gentemot uppmätt avstånd. Vi använder även denna för att se om vi håller på att köra in i en vägg.
 
@@ -481,17 +490,8 @@ Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specif
 \subsubsection{Gyro} \label{sssec:imu}
 MPU6050 är ett gyro som används via en I2C-bus. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar. Gyrot läses endast av när det efterfrågas (under sväng).
 
-\subsubsection{Reflex sensorer} \label{ssec:reflex}
+\subsubsection{Reflex sensorer}
 Reflex sensorerna skickar ut en analog signal som varierar beroende på hur mycket ljus som avges från ytan den siktar på. Eftersom att hjulet har en färgskala påklistrad så kommer signalen att variera i värde för varje gång som hjulet snurrat 1/8 av ett varv.
-
-\subsubsection{LP-filter} \label{sssec:lp-filter}
-De sensorer som skickar en analog signal kommer att få med sig endel brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så går sensorer med analoga signaler (förrutom reflex sensorer) till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggranheten i avläsningen betydligt.
-
-\begin{figure}[h!]
-	\makebox[\textwidth][c]{\includegraphics[width=0.5\textwidth]{lp-filter.png}}
-	\caption{LP-filtrets konstruktion.}
-	\label{fig:lpFilter}
-\end{figure}
 
 \clearpage
 
@@ -502,8 +502,8 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1}
 \hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}. Körs i \SI{8}{\mega\hertz}}{1}
 \hardware{GP2D120}{IR-sensor.}{5}
-\hardware{Resistor}{Till LP-filter. \SI{18}{\kilo\ohm}}{5}
-\hardware{Kondensator}{Till LP-filter. \SI{100}{\nano\farad}}{5}
+\hardware{Resistor}{Till LP-filter. \SI{18}{\kilo\ohm}}{6}
+\hardware{Kondensator}{Till LP-filter. \SI{100}{\nano\farad}}{6}
 \hardware{LIDAR lite v3}{Avancerad lasersensor.}{1}
 \hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
 \hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
@@ -658,11 +658,11 @@ Från styrenheten skickas information om vilka hastigheter motorerna/servot fåt
 
 \clearpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
-
 Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
+%TODO: Lägg till knappar som går till PI:n i schemat
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -1007,9 +1007,8 @@ PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inb
 \begin{appendices}
 
 \section{Detaljerat blockschema}
-% TODO: Sensorenhet-update
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{modules_detail.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{modules_detail.png}}
     \caption{Detaljerat blockschema över systemet.}
     \label{fig:modulesDetailed}
 \end{figure}
