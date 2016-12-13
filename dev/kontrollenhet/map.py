@@ -774,14 +774,13 @@ def passes_through_unknown_before_wall(grid_pos:Position, angle:float, grid_map:
             return True
     return True
     
-def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angle:float,
+def measurements_with_island(robot_pos:Position, facing_angle:float,
                              measurements:list, grid_map:GridMap):
     """
     Return the measurements detecting an island: a previously undetected wall that seems to be
     at least one tile from a previously detected wall behind it.
 
     Args:
-        :param start_pos (Position): The position in the maze the robot started at.
         :param robot_pos (Position): The current position of the robot, in millimeters.
         :param facing_angle (float): The current facing of the robot, in degrees.
         :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (0 to +180), and dist is the distance to a wall, in millimeters.
@@ -824,8 +823,7 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
                 with_island.append((angle, dist))
     return with_island
 
-def find_island(minimum_measurements:int,
-                start_pos:Position, robot_pos:Position, facing_angle:float,
+def find_island(minimum_measurements:int, robot_pos:Position, facing_angle:float,
                 measurements:list, grid_map:GridMap):
     """
     Return a tuple (angle, dist), which leads to an island, or None, if measurements doesn't indicate that an island exist. An island is considered a wall not in grid_map, which is at least one full tile away from the wall behind it.
@@ -834,7 +832,6 @@ def find_island(minimum_measurements:int,
 
     Args:
         :param minimum_measurements (int): The minimum number of measurements that considers something an island in order for an island to be considered detected.
-        :param start_pos (Position): The position in the maze the robot started at.
         :param robot_pos (Position): The current position of the robot, in millimeters.
         :param facing_angle (float): The current facing of the robot, in degrees.
         :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
@@ -843,7 +840,7 @@ def find_island(minimum_measurements:int,
     Returns:
         :return (tuple): A tuple containing (angle, dist), where angle is the angle the robot must turn to face the island, and dist the distance it has to drive to reach it. Or None, if no island is detected.
     """
-    with_island = measurements_with_island(start_pos, robot_pos, facing_angle, measurements, grid_map)
+    with_island = measurements_with_island(robot_pos, facing_angle, measurements, grid_map)
     # Did enough measurements think it was an island?
     if len(with_island) >= minimum_measurements:
         # Returns median value - should be about the center of the part of the island we see
