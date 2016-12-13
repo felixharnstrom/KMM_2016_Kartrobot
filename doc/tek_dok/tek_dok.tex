@@ -445,6 +445,14 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
     \item [TOGGLE\_MODE] Om vi är i det manuella läget: byte till autonomt. Annars: byt till manuellt.
 \end{description}
 
+\subsection{Ingående komponenter}
+Här följer en lista på ingående hårdvara som ej anses höra till ett viss delsystem.
+\begin{HardwareList}
+\hardware{USB-TTL}{Seriell omvandlare för USB.}{2}
+\hardware{\cite{terminator}}{Robotplattform.}{1}
+\hardware{Virkort}{För virning och montering.}{2}
+\hardware{7-segment-display}{7-segment-displayer för debugging, en för vardera ATmega1284-processor.}{2}
+\end{HardwareList}
 
 \clearpage
 \section{Sensorenhet} \label{sec:system1}
@@ -490,8 +498,8 @@ MPU6050 är ett gyro som används via en I2C-bus. Den ger oss rotationen kring z
 \subsubsection{Reflex sensorer}
 Reflex sensorerna skickar ut en analog signal som varierar beroende på hur mycket ljus som avges från ytan den siktar på. Eftersom att de två bakre hjulen har en färgskala påklistrad som skiftar mellan svart och vit kommer signalen att pendla mellan två olika spänningar. Varje färg består i 1/8 av ett varv, vilket betyder att när reflex sensorerna ändrat signalstyrkan så vet vi att hjulet snurrat 1/8 av ett varv. På detta sätt kan vi räkna ut hur långt roboten har kört.
 
-\subsubsection{Komponentbudget}
-Här följer en lista på all hårdvara som detta delsystem kräver.
+\subsubsection{Ingående komponenter}
+Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \begin{HardwareList}
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1}
@@ -501,6 +509,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{Kondensator}{Till LP-filter. \SI{100}{\nano\farad}}{6}
 \hardware{LIDAR lite v3}{Avancerad lasersensor.}{1}
 \hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
+\hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
 \hardware{MPU6050}{Gyro/Accelerometer.}{1}
 \hardware{Reflex sensor}{Detekterar färgändringar på hjulet. Används till att räkna ut hur långt vi kört.}{2}
 \end{HardwareList}
@@ -561,16 +570,13 @@ Hobbyservot styrs med PWM. Svängvidden är 180 grader. Styrenheten tar emot sty
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen. Styrenheten tar emot hastigheter via seriella kommandon enligt kapitel \ref{sec:controlCommunication} och omvandlar dessa till PWM-signaler.
 
-\subsubsection{Komponentbudget}
-Här följer en lista på all hårdvara som detta delsystem kräver.
+\subsubsection{Ingående komponenter}
+Här följer en lista på all hårdvara som ingår i detta delsystem.
 
-% TODO add hardware
 \begin{HardwareList}
 \hardware{ATmega1284}{Mikroprocessor med 40 pinnar (inklusive 8 A/D-omvandlare).}{1} 
 \hardware{EXO-3}{Oscillator för ATmega-klockan, med standardfrekvens \SI{16}{\mega\hertz}. Körs i \SI{8}{\mega\hertz}}{1}
 \hardware{Hobbyservo}{Används för att snurra på LIDAR lasern.}{1}
-\hardware{Terminator}{Chassi som roboten är byggd på.}{1}
-\hardware{DC-motor}{Är monterat på Terminator chassit.}{4}
 \end{HardwareList}
 
 \subsection{Mjukvara}
@@ -656,6 +662,7 @@ Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. De
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
+%TODO: Lägg till knappar som går till PI:n i schemat
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -671,8 +678,8 @@ Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så finns e
 
 För strömförsörjning används en USB-kabel från robotplatformen.
 
-\subsubsection{Komponentbudget}
-Här följer en lista på all hårdvara som detta delsystem använder.
+\subsubsection{Ingående komponenter}
+Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \begin{HardwareList}
 \hardware{Raspberry Pi 3}{Enkortsdator.}{1}
@@ -839,7 +846,7 @@ Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte
 Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar lämpliga kommandon till styrenheten (se kapitel \ref{sec:system2}) skrivs. Se figur \ref{fig:auto_flowchart} för ett lämpligt programflöde.
 
 %TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
-\begin{figure}[h!] \label{fig:auto_flowchart}
+\begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  }
 \end{figure}
@@ -1002,16 +1009,8 @@ Det grafiska gränssnittet är byggt med grafikbiblioteket \cite{tkinter}.
 
 PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inbyggda sockets.
 
-\section{Slutsatser}
-
-Sensorerna som skickar analoga signaler ger väldigt dåliga mätvärden, mycket för att det är svårt att filtrera allt brus. Det hade varit till stor fördel att använda digitala sensorer istället.
-
-LIDARN hade varit helt onödig om man istället använt IR-sensorer med 5-100 cm räckvidd. Köksön hade då kunnat scannas med IR-sensorerna och LIDARN hade blivit helt onödig.
-
 \clearpage
-
 \begin{appendices}
-
 
 \section{Detaljerat blockschema}
 \begin{figure}[h!]
