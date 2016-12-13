@@ -1,8 +1,6 @@
 
-from UART import UART
-from modules import *
-from sensorenhet_functions import *
 from geometry import *
+from robot_communication import *
 import json
 import math, time
 import numpy as np
@@ -16,16 +14,22 @@ CELL_SIZE = 400
 DIVISIONS_PER_LINE = 4
 
 """The number of votes per line section required for something to be considered a full line."""
-MIN_MESURE = 1
+MIN_MESURE = 2
 
 """The number of line segments that needs to be voted in for their line to be voted in."""
 SEGMENTS_REQUIRED = 3
 
-"""The thickness of a line segment."""
-ACCURACY = 130
+"""The thickness of a line segment in millimeters."""
+ACCURACY = 150
 
-"""The length of a line segment."""
+"""The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
+
+"""The sleep time when moving the servo to 0."""
+LIDAR_INITIAL_SLEEP = 1.5
+
+"""The sleep time when moving the servo 1 degree."""
+LIDAR_SLEEP = 0.015
 
 def bresenham(line):
     """
@@ -95,10 +99,10 @@ def coordinates_to_lines(coordinates):
     Approximate coordinates to line segments.
 
     Args:
-        :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of floats): Measurement endpoints formatted as (x, y), in millimeters.
 
     Returns:
-        :return (list of Line's): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
+        :return (list of Line's): Lines with end-points in millimeters describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
     """
     # Gets size coordinate area in squares of CELL_SIZE
     top_left = top_left_grid_index(coordinates)
@@ -182,13 +186,13 @@ def open_missed_corners(grid_map:GridMap):
                 
 
 # TODO: Non-DRY
-def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
+def update_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     """
     Gives every grid a CellType, as OPEN or WALL. OPEN if the grid is open from robot point of wiev adn WALL if the grid is behind a wall from robot point of view.
 
     Args:
         :param (list of Line): Lines describing walls, each being horizontal or vertical with lengths of CELL_SIZE millimeters.
-        :param robot_pos (Position): The position of the robot as the measurements was taken.
+        :param robot_pos (Position): The position of the robot as the measurements was taken, in millimeters.
         :param grid_map (GridMap): The GridMap to modify.
     """
     # Gets size coordinate area in squares of CELL_SIZE
@@ -197,6 +201,9 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
     top_left = top_left_grid_index(line_coordinates)
     bottom_right = bottom_right_grid_index(line_coordinates)
 
+    # Robot pos in grid
+    robot_grid_pos = Position(math.floor(robot_pos.x/CELL_SIZE), math.floor(robot_pos.y/CELL_SIZE))
+    
     # Loop over y-indices for the grid
     for y_index in range(top_left.y, bottom_right.y + 1):
         # Stores square position, start in y and end in y as multiplied with CELL_SIZE.
@@ -220,7 +227,7 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             end_vertical = Position(x, y_next)
             line_horizontal = Line(start, end_horizontal)
             line_vertical = Line(start, end_vertical)
-
+            
             #Check if there exists a horizontal line from current grid, if it exists create a WALL grid
             if line_horizontal in lines:
                 changed_pos_hor = change_grid_type(robot_pos, grid_pos, line_horizontal, grid_map)
@@ -234,7 +241,8 @@ def get_grid_map(lines, robot_pos:Position, grid_map:GridMap):
             for changed_pos in (changed_pos_hor, changed_pos_ver):
                 # If we have a new wall
                 if changed_pos is not None:
-                    cells_between = bresenham(Line(robot_pos, changed_pos))
+                    cells_between = bresenham(Line(robot_grid_pos, changed_pos))
+                    #print(robot_grid_pos, "->", changed_pos, ":", len(cells_between))
                     for cell in cells_between:
                         # If the cell isn't known, set it to OPEN
                         if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
@@ -274,10 +282,10 @@ def top_left_grid_index(coordinates):
     Return the top_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
-        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y), in millemeters.
 
     Returns:
-        :return (Position): The top left position of said AABB.
+        :return (Position): The top left position of said AABB, scaled by 1/CELL_SIZE (i.e an offset of 1 is an offset of CELL_SIZE millimeters).
     """
     top_left = Position(0, 0)
     for x, y in coordinates:
@@ -290,10 +298,10 @@ def bottom_right_grid_index(coordinates):
     Return the bottom_left coordinates of an AABB enclosing all coordinates and origin, scaled by 1/CELL_SIZE.
     
     Args:
-        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y).
+        :param coordinates (List of length 2 tuple of float): Measurement endpoints formatted as (x, y), in millimeters.
 
     Returns:
-        :return (Position): The bottom left position of said AABB, scaled by 1/CELL_SIZE.
+        :return (Position): The bottom right position of said AABB, scaled by 1/CELL_SIZE (i.e an offset of 1 is an offset of CELL_SIZE millimeters).
     """
     bottom_right = Position(0, 0)
     for x, y in coordinates:
@@ -313,7 +321,7 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
     ones (False).
 
     Args:
-        :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates.
+        :param coordinates: A list of tuples of floats, containing real-world (x, y) coordinates in millimeters.
         :param vertical: What sort of lines to approximate to. True if vertical, False if horizontal.
 
     Returns:
@@ -393,7 +401,7 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
     Updates a grid cell to CellType.WALL if it falls on the given wall line, or leaves it unchanged otherwise.
 
     Args:
-        :param robot_pos (Position): The position of the robot as the line was scanned.
+        :param robot_pos (Position): The position of the robot as the line was scanned in millimeters.
         :param grid_pos (Position): The grid cell to check.
         :param grid_map (GridMap): The GridMap to modify.
 
@@ -412,17 +420,17 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
 
     #Check if there is a line at current grid position.
     if line == next_vertical:
-        if grid_pos.x > robot_pos.x:
+        if grid_pos.x > robot_pos.x / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.x < robot_pos.x:
+        elif grid_pos.x < robot_pos.x / CELL_SIZE:
             grid_map.set(prev_grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(prev_grid_pos.x, grid_pos.y)
     elif line == next_horizontal:
-        if grid_pos.y > robot_pos.y:
+        if grid_pos.y > robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, grid_pos.y)
-        elif grid_pos.y < robot_pos.y:
+        elif grid_pos.y < robot_pos.y / CELL_SIZE:
             grid_map.set(grid_pos.x, prev_grid_pos.y, CellType.WALL)
             return Position(grid_pos.x, prev_grid_pos.y)
     return None
@@ -434,7 +442,7 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     
     Args:
         :param measurements (list of length-2-tuple of float: Tuples containing (angle, distance to wall), where angle is degrees.
-        :param robot_pos (Position): The robot position; origin point of the measurements.
+        :param robot_pos (Position): The robot position in millimeters; origin point of the measurements.
         :angle (float): The angle of the robot, in degrees.
     
     Returns:
@@ -442,8 +450,8 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
     coordinates = []
     for degree, dist in measurements:
-        x = (math.sin(math.radians(degree + angle)) * dist) + robot_pos.x
-        y = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.y
+        x = (math.sin(math.radians(degree + angle - 90)) * dist) + robot_pos.x
+        y = (math.cos(math.radians(degree + angle - 90)) * dist) + robot_pos.y
         coordinates.append((x, y))
     return coordinates
 
@@ -465,55 +473,52 @@ def read_debug_data(file_name):
 
 
 
-def measure_lidar(motor_uart:UART, sensor_uart:UART):
+def measure_lidar():
     """
     Turn the laser 180 degrees, taking measurements. Return said measurements.
-
-    Args:
-        :param motor_uart (UART): The motor unit UART interface.
-        :param sensor_uart (UART): The sensor unit UART interface.
 
     Returns:
         :return: (list of length-2-tuple of float): Tuples containing (angle, distance to wall), where angle is degrees.
     """
-    driveInstruction = Servo(0)
-
     degree_plot = []
     distance_plot = []
 
-    motor_uart.send_function(driveInstruction)
+    handle_command(Command.servo(0))
 
-    time.sleep(1.5)
+    time.sleep(LIDAR_INITIAL_SLEEP)
     degree = 0
 
     measurements = []
 
     for degree in range(0, 180):
-        sensor_uart.send_function(ReadLidar())
-
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 0:
-            raise RuntimeError("Incorrect acknowledge packet.")
-        if sensor_uart.decode_metapacket(sensor_uart.receive_packet())[2] != 8:
-            raise RuntimeError("Not a lidar value.")
-
-        highest = sensor_uart.receive_packet()
-        lowest = sensor_uart.receive_packet()
-        dist = ord(lowest) + ord(highest) * (2 ** 8)
-
-        x = math.sin(math.radians(degree)) * dist
-        y = math.cos(math.radians(degree)) * dist
-
+        dist = handle_command(Command.read_lidar())
         measurements.append([degree, dist])
-
-        motor_uart.send_function(Servo(int(degree)))
-        time.sleep(0.005)
+        handle_command(Command.servo(int(degree)))
+        time.sleep(LIDAR_SLEEP)
+    handle_command(Command.servo(90))
     return measurements
 
 
+def scan_and_update_grid(robot_pos:Position, robot_angle:float, grid_map:GridMap):
+    """
+    Scan the room and update grid_map with walls an open spaces found.
+
+    Args:
+        :param robot_pos (Position): The position of the robot, in millimeters.
+        :param robot_angle (float): The facing angle of the robot, in degrees..
+        :grid_map (GridMap): The GridMap to insert the results into.
+        :passes (int): The number of times we rotate the LIDAR to measure.
+    """
+    measurements = measure_lidar()
+    coordinates = convert_to_coordinates(measurements, robot_pos, robot_angle)
+    lines = coordinates_to_lines(coordinates)
+    update_grid_map(lines, robot_pos, grid_map)
+
+    
 
 def debug_plot(coordinates, lines):
     """
-    A test plotting, that shows all mesuring points and walls on the same plot. This is for debugging purpesus only.
+    A test plotting, that shows all meuring points and walls on the same plot. This is for debugging purpesus only.
     This returns a plot with a dot for all mesured data and also draws out all lines/Walls
     """
     plot_lines(lines)
@@ -528,3 +533,229 @@ def debug_plot(coordinates, lines):
     plt.plot([(top_left.x - 1) * CELL_SIZE, (bottom_right.x + 1) * CELL_SIZE],
              [(top_left.y) * CELL_SIZE, (bottom_right.y) * CELL_SIZE], '.')
     plt.show()
+
+
+def approximate_to_cell(pos, resolution=1):
+    """
+    Convert a real-world position (in mm) to a cell position (in CELL_SIZE/resolution mm).
+
+    Args:
+        :param start_pos (Position): The position the robot is initially placed in, in mm.
+        :param pos (Position): The position to convert, in mm.
+        :param resolution (float, >= 1): The amount to scale the result up with. 
+
+    Returns:
+        :return (Position): The cell indices the pos represents, in CELL_SIZE/resolution mm.
+
+    """
+    dx = pos.x 
+    dy = pos.y 
+    return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
+
+def movement_lines_to_cells(start_pos, lines, resolution=1):
+    """
+    Return the cells that a list of real-world lines passes through.
+
+    Args:
+        :param start_pos (Position): The position the robot is initially placed in, in mm.
+        :param lines (list of Line): Lines indicating path of movement, in mm.
+        :param resolution (float, >= 1): The amount to scale the result up with. Primarily for debugging.
+
+    Returns:
+        :return (list of Position): A list of cell indices the lines passes through, in CELL_SIZE/resolution mm.
+    """
+    grid_points = []
+    for line in lines:
+        start = approximate_to_cell(line.start, resolution)
+        end = approximate_to_cell(line.end, resolution)
+        between = bresenham(Line(start, end))
+        grid_points += between
+    return grid_points
+
+
+def movement_to_lines(movements: list, start):
+    """
+    Convert a list of movements (angles and distances) to lines indicating path of movement
+
+    Args:
+        :param movements (list): List of (current_angle_in_degrees, distance_since_start_in_mm) of the robots movements.
+
+    Returns:
+        :return (list of Line): The path of movement represented by lines.
+    """
+    # Start first line at (0,0). (The second pair will be popped before use)
+    points_x = [start.x, start.x]
+    points_y = [start.y, start.y]
+
+    lines = []
+
+    # Convert to points
+    last_distance = 0
+    for angle, distance in movements:
+        # Calculate distance moved since last savepoint
+        current_distance = distance - last_distance
+
+        # Add line ending (x2,y2), from last position (x1,y1)
+        points_x.append(points_x[-1] + current_distance * math.sin(math.radians(angle)))
+        points_y.append(points_y[-1] + current_distance * math.cos(math.radians(angle)))
+
+        # Add current line to plot
+        last_distance = distance
+
+    # Convert to lines
+    last = None
+    for i in range(len(points_x)):
+        current = Position(points_x[i], points_y[i])
+        if last is not None:
+            lines.append(Line(last, current))
+        last = current
+    return lines
+
+
+def make_open(cells, grid_map):
+    """
+    Set all cell indices given to OPEN.
+
+    Args:
+        :param cells (list of Position): The cell indices to set.
+        :param grid_map (GridMap): The GridMap to modify.
+    """
+    for cell in cells:
+        grid_map.set(cell.x, cell.y, CellType.OPEN)
+
+        
+def set_to_wall_if_unknown(x, y, grid_map):
+    """
+    Set a cell to WALL if it is UNKNOWN.
+
+    Args:
+       :param x (int): The x-index to set.
+       :param y (int): The y-index to set.
+       :param grid_map (GridMap): The GridMap to modify.
+    """
+    if grid_map.get(x, y) == CellType.UNKNOWN:
+        grid_map.set(x, y, CellType.WALL)
+
+        
+def add_walls(open_cells, grid_map):
+    """
+    Pad open cells with walls to the right.
+
+    Args:
+        :param open_cells (list of Position): The grid indices containing open cells to pad.
+        :param grid_map (GridMap): The GridMap to modify.
+    """
+    last_dir = None
+    for i in range(len(open_cells)-1):
+        start = open_cells[i]
+        end = open_cells[i+1]
+        direction = Position(end.x - start.x, end.y - start.y)
+        if end.x > start.x:
+            set_to_wall_if_unknown(end.x, end.y-1, grid_map)
+            set_to_wall_if_unknown(start.x, start.y-1, grid_map)
+        if end.x < start.x:
+            set_to_wall_if_unknown(end.x, end.y+1, grid_map)
+            set_to_wall_if_unknown(start.x, start.y+1, grid_map)
+        if end.y > start.y:
+            set_to_wall_if_unknown(end.x+1, end.y, grid_map)
+            set_to_wall_if_unknown(start.x+1, start.y, grid_map)
+        if end.y < start.y:
+            set_to_wall_if_unknown(end.x-1, end.y, grid_map)
+            set_to_wall_if_unknown(start.x-1, start.y, grid_map)
+        # Now available in animation!
+        # grid_map.debug_print()
+        # time.sleep(0.1)
+        last_dir = direction
+
+def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
+    """
+    Return the index of the first cell in grid_map matching ctype on a line from grid_pos
+    at angle degrees, or None if no such cell exists.
+
+    Args:
+        :param grid_pos (Position): The position in the grid to originate from.
+        :param angle (float): The angle to check at, in degrees.
+        :param ctype (CellType): The cell type to look for.
+        :param grid_map (GridMap): The Gridmap to read in.
+
+    Returns:
+        :return (Position): The cell index the celltype was first found on, or None if it doesn't exist.
+    """
+    grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
+    # A line can be at most the length of the diagonal of the GridMap
+    dx = grid_map.width()
+    dy = grid_map.height()
+    diagonal = math.sqrt(dx*dx + dy*dy)
+    line_end = Position(grid_pos.x + diagonal*math.cos(math.radians(angle)),
+                        grid_pos.y + diagonal*math.sin(math.radians(angle)))
+    line = Line(grid_pos, line_end)
+    # Find the cells line passes through
+    cells = bresenham(line)
+    # Look for cell of type
+    for cell in cells:
+        if not grid_map.is_within_bounds(cell.x, cell.y):
+            return None
+        elif grid_map.get(cell.x, cell.y) == ctype:
+            return cell
+    return None
+
+def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angle:float,
+                             measurements:list, grid_map:GridMap):
+    """
+    Return the measurements detecting an island: a previously undetected wall that seems to be
+    at least one tile from a previously detected wall behind it.
+
+    Args:
+        :param start_pos (Position): The position in the maze the robot started at.
+        :param robot_pos (Position): The current position of the robot, in millimeters.
+        :param facing_angle (float): The current facing of the robot, in degrees.
+        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
+        :param grid_map (GridMap): A GridMap of previously detected walls.
+
+    Returns:
+        :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
+    """
+    SMALL_FLOAT = 0.01 # For float comparison, just to be safe
+    grid_pos = approximate_to_cell(robot_pos)
+    with_island = [] # Result
+    for angle, dist in measurements:
+        # Check if the measurement coincides with the wall behind it at that angle
+        actual_angle = facing_angle + angle
+        wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
+        
+        scanned_pos = Position(robot_pos.x + dist*math.sin(math.radians(actual_angle)),
+                               robot_pos.y + dist*math.cos(math.radians(actual_angle)))
+        scanned_grid_pos = approximate_to_cell(scanned_pos)
+        if wall_there is not None and scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT:
+            with_island.append((angle, dist))
+    return with_island
+
+def find_island(minimum_measurements:int,
+                start_pos:Position, robot_pos:Position, facing_angle:float,
+                measurements:list, grid_map:GridMap):
+    """
+    Return a tuple (angle, dist), which leads to an island, or None, if measurements doesn't indicate that an island exist. An island is considered a wall not in grid_map, which is at least one full tile away from the wall behind it.
+
+    Not tested.
+
+    Args:
+        :param minimum_measurements (int): The minimum number of measurements that considers something an island in order for an island to be considered detected.
+        :param start_pos (Position): The position in the maze the robot started at.
+        :param robot_pos (Position): The current position of the robot, in millimeters.
+        :param facing_angle (float): The current facing of the robot, in degrees.
+        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
+        :param grid_map (GridMap): A GridMap of previously detected walls.
+
+    Returns:
+        :return (tuple): A tuple containing (angle, dist), where angle is the angle the robot must turn to face the island, and dist the distance it has to drive to reach it. Or None, if no island is detected.
+    """
+    with_island = measurements_with_island(start_pos, robot_pos, facing_angle, measurements, grid_map)
+    # Did enough measurements think it was an island?
+    if len(with_island) >= minimum_measurements:
+        # Returns median value - should be about the center of the part of the island we see
+        with_island = sorted(with_island, key=lambda e: e[0])
+        middle = math.floor(len(with_island)/2)
+        return with_island[middle]
+    return None
+        
+    
