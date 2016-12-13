@@ -30,7 +30,7 @@ class Size:
     def __str__(self):
         return str(self.__dict__)
 
-    def __eq__(self, other): 
+    def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
     def __ne__(self, other): 
@@ -72,6 +72,12 @@ class Position:
 
     def __eq__(self, other): 
         return self.x == other.x and self.y == other.y
+
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+#        return self.__dict__ == other.__dict__
+
 
     def __ne__(self, other): 
         return not self == other

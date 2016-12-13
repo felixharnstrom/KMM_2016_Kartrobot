@@ -658,7 +658,7 @@ def movement_to_lines(movements: list, start):
     return lines
 
 
-def make_open(cells, grid_map):
+def make_open(cells, grid_map:GridMap):
     """
     Set all cell indices given to OPEN.
 
@@ -670,7 +670,7 @@ def make_open(cells, grid_map):
         grid_map.set(cell.x, cell.y, CellType.OPEN)
 
         
-def set_to_wall_if_unknown(x, y, grid_map):
+def set_to_wall_if_unknown(x, y, grid_map:GridMap):
     """
     Set a cell to WALL if it is UNKNOWN.
 
@@ -797,7 +797,7 @@ def measurements_with_island(robot_pos:Position, facing_angle:float,
 #        input()
 
         # Check if the measurement coincides with the wall behind it at that angle
-        actual_angle = facing_angle + 90 - angle
+        actual_angle = facing_angle + 180 - angle
         wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
         #grid_map.debug_print(print_origin=True)
         #print(wall_there)
@@ -823,30 +823,97 @@ def measurements_with_island(robot_pos:Position, facing_angle:float,
                 with_island.append((angle, dist))
     return with_island
 
-def find_island(minimum_measurements:int, robot_pos:Position, facing_angle:float,
-                measurements:list, grid_map:GridMap):
-    """
-    Return a tuple (angle, dist), which leads to an island, or None, if measurements doesn't indicate that an island exist. An island is considered a wall not in grid_map, which is at least one full tile away from the wall behind it.
 
-    Not tested.
+def filter_out_small_walls(measurements_with_islands:list, min_wall_size:int=CELL_SIZE):
+    """
+    Filter out measurements that does not contain full walls, and return
+    lists of series of measurements describing the same wall.
 
     Args:
-        :param minimum_measurements (int): The minimum number of measurements that considers something an island in order for an island to be considered detected.
-        :param robot_pos (Position): The current position of the robot, in millimeters.
-        :param facing_angle (float): The current facing of the robot, in degrees.
-        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (-90 to +90), and dist is the distance to a wall, in millimeters.
-        :param grid_map (GridMap): A GridMap of previously detected walls.
+        :param measurements_with_islands (list): list of measurements pointing to islands; tuples 
+            containin (angle, dist), in degrees, mm, respectively.
+        :param min_wall_size (int): The minimum wall length required to not be filtered out.
 
     Returns:
-        :return (tuple): A tuple containing (angle, dist), where angle is the angle the robot must turn to face the island, and dist the distance it has to drive to reach it. Or None, if no island is detected.
+        :return (list): list of list of tuples containing (angle, dist)
+            (in degrees, mm). Each sublist contains measurements describing the same wall.
     """
-    with_island = measurements_with_island(robot_pos, facing_angle, measurements, grid_map)
-    # Did enough measurements think it was an island?
-    if len(with_island) >= minimum_measurements:
-        # Returns median value - should be about the center of the part of the island we see
-        with_island = sorted(with_island, key=lambda e: e[0])
-        middle = math.floor(len(with_island)/2)
-        return with_island[middle]
-    return None
+    
+    # Sort after angle, just to be sure
+    # In case the way we measure stuff changes
+    measurements_with_islands = sorted(measurements_with_islands, key=lambda e: e[0])
+
+    # Bigger -> less sensitive
+    MAX_ANGLE_DIF = 2
+    MAX_DIST_DIF = CELL_SIZE * 0.75
+    
+    # Find continuities
+    conts = [[]]
+    prev_angle, prev_dist = None, None
+    for e in measurements_with_islands:
+        angle, dist = e
+        if ((prev_angle is not None and prev_dist is not None) and
+            (angle - prev_angle > MAX_ANGLE_DIF or abs(prev_dist - dist) > MAX_DIST_DIF)):
+            conts.append([])
+        conts[-1].append(e)
+        prev_angle, prev_dist = angle, dist
+
+    # Measure continuities
+    ret = []
+    for cont in conts:
+        start, end = cont[0], cont[-1]
+        start_angle, start_dist = start
+        end_angle, end_dist = end
+        start_pos = Position(start_dist*math.cos(math.radians(start_angle)),
+                             start_dist*math.sin(math.radians(start_angle)))
+        end_pos = Position(end_dist*math.cos(math.radians(end_angle)),
+                             end_dist*math.sin(math.radians(end_angle)))
+        dist = start_pos.dist(end_pos)
+
+        if dist >= min_wall_size:
+            ret.append(cont)
+
+    return conts
+
+
+    
+def left_island_exists(robot_pos:Position, facing_angle:float, grid_map:GridMap, measurements=None):
+    """
+    Return True if an island exists to the left.
+
+    Args:
+        :robot_pos (Position): The current position of the robot, in mm.
+        :facing_angle (float): The facing angle of the robot, in degrees.
+        :grid_map (GridMap): A grid_map containing all outer wall tiles.
+        :measurements (list): the measurements to process. If None, measure lidar instead.
+
+    Returns:
+        :return (bool): True if an island exist.
+    """
+    
+    # Some constants
+    ACCEPTABLE_SPAN_MIN = 80  # degrees
+    ACCEPTABLE_SPAN_MAX = 100 # degrees
+
+    # Read measurements if none was given
+    if measurements is None:
+        measurements = measure_lidar()
         
+    # Find possible islands
+    islands = measurements_with_island(robot_pos, facing_angle, measurements, grid_map)
+    islands = filter_out_small_walls(islands)
+
+    # We might not be perfectly aligned with a multiple of 90 degrees, I guess
+    facing_error = facing_angle % 90
+    
+    # Find an island that's 90 degrees to our facing
+    for island in islands:
+        island_angles = [e[0] for e in island]
+        acceptable_angles = range(ACCEPTABLE_SPAN_MIN, ACCEPTABLE_SPAN_MAX)
+        for acceptable_angle in acceptable_angles:
+            if acceptable_angle - facing_error in island_angles:
+                return True
+            
+    # No such island found
+    return False
     
