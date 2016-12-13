@@ -753,39 +753,44 @@ Roboten konstrueras med två olika lägen: ett manuellt, och ett autonomt. Olika
 När roboten startar så initieras den med startvärden och hamnar i den huvudloop som ser till att den alltid är i det styrläge som användaren avser, se figur \ref{fig:lageskontroll}.
 
 \begin{figure}[h!]
-    \centering
-    \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
-    \tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
-    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
-    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
-    \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black,
-     fill=green!30, align=center, inner sep=10pt, aspect=2]
-    \tikzstyle{arrow} = [thin,->,>=stealth]
-    \tikzstyle{line} = [thin,>=stealth]
-    % Nodes
-    \node (start) [startstop] {Start};
-    \node (initstart) [process, below of=start, yshift=-30pt] {Setup start\\ values};
-    \node (exitquestion) [decision, below of=initstart, yshift=-30pt] {Exit?};
-    \node (end) [startstop, left of= exitquestion, xshift=-80pt] {End}; %TODO: Behöver vi verkligen det här?
-    \node (ismanual) [decision, below of=exitquestion, yshift=-30pt] {Is mode\\ manual?};
-    \node (manualmode) [process, right of=ismanual, xshift=100pt] {Run manual mode};
-    \node (automode) [process, below of=ismanual, yshift=-30pt] {Run autonomous mode};
-    % Arrows
-    \draw [arrow] (start) -- (initstart);
-    \draw [arrow] (initstart) -- (exitquestion);
-    \draw [arrow] (exitquestion) -- node[anchor=south] {Yes}(end);
-    \draw [arrow] (exitquestion) -- node[auto] {No}(ismanual);
-    \draw [arrow] (ismanual) -- node[anchor=south] {Yes}(manualmode);
-    \draw [arrow] (ismanual) -- node[auto] {No}(automode);
-    \coordinate(dummy) at ($(manualmode |- automode) + (80pt,0pt)$);
-    \draw [line] (automode) -- (dummy);
-    \draw [line] (manualmode) -- ($(manualmode) + (80pt,0pt)$);
-    \draw [line] (dummy) -- (dummy |- exitquestion); 
-    \draw [arrow] (dummy |- exitquestion) -- (exitquestion);
-    \end{tikzpicture}
-    \caption{Programflöde för robotens huvudloop.}
-    \label{fig:lageskontroll}
+	\makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{main-flowchart.png}}
+	\caption{Flödesschema för robotens huvudloop. \label{fig:lageskontroll}}
 \end{figure}
+
+%\begin{figure}[h!]
+%    \centering
+%    \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
+%    \tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
+%    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
+%    \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
+%    \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black,
+%     fill=green!30, align=center, inner sep=10pt, aspect=2]
+%    \tikzstyle{arrow} = [thin,->,>=stealth]
+%    \tikzstyle{line} = [thin,>=stealth]
+    % Nodes
+%    \node (start) [startstop] {Start};
+%    \node (initstart) [process, below of=start, yshift=-30pt] {Setup start\\ values};
+%    \node (exitquestion) [decision, below of=initstart, yshift=-30pt] {Exit?};
+%    \node (end) [startstop, left of= exitquestion, xshift=-80pt] {End};
+%    \node (ismanual) [decision, below of=exitquestion, yshift=-30pt] {Is mode\\ manual?};
+%    \node (manualmode) [process, right of=ismanual, xshift=100pt] {Run manual mode};
+%    \node (automode) [process, below of=ismanual, yshift=-30pt] {Run autonomous mode};
+    % Arrows
+%    \draw [arrow] (start) -- (initstart);
+%    \draw [arrow] (initstart) -- (exitquestion);
+%    \draw [arrow] (exitquestion) -- node[anchor=south] {Yes}(end);
+%    \draw [arrow] (exitquestion) -- node[auto] {No}(ismanual);
+%    \draw [arrow] (ismanual) -- node[anchor=south] {Yes}(manualmode);
+%    \draw [arrow] (ismanual) -- node[auto] {No}(automode);
+%    \coordinate(dummy) at ($(manualmode |- automode) + (80pt,0pt)$);
+%    \draw [line] (automode) -- (dummy);
+%    \draw [line] (manualmode) -- ($(manualmode) + (80pt,0pt)$);
+%    \draw [line] (dummy) -- (dummy |- exitquestion); 
+%    \draw [arrow] (dummy |- exitquestion) -- (exitquestion);
+%    \end{tikzpicture}
+%    \caption{Programflöde för robotens huvudloop.}
+%    \label{fig:lageskontroll}
+%\end{figure}
 
 \subsubsection{Manuellt läge}
 I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nertryckta som då översätts till styrkommandon och skickas vidare till styrenheten.
@@ -837,7 +842,7 @@ Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte
 
 \subsubsection{Autonomt läge}
 I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
-%TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
+
 \begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
