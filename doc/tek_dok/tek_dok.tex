@@ -1,4 +1,3 @@
-% !TeX spellcheck = en_US
 \documentclass[a4paper,11pt]{article}
 
 \usepackage[utf8]{inputenc}
@@ -10,6 +9,8 @@
 \usepackage{pdfpages}
 \usepackage{siunitx}
 \usepackage{bytefield}
+\usepackage{dirtree}
+\usepackage{listings}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
@@ -1060,8 +1061,186 @@ Pythonkod följer \cite{pep8} med PyCharm-stil\footnote{\url{https://www.jetbrai
 
 \clearpage
 \section{Programlistning}
+\subsection{Huvudmoduler}
+\subsubsection{Sensorenhet}
+\dirtree{%
+.1 /.
+.2 dev.
+.3 sensorenhet.
+.4 Sensorenhet.
+.5 Sensorenhet.
+.6 Sensorenhet.c.
+.6 Sensorenhet.h.
+}
 
+\begin{description}
+\item[Redaktör] EN
+\item[Författare] EN, SL, HH, JJ
+\item[Datum] 2016-12-13
+\item[Version] 1.0
+\end{description}
 
+\subsubsection{Styrenhet}
+\dirtree{%
+.1 /.
+.2 dev.
+.3 styrenhet.
+.4 Styrenhet.
+.5 Styrenhet.
+.6 Styrenhet.c.
+.6 Styrenhet.h.
+}
+
+\begin{description}
+\item[Redaktör] DM
+\item[Författare] DM, HH
+\item[Datum] 2016-12-13
+\item[Version] 1.0
+\end{description}
+
+\subsubsection{Kommunikations- och kontrollenhet}
+\dirtree{%
+.1 /.
+.2 dev.
+.3 kontrollenhet.
+.4 main.py.
+}
+
+\begin{description}
+\item[Redaktör] SL
+\item[Författare] SL, FH, HH, DM, EN
+\item[Datum] 2016-12-14
+\item[Version] 1.0
+\end{description}
+
+\subsubsection{PC-mjukvara}
+\dirtree{%
+.1 /.
+.2 dev.
+.3 PC.
+.4 main.py.
+}
+
+\begin{description}
+\item[Redaktör] HH
+\item[Författare] DM, HH, SL, EN
+\item[Datum] 2016-12-14
+\item[Version] 1.0
+\end{description}
+
+%\dirtree{%
+%.1 /.
+%.2 dev.
+%.3 PC.
+%.4 main.py.
+%.3 kontrollenhet.
+%.4 main.py.
+%.3 styrenhet.
+%.4 Styrenhet.
+%.5 Styrenhet.
+%.6 Styrenhet.c.
+%.6 Styrenhet.h.
+%.3 sensorenhet.
+%.4 Sensorenhet.
+%.5 Sensorenhet.
+%.6 Sensorenhet.c.
+%.6 Sensorenhet.h.
+%}
+
+\subsection{Dokumentationsstandard}
+\subsubsection{C}
+All funktionsdokumentation för den del av projektet som är skriven i C återfinns i header-filerna (\texttt{.h}).
+
+\lstset{language=C,
+                basicstyle=\ttfamily,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red!50!brown}\ttfamily,
+                commentstyle=\color{green!50!black}\ttfamily,
+                showstringspaces=false}
+\begin{lstlisting}
+#ifndef EXAMPLEMODULE_H_
+#define EXAMPLEMODULE_H_
+
+/**
+ * @brief Example macro.
+ */
+#ifndef DEF_TEST
+#define DEF_TEST 8000000UL
+#endif
+
+/**
+  * @brief Example enum.
+  */
+typedef enum {VAL1, VAL2, VAL2, VAL4} enumExample_t;
+
+/**
+ * @brief Example function without return value.
+ *
+ * @param   param1 Description of param1.
+ */
+void startADConversion(type param1);
+
+/**
+ * @brief Example function with params and return value.
+ *
+ * @param   param1 Description of param1.
+ * @param   param2 Description of param2.
+ * @return  Description of return value.
+ */
+type msgTypeToSensor(type param1, type param2);
+
+#endif /* EXAMPLEMODULE_H_ */
+
+\end{lstlisting}
+
+\clearpage
+\subsubsection{Python}
+\lstset{language=Python}
+\begin{lstlisting}
+"""
+A short overview of this module, including usage examples
+if necessary.
+
+Examples:
+        $ python3 main.py -f 'foo' -b 'bar'
+"""
+
+class ExampleClass:
+    """
+    Short description of this class including constructor
+    arguments and public attributes.
+    
+    Args:
+        param1  (type): Description of param1.
+
+    Attributes:
+        attr1   (type): Description of attr1.
+        ATTR2   (type): Description of constant ATTR2.
+    """
+
+    def __init__(self, param1 : type):
+        self.attr1 = param1
+        self.ATTR2 = 10
+
+    def function_with_return(self, param1: type):
+        """
+        Example function with return value.
+
+        Args:
+            :param1    (type): Description of param1.
+        Returns:
+            (type): Description of return value.
+        """
+
+    def function_without_return(self, param1: type, param2 : type):
+        """
+        Example function without return value.
+
+        Args:
+            :param1    (type): Description of param1.
+            :param2    (type): Description of param2.
+        """
+\end{lstlisting}
 
 \clearpage
 \addcontentsline{toc}{section}{Referenser} %append references section at this location to TOC
