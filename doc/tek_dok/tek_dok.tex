@@ -125,9 +125,9 @@ Detta dokument innehåller nödvändig teknisk dokumentation för underhåll och
 \section{Produkten}
 Roboten är uppbyggd med tre olika moduler (kommunikations- och kontrollenhet, styrenhet och sensorenhet) vars placering på roboten kan ses i figur \ref{fig:robot_overview}. Siffrorna i figuren illustrerar följande komponenter:
 \begin{enumerate}
-\item Sensorenhet.
-\item Styrenhet.
-\item Kommunikations- och kontrollenhet.
+\item Sensorenhet
+\item Styrenhet
+\item Kommunikations- och kontrollenhet
 \end{enumerate}
 
 \begin{figure}[h!]
@@ -842,27 +842,13 @@ Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte
 \clearpage
 
 \subsubsection{Autonomt läge}
-I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
+Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar lämpliga kommandon till styrenheten (se kapitel \ref{sec:system2}) skrivs. Se figur \ref{fig:auto_flowchart} för ett lämpligt programflöde.
+
 %TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
-	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
+	\caption{Flödesschema för det autonoma läget.  }
 \end{figure}
-
-Efter att roboten kört ett varv och återkommit till garaget så påbörjas ytterligare ett varv, för att hitta till köksön, enligt figur \ref{fig:kitchenSearch}
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{kitchen_flowchart.png}}
-    \caption{Flödesschema för att hitta köksön. \label{fig:kitchenSearch}}
-\end{figure}
-
-Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDrive}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
-\begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{kitchen_around_flowchart.png}}
-    \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
-\end{figure}
-
-När roboten hitta tillbaka till en yttervägg kommer denne återigen att köra tills den hamnat i garage-rutan.
-
 
 %\begin{figure}[h!]
 %\centering
@@ -1067,11 +1053,26 @@ Pythonkod följer \cite{pep8} med PyCharm-stil\footnote{\url{https://www.jetbrai
 \section{Robotplattform}
 \label{app:placement}
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[scale=0.6]{layout_topdown_vectorized.png}}
+    \centering
+    \includegraphics[scale=0.15]{robot_side_annotated.png}
     \caption{Placering av hårdvara på robotchassit.}
     \label{fig:placement}
 \end{figure}
 \end{appendices}
+
+Siffrorna i figur \ref{fig:placement} illustrerar följande komponenter:
+\begin{enumerate}
+\item Sensorenhet
+\item Styrenhet
+\item Kommunikations- och kontrollenhet
+\item IR-sensor
+\item LIDAR
+\item Servo
+\item Återställningsknapp
+\item Reflexsensor
+\item Avstängningsknapp
+\item Manuell brytare för att byta läge
+\end{enumerate}
 
 \clearpage
 \section{Programlistning}
