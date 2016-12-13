@@ -1000,15 +1000,24 @@ PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenh
 Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
 
 \subsubsection{GUI}
-Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren kunna välja kommandon som ska skickas till roboten, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui_mockup} för en mockup.
+Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren styra roboten med piltangenterna i manuellt läge, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui} för en bild av gränssnittet.
 
 Det grafiska gränssnittet är byggt med grafikbiblioteket \cite{tkinter}.
 
 \begin{figure}[h!]
-    \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{gui_mockup.png}}
-    \caption{Mockup av det grafiska gränssnittet.}
-    \label{fig:gui_mockup}
+    \centering
+    \includegraphics[scale=0.55]{gui_annotated.png}
+    \caption{Det grafiska gränssnittet.}
+    \label{fig:gui}
 \end{figure}
+
+Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska gränssnittet;
+\begin{enumerate}
+\item Hitintills utritad karta.
+\item Knappar för att byta läge och stänga ner PC-mjukvaran.
+\item Nuvarande motorhastighet och servoposition.
+\item Nuvarande sensorvärden och avverkat avstånd.
+\end{enumerate}
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
