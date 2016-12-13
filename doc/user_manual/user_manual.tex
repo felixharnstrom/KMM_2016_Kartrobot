@@ -73,11 +73,11 @@
 \newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
 \newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
 \newcommand{\LIPSdokumenttyp}{Användarhandledning}
-\newcommand{\LIPSredaktor}{TODO}
+\newcommand{\LIPSredaktor}{Silas Lenz}
 
-\newcommand{\LIPSversion}{1.1}
-\newcommand{\LIPSgranskare}{}
-\newcommand{\LIPSgranskatdatum}{}
+\newcommand{\LIPSversion}{1.0}
+\newcommand{\LIPSgranskare}{Felix Härnström}
+\newcommand{\LIPSgranskatdatum}{2016-12-13}
 \newcommand{\LIPSgodkannare}{}
 \newcommand{\LIPSgodkantdatum}{}
 
@@ -105,7 +105,7 @@
 \normalfont
 \clearpage
 \begin{LIPSdokumenthistorik}
-    \LIPSversionsinfo{1.0}{}{}{}{}
+    \LIPSversionsinfo{1.0}{2016-12-13}{Första versionen.}{FH, SL}{FH}
 \end{LIPSdokumenthistorik}
 \clearpage
 \setcounter{page}{1}
@@ -122,10 +122,25 @@ Vid strömpåslag kommer roboten automatiskt starta upp och ansluta till \texttt
 \end{enumerate}
 
 \section{GUI}\label{sec:gui}
-Det grafiska gränssnittet har knappar för att byta läge, samt för att stänga av programmet. I det manuella läget kan piltangenterna på tangentbordet användas för styrning. Även flera tangenter samtidigt fungerar. Till vänster visas en karta i det autonoma läget. Till höger visas sensordata och i mitten visas aktuell motorstatus samt kontrollpanelen.
+Det grafiska gränssnittet har knappar för att byta läge, samt för att stänga av programmet. I det manuella läget kan piltangenterna på tangentbordet användas för styrning. Även flera tangenter samtidigt fungerar. Till vänster visas en karta i det autonoma läget. Till höger visas sensordata och i mitten visas aktuell motorstatus samt kontrollpanelen. Se figur \ref{fig:gui} för en bild av gränssnittet.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.55]{gui_annotated.png}
+    \caption{Det grafiska gränssnittet.}
+    \label{fig:gui}
+\end{figure}
+
+Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska gränssnittet;
+\begin{enumerate}
+\item Hitintills utritad karta.
+\item Knappar för att byta läge och stänga ner PC-mjukvaran.
+\item Nuvarande motorhastighet och servoposition.
+\item Nuvarande sensorvärden och avverkat avstånd.
+\end{enumerate}
 
 \section{Byta läge}
-För att byta mellan autonomnt och manuellt kan det grafiska gränssnittet (se kapitel \ref{sec:gui}) eller den blåa fysiska knappen på roboten användas (se punkt 3 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
+För att byta mellan autonomt och manuellt kan det grafiska gränssnittet (se kapitel \ref{sec:gui}) eller den blåa fysiska knappen på roboten användas (se punkt 3 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
 
 \section{Avstängning}
 För att stänga av roboten måste kommunikations- och kontrollenheten genomföra en mjuk avstängning innan strömmen bryts. För att stänga av kommunikations- och kontrollenheten trycker man ned den röda knappen på roboten (se punkt 2 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
