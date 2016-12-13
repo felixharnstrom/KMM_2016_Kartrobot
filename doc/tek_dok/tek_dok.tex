@@ -447,6 +447,7 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
 
 \subsection{Ingående komponenter}
 Här följer en lista på ingående hårdvara som ej anses höra till ett viss delsystem.
+
 \begin{HardwareList}
 \hardware{USB-TTL}{Seriell omvandlare för USB.}{2}
 \hardware{\cite{terminator}}{Robotplattform.}{1}
@@ -456,9 +457,9 @@ Här följer en lista på ingående hårdvara som ej anses höra till ett viss d
 
 \clearpage
 \section{Sensorenhet} \label{sec:system1}
-Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Den innehåller en processor av modellen ATmega1284, 5 IR-sensorer, en lasersensor, 2 reflex sensorer, samt gyro.
+Sensorenheten har i uppgift att läsa in sensordata och omvandla den till ett läsligt format. Den innehåller en processor av modellen ATmega1284, 5 IR-sensorer, en lasersensor, 2 reflexsensorer, samt gyro.
 
-IR-sensorerna används för navigering - bland annat ger de indata till reglerings algoritmen: väggavstånd. Lasersensorn, LIDAR, används för skanning av rummet. Med hjälp av gyrot kan vi se till att vi utför våra 90-graders-svängar korrekt. De 2 reflex sensorerna sitter på hjulen och används för att avgöra hur långt vi har kört.
+IR-sensorerna används för navigering - bland annat ger de indata till reglerings algoritmen: väggavstånd. Lasersensorn, LIDAR, används för skanning av rummet. Med hjälp av gyrot kan vi se till att vi utför våra 90-graders-svängar korrekt. De 2 reflexsensorerna sitter på hjulen och används för att avgöra hur långt vi har kört.
 
 Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenheten.
 
@@ -473,13 +474,13 @@ Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenhet
 \subsection{Hårdvara}
 
 \subsubsection{Processor}
-ATmega1284 används som processormodell, då den är kraftfull utan att ta det är till överdrift. Antalet pinnar, A/D-omvandlare, interrupts samt UART-enheter som processorn har räcker för samtliga sensorer och kommunikationsbussar.
+ATmega1284 används som processormodell då den är kraftfull utan att ta det är till överdrift. Antalet pinnar, A/D-omvandlare, avbrott, samt UART-enheter som processorn har räcker för samtliga sensorer och kommunikationsbussar.
 
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
-Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placacering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40x40cm.
+Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40 $\times$ 40 cm.
 
 \subsubsection{LP-filter}
-De sensorer som skickar en analog signal kommer att få med sig endel brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förrutom reflex sensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggranheten i avläsningen i ATmega:n betydligt.
+De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{lp-filter.png}}
@@ -493,7 +494,7 @@ LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med k
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar (0 till 180 grader) utan att rotera roboten.
 
 \subsubsection{Gyro} \label{sssec:imu}
-MPU6050 är ett gyro som används via en I2C-bus. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar. Gyrot läses endast av när det efterfrågas (under sväng).
+MPU6050 är ett gyro som används via en I\textsuperscript{2}C-bus. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar. Gyrot läses endast av när det efterfrågas (under sväng).
 
 \subsubsection{Reflex sensorer}
 Reflex sensorerna skickar ut en analog signal som varierar beroende på hur mycket ljus som avges från ytan den siktar på. Eftersom att de två bakre hjulen har en färgskala påklistrad som skiftar mellan svart och vit kommer signalen att pendla mellan två olika spänningar. Varje färg består i 1/8 av ett varv, vilket betyder att när reflex sensorerna ändrat signalstyrkan så vet vi att hjulet snurrat 1/8 av ett varv. På detta sätt kan vi räkna ut hur långt roboten har kört.
@@ -516,15 +517,9 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \subsection{Mjukvara}
 
-Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}.
+Koden skrivs i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
 
 På instruktion läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format (se kapitel \ref{ssec:sensorInterface}) samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
-
-\subsection{Gränssnitt} \label{ssec:sensorInterface}
-Sensorenheten ska kommunicera med alla sensorer och skicka vidare utdata. Mer information om interenhetskommunikationen finner man i kapitel \ref{sssec:kontrollenhet_arrow_styrenhet}.
-
-% TODO: Mer om protokollen till hårdvaran
-% Om vi inte tar bort denna sektionen; protokollen är typ beskrivna nedan ändå.
 
 \subsubsection{LIDAR}
 LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
@@ -532,7 +527,7 @@ LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensor
 \clearpage
 
 \subsubsection{Gyro}
-MPU6050 läses av via I2C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel (då det inte ligger plant gentemot chassit). Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det. Gyrot är inställt på att använda en maximal vinkelhastighet på 250 grader/s. Efter avläsning omvandlas vinkelhastigheten till centigrader/s.
+MPU6050 läses av via I\textsuperscript{2}C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel (då det inte ligger plant gentemot chassit). Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det. Gyrot är inställt på att använda en maximal vinkelhastighet på 250 grader/s. Efter avläsning omvandlas vinkelhastigheten till centigrader/s.
 
 \subsubsection{Reflex sensorer}
 Reflex sensorerna skickar en analog signal till AD-omvandlarna. Eftersom att spänningen skljer sig ganska mycket beroende på om reflex sensorn pekar på en svart eller vit yta så behöver vi inget LP-filter här.
@@ -580,7 +575,7 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \end{HardwareList}
 
 \subsection{Mjukvara}
-Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{sec:cstandard}. 
+Koden skrivs i C, och ska följa standarden specificerad i bilaga \ref{app:cstandard}. 
 
 \clearpage
 
@@ -644,6 +639,7 @@ Eftersom att hårdvaran sköter inläsning från en pinne parallellt med det pro
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{Styrsignaler samt styrdata}
+%TODO : Här borde det snarare stå om PWM-moduleringen av motorerna.
 Vi implementerar en seriell buss som går mellan styrenheten och kommunikationsenheten.
 
 Styrdatan ska innehålla information om följande punkter:
@@ -672,11 +668,11 @@ Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunika
 \subsection{Hårdvara}
 
 \subsubsection{Datormodell}
-Raspberry Pi 3 används, med inbyggd Wi-Fi-modul. Denna lilla dator är relativt kraftig, och bör därmed inte ha problem med att hålla sitt program gående i rimlig takt. Antalet portar räcker också till: två USB-utgångar behövs för USB-UARTen och två pinnar behövs för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
+Raspberry Pi 3 används, med inbyggd Wi-Fi-modul. Denna lilla dator är relativt kraftig, och bör därmed inte ha problem med att hålla sitt program gående i rimlig takt. Antalet portar räcker också till: två USB-utgångar behövs för USB-UART:en och två pinnar behövs för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
 
 Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så finns en knapp med funktionen att stänga ner mjukvaran. Denna används då lämpligen innan brytaren för strömmen.
 
-För strömförsörjning används en USB-kabel från robotplatformen.
+För strömförsörjning används en USB-kabel från robotplattformen.
 
 \subsubsection{Ingående komponenter}
 Här följer en lista på all hårdvara som ingår i detta delsystem.
@@ -689,7 +685,7 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \end{HardwareList}
 
 \subsection{Mjukvara}
-Koden skrivs i Python 3, och ska följa \cite{pep8}. Operativsystemet som används är Raspbian.
+Koden skrivs i Python 3, och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
 \subsubsection{Kommunikation}
 Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Mjukvara skrivs för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
@@ -1040,7 +1036,7 @@ PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inb
 \includepdf[scale=0.8,pages=1,angle=180,pagecommand=\section{[Kopplingsschema] Kontrollenhet}\label{schematics:brain}]{schematics/brain/kicad.pdf}
 
 \clearpage
-\section{C-standard} \label{sec:cstandard}
+\section{C-standard} \label{app:cstandard}
 Som kodstandard för C används \cite{cstandard} med några smärre tillägg och ändringar:
 
 \begin{itemize}
@@ -1053,7 +1049,7 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
 \end{itemize}
 
 \clearpage
-\section{Python-standard} \label{sec:pythonstandard}
+\section{Python-standard} \label{app:pythonstandard}
 Pythonkod följer \cite{pep8} med PyCharm-stil\footnote{\url{https://www.jetbrains.com/help/pycharm/2016.3/using-docstrings-to-specify-types.html}} på dokumentationskommentarer för funktioner och dylikt med vissa förändringar:
 
 \begin{itemize}
