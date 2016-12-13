@@ -151,10 +151,12 @@ class GridMap:
         Returns:
             :return (bool): True if it is.
         """
-        return (x >= self.top_left().x and
-                y >= self.top_left().y and
-                x <= self.bottom_right().x and
-                y <= self.bottom_right().y)
+        tl = self.top_left()
+        br = self.bottom_right()
+        return (x >= tl.x and
+                y >= tl.y and
+                x <= br.x and
+                y <= br.y)
         
     def width(self):
         """
