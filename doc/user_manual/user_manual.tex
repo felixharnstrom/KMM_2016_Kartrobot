@@ -116,13 +116,29 @@ Vid strömpåslag kommer roboten automatiskt starta upp och ansluta till \texttt
 
 \section{Uppstart}
 \begin{enumerate}
-    \item Det rekommenderas att starta om robotens AVR-processorer genom att trycka in den röda knappen på övre virkortet innan körning, för att kalibrera sensorer. Se till att roboten står stilla under kalibrering.
+    \item Det rekommenderas att starta om robotens AVR-processorer genom att trycka in den röda knappen på övre virkortet innan körning (se punkt 1 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}), för att kalibrera sensorer. Se till att roboten står stilla under kalibrering.
     
     \item Starta upp PC-mjukvaran genom ändra IP-adress i \texttt{main.py} och därefter köra \texttt{python3 main.py}. 
 \end{enumerate}
 
-
-\section{GUI}
+\section{GUI}\label{sec:gui}
 Det grafiska gränssnittet har knappar för att byta läge, samt för att stänga av programmet. I det manuella läget kan piltangenterna på tangentbordet användas för styrning. Även flera tangenter samtidigt fungerar. Till vänster visas en karta i det autonoma läget. Till höger visas sensordata och i mitten visas aktuell motorstatus samt kontrollpanelen.
+
+\section{Byta läge}
+För att byta mellan autonomnt och manuellt kan det grafiska gränssnittet (se kapitel \ref{sec:gui}) eller den blåa fysiska knappen på roboten användas (se punkt 3 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
+
+\section{Avstängning}
+För att stänga av roboten måste kommunikations- och kontrollenheten genomföra en mjuk avstängning innan strömmen bryts. För att stänga av kommunikations- och kontrollenheten trycker man ned den röda knappen på roboten (se punkt 2 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
+
+\clearpage
+\begin{appendices}
+\section{Produktbild}\label{app:picture}
+ \begin{figure}[h!]
+     \centering
+     \includegraphics[scale=0.15]{robot_side_annotated.png}
+     \caption{Översikt över roboten.}
+     \label{fig:robot_overview}
+ \end{figure}
+\end{appendices}
 
 \end{document}
