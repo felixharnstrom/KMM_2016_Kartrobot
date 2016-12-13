@@ -576,7 +576,7 @@ Vi använder en ATmega1284-processor för styrmodulen. Processorn kommunicerar m
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten finns en lasersensor (se kapitel \ref{sssec:lidar}) monterad. Denna sensor är placerad ovanpå ett servo som tillåter sensorn att rotera, detta servo är ett hobbyservo.
 
-Hobbyservot styrs med PWM och dess svängvidd är 180\si{\degree}. Styrenheten tar emot styrinstruktioner som justerar hobbyservot på engradsnivå, genom att omvandla vinkeln till ett värde som förändrar duty-cyclen hos PWM-signalen. PWM-signalen som styr servot har frekvensen 50Hz och en duty-cycle som varierar mellan $3,9-11,7\%$ för att sätta vinkeln i intervallet 0 - 180\si{\degree}.
+Hobbyservot styrs med PWM och dess svängvidd är 180\si{\degree}. Styrenheten tar emot och exekverar styrinstruktioner som justerar hobbyservot på engradsnivå genom att förändra duty-cyclen på PWM-signalen.
 
 \subsubsection{Hjulmotorer}
 Totalt är det fyra motorer som är monterade på chassit. De fyra DC-motorerna styrs parvis (höger sida och vänster sida) med hjälp av en PWM-signal samt en rotationsriktningssignal per motorpar. Sammanlagt används alltså 4 pinnar på processorn för styrning av hjulen. Styrenheten tar emot hastigheter via seriella kommandon enligt kapitel \ref{sec:controlCommunication} och omvandlar dessa till PWM-signaler.
@@ -592,7 +592,7 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \subsection{Mjukvara}
 Koden för styrenheten är skriven i C, och följer den standard som är specificerad i bilaga \ref{app:cstandard}. 
-Styrenheten lyssnar på UARTen efter 'funktionspaket', utformade enligt specifikationen i \ref{ssec:seriellkommunikation}. Dessa paket tas emot, avkodas och exekveras med de parametrar som hör funktionen till, varefter den återgår till att lyssna efter nya paket.
+Styrenheten lyssnar på UARTen efter instruktioner, utformade enligt specifikationen i \ref{ssec:seriellkommunikation}. Dessa instruktioner tas emot och avkodas till de funktionsanrop som de representerar, och exekveras sedan med de parametrar som hör funktionen till. Därefter återgår enheten till att lyssna efter nya instruktioner.
 
 
 \clearpage
@@ -605,9 +605,9 @@ Styrenheten lyssnar på UARTen efter 'funktionspaket', utformade enligt specifik
 \subsubsection{Programflöde}
 I flödesschemat som visas i \ref{fig:styrenhetFlowchart} så ser vi hur styrmodulen fungerar. Programet startar med att roboten slås igång, då den direkt börjar med sin initiering. Vid initiering så konfigureras enheten med de startvärden som krävs för att fungera korrekt. Efter initieringsprocessen så övergår enheten till att lyssna efter paket från UARTen, dessa paket och deras funktion beskrivs ingående i \ref{sssec:kontrollenhet_arrow_styrenhet}. 
 
-När styrenheten väl tar emot ett 'funktionspaket' med tillhörande parametrar, så skickas den datan vidare till en funktion som läser av funktionsnumret, och därefter vidarebefodrar den till rätt respektive skalfunktion, som ser till att just det funktionsanropet får korrekta typer och värden som håller sig inom gränserna. Därefter så vidarebefodras den avkodade datan till sin respektive interna funktion, som med hjälp av flera delfunktioner ser till att utföra de mer lågnivå-operationer som krävs för varje funktionsanrop. 
+När styrenheten väl tar emot en instruktion med tillhörande parametrar, så skickas den datan vidare till en funktion som läser av dess funktionsnummer. Därefter vidarebefordras den till rätt skal-funktion, som ser till att just det funktionsanropet får korrekta typer, och så att värdena håller sig inom gränserna. Därefter så vidarebefordras den avkodade datan till sin respektive interna funktion, som med hjälp av flera delfunktioner ser till att utföra de lågnivå-operationer som krävs för att genomföra varje funktionsanrop. 
 
-Om funktionsanropet var ett motorkommando som gjordes med ett tidsargument som var nollskilt, så innebär det att styrenheten kommer att köra funktionen under den tid i millisekunder som har angivits, varefter den stannar motorerna och går tillbaka till att invänta en ny instruktion. En funktion som saknar tidsargument, eller där tidsargumentet är 0 varar istället tills en ny instruktion exekveras. Funktionen tar heller inte och låser upp enheten, utan går direkt tillbaka till att kolla efter nya instruktioner.
+Om funktionsanropet var ett motorkommando som gjordes med ett nollskilt tidsargument så innebär det att styrenheten kommer att köra funktionen under den tid i millisekunder som har angivits, varefter den stannar motorerna och går tillbaka till att invänta en ny instruktion. En funktion som saknar tidsargument (eller där det är $0$) påverkar istället motorerna fram tills en ny instruktion som förändrar dem exekveras. Funktionen tar heller inte och låser upp enheten, utan går direkt tillbaka till att vänta efter nya instruktioner.
 
 \begin{figure}[h!]
 	\centering
@@ -650,19 +650,16 @@ Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sk�
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
-\subsubsection{Styrsignaler samt styrdata}
-%TODO : Här borde det snarare stå om PWM-moduleringen av motorerna.
-Vi implementerar en seriell buss som går mellan styrenheten och kommunikationsenheten.
+\subsubsection{PWM-styrning servo}
+För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Detta värde som måste sättas utgår från att PWM-signalen ligger på 50Hz, och att en duty-cycle på $3.9-11.7\%$ täcker det vinkelspann som servot kan röra sig i, nämligen 0-180\si{\degree}.  
+%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
 
-Styrdatan ska innehålla information om följande punkter:
-\begin{itemize}
-	\item Om instruktionen är av typen \texttt{SCAN} eller \texttt{DRIVE}. \texttt{SCAN} styr servot medans \texttt{DRIVE} styr DC motorerna.
-	\item Hur många grader roboten/servot ska rotera.
-	\item Hur långt roboten ska köra i den givna riktningen. Denna information är endast intressant om instruktionen är av typen \texttt{DRIVE}.
-	\item Vilken hastighet de givna motorerna ska köra med.
-\end{itemize}
+\subsubsection{PWM-styrning motorpar}
+För att reglera hastigheten hos motorerna så används en PWM-signal för varje motorsida. Signalen bestäms genom att ta den önskade motorhastigheten i procent och multiplicera den med faktorn $2.52$, vilket ger oss en duty-cycle på $0-98.4\%$. Anledningen till att duty-cyceln inte kan sträcka sig upp till $100\%$ ligger i att motorerna kräver en 0-flank för att fungera korrekt. 
+%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
 
-Från styrenheten skickas information om vilka hastigheter motorerna/servot fått när instruktionen utförs.
+\subsubsection{Rotationsriktning motorpar}
+För att bestämma vilken riktning som ett motorpar ska rotera i så används en output-pin för varje motorsida. Om pinnen är hög ($1$) medför det att motorparet roterar framåt sett till robotens chassi, om pinnen är låg ($0$) medför det att motorparet roterar bakåt.
 
 \clearpage
 \section{Kommunikations- och kontrollenhet} \label{sec:system3}
