@@ -583,7 +583,7 @@ def approximate_to_cell(pos, resolution=1):
     return Position(math.floor(resolution*dx / CELL_SIZE), math.floor(resolution*dy / CELL_SIZE))
 
 def mark_all_cells_direction(cells, direction):
-    print(direction)
+    #print(direction)
     for cell in cells:
         cell.direction = direction
 
@@ -709,8 +709,8 @@ def add_walls(open_cells, grid_map):
             set_to_wall_if_unknown(start.x+1, start.y, grid_map)
             #set_to_wall_if_unknown(start.x-1, start.y, grid_map)
         # Now available in animation!
-        grid_map.debug_print()
-        time.sleep(0.1)
+        #grid_map.debug_print()
+        #time.sleep(0.1)
 
 def get_cells_passed(grid_pos:Position, angle:float):
     grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
@@ -818,6 +818,7 @@ def measurements_with_island(start_pos:Position, robot_pos:Position, facing_angl
             wall_there != grid_pos and
             scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT):
             # More expensive checks
+            # Not even sure if this catches anything. I think it should.
             if FAST or passes_through_unknown_before_wall(robot_pos, actual_angle, grid_map):
                 #print("ISLAND")
                 with_island.append((angle, dist))
