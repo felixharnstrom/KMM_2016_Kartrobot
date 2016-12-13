@@ -997,8 +997,20 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \item Namn på funktioner, typedef, variabler, strukter, unioner, och enums ska vara i lower camel case.
     \item Namn på \#define's, enum-konstanter, och macrofunktioner ska vara i all-caps med ord separerade av underscore.
     \item Typedef:ade namn ska avslutas med "\_t".
-    \item Globala namn ska \textit{ej} påbörjas med ett prefix som identiferar vilken modul de tillhör.
-    \item Dokumentationskommentarer för funktioner och dylikt ska inledas med "/*" följt av tom rad, med textrader inledda med "{ }* ". Hela kommentaren avslutas med en rad som endast innehåller "{ }*/".
+    \item Globala namn ska \textit{ej} påbörjas med ett prefix som identifierar vilken modul de tillhör.
+    \item Dokumentationskommentarer för funktioner och dylikt ska följa Doxygen-standard med JavaDoc-stil på inledande rad ("/**").
+\end{itemize}
+
+\clearpage
+\section{Python-standard} \label{sec:pythonstandard}
+Pythonkod följer \cite{pep8} med PyCharm-stil\footnote{\url{https://www.jetbrains.com/help/pycharm/2016.3/using-docstrings-to-specify-types.html}} på dokumentationskommentarer för funktioner och dylikt med vissa förändringar:
+
+\begin{itemize}
+    \item Indenteringar sker med exakt fyra stycken mellanslag.
+    \item Alla dokumentationskommentarer för funktioner och dylikt ska inledas och avslutas med exakt tre dubbla, raka citationstecken (\texttt{"}) på ensam rad.
+    \item För klassdokumentation används taggarna \texttt{:param} och \texttt{:attribute} för respektive konstruktorargument och publika attribut.
+    \item Efter en parameter, attribut eller dylikt ska typen anges inom parentes.
+    \item Taggar ska grupperas efter typ (såsom \texttt{:param}, \texttt{:return} och så vidare), och dessa grupper ska indenteras samt föregås av en rubrik som beskriver grupperingen.
 \end{itemize}
 
 \clearpage
@@ -1010,9 +1022,6 @@ Som kodstandard för C används \cite{cstandard} med några smärre tillägg och
     \label{fig:placement}
 \end{figure}
 \end{appendices}
-
-\clearpage
-\section{Python-standard} \label{sec:pythonstandard}
 
 \clearpage
 \section{Programlistning}
