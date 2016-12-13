@@ -71,7 +71,7 @@ class Position:
         return str(self.__dict__)
 
     def __eq__(self, other): 
-        return self.__dict__ == other.__dict__
+        return self.x == other.x and self.y == other.y
 
     def __ne__(self, other): 
         return not self == other
