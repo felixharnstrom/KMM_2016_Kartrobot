@@ -600,12 +600,12 @@ def movement_lines_to_cells(lines, resolution=1):
         :return (list of Position): A list of cell indices the lines passes through, in CELL_SIZE/resolution mm.
     """
     grid_points = []
-    print ("LINES",len(lines))
+    # print ("LINES",len(lines))
     for line in lines:
         start = approximate_to_cell(line.start, resolution)
         end = approximate_to_cell(line.end, resolution)
         between = bresenham(Line(start, end))
-        print (line.start, line.end)
+        # print (line.start, line.end)
         if line.end.x > line.start.x:
             mark_all_cells_direction(between, Direction.LEFT)
         if line.end.x < line.start.x:
@@ -695,7 +695,7 @@ def add_walls(open_cells, grid_map):
     for i in range(len(open_cells)-1):
         start = open_cells[i]
         
-        print (open_cells[i].direction)
+        # print (open_cells[i].direction)
         if open_cells[i].direction == Direction.RIGHT:
             set_to_wall_if_unknown(start.x, start.y+1, grid_map)
             #set_to_wall_if_unknown(start.x, start.y-1, grid_map)
