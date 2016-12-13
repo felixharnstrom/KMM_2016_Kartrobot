@@ -229,10 +229,6 @@ Vidare är ett ett gyro (modell MPU6050) monterat i mitten av roboten för att d
 
 I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placering. Kopplingsscheman finns i bilaga \ref{schematics:styrenhet} till och med bilaga \ref{schematics:brain}.
 
-
-\subsection{Kommunikation}
-\label{ssec:communication}
-
 \subsection{Seriell kommunikation}
 För kommunikation mellan kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
 
@@ -505,7 +501,6 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{Kondensator}{Till LP-filter. \SI{100}{\nano\farad}}{6}
 \hardware{LIDAR lite v3}{Avancerad lasersensor.}{1}
 \hardware{Resistor}{Separation av trigger och monitor för LIDAR. \SI{1}{\kilo\ohm}}{1}
-\hardware{Kondensator}{Störningsreducering av LIDAR. \SI{680}{\micro\farad}.}{1}
 \hardware{MPU6050}{Gyro/Accelerometer.}{1}
 \hardware{Reflex sensor}{Detekterar färgändringar på hjulet. Används till att räkna ut hur långt vi kört.}{2}
 \end{HardwareList}
@@ -661,7 +656,6 @@ Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. De
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
-%TODO: Lägg till knappar som går till PI:n i schemat
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -845,7 +839,7 @@ Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte
 Roboten behöver kontinuerligt ta reda på, leta sig till, och skanna outforskade delar av rummet i det autonoma läget. En algoritm för att hitta ett lämpligt outforskat ställe, en för att hitta en väg dit, och en som skickar lämpliga kommandon till styrenheten (se kapitel \ref{sec:system2}) skrivs. Se figur \ref{fig:auto_flowchart} för ett lämpligt programflöde.
 
 %TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
-\begin{figure}[h!]
+\begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  }
 \end{figure}
@@ -1008,8 +1002,16 @@ Det grafiska gränssnittet är byggt med grafikbiblioteket \cite{tkinter}.
 
 PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inbyggda sockets.
 
+\section{Slutsatser}
+
+Sensorerna som skickar analoga signaler ger väldigt dåliga mätvärden, mycket för att det är svårt att filtrera allt brus. Det hade varit till stor fördel att använda digitala sensorer istället.
+
+LIDARN hade varit helt onödig om man istället använt IR-sensorer med 5-100 cm räckvidd. Köksön hade då kunnat scannas med IR-sensorerna och LIDARN hade blivit helt onödig.
+
 \clearpage
+
 \begin{appendices}
+
 
 \section{Detaljerat blockschema}
 \begin{figure}[h!]
