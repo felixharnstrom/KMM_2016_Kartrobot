@@ -466,6 +466,19 @@ def change_grid_type(robot_pos:Position, grid_pos:Position, line:Line, grid_map:
             return Position(grid_pos.x, prev_grid_pos.y)
     return None
 
+def polar_projection(dist:float, angle:float):
+    """
+    Convert angle and distance to position.
+
+    Args:
+        :param dist (float): The distance.
+        :param angle (float): The angle.
+
+    Returns:
+        :return (Position): The position.
+    """
+    return Position(dist*math.cos(math.radians(angle)),
+                    dist*math.sin(math.radians(angle)))
 
 def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
@@ -481,9 +494,8 @@ def convert_to_coordinates(measurements, robot_pos:Position, angle):
     """
     coordinates = []
     for degree, dist in measurements:
-        x = (math.sin(math.radians(degree + angle)) * dist) + robot_pos.x
-        y = (math.cos(math.radians(degree + angle)) * dist) + robot_pos.y
-        coordinates.append((x, y))
+        pos = polar_projection(dist, degree+angle)
+        coordinates.append((pos.x, pos.y))
     return coordinates
 
 
@@ -606,13 +618,13 @@ def movement_lines_to_cells(lines, resolution=1):
         end = approximate_to_cell(line.end, resolution)
         between = bresenham(Line(start, end))
         # print (line.start, line.end)
-        if line.end.x > line.start.x:
-            mark_all_cells_direction(between, Direction.LEFT)
         if line.end.x < line.start.x:
+            mark_all_cells_direction(between, Direction.LEFT)
+        if line.end.x > line.start.x:
             mark_all_cells_direction(between, Direction.RIGHT)
-        if line.end.y > line.start.y:
-            mark_all_cells_direction(between, Direction.UP)
         if line.end.y < line.start.y:
+            mark_all_cells_direction(between, Direction.UP)
+        if line.end.y > line.start.y:
             mark_all_cells_direction(between, Direction.DOWN)
 
         grid_points += between
@@ -642,8 +654,9 @@ def movement_to_lines(movements: list, start):
         current_distance = distance - last_distance
 
         # Add line ending (x2,y2), from last position (x1,y1)
-        points_x.append(points_x[-1] + current_distance * math.sin(math.radians(angle)))
-        points_y.append(points_y[-1] + current_distance * math.cos(math.radians(angle)))
+        change = polar_projection(current_distance, angle)
+        points_x.append(points_x[-1] + change.x)
+        points_y.append(points_y[-1] + change.y)
 
         # Add current line to plot
         last_distance = distance
@@ -719,8 +732,9 @@ def get_cells_passed(grid_pos:Position, angle:float):
     dy = grid_map.height()
     diagonal = math.sqrt(dx*dx + dy*dy)
     #print("GCELLS ANGLE:", angle)
-    line_end = Position(grid_pos.x + diagonal*math.cos(math.radians(angle)),
-                        grid_pos.y + diagonal*math.sin(math.radians(angle)))
+    line_end = polar_projection(diagonal, angle)
+    line_end.x += grid_pos.x
+    line_end.y += grid_pos.y
     #print("END:", line_end)
     line = Line(grid_pos, line_end)
     # Find the cells line passes through
@@ -802,11 +816,11 @@ def measurements_with_island(robot_pos:Position, facing_angle:float,
         #grid_map.debug_print(print_origin=True)
         #print(wall_there)
         #time.sleep(0.1)
-        dif = Position(dist*math.cos(math.radians(actual_angle)),
-                       dist*math.sin(math.radians(actual_angle)))
+        dif = polar_projection(dist, actual_angle)
         scanned_pos = Position(robot_pos.x + dif.x,
                                robot_pos.y + dif.y)
         scanned_grid_pos = approximate_to_cell(scanned_pos)
+
         """print(angle, actual_angle, dist, dif)
         print(grid_pos, wall_there)
         print(scanned_pos, scanned_grid_pos)
@@ -861,13 +875,14 @@ def filter_out_small_walls(measurements_with_islands:list, min_wall_size:int=CEL
     # Measure continuities
     ret = []
     for cont in conts:
+        if not cont:
+            continue
+        
         start, end = cont[0], cont[-1]
         start_angle, start_dist = start
         end_angle, end_dist = end
-        start_pos = Position(start_dist*math.cos(math.radians(start_angle)),
-                             start_dist*math.sin(math.radians(start_angle)))
-        end_pos = Position(end_dist*math.cos(math.radians(end_angle)),
-                             end_dist*math.sin(math.radians(end_angle)))
+        start_pos = polar_projection(start_dist, start_angle)
+        end_pos = polar_projection(end_dist, end_angle)
         dist = start_pos.dist(end_pos)
 
         if dist >= min_wall_size:
@@ -901,7 +916,9 @@ def left_island_exists(robot_pos:Position, facing_angle:float, grid_map:GridMap,
         
     # Find possible islands
     islands = measurements_with_island(robot_pos, facing_angle, measurements, grid_map)
+    print(islands)
     islands = filter_out_small_walls(islands)
+    print(islands)
 
     # We might not be perfectly aligned with a multiple of 90 degrees, I guess
     facing_error = facing_angle % 90
