@@ -42,7 +42,7 @@ def send_command(command, socket, guit):
 def main():
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="130.236.226.142")
+    robot.start(ip="130.236.227.56")
 
     map = [[1,0,1],[0,1,1]]
 
