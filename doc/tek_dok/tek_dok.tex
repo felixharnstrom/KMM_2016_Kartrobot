@@ -9,6 +9,7 @@
 \usepackage{pdfpages}
 \usepackage{siunitx}
 \usepackage{bytefield}
+\usepackage{amsmath}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
@@ -249,8 +250,8 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     	\hline
     	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
     	\texttt{Direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
-    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
-    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 är stillastående. \\
+    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. Om värdet är 0 så körs instruktionen tills en ny instruktion som påverkar motorparen utförs. \\ \hline
     \end{tabular}
     \caption{\texttt{Drive}-instruktionens argument.}
     \label{tab:drive}
@@ -266,8 +267,8 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     	\hline
     	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
     	\texttt{Direction} & 1  & 0 motsvarar vänster, 1 höger. \\
-    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 stillastående. \\
-    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. \\ \hline
+    	\texttt{Speed} & 1 & Integer mellan 0 och 100, där 100 är maxhastighet och 0 är stillastående. \\
+    	\texttt{Time} & 2 & Integer i millisekunder. 16 bitar uppdelat på (först) höga 8 bitar och sedan låga 8 bitar. Om värdet är 0 så körs instruktionen tills en ny instruktion som påverkar motorparen utförs. \\ \hline
     \end{tabular}
     \caption{\texttt{Turn}-instruktionens argument.}
     \label{tab:turn}
@@ -297,11 +298,11 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \begin{table}[h!]
     \centering
     \rowcolors{2}{gray!25}{white}
-    \begin{tabular}{|l|l|l|}
+    \begin{tabular}{|l|l|L{260pt}|}
     \rowcolor{gray!50}
     	\hline
       \textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
-      \texttt{Direction} & 1 & Servots vinkel, mellan 0 och 180 \\ \hline
+      \texttt{Angle} & 1 & Servots vinkel i grader. Anges som en Integer med ett värde mellan 0 och 180. \\ \hline
     \end{tabular}
     \caption{\texttt{Servo}-instruktionens argument.}
     \label{tab:servo}
@@ -311,7 +312,7 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
 \texttt{Stop-motors}-instruktionen stannar båda motorerna. Kommandot har typnummer \texttt{5}.
 
 \paragraph{Controller-Information}
-\texttt{Controller-Information}-instruktionen ber styrenheten om diagnostisk data som returneras såsom specificerat i tabell \ref{tab:controller_information}. Kommandot har typnummer \texttt{6}.
+\texttt{Controller-Information}-instruktionen ber styrenheten om diagnostisk data som returneras såsom specificerat i tabell \ref{tab:controller_information}. För omvandling från PWM till hastighet/vinkel används formlerna i \ref{tab:pwm_to_values}  Kommandot har typnummer \texttt{6}.
 
 
 \begin{table}[h!]
@@ -322,13 +323,27 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     	\hline
     	\textbf{Argument} & \textbf{Storlek (bytes)} & \textbf{Betydelse} \\ \hline
     	\texttt{Left direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
-    	\texttt{Left PWM}  & 1 & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående. \\
+    	\texttt{Left PWM}  & 1 & Integer mellan 0 och 252, där 252 motsvarar maxhastigheten och 0 stillastående. \\
     	\texttt{Right direction} & 1 & 0 motsvarar framåt, 1 bakåt. \\
-    	\texttt{Right PWM} & 1 & Integer mellan 0 och 255, där 255 är maxhastighet och 0 stillastående. \\
-    	\texttt{Servo PWM} & 2 & Integer mellan 0 och 65535, där 773 är längst till vänster och 2343 till höger. \\ \hline
+    	\texttt{Right PWM} & 1 & Integer mellan 0 och 252, där 252 motsvarar maxhastigheten och 0 stillastående. \\
+    	\texttt{Servo PWM} & 2 & Integer mellan 0 och 2342, där 773 motsvarar läget längst till vänster (0\si{\degree}) och 2342 läget längst till höger (180\si{\degree}). \\ \hline
     \end{tabular}
     \caption{Returvärden från \texttt{Controller-Information}-instruktionen.}
     \label{tab:controller_information}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\rowcolors{2}{gray!25}{white}
+	\begin{tabular}{|l|L{100pt}|}
+		\rowcolor{gray!50}
+		\hline
+		\textbf{Utvärde} & \textbf{Formel} \\ \hline
+		\texttt{Motorhastighet (\%)} & \[ \Bigl\lceil \dfrac{\text{motor\_pwm}}{2.52}\Bigr\rceil \] \\
+		\texttt{Servo-vinkel (\si{\degree})} &  \[ \Bigl\lceil \dfrac{\text{servo\_pwm}-773}{6.72}\Bigr\rceil \] \\ \hline
+	\end{tabular}
+	\caption{Beräkning av hastighet och vinkel från PWM-värden.}
+	\label{tab:pwm_to_values}
 \end{table}
 
 \subsubsection{Kontrollenhet $\leftrightarrow$ Sensorenhet}
@@ -407,9 +422,9 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
     \item [TRANSMIT] Utför nästa UART-command som skickas.
     \item [FORWARD\_MOTOR\_INFO] Svara med motorenhetsdata (\texttt{dict}), kodat med JSON.
     \item [FORWARD\_SENSOR\_INFO] Svara med sensorenhetsdata (\texttt{dict}), kodat med JSON.
-    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent. Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}''.
+    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}''.
     \item [SEND\_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
-    \item [TOGGLE\_MODE] Om vi är i det manuella läget: byte till autonomt. Annars: byt till manuellt.
+    \item [TOGGLE\_MODE] Om vi är i det manuella läget: byt till autonomt. Annars: byt till manuellt.
 \end{description}
 
 
@@ -578,7 +593,7 @@ I flödesschemat i figur \ref{fig:styrenhetFlowchart} ser vi att det finns funkt
 \end{tikzpicture}
 	%\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
 	\caption{Flödesschema för styrenheten.}
-	\label{fig:styrenhetFlowchart}
+	\label{fig:enhetFlowchart}
 \end{figure}
 
 \subsubsection{Processer}
