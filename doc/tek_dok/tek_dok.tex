@@ -30,7 +30,7 @@
 
 \usepackage[tocgraduated]{tocstyle}
 \usetocstyle{allwithdot}
-
+F
 \usepackage[titletoc,title]{appendix}
 
 \usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
@@ -118,7 +118,7 @@
 \pagestyle{content}
 
 \section{Inledning}
-Produkten som beskrivs i detta dokument är en robot med förmågan att kartlägga rum som specificeras enligt över \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett Wi-Fi-gränssnitt.
+Produkten som beskrivs i detta dokument är en robot med förmågan att kartlägga rum som specificeras enligt \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett Wi-Fi-gränssnitt.
 
 Detta dokument innehåller nödvändig teknisk dokumentation för underhåll och vidareutveckling av produkten.
 
@@ -193,7 +193,7 @@ Vidare är ett ett gyro (modell MPU6050) monterat i mitten av roboten för att d
 I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placering. Kopplingsscheman finns i bilaga \ref{schematics:styrenhet} till och med bilaga \ref{schematics:brain}.
 
 \subsection{Seriell kommunikation}
-\label{ssec:seriellkommunikation}
+\label{ssec:serial}
 För kommunikation mellan kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
 
 Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket på 8 bitar som följs av noll eller flera datapaket som illustrerat i figur \ref{fig:msg_structure}. Se tabell \ref{tab:meta_packet} för en mer ingående förklaring över fälten i metapaketet.
@@ -231,11 +231,8 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     \label{tab:meta_packet}
 \end{table}
 
-% TODO: Skriv om acknowledge.
-
 \subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet} \label{sssec:kontrollenhet_arrow_styrenhet}
 \label{sec:controlCommunication}
-% TODO: Fixa upplägget med sektioner
 \paragraph{Drive}
 \texttt{Drive}-instruktionen kör roboten framåt eller bakåt enligt argumenten som beskrivs i tabell \ref{tab:drive}. Kommandot har typnummer \texttt{1}.
 \begin{table}[h!]
@@ -410,17 +407,20 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
 \end{table}
 
 \subsection{WIFI-kommunikation}
+\label{ssec:wifi}
 Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
-Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
+Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt.
+Alla kommandon som skickas avslutas även med en '\texttt{\textbackslash n}'-karaktär för att markera att kommandot är fullständigt. Följande kommandon finns tillgängliga:
 
 \begin{description}
     \item [TRANSMIT] Utför nästa UART-command som skickas.
     \item [FORWARD\_MOTOR\_INFO] Svara med motorenhetsdata (\texttt{dict}), kodat med JSON.
     \item [FORWARD\_SENSOR\_INFO] Svara med sensorenhetsdata (\texttt{dict}), kodat med JSON.
-    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}''.
+    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}'' med suffixet ''\texttt{\_p}'' om tangenten tryckts ner eller ''\texttt{\_r}'' om tangenten släppts.
     \item [SEND\_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
     \item [TOGGLE\_MODE] Om vi är i det manuella läget: byt till autonomt. Annars: byt till manuellt.
+    \item [SYNC\_MODE] Hämtar vilket läge (manuellt/autonomt) som roboten i nuläget står i.
 \end{description}
 
 \subsection{Ingående komponenter}
@@ -457,8 +457,9 @@ ATmega1284 används som processormodell då den är kraftfull utan att ta det ä
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
 Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på ena kortsidan. För avståndsmätning åt andra kortsidan används vid behov LIDARn. För nogrannare mätningar åt sidorna kan LIDARn snurra. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40 $\times$ 40 cm.
 
+
 \subsubsection{LP-filter}
-De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
+De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 \si{\hertz}. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{lp-filter.png}}
@@ -467,9 +468,11 @@ De sensorer som skickar en analog signal kommer att få med sig en del brus, vil
 \end{figure}
 
 \subsubsection{LIDAR} \label{sssec:lidar}
-LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med komponenten via en trigger-pin; tiden som signaler är höga är linjära gentemot uppmätt avstånd. Vi använder även denna för att se om vi håller på att köra in i en vägg.
+LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med komponenten via en trigger-pin. Utsignalen är digital och är av typen PWM. Vi använder även LIDARn för att detektera om vi håller på att köra in i en vägg.
 
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar (0 till 180 grader) utan att rotera roboten.
+
+Triggern är konstant låg för att LIDARn ska skicka data kontinuerligt. ATmegan genererar ett avbrott för varje gång som PWM signalen skiftar läge så att vi kan räkna hur lång tid som signalen är hög. Längden växer linjärt med tiden som signalen är hög så efter lite kalibrering ger lasern rätt avstånd.
 
 \subsubsection{Gyro} \label{sssec:imu}
 MPU6050 är ett gyro som används via en I\textsuperscript{2}C-bus. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar. Gyrot läses endast av när det efterfrågas (under sväng).
@@ -495,24 +498,23 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \subsection{Mjukvara}
 
-Koden skrivs i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
+Koden för sensorenheten är skriven i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
 
-På instruktion läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format (se kapitel \ref{ssec:sensorInterface}) samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
+På instruktion så läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
 
 \subsubsection{LIDAR}
-LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
-
-\clearpage
+LIDAR:n använder avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
 
 \subsubsection{Gyro}
 MPU6050 läses av via I\textsuperscript{2}C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel (då det inte ligger plant gentemot chassit). Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det. Gyrot är inställt på att använda en maximal vinkelhastighet på 250 grader/s. Efter avläsning omvandlas vinkelhastigheten till centigrader/s.
 
 \subsubsection{Reflex sensorer}
-Reflex sensorerna skickar en analog signal till AD-omvandlarna. Eftersom att spänningen skljer sig ganska mycket beroende på om reflex sensorn pekar på en svart eller vit yta så behöver vi inget LP-filter här.
+Reflex sensorerna skickar en analog signal till AD-omvandlarna. Eftersom att spänningen skiljer sig ganska mycket beroende på om reflex sensorn pekar på en svart eller vit yta så behöver vi inget LP-filter här.
 
 För varje gång som reflex sensorn detekterar att färgen skiftat från svart till vit eller tvärtom så adderar ATmega:n 1 till respektive räknare. På detta sätt kan vi räkna ut hur långt ett hjul har snurra.
 
 \subsubsection{IR-sensorer}
+\label{ssec:ir_interface}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}. Efter avläsning i form av spänningen, $v$, som går mellan 0 och 5 volt översätts detta med formeln $d = 10 \times (v/4.577) ^{(1/-0.634)}$ till ett avstånd, $d$, i millimeter.
 
 \subsubsection{Utvärden/Input}
@@ -533,9 +535,8 @@ Styrenheten är ansvarig för att kontrollera robotens alla motorer och för att
 \subsubsection{Processor}
 Vi använder en ATmega1284-processor för styrmodulen. Processorn kommunicerar med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
 
-\clearpage
-
-\subsubsection{Servo/steppermotor} \label{ssec:servomotor}
+\subsubsection{Servo/steppermotor} 
+\label{ssec:servomotor}
 På toppen av roboten finns en lasersensor (se kapitel \ref{sssec:lidar}) monterad. Denna sensor är placerad ovanpå ett servo som tillåter sensorn att rotera, detta servo är ett hobbyservo.
 
 Hobbyservot styrs med PWM och dess svängvidd är 180\si{\degree}. Styrenheten tar emot och exekverar styrinstruktioner som justerar hobbyservot på engradsnivå genom att förändra duty-cyclen på PWM-signalen.
@@ -554,18 +555,10 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \subsection{Mjukvara}
 Koden för styrenheten är skriven i C, och följer den standard som är specificerad i bilaga \ref{app:cstandard}. 
-Styrenheten lyssnar på UARTen efter instruktioner, utformade enligt specifikationen i \ref{ssec:seriellkommunikation}. Dessa instruktioner tas emot och avkodas till de funktionsanrop som de representerar, och exekveras sedan med de parametrar som hör funktionen till. Därefter återgår enheten till att lyssna efter nya instruktioner.
-
-
-\clearpage
-
-%\subsubsection{Tillståndsdiagram}
-%TODO: Skriva om eller ta bort? (Med uppdaterad bild)
-%Som vi ser i tillståndsdiagrammet för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika %tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en %instruktion. Notera att en instruktion kan sättas i a0lla tillstånd, så om roboten redan har en instruktion %inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
-%\clearpage
+Styrenheten lyssnar på UARTen efter instruktioner, utformade enligt specifikationen i kapitel \ref{ssec:serial}. Dessa instruktioner tas emot och avkodas till de funktionsanrop som de representerar, och exekveras sedan med de parametrar som hör funktionen till. Därefter återgår enheten till att lyssna efter nya instruktioner.
 
 \subsubsection{Programflöde}
-I flödesschemat som visas i \ref{fig:styrenhetFlowchart} så ser vi hur styrmodulen fungerar. Programet startar med att roboten slås igång, då den direkt börjar med sin initiering. Vid initiering så konfigureras enheten med de startvärden som krävs för att fungera korrekt. Efter initieringsprocessen så övergår enheten till att lyssna efter paket från UARTen, dessa paket och deras funktion beskrivs ingående i \ref{sssec:kontrollenhet_arrow_styrenhet}. 
+I flödesschemat som visas i figur \ref{fig:styrenhetFlowchart} så ser vi hur styrmodulen fungerar. Programet startar med att roboten slås igång, då den direkt börjar med sin initiering. Vid initiering så konfigureras enheten med de startvärden som krävs för att fungera korrekt. Efter initieringsprocessen så övergår enheten till att lyssna efter paket från UARTen, dessa paket och deras funktion beskrivs ingående i kapitel \ref{sssec:kontrollenhet_arrow_styrenhet}. 
 
 När styrenheten väl tar emot en instruktion med tillhörande parametrar, så skickas den datan vidare till en funktion som läser av dess funktionsnummer. Därefter vidarebefordras den till rätt skal-funktion, som ser till att just det funktionsanropet får korrekta typer, och så att värdena håller sig inom gränserna. Därefter så vidarebefordras den avkodade datan till sin respektive interna funktion, som med hjälp av flera delfunktioner ser till att utföra de lågnivå-operationer som krävs för att genomföra varje funktionsanrop. 
 
@@ -602,34 +595,39 @@ Om funktionsanropet var ett motorkommando som gjordes med ett nollskilt tidsargu
 	\draw [arrow] (hNode2) -- (awaitNewInstruction);	
 	\end{tikzpicture}
 	%\makebox[\textwidth][c]{\includegraphics[width=0.9\textwidth]{styrenhet-flowchart.png}}
-	\caption{Flödesschema för styrenheten.}
+	\caption{Flödesschema för styrenhetens mjukvara.}
 	\label{fig:styrenhetFlowchart}
 \end{figure}
 
 \subsubsection{Processer}
 Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sköts all exekvering inom en process, där datan från UARTen kan ses som indata från en kö.
-\clearpage
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{PWM-styrning servo}
-För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Detta värde som måste sättas utgår från att PWM-signalen ligger på 50Hz, och att en duty-cycle på $3.9-11.7\%$ täcker det vinkelspann som servot kan röra sig i, nämligen 0-180\si{\degree}.  
-%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
+För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Värdet beräknas enligt formel \ref{eq:servo_degree_to_pwm}.
+\begin{equation}\label{eq:servo_degree_to_pwm}
+pwm\_value =  \lfloor 773 + angle \times 8.72 \rfloor 
+\end{equation}
+Detta värde bestämmer hur många steg i början av en räknare som PWM-signalen kommer att vara ettställd, med andra ord hur länge som duty-cyclen varar. Räknaren som styr signalen är inställd på att räkna från $0-20000$ med uppräkningsfrekvensen 1 \si{\mega\hertz}, detta medför att PWM-signalen får frekvensen 50 \si{\hertz} då det tar 20000 uppräkningar för att räknaren ska slå om till början. Detta betyder att PWM-signalens duty-cycle för att sätta vinkeln med vår formel, kommer att ligga inom intervallet $3.9-11.7\%$ - något som har visat sig täcka hela vinkelspannet (0-180\si{\degree}) och fungera bra genom testning.
+
 
 \subsubsection{PWM-styrning motorpar}
-För att reglera hastigheten hos motorerna så används en PWM-signal för varje motorsida. Signalen bestäms genom att ta den önskade motorhastigheten i procent och multiplicera den med faktorn $2.52$, vilket ger oss en duty-cycle på $0-98.4\%$. Anledningen till att duty-cyceln inte kan sträcka sig upp till $100\%$ ligger i att motorerna kräver en 0-flank för att fungera korrekt. 
-%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
+För att reglera hastigheten hos motorerna så används en PWM-signal för varje motorsida. Signalen bestäms genom att ta den önskade motorhastigheten i procent och multiplicera den med en omvandlingsfaktor för att sätta duty-cyclen på PWM-signalen. Detta görs enligt formel \ref{eq:motor_to_pwm}.
+\begin{equation}\label{eq:motor_to_pwm}
+pwm\_value =  \lfloor speed\_percentage \times 2.52 \rfloor 
+\end{equation}
+Detta värde bestämmer hur många steg i början av en räknare som PWM-signalen kommer att vara ettställd, alltså hur länge som duty-cyclen för PWM-signalen kommer att vara. En högre duty-cycle medför också en högre rotationshastighet hos motorerna, medan en väldigt låg eller nollställd medför att motorerna står stilla.  Räknaren för PWM-signalen räknar från $0-256$ med uppräkningsfrekvens 125 \si{\kilo\hertz}. Detta medför att PWM-signalen får en frekvens på cirka 488 \si{\hertz}, och en duty-cycle som sträcker sig mellan $0-98.4\%$. Anledningen till att duty-cyclen inte sträcker sig ändå upp mot $100\%$ ligger i att motorerna kräver en $0$-flank för att fungera korrekt.
 
 \subsubsection{Rotationsriktning motorpar}
 För att bestämma vilken riktning som ett motorpar ska rotera i så används en output-pin för varje motorsida. Om pinnen är hög ($1$) medför det att motorparet roterar framåt sett till robotens chassi, om pinnen är låg ($0$) medför det att motorparet roterar bakåt.
 
 \clearpage
-\section{Kommunikations- och kontrollenhet} \label{sec:system3}
-Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
+\section{Kommunikation- och kontrollenhet} \label{sec:system3}
+Kommunikation- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
-%TODO: Lägg till knappar som går till PI:n i schemat
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -656,17 +654,12 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \end{HardwareList}
 
 \subsection{Mjukvara}
-Koden skrivs i Python 3, och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
+Koden är skriven i Python 3 och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
-\subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och kan därför skicka meddelanden mellan dessa. Mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot  finns (se kapitel \ref{ssec:brainInterface}).
+\subsubsection{Kommunikation}\label{ssec:brain_comm}
+Kommunikation- och kontrollenheten är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Det är kommunikations- och kontrollenheten som ansvarar för den seriella kommunikationen (se kapitel \ref{ssec:serial}) med de övriga inbyggda delsystemen, och det är därför denna enhet som inleder all seriell kommunikation. Det betyder att sensorenheten och styrenheten aldrig inleder kommunikationen med kommunikations- och kontrollenheten, utan de svarar bara på kommandon som skickas av denna.
 
-Förutom hårdvarugränssnitt kan den också kommunicera med en extern PC (se kapitel \ref{sec:system4}) med hjälp av Wi-Fi-kommunikation, där den skickar debugdata och kartinformation samt tar emot meddelanden. Dessa meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
-
-% TODO implementeras UART m.h.a avbrott?
-% TODO olika köer för meddelanden från olika ingångar, eller en gemensam? Prioritetskö?
-% Vi skulle kunna använda något liknande http://raspi.tv/2013/how-to-use-interrupts-with-python-on-the-raspberry-pi-and-rpi-gpio-part-3
-För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:wifi} som exempel). 
+Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten också med en extern PC (se kapitel \ref{sec:system4}) via Wi-Fi, där vi har ett liknande förhållande som med den seriella kommunikationen. På kommunikations- och kontrollenheten körs en serverprocess som låter en klient ansluta (se kapitel \ref{ssec:pc_comm}) och skicka kommandon till kommunikations- och kontrollenheten. Anledningen till att köra servermjukvaran på roboten är för att underlätta anslutning då klienten behöver veta serverns IP-adress vid anslutning men ej vice versa. Wi-Fi-meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
 
 \begin{figure}[h!]
     \centering
@@ -683,32 +676,41 @@ För att hantera meddelanden mellan de interna såväl som de externa modulerna 
     \node (initstart) [process, below of=start, yshift=-10pt] {Setup start\\ values};
     \node (connectedquestion) [decision, below of=initstart, yshift=-30pt] {Connected?};
     \node (waitforcom) [io, left of= connectedquestion, xshift=-90pt] {Wait for\\ new connection}; 
-    \node (senddata) [process, below of=connectedquestion, yshift=-20pt] {Send data\\ to PC};
-    \node (waitforpc) [io, left of=senddata, xshift=-90pt] {Wait for\\ response};
-    \node (changemode) [decision, below of=waitforpc, yshift=-20pt] {Change mode?};
+    \node (waitforpc) [io, below of=connectedquestion, yshift=-20pt] {Wait for\\ message};
+    \node (processmsg) [process, left of=waitforpc, xshift=-90pt] {Process\\ message};
+    \node (changemode) [decision, below of=processmsg, yshift=-20pt] {Change mode?};
     \node (modeswitch) [process, right of=changemode, xshift=90pt] {Switch mode};
-    \node (newdata) [decision, below of=changemode, yshift=-40pt] {Commands in\\ response?};
-    \node (adddata) [process, below of=newdata, yshift=-30pt] {Add data to\\ input queue};
+    \node (query) [decision, below of=changemode, yshift=-40pt] {Data query?};
+    \node (response) [process, right of=query, xshift=90pt] {Respond with\\ requested data};
+    \node (robotcommand) [decision, below of=query, yshift=-40pt] {Robot command?};
+    \node (addinput) [process, right of=robotcommand, xshift=90pt] {Add data to\\ input queue};
     % Arrows
     \draw [arrow] (start) -- (initstart);
     \coordinate(dummy2) at ($(initstart) + (0pt,-40pt)$);
     \draw [arrow] (initstart) -- (connectedquestion);
     \draw [arrow] (connectedquestion) -- node[anchor=south] {No}(waitforcom);
-    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(senddata);
-    \draw [arrow] (senddata) -- (waitforpc);
-    \draw [arrow] (waitforpc) -- (changemode);
-    \draw [arrow] (changemode) -- node[auto] {No}(newdata);
+    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(waitforpc);
+    \draw [arrow] (waitforpc) -- (processmsg);
+    \draw [arrow] (processmsg) -- (changemode);
+    \draw [arrow] (changemode) -- node[auto] {No}(query);
     \draw [arrow] (changemode) -- node[anchor=south] {Yes}(modeswitch);
     \draw [line] (modeswitch) -- ($(modeswitch) + (83pt,0pt)$); %It works..
-    \draw [arrow] (newdata) -- node[auto] {Yes}(adddata);
-    \draw [line] (newdata) -- node[auto] {No}($(newdata) + (230pt,0pt)$);
-    \coordinate(dummy) at ($(adddata -| newdata) + (230pt,0pt)$);
-    \draw [line] (adddata) -- (dummy);
+    \draw [arrow] (query) -- node[auto] {No}(robotcommand);
+    \draw [arrow] (query) -- node[anchor=south] {Yes}(response);
+    \draw [line] (response) -- ($(response) + (83pt,0pt)$);
+    \draw [arrow] (robotcommand) -- node[anchor=south] {Yes}(addinput);
+    \draw [line] (robotcommand) -- node[auto] {No}($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy) at ($(addinput -| robotcommand) + (230pt,0pt)$);
+    \draw [line] (addinput) -- (dummy);
     \draw [line] (dummy) -- (dummy |- connectedquestion);
     \draw [arrow] (dummy |- connectedquestion) -- (connectedquestion);
     \coordinate(test) at (waitforcom |- dummy2);
     \draw [line] (waitforcom |- dummy2) -- (waitforcom);
     \draw [line] (waitforcom |- dummy2) -- (dummy2);
+    \coordinate(dummy3) at ($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy4) at ($(robotcommand) + (230pt,-70pt)$);
+    \draw [line] (dummy3) -- (dummy4);
+    \draw [line] (dummy4) -- (dummy);
     
     \end{tikzpicture}
     \caption{Programflöde för robotens Wi-Fi-kommunikation.}
@@ -717,9 +719,6 @@ För att hantera meddelanden mellan de interna såväl som de externa modulerna 
 
 \subsubsection{Kartritning} \label{sssec:mapping}
 Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan beräknas av kontrollenheten och används internt för bland annat vägledning. Kartan överförs även kontinuerligt till PC:n (se kapitel \ref{sec:system4}) för skärmutritning, så att en användare kan se resultatet.
-% TODO Överväg att ha med denna skickning som ett steg i flödesscheman över
-
-\clearpage
 
 \subsubsection{Lägesstyrning}
 Roboten är konstruerad med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner finns för varje, men de delar på många funktioner och moduler.
@@ -767,11 +766,7 @@ När roboten startar så initieras den med startvärden och hamnar i den huvudlo
 %\end{figure}
 
 \subsubsection{Manuellt läge}
-I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nertryckta som då översätts till styrkommandon och skickas vidare till styrenheten.
-
-
-\noindent
-Kod finns för var och en av dessa rutiner, men i ett makroperspektiv blir inte mjukvaran särskilt komplex. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
+I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nedtryckta som då översätts till styrkommandon och skickas vidare till styrenheten. Eftersom det manuella läget främst omvandlar och vidarebefordrar givna kommandon så är inte mjukvaran särskilt komplex i ett makroperspektiv. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
 
 \begin{figure}[h!]
 \centering
@@ -812,12 +807,9 @@ Kod finns för var och en av dessa rutiner, men i ett makroperspektiv blir inte 
 \label{fig:manual_flowchart}
 \end{figure}
 
-\clearpage
-
 \subsubsection{Autonomt läge}
 I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
 
-%TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
 \begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
@@ -838,10 +830,8 @@ Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDriv
     \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
 \end{figure}
 
-När roboten hitta tillbaka till en yttervägg kommer denne återigen att köra tills den hamnat i garage-rutan.
+När roboten hittat tillbaka till en yttervägg kommer den återigen att köra tills den hamnat i garage-rutan.
     
-
-
 %\begin{figure}[h!]
 %\centering
 %\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
@@ -883,14 +873,16 @@ När roboten hitta tillbaka till en yttervägg kommer denne återigen att köra 
 %\label{fig:auto_flowchart}
 %\end{figure}
 
-\subsection{Gränssnitt} \label{ssec:brainInterface}
-Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
+\subsection{Gränssnitt} 
+\label{ssec:brainInterface}
+Kommunikation- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten tar antingen emot ett styrkommando som inte returnerar något värde, alternativt ett kommando för att få ut styrdiagnostisk som då returneras från styrenheten.
 
-Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul används. På båda sidor används sockets.
+Utöver detta så finns Wi-Fi-kommunikation där Raspberry PI:ns inbyggda Wi-Fi-modul används. Båda sidorna använder sig av sockets, där kommunikationsenheten agerar server. För en detaljerad beskrivning över hur detta går till, se kapitel \ref{ssec:wifi}.
 
-\newpage
-\section{PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
+\clearpage
+\section{PC} 
+\label{sec:system4}
+Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{PC.png}}
@@ -898,7 +890,7 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och Wi-Fi-modul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
+PC-mjukvaran är körbar på en godtycklig PC med Wi-Fi modul samt med Python 3 och numpy installerat. Lämpligen med skärm, tangentbord, och datormus för att kunna använda sig av all den funktionalitet som GUIet erbjuder.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -909,10 +901,8 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \end{HardwareList}
 \end{center}
 
-\clearpage
-
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och ska följa \cite{pep8}. Den består av två trådar där den ena hanterar GUIt och den andra hanterar kommunikation med roboten via en socket och med GUIt via köer.
+PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödesschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
 
 \begin{figure}[h!]
 \centering
@@ -974,16 +964,14 @@ PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta använ
 \label{fig:gui_flowchart}
 \end{figure}
 
-% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
-%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
+\subsubsection{Kommunikation}\label{ssec:pc_comm}
+PC-mjukvaran tar emot sensordata, styrdata, och kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från användaren i form av knapptryck och tangentbordskommandon.
 
-\subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från användaren i form av knapptryck och tangentbordskommandon.
+I det manuella läget skickar PC-mjukvaran styrkommandon samt uppmaning om att läsa av sensorerna till roboten. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten, samt information om hur långt roboten har åkt. I det autonoma läget skickar PC-mjukvaran också förfrågningar om kartdata.
 
-\clearpage
+PC-mjukvaran är implementerad som en klient som ansluter till serverprocessen som körs på kommunikations- och kontrollenheten (se kapitel \ref{ssec:brain_comm}). För att ansluta till roboten krävs därför endast serverns IP-adress. Se kapitel \ref{ssec:wifi} för en mer ingående beskrivning av hur denna erhålls.
 
-\subsubsection{Output}
-Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
+Mjukvaran skickar tangentevent samt uppmaningar med jämna mellanrum om att kommunikationsenheten ska skicka uppdateringar av sensorvärden och motordiagnostik. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då direkt ändrar läget på roboten.
 
 \subsubsection{GUI}
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren styra roboten med piltangenterna i manuellt läge, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui} för en bild av gränssnittet.
@@ -1007,7 +995,7 @@ Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska grän
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inbyggda sockets.
+PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används Pythons inbyggda sockets. För en ingående beskrivning över protokoll och kommandon, se \ref{ssec:wifi}.
 
 \clearpage
 \begin{appendices}
