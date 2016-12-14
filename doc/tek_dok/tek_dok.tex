@@ -495,7 +495,7 @@ ATmega1284 används som processormodell då den är kraftfull utan att ta det ä
 På vardera sida om roboten är två stycken IR-sensorer av modell GP2D120 monterade, samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:ir_interface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät där varje ruta är 40 $\times$ 40 cm.
 
 \subsubsection{LP-filter}
-De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
+De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 \si{\hertz}. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{lp-filter.png}}
@@ -640,19 +640,18 @@ Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sk�
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{PWM-styrning servo}
-För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Värdet beräknas enligt \ref{eq:servo_degree_to_pwm}.
+För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Värdet beräknas enligt formel \ref{eq:servo_degree_to_pwm}.
 \begin{equation}\label{eq:servo_degree_to_pwm}
-value =  773 + angle \times 8.72
+pwm\_value =  \lfloor 773 + angle \times 8.72 \rfloor 
 \end{equation}
-Detta värde bestämmer hur många steg i en räknare som PWM-signalen kommer att vara ettställd, med andra ord hur lång som duty-cyclen är.
-%WIP
-  Räknaren i sig räknar från $0 -- 20000$ med uppräkningsfrekvensen 
-  Detta värde som måste sättas utgår från att PWM-signalen ligger på 50Hz, och att en duty-cycle på $3.9-11.7\%$ täcker det vinkelspann som servot kan röra sig i, nämligen 0-180\si{\degree}.  
-%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
+Detta värde bestämmer hur många steg i början av en räknare som PWM-signalen kommer att vara ettställd, med andra ord hur länge som duty-cyclen varar. Räknaren som styr signalen är inställd på att räkna från $0-20000$ med uppräkningsfrekvensen 1 \si{\mega\hertz}, detta medför att PWM-signalen får frekvensen 50 \si{\hertz} då det tar 20000 uppräkningar för att räknaren ska slå om till början. Detta betyder att PWM-signalens duty-cycle för att sätta vinkeln med vår formel, kommer att ligga inom intervallet $3.9-11.7\%$ - något som har visat sig täcka hela vinkelspannet (0-180\si{\degree}) och fungera bra genom testning.
 
 \subsubsection{PWM-styrning motorpar}
-För att reglera hastigheten hos motorerna så används en PWM-signal för varje motorsida. Signalen bestäms genom att ta den önskade motorhastigheten i procent och multiplicera den med faktorn $2.52$, vilket ger oss en duty-cycle på $0-98.4\%$. Anledningen till att duty-cyceln inte kan sträcka sig upp till $100\%$ ligger i att motorerna kräver en 0-flank för att fungera korrekt. 
-%TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
+För att reglera hastigheten hos motorerna så används en PWM-signal för varje motorsida. Signalen bestäms genom att ta den önskade motorhastigheten i procent och multiplicera den med en omvandlingsfaktor för att sätta duty-cyclen på PWM-signalen. Detta görs enligt formel \ref{eq:motor_to_pwm}.
+\begin{equation}\label{eq:motor_to_pwm}
+pwm\_value =  \lfloor speed\_percentage \times 2.52 \rfloor 
+\end{equation}
+Detta värde bestämmer hur många steg i början av en räknare som PWM-signalen kommer att vara ettställd, alltså hur länge som duty-cyclen för PWM-signalen kommer att vara. En högre duty-cycle medför också en högre rotationshastighet hos motorerna, medan en väldigt låg eller nollställd medför att motorerna står stilla.  Räknaren för PWM-signalen räknar från $0-256$ med uppräkningsfrekvens 125 \si{\kilo\hertz}. Detta medför att PWM-signalen får en frekvens på cirka 488 \si{\hertz}, och en duty-cycle som sträcker sig mellan $0-98.4\%$. Anledningen till att duty-cyclen inte sträcker sig ändå upp mot $100\%$ ligger i att motorerna kräver en $0$-flank för att fungera korrekt.
 
 \subsubsection{Rotationsriktning motorpar}
 För att bestämma vilken riktning som ett motorpar ska rotera i så används en output-pin för varje motorsida. Om pinnen är hög ($1$) medför det att motorparet roterar framåt sett till robotens chassi, om pinnen är låg ($0$) medför det att motorparet roterar bakåt.
