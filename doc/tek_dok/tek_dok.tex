@@ -447,7 +447,8 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
     \label{tab:gyro}
 \end{table}
 
-\subsection{WIFI-kommunikation}\label{sec:wifi}
+\subsection{WIFI-kommunikation}
+\label{ssec:wifi}
 Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
 Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
@@ -929,12 +930,21 @@ Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-PC-mjukvaran är körbar på en godtycklig PC med Python3 och Wi-Fi-modul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
+PC-mjukvaran är körbar på en godtycklig PC med Wi-Fi modul samt med Python 3 och numpy installerat. Lämpligen med skärm, tangentbord, och datormus för att kunna använda sig av all den funktionalitet som GUIet erbjuder.
+
+\subsubsection{Komponentbudget}
+Här följer en lista på all hårdvara som detta delsystem kräver.
+
+\begin{center}
+\begin{HardwareList}
+\hardware{PC}{PC med Wi-Fi-modul.}{1}
+\end{HardwareList}
+\end{center}
 
 \clearpage
 
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
+PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödesschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
 
 \begin{figure}[h!]
 \centering
@@ -1001,7 +1011,9 @@ PC-mjukvaran tar emot sensordata, styrdata, och kartdata från kommunikationsenh
 
 I det manuella läget skickar PC-mjukvaran styrkommandon samt uppmaning om att läsa av sensorerna till roboten. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten, samt information om hur långt roboten har åkt. I det autonoma läget skickar PC-mjukvaran också förfrågningar om kartdata.
 
-PC-mjukvaran är implementerad som en klient som ansluter till serverprocessen som körs på kommunikations- och kontrollenheten (se kapitel \ref{ssec:brain_comm}). För att ansluta till roboten krävs därför endast serverns IP-adress. Se kapitel \ref{sec:wifi} för en mer ingående beskrivning av hur denna erhålls.
+PC-mjukvaran är implementerad som en klient som ansluter till serverprocessen som körs på kommunikations- och kontrollenheten (se kapitel \ref{ssec:brain_comm}). För att ansluta till roboten krävs därför endast serverns IP-adress. Se kapitel \ref{ssec:wifi} för en mer ingående beskrivning av hur denna erhålls.
+
+Mjukvaran skickar tangentevent samt uppmaningar med jämna mellanrum om att kommunikationsenheten ska skicka uppdateringar av sensorvärden och motordiagnostik. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då direkt ändrar läget på roboten.
 
 \subsubsection{GUI}
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren styra roboten med piltangenterna i manuellt läge, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui} för en bild av gränssnittet.
@@ -1025,7 +1037,7 @@ Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska grän
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inbyggda sockets.
+PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används Pythons inbyggda sockets. För en ingående beskrivning över protokoll och kommandon, se \ref{ssec:wifi}.
 
 \clearpage
 \begin{appendices}
