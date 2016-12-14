@@ -212,10 +212,13 @@ class Robot:
         self.pid_controller.set_mode(1)
         init_UARTs()
 
-        #Read start values for X and Y
+        # Read start values for X and Y
         self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
         self._y_start = self._median_sensor(5, Command.read_lidar())+150
 
+        # Include garage in grid_map
+        self._reset_grid_map()
+        
     def read_ir_side(self, side: Direction):
         """
         Returs the median of IR_MEDIAN_ITERATIONS reads of the specified ir sensor pair.
@@ -343,7 +346,7 @@ class Robot:
         self.logger.info("Current cell" +str(cells[-1]))
         self.logger.info("Current path" +str(self.path_trace))
         if not self.look_for_island and len(cells) > 0:
-            self.grid_map = GridMap()
+            self._reset_grid_map()
             make_open(cells, self.grid_map)
             self.grid_map.debug_print()
             self.logger.info("---------")
@@ -550,7 +553,16 @@ class Robot:
             ir_back, ir_front = self.read_ir_side(Direction.RIGHT)
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
             self.turn(math.degrees(angle) < 0, abs(int(math.degrees(angle))), speed=self.BASE_SPEED+10)
+            
+    def _reset_grid_map(self):
+        self.grid_map = GridMap()
+        # Update grid_map to include garage
+        self.grid_map.set(-1, 0, CellType.WALL)
+        self.grid_map.set(0, 1, CellType.WALL)
+        self.grid_map.set(0, -1, CellType.WALL)
+        self.grid_map.set(0, 0, CellType.OPEN)
 
+            
     def _median_sensor(self, it : int, sensor_instr : Command):
         """
         Return the median value of the specified number of readings from the given sensor.
