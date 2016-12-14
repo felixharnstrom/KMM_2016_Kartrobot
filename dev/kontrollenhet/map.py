@@ -746,23 +746,22 @@ def median_sensor(it : int, sensor_instr : Command):
         return np.median(values)
 
 
-def left_island_exists(grid_pos:Position, facing_angle:float, grid_map:GridMap):
+def island_exists(grid_pos:Position, measuring_angle:float, grid_map:GridMap):
     """
-    Check if an island exists to the left.
+    Check if an island exists .
     There's definetly an island if it returns not None. It could still be one there
       if we get None - we just can't determine right now.
 
     Args:
         :robot_pos (Position): The current position of the robot, in 40x40cm.
-        :facing_angle (float): The facing angle of the robot, in degrees.
+        :measuring_angle (float): The angle we're measuring in.
         :grid_map (GridMap): A grid_map containing all outer wall tiles.
 
     Returns:
-        :return (bool): None if no island exist, otherwise the distance to the island.
+        :return (bool, float): The bool is True iff we are sure 
     """
 
     # Check what multiple of 90 degrees we're facing
-    measuring_angle = facing_angle - 90
     dir_i = math.floor((measuring_angle % 360) / 90)
 
     # Convert that to a normalized direction vector
@@ -794,30 +793,24 @@ def left_island_exists(grid_pos:Position, facing_angle:float, grid_map:GridMap):
     # Check if we exited because we found a wall
     has_found_wall = grid_map.get(cur_pos.x, cur_pos.y) == CellType.WALL
 
+    # Measure lidar
+    MEASUREMENT_ITERATIONS = 50
+    lidar_dist = median_sensor(MEASUREMENT_ITERATIONS, Command.read_lidar())
+
     if not has_found_wall:
         # There is no wall in that direction =>
         #   we can't determine if there's an island there
-        return None
-    if not has_found_unknown:
+        return False, lidar_dist
+    elif not has_found_unknown:
         # We didn't pass any UNKNOWN's =>
         #   There's no room for an island there.
-        return None
-
-
-    # Measure lidar
-    MEASUREMENT_ITERATIONS = 50
-    handle_command(Command.servo(90))
-    time.sleep(0.75)
-    lidar_dist = median_sensor(MEASUREMENT_ITERATIONS, Command.read_lidar())
-    handle_command(Command.servo(180))
-    time.sleep(0.75)
-
+        return False, lidar_dist
     # If the wall is at least a tile away from what we measured,
     #   we should either have discovered it when reading outer walls,
     #   or it is an island.
     # Thus, unless the grid_map is wrong, we've definetly found our island.
-    if distance > lidar_dist + CELL_SIZE:
-        return lidar_dist
+    elif distance < lidar_dist + CELL_SIZE:
+        return False, lidar_dist
     else:
-        return None
+        return True, lidar_dist
     

@@ -367,7 +367,14 @@ class Robot:
             
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
-            if left_island_exists(cells[-1], self.get_angle(), self.grid_map) is not None:
+
+            # Turn servo proper direction
+            handle_command(Command.servo(90))
+            time.sleep(0.75)
+            is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
+            handle_command(Command.servo(180))
+            time.sleep(0.75)
+            if is_island:
                 self.logger.info("ISLAND!!!")
                 time.sleep(2)
             else:
