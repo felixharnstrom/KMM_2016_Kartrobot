@@ -30,7 +30,6 @@
 
 \usepackage[tocgraduated]{tocstyle}
 \usetocstyle{allwithdot}
-F
 \usepackage[titletoc,title]{appendix}
 
 \usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
@@ -194,7 +193,7 @@ I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placer
 
 \subsection{Seriell kommunikation}
 \label{ssec:serial}
-För kommunikation mellan kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
+För kommunikation mellan kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
 
 Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket på 8 bitar som följs av noll eller flera datapaket som illustrerat i figur \ref{fig:msg_structure}. Se tabell \ref{tab:meta_packet} för en mer ingående förklaring över fälten i metapaketet.
 
