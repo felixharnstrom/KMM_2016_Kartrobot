@@ -188,9 +188,9 @@ class Robot:
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 1
         self.GYRO_MEDIAN_ITERATIONS = 32
-        self.TURN_OVERRIDE_DIST = 200
+        self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 90
+        self.CORRIDOR_TURN_ENTRY_DIST = 75
         self.CORRIDOR_TURN_EXIT_DIST = 350
         self.OBSTACLE_SAFETY_OVERRIDE = 30
         self.EDGE_SPIKE_FACTOR = 2
@@ -463,7 +463,8 @@ class Robot:
             #self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
             # Detect corridor to the right
-            if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
+            if (ir_side_front >= self.TURN_OVERRIDE_DIST):
+                self.logger.debug("IR - front: " + str(ir_side_front) + " IR - back: " + str(ir_side_back) + " list_dist: " + str(self._last_dist))
                 self.drive_distance(self.CORRIDOR_TURN_ENTRY_DIST, self.BASE_SPEED, True)
                 # Save the given length driven
                 self._save_position(reflex_right - reflex_right_start)
@@ -734,8 +735,6 @@ def main(argv):
                 status = robot.follow_wall(9999999, side = "right")
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
-            
-
 
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
@@ -744,16 +743,29 @@ def main(argv):
                 while robot._is_moving(): pass
                 ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-                if (ir_right_front > ir_left_front):
+
+                if ir_right_front > robot.TURN_OVERRIDE_DIST and ir_left_front > robot.TURN_OVERRIDE_DIST:
                     robot.stand_perpendicular('left')
                     robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('left')
-                else:
+                elif ir_right_front < robot.TURN_OVERRIDE_DIST and ir_left_front < robot.TURN_OVERRIDE_DIST:
                     robot.stand_perpendicular('right')
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('right')
+                else:
+                    if (ir_right_front > ir_left_front):
+                        robot.stand_perpendicular('left')
+                        robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                        while robot._is_moving(): pass
+                        robot.stand_perpendicular('left')
+                        
+                    else:
+                        robot.stand_perpendicular('right')
+                        robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                        while robot._is_moving(): pass
+                        robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
