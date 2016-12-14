@@ -454,10 +454,9 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
     \item [TRANSMIT] Utför nästa UART-command som skickas.
     \item [FORWARD\_MOTOR\_INFO] Svara med motorenhetsdata (\texttt{dict}), kodat med JSON.
     \item [FORWARD\_SENSOR\_INFO] Svara med sensorenhetsdata (\texttt{dict}), kodat med JSON.
-    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}'' med suffixet ''\texttt{\_p}'' om tangenten tryckts ner eller suffixet ''\texttt{\_r}'' om tangenten släppts.
+    \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}''.
     \item [SEND\_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
     \item [TOGGLE\_MODE] Om vi är i det manuella läget: byt till autonomt. Annars: byt till manuellt.
-    \item [SYNC\_MODE] Hämtar vilket läge som roboten i nuläget står i.
 \end{description}
 
 \subsection{Ingående komponenter}
@@ -640,14 +639,7 @@ Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sk�
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
 \subsubsection{PWM-styrning servo}
-För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Värdet beräknas enligt \ref{eq:servo_degree_to_pwm}.
-\begin{equation}\label{eq:servo_degree_to_pwm}
-value =  773 + angle \times 8.72
-\end{equation}
-Detta värde bestämmer hur många steg i en räknare som PWM-signalen kommer att vara ettställd, med andra ord hur lång som duty-cyclen är.
-%WIP
-  Räknaren i sig räknar från $0 -- 20000$ med uppräkningsfrekvensen 
-  Detta värde som måste sättas utgår från att PWM-signalen ligger på 50Hz, och att en duty-cycle på $3.9-11.7\%$ täcker det vinkelspann som servot kan röra sig i, nämligen 0-180\si{\degree}.  
+För att styra vilken vinkel som servot står i så används en PWM-signal. Denna signal bestäms genom att omvandla den önskade vinkeln till ett värde som sätter en duty-cycle hos PWM-signalen. Detta värde som måste sättas utgår från att PWM-signalen ligger på 50Hz, och att en duty-cycle på $3.9-11.7\%$ täcker det vinkelspann som servot kan röra sig i, nämligen 0-180\si{\degree}.  
 %TODO: Mer ingående detaljbeskrivning av hur PWM-signalen bestäms på styrenheten
 
 \subsubsection{PWM-styrning motorpar}
