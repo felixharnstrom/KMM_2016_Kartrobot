@@ -157,15 +157,6 @@ Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning 
 Efter igenkänning av ett hinder körs 
 
 \begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
-% 
-% Skiss:
-% Finns meddelande i kön? -Ja-> Utför rutin givet i meddelande
-%   |     ʌ     ʌ                       |
-%  Nej    |     |                       |
-%   |     |     -------------------------
-%   V     |
-%  Invänta meddelande, dummer!
-%
 \tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
@@ -845,14 +836,13 @@ I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapite
 \end{figure}
 
 \subsubsection{Autonomt läge}
-I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
+I det autonoma läget så ska roboten kartlägga ett rum som består av en sammanhängande yttre vägg och en sammanhängande köksö.
 
-\begin{figure}[h!] \label{fig:auto_flowchart}
-	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
-	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
-\end{figure}
+Medan roboten följer en vägg så markerar den ut alla väggar till höger (om den följer högerväggen) om dess färdväg som väggar. Då de yttre väggarna är sammanhängande upptäcks alla dessa.
 
-Efter att roboten kört ett varv och återkommit till garaget så påbörjas ytterligare ett varv, för att hitta till köksön, enligt figur \ref{fig:kitchenSearch}
+För att sedan upptäcka köksön så måste man först lokalisera var den är. Under körning kan roboten göra detta genom att skanna över en okänd ruta med LIDARn. Roboten kollar i den upptäckta kartan för att beräkna vad LIDARn bör uppmäta om ön inte finns på den platsen - finns ingen upptäckt yttervägg i den riktningen kan vi inte kolla om det finns en köksö där. Om det uppmätta värdet inte stämmer överrens med värdet vi borde få om den inte blockeras, så blockeras naturligtvis lasern. Gör den detta har vi på denna plats en köksö, förutsatt att hela ytterväggen är upptäckt.
+
+För en flödesschema över hur vi hittar köksön, se figur \ref{fig:kitchenSearch}.
 
 \begin{figure}[h!]
  \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{kitchen_flowchart.png}}
@@ -860,55 +850,12 @@ Efter att roboten kört ett varv och återkommit till garaget så påbörjas ytt
  
 \end{figure}
 
-Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDrive}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
+När vi väl upptäckt ön behöver vi åka över och följa dess vägg, om det gömmer sig rutor inuti den. Efter vi gjort detta är det bara att köra tillbaka till ytterväggen och följa den tillbaka till garaget. För en grafisk representation, se figur \ref{fig:kitchenDrive}.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{kitchen_around_flowchart.png}}
     \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
 \end{figure}
-
-När roboten hittat tillbaka till en yttervägg kommer den återigen att köra tills den hamnat i garage-rutan.
-    
-%\begin{figure}[h!]
-%\centering
-%\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
-%
-% Skiss:
-% Är rummet klarskannat? -Ja-> vägleta till startplats -> klar
-%   |        ʌ
-%  Nej       |
-%   |        ----------------------------------------------------
-%   V                                                           |
-%  Hitta lämplig rand till outforskat område -> vägleta dit -> skanna
-%
-% Styles
-%\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
-%\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
-%\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
-%\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
-%\tikzstyle{arrow} = [thin,->,>=stealth]
-% Nodes
-%\node (start) [startstop] {Start};
-%\node (complete_map) [decision, below of=start, yshift=-40pt] {Room completely mapped?};
-%\node (find_border) [process, left of=complete_map, xshift=-200pt] {Find appropriate border to unmapped area};
-%\node (pathfind) [process, below of=find_border] {Pathfind there};
-%\node (scan) [process, below of=pathfind] {Scan};
-%\node (update_map) [process, right of=scan, xshift=200pt] {Update internal map};
-%\node (pathfind_start) [process, right of=complete_map, xshift=150pt] {Pathfind to start};
-%\node (done) [startstop, above of=pathfind_start, yshift=40pt] {Done};
-% Arrows
-%\draw [arrow] (start) -- (complete_map);
-%\draw [arrow] (complete_map) -- node[anchor=south] {No} (find_border);
-%\draw [arrow] (find_border) -- (pathfind);
-%\draw [arrow] (pathfind) -- (scan);
-%\draw [arrow] (scan) -- (update_map);
-%\draw [arrow] (update_map) -- (complete_map);
-%\draw [arrow] (complete_map) -- node[auto] {Yes} (pathfind_start);
-%\draw [arrow] (pathfind_start) -- (done);
-%\end{tikzpicture}
-%\caption{Typiskt programflöde i det autonoma läget.}
-%\label{fig:auto_flowchart}
-%\end{figure}
 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
