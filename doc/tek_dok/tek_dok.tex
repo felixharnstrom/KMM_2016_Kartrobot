@@ -505,9 +505,11 @@ De sensorer som skickar en analog signal kommer att få med sig en del brus, vil
 \end{figure}
 
 \subsubsection{LIDAR} \label{sssec:lidar}
-LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med komponenten via en trigger-pin; tiden som signaler är höga är linjära gentemot uppmätt avstånd. Vi använder även denna för att se om vi håller på att köra in i en vägg.
+LIDAR är en lasersensor som används för rumsavskanning. Vi kommunicerar med komponenten via en trigger-pin. Utsignalen är digital och är av typen PWM. Vi använder även LIDARn för att detektera om vi håller på att köra in i en vägg.
 
 Sensorn monteras på toppen av roboten - ovanpå ett roterande servo, som specificeras i större detalj i kapitel \ref{ssec:servomotor}. Detta för att kunna mäta avstånd i flera vinklar (0 till 180 grader) utan att rotera roboten.
+
+Triggern är konstant låg för att LIDARn ska skicka data kontinuerligt. ATmegan genererar ett avbrott för varje gång som PWM signalen skiftar läge så att vi kan räkna hur lång tid som signalen är hög. Längden växer linjärt med tiden som signalen är hög så efter lite kalibrering ger lasern rätt avstånd.
 
 \subsubsection{Gyro} \label{sssec:imu}
 MPU6050 är ett gyro som används via en I\textsuperscript{2}C-bus. Den ger oss rotationen kring z-axeln, som användas för att beräkna robotens riktning i rummet under svängar. Gyrot läses endast av när det efterfrågas (under sväng).
