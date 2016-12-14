@@ -538,7 +538,8 @@ def measure_lidar():
         measurements.append([degree, dist])
         handle_command(Command.servo(int(degree)))
         time.sleep(LIDAR_SLEEP)
-    handle_command(Command.servo(90))
+        
+    handle_command(Command.servo(180))
     return measurements
 
 
@@ -725,212 +726,98 @@ def add_walls(open_cells, grid_map):
         #grid_map.debug_print()
         #time.sleep(0.1)
 
-def get_cells_passed(grid_pos:Position, angle:float):
-    grid_map.get(grid_pos.x, grid_pos.y) # Expand to fit grid_pos
-    # A line can be at most the length of the diagonal of the GridMap
-    dx = grid_map.width()
-    dy = grid_map.height()
-    diagonal = math.sqrt(dx*dx + dy*dy)
-    #print("GCELLS ANGLE:", angle)
-    line_end = polar_projection(diagonal, angle)
-    line_end.x += grid_pos.x
-    line_end.y += grid_pos.y
-    #print("END:", line_end)
-    line = Line(grid_pos, line_end)
-    # Find the cells line passes through
-    return raytrace(line)
-
-def first_cell_of_type(grid_pos:Position, angle:float, ctype:CellType, grid_map:GridMap):
+def median_sensor(it : int, sensor_instr : Command):
     """
-    Return the index of the first cell in grid_map matching ctype on a line from grid_pos
-    at angle degrees, or None if no such cell exists.
-
-    Args:
-        :param grid_pos (Position): The position in the grid to originate from.
-        :param angle (float): The angle to check at, in degrees.
-        :param ctype (CellType): The cell type to look for.
-        :param grid_map (GridMap): The Gridmap to read in.
-
-    Returns:
-        :return (Position): The cell index the celltype was first found on, or None if it doesn't exist.
-    """
-    cells = get_cells_passed(grid_pos, angle)
-    # Look for cell of type
-    for cell in cells:
-        #print(cell)
-        if not grid_map.is_within_bounds(cell.x, cell.y):
-            return None
-        elif grid_map.get(cell.x, cell.y) == ctype:
-            return cell
-    return None
-
-def passes_through_unknown_before_wall(grid_pos:Position, angle:float, grid_map:GridMap):
-    """
-    Return True if iterating over all cells covering a line in a certain angle
-    encounters an UNKNOWN cell before a WALL.
-
-    Args:
-        :param position (Position): The position to start at.
-        :param angle (float): The angle to iterate in, in degrees.
-        :param grid_map (GridMap): The grid_map to read from.
-
-    Returns:
-        :return (bool): True if UNKNOWN was encountered first.
-    """
-    cells = get_cells_passed(grid_pos, angle)
-    # Look for cell of type
-    for cell in cells:
-        if not grid_map.is_within_bounds(cell.x, cell.y):
-            return True
-        if grid_map.get(cell.x, cell.y) == CellType.WALL:
-            return False
-        if grid_map.get(cell.x, cell.y) == CellType.UNKNOWN:
-            return True
-    return True
+    Return the median value of the specified number of readings from the given sensor.
     
-def measurements_with_island(robot_pos:Position, facing_angle:float,
-                             measurements:list, grid_map:GridMap):
-    """
-    Return the measurements detecting an island: a previously undetected wall that seems to be
-    at least one tile from a previously detected wall behind it.
-
     Args:
-        :param robot_pos (Position): The current position of the robot, in millimeters.
-        :param facing_angle (float): The current facing of the robot, in degrees.
-        :param measurements (list): A list of tuples containing (angle, dist), where angle is the angle of the servo in degrees (0 to +180), and dist is the distance to a wall, in millimeters.
-        :param grid_map (GridMap): A GridMap of previously detected walls.
-
+    it              (int): Number of sensor values.
+    sensor_instr    (Command): A sensor command.
+    
     Returns:
-        :return (list): A subset of measurements - those who indicates a previously undetected walls at least one tile from a previously detected wall behind it.
+    (int): Median value.
     """
-    SMALL_FLOAT = 0.01 # For float comparison, just to be safe
-    FAST = True # Ignore less expensive checks
-    grid_pos = approximate_to_cell(robot_pos)
-    with_island = [] # Result
-    for angle, dist in measurements:
-#        input()
-
-        # Check if the measurement coincides with the wall behind it at that angle
-        actual_angle = facing_angle + 180 - angle
-        wall_there = first_cell_of_type(grid_pos, actual_angle, CellType.WALL, grid_map)
-        #grid_map.debug_print(print_origin=True)
-        #print(wall_there)
-        #time.sleep(0.1)
-        dif = polar_projection(dist, actual_angle)
-        scanned_pos = Position(robot_pos.x + dif.x,
-                               robot_pos.y + dif.y)
-        scanned_grid_pos = approximate_to_cell(scanned_pos)
-
-        """print(angle, actual_angle, dist, dif)
-        print(grid_pos, wall_there)
-        print(scanned_pos, scanned_grid_pos)
-        if wall_there is not None:
-            print(wall_there)
-            print(scanned_grid_pos.dist_to_squared(wall_there))"""
-        if (wall_there is not None and
-            wall_there != grid_pos and
-            scanned_grid_pos.dist_to_squared(wall_there) > 2 + SMALL_FLOAT):
-            # More expensive checks
-            # Not even sure if this catches anything. I think it should.
-            if FAST or passes_through_unknown_before_wall(robot_pos, actual_angle, grid_map):
-                #print("ISLAND")
-                with_island.append((angle, dist))
-    return with_island
+    values = []
+    for i in range(it):
+        values.append(handle_command(sensor_instr))
+    if len(values) == 1:
+        return values[0]
+    else:
+        return np.median(values)
 
 
-def filter_out_small_walls(measurements_with_islands:list, min_wall_size:int=CELL_SIZE):
+def left_island_exists(grid_pos:Position, facing_angle:float, grid_map:GridMap):
     """
-    Filter out measurements that does not contain full walls, and return
-    lists of series of measurements describing the same wall.
+    Check if an island exists to the left.
+    There's definetly an island if it returns not None. It could still be one there
+      if we get None - we just can't determine right now.
 
     Args:
-        :param measurements_with_islands (list): list of measurements pointing to islands; tuples 
-            containin (angle, dist), in degrees, mm, respectively.
-        :param min_wall_size (int): The minimum wall length required to not be filtered out.
-
-    Returns:
-        :return (list): list of list of tuples containing (angle, dist)
-            (in degrees, mm). Each sublist contains measurements describing the same wall.
-    """
-    
-    # Sort after angle, just to be sure
-    # In case the way we measure stuff changes
-    measurements_with_islands = sorted(measurements_with_islands, key=lambda e: e[0])
-
-    # Bigger -> less sensitive
-    MAX_ANGLE_DIF = 2
-    MAX_DIST_DIF = CELL_SIZE * 0.75
-    
-    # Find continuities
-    conts = [[]]
-    prev_angle, prev_dist = None, None
-    for e in measurements_with_islands:
-        angle, dist = e
-        if ((prev_angle is not None and prev_dist is not None) and
-            (angle - prev_angle > MAX_ANGLE_DIF or abs(prev_dist - dist) > MAX_DIST_DIF)):
-            conts.append([])
-        conts[-1].append(e)
-        prev_angle, prev_dist = angle, dist
-
-    # Measure continuities
-    ret = []
-    for cont in conts:
-        if not cont:
-            continue
-        
-        start, end = cont[0], cont[-1]
-        start_angle, start_dist = start
-        end_angle, end_dist = end
-        start_pos = polar_projection(start_dist, start_angle)
-        end_pos = polar_projection(end_dist, end_angle)
-        dist = start_pos.dist(end_pos)
-
-        if dist >= min_wall_size:
-            ret.append(cont)
-
-    return conts
-
-
-    
-def left_island_exists(robot_pos:Position, facing_angle:float, grid_map:GridMap, measurements=None):
-    """
-    Return True if an island exists to the left.
-
-    Args:
-        :robot_pos (Position): The current position of the robot, in mm.
+        :robot_pos (Position): The current position of the robot, in 40x40cm.
         :facing_angle (float): The facing angle of the robot, in degrees.
         :grid_map (GridMap): A grid_map containing all outer wall tiles.
-        :measurements (list): the measurements to process. If None, measure lidar instead.
 
     Returns:
-        :return (bool): True if an island exist.
+        :return (bool): None if no island exist, otherwise the distance to the island.
     """
-    
-    # Some constants
-    ACCEPTABLE_SPAN_MIN = 80  # degrees
-    ACCEPTABLE_SPAN_MAX = 100 # degrees
 
-    # Read measurements if none was given
-    if measurements is None:
-        measurements = measure_lidar()
-        
-    # Find possible islands
-    islands = measurements_with_island(robot_pos, facing_angle, measurements, grid_map)
-    print(islands)
-    islands = filter_out_small_walls(islands)
-    print(islands)
+    # Check what multiple of 90 degrees we're facing
+    measuring_angle = facing_angle - 90
+    dir_i = math.floor((measuring_angle % 360) / 90)
 
-    # We might not be perfectly aligned with a multiple of 90 degrees, I guess
-    facing_error = facing_angle % 90
-    
-    # Find an island that's 90 degrees to our facing
-    for island in islands:
-        island_angles = [e[0] for e in island]
-        acceptable_angles = range(ACCEPTABLE_SPAN_MIN, ACCEPTABLE_SPAN_MAX)
-        for acceptable_angle in acceptable_angles:
-            if acceptable_angle - facing_error in island_angles:
-                return True
-            
-    # No such island found
-    return False
+    # Convert that to a normalized direction vector
+    direction = None
+    if dir_i == 0:
+        direction = Position(1, 0)
+    elif dir_i == 1:
+        direction = Position(0, 1)
+    elif dir_i == 2:
+        direction = Position(-1, 0)
+    else:
+        direction = Position(0, -1)
+
+    cur_pos = grid_pos
+    distance = 0
+    has_found_unknown = False
+
+    # Search for a wall in the measuring direction
+    # distance will be the distance to that wall, in mm
+    while (grid_map.is_within_bounds(cur_pos.x, cur_pos.y) and
+           grid_map.get(cur_pos.x, cur_pos.y) != CellType.WALL):
+
+        if grid_map.get(cur_pos.x, cur_pos.y) == CellType.UNKNOWN:
+            has_found_unknown = True
+        cur_pos.x += direction.x
+        cur_pos.y += direction.y
+        distance += CELL_SIZE
+
+    # Check if we exited because we found a wall
+    has_found_wall = grid_map.get(cur_pos.x, cur_pos.y) == CellType.WALL
+
+    if not has_found_wall:
+        # There is no wall in that direction =>
+        #   we can't determine if there's an island there
+        return None
+    if not has_found_unknown:
+        # We didn't pass any UNKNOWN's =>
+        #   There's no room for an island there.
+        return None
+
+
+    # Measure lidar
+    MEASUREMENT_ITERATIONS = 50
+    handle_command(Command.servo(90))
+    time.sleep(0.75)
+    lidar_dist = median_sensor(MEASUREMENT_ITERATIONS, Command.read_lidar())
+    handle_command(Command.servo(180))
+    time.sleep(0.75)
+
+    # If the wall is at least a tile away from what we measured,
+    #   we should either have discovered it when reading outer walls,
+    #   or it is an island.
+    # Thus, unless the grid_map is wrong, we've definetly found our island.
+    if distance > lidar_dist + CELL_SIZE:
+        return lidar_dist
+    else:
+        return None
     

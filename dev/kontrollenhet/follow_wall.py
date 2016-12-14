@@ -51,6 +51,92 @@ class DriveStatus:
     CORRIDOR_DETECTED_LEFT = 2
     DONE = 3
 
+
+def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
+    """
+    Checks if there are unknowns in the row or column in front of the location.
+
+    Args:
+        :param location (Position): The robots current location
+        :param angle (int): In which direction the robot is looking (0 == Right, 90 == Up, ...)7
+        :param move_forward (int): How many cells in front of the robots current location to check. (0 == current row/column)
+
+    Returns:
+        :return (bool): If there is a unknow cell in the row/column specified.
+    """
+
+    angle = angle % 360
+    if angle == 0 or angle == 180:
+        print("THIS IS A COLUMN")
+        # Scan one row forwards
+        if angle == 0:
+            scancolumn = location.x+move_forward
+        elif angle == 180:
+            scancolumn = location.x-move_forward
+        # print("ScanColumn", scancolumn)
+
+        if g.get(scancolumn, location.y) == CellType.WALL:
+            raise ValueError("Robot will stand on wall")
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for y in range(location.y, g.bottom_right().y):
+            print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == CellType.UNKNOWN:
+                return True
+                pass
+            if g.get(scancolumn, y) == CellType.WALL:
+                break
+        # print(location.y, g.top_left().y)
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for y in range(location.y, g.top_left().y-1, -1):
+            print("LOOKING at x:", scancolumn, "y:", y)
+            if g.get(scancolumn, y) == CellType.UNKNOWN:
+                return True
+            if g.get(scancolumn, y) == CellType.WALL:
+                break
+            # print (g.get(location.x, y))
+        return False
+    elif angle == 90 or angle == 270:
+        print("THIS IS A ROW")
+        # Moving on y-axis.
+        # Assuming up is 90 degrees, down is 270 degrees.
+        # Scan one row forwards
+        if angle == 90:
+            scanrow = location.y-move_forward
+        elif angle == 270:
+            scanrow = location.y+move_forward
+
+        # print("ScanRow", scanrow)
+
+        if g.get(location.x, scanrow) == CellType.WALL:
+            raise Exception("Robot will stand on wall")
+
+        # Loop through current y-axis (since we are moving on the x-axis)
+        # From current location to either unknow or a blocking wall.
+        for x in range(location.x, g.bottom_right().x):
+            # print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == CellType.UNKNOWN:
+                return True
+                pass
+            if g.get(x, scanrow) == CellType.WALL:
+                # print("met wall")
+                break
+        # print(location.x, g.top_left().x)
+        # print((location.x, g.top_left().x-1, -1))
+        # Loop through current y-axis (since we are moving on the x-arobotxis)
+        # From current location to either unknow or a blocking wall.
+        for x in range(location.x, g.top_left().x-1, -1):
+            # print("LOOKING at x:", x, "y:", scanrow)
+            if g.get(x, scanrow) == CellType.UNKNOWN:
+                return True
+            if g.get(x, scanrow) == CellType.WALL:
+                break
+        return False
+
+    
 class Robot:
     """
     Contains the robot's current state and several functions enabling the robot's high-level behaviour.
@@ -61,6 +147,9 @@ class Robot:
         control_device  (str): Device name of the USB<->Serial converter for the control unit.
 
     Attributes:
+        look_for_island             (bool): True if the robot should be scanning for an island.
+        grid_map                    (GridMap): Mapping of room.
+
         driven_distance             (int): Driven distance thus far.
         current_angle               (int): Current angle against right wall.
         control_mode                (ControllerMode): Current controller mode.
@@ -87,6 +176,8 @@ class Robot:
 
     def __init__(self, mode: ControllerMode, logger):
         # Public attributes
+        self.grid_map = GridMap()
+        self.look_for_island = False
         self.driven_distance = 0
         self.current_angle = 0
         self.control_mode = mode
@@ -98,7 +189,7 @@ class Robot:
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 100
         self.CORRIDOR_TURN_ENTRY_DIST = 40
-        self.CORRIDOR_TURN_EXIT_DIST = 300
+        self.CORRIDOR_TURN_EXIT_DIST = 350
         self.OBSTACLE_SAFETY_OVERRIDE = 120
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 170
@@ -113,7 +204,7 @@ class Robot:
 
         # Initialize PID controller
         self.pid_controller = Pid()
-        self.pid_controller.setpoint = 50
+        self.pid_controller.setpoint = 60
         self.pid_controller.output_data = 0
         self.pid_controller.set_tunings(3, 0, -200)
         self.pid_controller.set_sample_time(33)
@@ -246,20 +337,50 @@ class Robot:
         handle_command(servo_instr)
         """
         lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
-        cells = movement_lines_to_cells(Position(self._x_start, self._y_start), lines, 1)
-        if len(cells) > 0:
-            g = GridMap()
-            make_open(cells, g)
-            g.debug_print()
+        cells = movement_lines_to_cells(lines, 1)
+        # Scanning walls
+        # unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
+        self.logger.info("Current cell" +str(cells[-1]))
+        self.logger.info("Current path" +str(self.path_trace))
+        if not self.look_for_island and len(cells) > 0:
+            self.grid_map = GridMap()
+            make_open(cells, self.grid_map)
+            self.grid_map.debug_print()
             self.logger.info("---------")
-            add_walls(cells, g)
-            g.set(0,0, CellType.LOCATION)
-            g.debug_print(print_origin = True)
+            add_walls(cells, self.grid_map)
             self.logger.info("STOP")
-            if cells[-1] == cells[0]:
-                self.logger.info("In garage")
+            self.logger.info("start: " + str(cells[0]))
+            self.logger.info("end: " + str(cells[-1]))
+            if cells[-1] == cells[0] and len(cells) > 1:
+                # We've returned to the garage
+                self.look_for_island = True
+                self.logger.warning("In garage - looking for island")
 
+        old = self.grid_map.get(cells[-1].x, cells[-1].y)
+        self.grid_map.set(cells[-1].x, cells[-1].y, CellType.LOCATION)
+        self.grid_map.debug_print(print_origin = True)
+        self.grid_map.set(cells[-1].x, cells[-1].y, old)
+        self.logger.info("ANGLE: " + str(self.get_angle()))
+        self.logger.info("POS: " + str(self.get_position()))
+        
+        if self.look_for_island and cells:
+            
+            # We should no longer need to check if we need to scan, as long as we
+            #   do this on every turn. left_island_exists does this implicitly.
+            if left_island_exists(cells[-1], self.get_angle(), self.grid_map) is not None:
+                self.logger.info("ISLAND!!!")
+                time.sleep(2)
+            else:
+                self.logger.info("No island :(")
 
+            
+        if cells and cells[-1] == cells[0] and self.grid_map.is_complete(cells[0]):
+            # We're done!
+            self.logger.info("================")
+            self.logger.info(" D O N E")
+            self.logger.info("================")
+
+                
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
         """
         Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
@@ -301,7 +422,7 @@ class Robot:
 
         # Read start values from sensors
         reflex_right_start = handle_command(Command.read_reflex_right())
-        reflex_right = handle_command(Command.read_reflex_left())
+        reflex_right = handle_command(Command.read_reflex_right())
         self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
         # Drive until the wanted distance is reached
@@ -319,7 +440,7 @@ class Robot:
 
             lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
 
-            self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
+            #self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
             # Detect corridor to the right
             if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
@@ -395,6 +516,9 @@ class Robot:
             lidar_distance = handle_command(Command.read_lidar())
             recorded_data.append([i, lidar_distance])
             time.sleep(0.005)
+
+        # Point LIDAR forward
+        handle_command(Command.servo(180))
 
         return recorded_data
 
@@ -483,7 +607,8 @@ class Robot:
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
 
         time.sleep(wait_time)
-
+        # TODO: Currently skipping check
+        return False
         ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir()))
         lidar_diff = abs(lidar - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar()))
         ir_right_front_diff = abs(ir_right_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir()))
@@ -511,88 +636,6 @@ def sensor_test(robot):
         lidar = robot._median_sensor(1, Command.read_lidar())
         robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
-
-def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
-    """
-    Checks if there are unknowns in the row or column in front of the location.
-
-    Args:
-        :param location (Position): The robots current location
-        :param angle (int): In which direction the robot is looking (0 == Right, 90 == Up, ...)7
-        :param move_forward (int): How many cells in front of the robots current location to check. (0 == current row/column)
-
-    Returns:
-        :return (bool): If there is a unknow cell in the row/column specified.
-    """
-
-    angle = angle % 360
-    if angle == 0 or angle == 180:
-        # Scan one row forwards
-        if angle == 0:
-            scancolumn = location.x+move_forward
-        elif angle == 180:
-            scancolumn = location.x-move_forward
-        # print("ScanColumn", scancolumn)
-
-        if g.get(scancolumn, location.y) == CellType.WALL:
-            raise ValueError("Robot will stand on wall")
-
-        # Loop through current y-axis (since we are moving on the x-axis)
-        # From current location to either unknow or a blocking wall.
-        for y in range(location.y, g.bottom_right().y):
-            # print("LOOKING at x:", scancolumn, "y:", y)
-            if g.get(scancolumn, y) == CellType.UNKNOWN:
-                return True
-                pass
-            if g.get(scancolumn, y) == CellType.WALL:
-                break
-        # print(location.y, g.top_left().y)
-
-        # Loop through current y-axis (since we are moving on the x-axis)
-        # From current location to either unknow or a blocking wall.
-        for y in range(location.y, g.top_left().y-1, -1):
-            # print("LOOKING at x:", scancolumn, "y:", y)
-            if g.get(scancolumn, y) == CellType.UNKNOWN:
-                return True
-            if g.get(scancolumn, y) == CellType.WALL:
-                break
-            # print (g.get(location.x, y))
-        return False
-    elif angle == 90 or angle == 270:
-        # Moving on y-axis.
-        # Assuming up is 90 degrees, down is 270 degrees.
-        # Scan one row forwards
-        if angle == 90:
-            scanrow = location.y-move_forward
-        elif angle == 270:
-            scanrow = location.y+move_forward
-
-        # print("ScanRow", scanrow)
-
-        if g.get(location.x, scanrow) == CellType.WALL:
-            raise Exception("Robot will stand on wall")
-
-        # Loop through current y-axis (since we are moving on the x-axis)
-        # From current location to either unknow or a blocking wall.
-        for x in range(location.x, g.bottom_right().x):
-            # print("LOOKING at x:", x, "y:", scanrow)
-            if g.get(x, scanrow) == CellType.UNKNOWN:
-                return True
-                pass
-            if g.get(x, scanrow) == CellType.WALL:
-                # print("met wall")
-                break
-        # print(location.x, g.top_left().x)
-        # print((location.x, g.top_left().x-1, -1))
-        # Loop through current y-axis (since we are moving on the x-arobotxis)
-        # From current location to either unknow or a blocking wall.
-        for x in range(location.x, g.top_left().x-1, -1):
-            # print("LOOKING at x:", x, "y:", scanrow)
-            if g.get(x, scanrow) == CellType.UNKNOWN:
-                return True
-            if g.get(x, scanrow) == CellType.WALL:
-                break
-        return False
 
 
 
@@ -630,7 +673,7 @@ def main(argv):
     robot = Robot(ControllerMode.MANUAL, logger)
 
     # Turn LIDAR to 90 degrees
-    servo_instr = Command.servo(90)
+    servo_instr = Command.servo(180)
     handle_command(servo_instr)
 
     # Wait fot LIDAR to be in position
@@ -639,7 +682,6 @@ def main(argv):
     g = grid_map.GridMap()
 
     print (robot.get_position())
-    robot.update_map("left")
 
     #print("lidar", robot.scan())
     g.debug_print()
@@ -647,9 +689,13 @@ def main(argv):
     # Try driving in infinite loop around the maze
     while 1:
             # Drive forward without crashing in wall
-            status = robot.follow_wall(9999999, side = "right")
+            if robot.look_for_island:
+                status = robot.follow_wall(400, side = "right")
+            else:
+                status = robot.follow_wall(9999999, side = "right")
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
+            robot.update_map("srasneiarsneairen")
             
 
 
@@ -665,13 +711,11 @@ def main(argv):
                     robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('left')
-                    robot.update_map("right")
                 else:
                     robot.stand_perpendicular('right')
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
                     robot.stand_perpendicular('right')
-                    robot.update_map("left")
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
@@ -683,7 +727,6 @@ def main(argv):
                 handle_command(turn_instr)
                 while robot._is_moving(): pass
                 #robot.stand_perpendicular('left')
-                robot.update_map("left")
                 robot.drive_distance(robot.CORRIDOR_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
                 robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                 while robot._is_moving(threshold = 30): pass
