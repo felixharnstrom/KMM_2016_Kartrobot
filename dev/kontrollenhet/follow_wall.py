@@ -221,8 +221,8 @@ class Robot:
         init_UARTs()
 
         # Read start values for X and Y
-        self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
-        self._y_start = self._median_sensor(5, Command.read_lidar())+150
+        self._x_start = self._median_sensor(5, Command.read_left_back_ir()) + 100
+        self._y_start = 200
 
         
     def read_ir_side(self, side: Direction):
@@ -445,7 +445,7 @@ class Robot:
         while (reflex_right - reflex_right_start <= distance):
             # Get sensor values
             reflex_right = handle_command(Command.read_reflex_right())
-            lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
+            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
 
             if side == "right":
                 ir_side_back, ir_side_front = self.read_ir_side(Direction.RIGHT)
@@ -463,7 +463,7 @@ class Robot:
                     return DriveStatus.CORRIDOR_DETECTED_LEFT
 
             # Obstacle detected, and no turn to the right
-            if(lidar < self.OBSTACLE_DIST):
+            if(ir_front < self.OBSTACLE_DIST):
                 # Save the given length driven
                 handle_command(Command.stop_motors())
                 self._save_position(reflex_right - reflex_right_start)
@@ -719,7 +719,7 @@ def main(argv):
             if robot.look_for_island:
                 status = robot.follow_wall(400, side = "right")
             elif robot.explore_island:
-                robot_positon = robot.get_position()
+                robot_position = robot.get_position()
                 if robot.start_cell_at_island == approximate_to_cell(robot_position):
                     robot.leave_island()
                 else:
