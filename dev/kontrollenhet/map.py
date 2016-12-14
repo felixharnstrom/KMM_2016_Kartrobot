@@ -11,16 +11,16 @@ from grid_map import GridMap, CellType
 CELL_SIZE = 400
 
 """The number of line segments per line."""
-DIVISIONS_PER_LINE = 4
+DIVISIONS_PER_LINE = 2
 
 """The number of votes per line section required for something to be considered a full line."""
-MIN_MESURE = 2
+MIN_MESURE = 3
 
 """The number of line segments that needs to be voted in for their line to be voted in."""
-SEGMENTS_REQUIRED = 3
+SEGMENTS_REQUIRED = 1
 
 """The thickness of a line segment in millimeters."""
-ACCURACY = 150
+ACCURACY = 100
 
 """The length of a line segment in millimeters."""
 LINE_SEG_LENGTH = CELL_SIZE // DIVISIONS_PER_LINE
@@ -30,6 +30,8 @@ LIDAR_INITIAL_SLEEP = 1.5
 
 """The sleep time when moving the servo 1 degree."""
 LIDAR_SLEEP = 0.015
+
+
 
 def bresenham(line):
     """
@@ -94,7 +96,7 @@ def bresenham(line):
     return points
 
 
-def coordinates_to_lines(coordinates):
+def coordinates_to_lines(coordinates, angle):
     """
     Approximate coordinates to line segments.
 
@@ -108,8 +110,8 @@ def coordinates_to_lines(coordinates):
     top_left = top_left_grid_index(coordinates)
     bottom_right = bottom_right_grid_index(coordinates)
     # Get votes
-    horizontal_votes = get_votes_for_horizontal_line_segments(coordinates, top_left, bottom_right)
-    vertical_votes = get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right)
+    horizontal_votes = get_votes_for_horizontal_line_segments(coordinates, top_left, bottom_right, angle)
+    vertical_votes = get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right, angle)
 
     # Our return value
     lines = []
@@ -155,6 +157,7 @@ def coordinates_to_lines(coordinates):
                 line = Line(start, end)
                 if line not in lines:
                     lines.append(line)
+
     return lines
 
 def open_missed_corners(grid_map:GridMap):
@@ -311,7 +314,7 @@ def bottom_right_grid_index(coordinates):
 
 
 
-def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, vertical:bool):
+def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, angle, vertical:bool):
     """
     For each possible line segment approximate each coordinate to the closest segment, and return the
     number of coordinates approximated to fall in each line segment (the number of "votes"). A line segment 
@@ -376,23 +379,23 @@ def get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right
 
 
 
-def get_votes_for_horizontal_line_segments(coordinates, top_left, bottom_right):
+def get_votes_for_horizontal_line_segments(coordinates, top_left, bottom_right, angle):
     """
     Performs get_votes_for_axis_aligned_line_segments(...), returning the votes for
     all horizontal line segments.
 
     See get_votes_for_axis_aligned_line_segments(...) for more information regarding return value.
     """
-    return get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, False)
+    return get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, angle, False)
 
-def get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right):
+def get_votes_for_vertical_line_segments(coordinates, top_left, bottom_right, angle):
     """
     Performs get_votes_for_axis_aligned_line_segments(...), returning the votes for
     all vertical line segments.
 
     See get_votes_for_axis_aligned_line_segments(...) for more information regarding return value.
     """
-    return get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, True)
+    return get_votes_for_axis_aligned_line_segments(coordinates, top_left, bottom_right, angle, True)
 
 
 
