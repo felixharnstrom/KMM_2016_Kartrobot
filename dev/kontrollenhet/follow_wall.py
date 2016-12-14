@@ -161,6 +161,7 @@ class Robot:
         uart_sensorenhet            (str): Device name of the USB<->Serial converter for the sensor unit.
         uart_styrenhet              (str): Device name of the USB<->Serial converter for the control unit.
         pid_controller              (Pid): The PID controller in use.
+        START_X                     (int): Starting x-value, in mm
         BLOCK_SIZE                  (int): Block size in millimetres.
         IR_MEDIAN_ITERATIONS        (int): Number of values to get from IR sensors.
         GYRO_MEDIAN_ITERATIONS      (int): Number of values to get from gyro.
@@ -190,6 +191,7 @@ class Robot:
         self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
+        self.START_X = 200
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
@@ -221,9 +223,8 @@ class Robot:
         init_UARTs()
 
         # Read start values for X and Y
-        self._x_start = self._median_sensor(5, Command.read_left_back_ir()) + 100
-        self._y_start = 200
-
+        self._y_start = self._median_sensor(10, Command.read_right_back_ir())+100
+        self._x_start = self.START_X;
         
     def read_ir_side(self, side: Direction):
         """
@@ -327,7 +328,7 @@ class Robot:
         elif (self.current_angle < 0):
             return 360 - abs(self.current_angle) % 360
 
-    def update_map(self, turndir):
+    def update_map(self):
         """
         Update the gridmap with new scan data.
         
@@ -457,6 +458,9 @@ class Robot:
                 # Save the given length driven
                 self._save_position(reflex_right - reflex_right_start)
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+                # Update map
+                self.update_map()
+
                 if side == "right":
                     return DriveStatus.CORRIDOR_DETECTED_RIGHT
                 else:
@@ -467,6 +471,8 @@ class Robot:
                 # Save the given length driven
                 handle_command(Command.stop_motors())
                 self._save_position(reflex_right - reflex_right_start)
+                # Update map
+                self.update_map()
                 return DriveStatus.OBSTACLE_DETECTED
 
             # We need to get the distance from the center of the robot perpendicular to the wall
@@ -489,6 +495,8 @@ class Robot:
         # Save the given length driven
         handle_command(Command.stop_motors())
         self._save_position(reflex_right - reflex_right_start)
+        # Update map
+        self.update_map()
         return DriveStatus.DONE
 
     def scan(self):
