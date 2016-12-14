@@ -161,6 +161,7 @@ class Robot:
         uart_sensorenhet            (str): Device name of the USB<->Serial converter for the sensor unit.
         uart_styrenhet              (str): Device name of the USB<->Serial converter for the control unit.
         pid_controller              (Pid): The PID controller in use.
+        has_been_to_other_cell      (bool): Robot has left the starting position at the island. 
         START_X                     (int): Starting x-value, in mm
         BLOCK_SIZE                  (int): Block size in millimetres.
         IR_MEDIAN_ITERATIONS        (int): Number of values to get from IR sensors.
@@ -208,6 +209,7 @@ class Robot:
         self.WHEEL_RADIUS = 32.5
         self.DRIVE_TO_ISLAND_THRESHOLD = 800
         self.logger = logger
+        self.has_been_to_other_cell = False
         # Private attributes
         self._last_dist = 0
         self._grid_map = GridMap()
@@ -434,6 +436,8 @@ class Robot:
             # the argument should really be an enum.
             assert (False)
 
+        self.logger.info("Side: " + side)
+
         # Sleep after servo turn
         time.sleep(0.75)
         
@@ -482,7 +486,7 @@ class Robot:
             self.pid_controller.d_term = angle_side
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
-            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(lidar,100), 200) / 200, side)
+            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front,100), 200) / 200, side)
             if side == "right":
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             else:
@@ -566,7 +570,7 @@ class Robot:
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
-        self._start_cell_at_island = approximate_to_cell(self.get_position())
+        self.start_cell_at_island = approximate_to_cell(self.get_position())
         self.look_for_island = False
         self.explore_island = True
 
@@ -722,8 +726,13 @@ def main(argv):
                 status = robot.follow_wall(400, side = "right")
             elif robot.explore_island:
                 robot_position = robot.get_position()
-                if (robot.start_cell_at_island == approximate_to_cell(robot_position)):
+                if (robot.start_cell_at_island == approximate_to_cell(robot_position) and robot.has_been_to_other_cell):
                     robot.leave_island()
+                    robot.logger.info("RETURNING HOME!")
+                    status = robot.follow_wall(999999, side = "left")
+                elif (robot.start_cell_at_island != approximate_to_cell(robot_position)):
+                    robot.has_been_to_other_cell = True
+                    status = robot.follow_wall(200, side = "right")
                 else:
                     status = robot.follow_wall(200, side = "right")
             elif robot.return_home:
