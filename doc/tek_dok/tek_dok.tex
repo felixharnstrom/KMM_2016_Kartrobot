@@ -173,7 +173,7 @@ Styrenheten ansvarar för att omvandla högnivåkommandon till lågnivåkommando
 
 Kommunikations- och kontrollenheten är den centrala hjärnan i systemet, som skickar kommandon till de andra enheterna. I det manuella läget utför den kommandon som kommer från den externa PC:n, och i det autonoma bestämmer den själv bästa tillvägagångssätt för att systemet ska kunna kartlägga rummet.
 
-På den externa PC:n finner vi ett användargränssnitt där en människa kan läsa av kartan, robotens position, och sensordata, samt skicka kommandon till roboten om denna befinner sig i det manuella läget.
+På den externa PC:n finner vi ett användargränssnitt där en människa kan läsa av kartan, robotens position, sensordata, motordiagnostik, samt skicka kommandon till roboten om denna befinner sig i det manuella läget.
 
 I figur \ref{fig:modules} beskrivs det grafiskt hur dessa moduler kommunicerar med varandra. Mer detaljerade blockschema finns till varje modul, samt en fullständig översikt i figur \ref{fig:modulesDetailed}.
 
@@ -183,7 +183,7 @@ I figur \ref{fig:modules} beskrivs det grafiskt hur dessa moduler kommunicerar m
     \label{fig:modules}
 \end{figure}
 
-Robotens hårdvara är monterad ovanpå dess chassi, en modell som går under namnet \cite{terminator}. Denna kommer med fyra hjul påmonterade, som används för att roboten ska kunna ta sig runt i rummet. Ytterligare ett servo, monteras på toppen av roboten.
+Robotens hårdvara är monterad ovanpå dess chassi, en modell som går under namnet \cite{terminator}. Denna kommer med fyra hjul påmonterade, som används för att roboten ska kunna ta sig runt i rummet. Utöver det så är även ett servo monterat på toppen av roboten.
 
 Ovanpå denna sitter den avståndskänsliga lasern LIDAR - systemets viktigaste sensor vad gäller rumskanningen. Ytterligare sensorer hittas på tre av robotens fyra sidor: IR-sensorer för bättre kontroll under körning. Ingen sensor är monterad längst fram på chassit, eftersom LIDAR:n täcker den funktionaliteten då roboten rör på sig.
 
