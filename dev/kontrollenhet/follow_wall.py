@@ -186,13 +186,13 @@ class Robot:
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
-        self.TURN_OVERRIDE_DIST = 300
+        self.TURN_OVERRIDE_DIST = 200
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 40
+        self.CORRIDOR_TURN_ENTRY_DIST = 90
         self.CORRIDOR_TURN_EXIT_DIST = 350
-        self.OBSTACLE_SAFETY_OVERRIDE = 120
+        self.OBSTACLE_SAFETY_OVERRIDE = 25
         self.EDGE_SPIKE_FACTOR = 2
-        self.OBSTACLE_DIST = 170
+        self.OBSTACLE_DIST = 30
         self.SENSOR_SPACING = 95
         self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
@@ -214,7 +214,7 @@ class Robot:
 
         #Read start values for X and Y
         self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
-        self._y_start = self._median_sensor(5, Command.read_back_ir())+150
+        self._y_start = self._median_sensor(5, Command.read_lidar())+150
 
     def read_ir_side(self, side: Direction):
         """
@@ -355,7 +355,6 @@ class Robot:
                 # We've returned to the garage
                 self.look_for_island = True
                 self.logger.warning("In garage - looking for island")
-
         old = self.grid_map.get(cells[-1].x, cells[-1].y)
         self.grid_map.set(cells[-1].x, cells[-1].y, CellType.LOCATION)
         self.grid_map.debug_print(print_origin = True)
@@ -367,7 +366,6 @@ class Robot:
             
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
-
             # Turn servo proper direction
             handle_command(Command.servo(90))
             time.sleep(0.75)
@@ -379,7 +377,6 @@ class Robot:
                 time.sleep(2)
             else:
                 self.logger.info("No island :(")
-
             
         if cells and cells[-1] == cells[0] and self.grid_map.is_complete(cells[0]):
             # We're done!
@@ -387,7 +384,7 @@ class Robot:
             self.logger.info(" D O N E")
             self.logger.info("================")
 
-                
+
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
         """
         Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
@@ -404,7 +401,7 @@ class Robot:
         # logger.debug("LIDAR INIT: ", lidar_init)
         while(reflex_right - reflex_right_start < dist):
             reflex_right = handle_command(Command.read_reflex_right())
-            lidar_cur = handle_command(Command.read_lidar())
+            lidar_cur = handle_command(Command.read_front_ir())
             if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
                 handle_command(Command.stop_motors())
                 if save_new_distance:
@@ -445,7 +442,7 @@ class Robot:
             else:
                 ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
 
-            lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
+            lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
 
             #self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
 
@@ -608,7 +605,7 @@ class Robot:
         Returns:
             (bool): If the robot has moved more than threshold.
         """
-        ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
+        ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
         lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
         ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
@@ -616,7 +613,7 @@ class Robot:
         time.sleep(wait_time)
         # TODO: Currently skipping check
         return False
-        ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir()))
+        ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir()))
         lidar_diff = abs(lidar - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar()))
         ir_right_front_diff = abs(ir_right_front - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir()))
         ir_right_back_diff = abs(ir_right_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir()))
@@ -637,9 +634,9 @@ def sensor_test(robot):
     Continuously get all sensor values and print these.
     """
     while 1:
-        ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
-        ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
-        ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
+        ir_right_back, ir_right_front = robot.read_ir_side(Direction.RIGHT)
+        ir_left_back, ir_left_front = robot.read_ir_side(Direction.LEFT)
+        ir_back = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
         robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
@@ -689,9 +686,9 @@ def main(argv):
     g = grid_map.GridMap()
 
     print (robot.get_position())
-
     #print("lidar", robot.scan())
     g.debug_print()
+    # sensor_test(robot)
 #    time.sleep(10)
     # Try driving in infinite loop around the maze
     while 1:
@@ -739,7 +736,7 @@ def main(argv):
                 while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
+                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 50:
                     logger.info("Not a corridor, moving back")
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('right')
@@ -765,7 +762,7 @@ def main(argv):
                 while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(1, Command.read_lidar()) < robot.BLOCK_SIZE:
+                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 50:
                     logger.info("Not a corridor, moving back")
                     robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('left')

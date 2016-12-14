@@ -75,7 +75,7 @@ class Command():
             :return (Command): Drive command.
         """
         time1, time2 = split_time(time)
-        return Command(CommandEnums.DRIVE, [direction, speed, time1, time2])
+        return Command(CommandEnums.DRIVE, [(1-direction), speed, time1, time2])
 
     @staticmethod
     def turn(turn : int, speed : int, time : int):
@@ -107,7 +107,7 @@ class Command():
         Returns:
             :return (Command): Side speeds command.
         """
-        return Command(CommandEnums.SIDE_SPEEDS, [left_direction, left_speed, right_direction, right_speed])
+        return Command(CommandEnums.SIDE_SPEEDS, [(1-right_direction), right_speed, (1-left_direction), left_speed])
 
     @staticmethod
     def servo(degrees : int):
@@ -150,7 +150,7 @@ class Command():
         Returns:
             :return (Command): Read left front IR command.
         """
-        return Command(CommandEnums.READ_IR_LEFT_FRONT)
+        return Command(CommandEnums.READ_IR_RIGHT_BACK)
 
     @staticmethod
     def read_left_back_ir():
@@ -160,7 +160,7 @@ class Command():
         Returns:
             :return (Command): Read left back IR command.
         """
-        return Command(CommandEnums.READ_IR_LEFT_BACK)
+        return Command(CommandEnums.READ_IR_RIGHT_FRONT)
 
     @staticmethod
     def read_right_front_ir():
@@ -170,7 +170,7 @@ class Command():
         Returns:
             :return (Command): Read right front IR command.
         """
-        return Command(CommandEnums.READ_IR_RIGHT_FRONT)
+        return Command(CommandEnums.READ_IR_LEFT_BACK)
 
     @staticmethod
     def read_right_back_ir():
@@ -180,10 +180,10 @@ class Command():
         Returns:
             :return (Command): Read right back IR command.
         """
-        return Command(CommandEnums.READ_IR_RIGHT_BACK)
+        return Command(CommandEnums.READ_IR_LEFT_FRONT)
 
     @staticmethod
-    def read_back_ir():
+    def read_front_ir():
         """
         Query current back IR sensor value.
 

@@ -538,7 +538,7 @@ def measure_lidar():
         measurements.append([degree, dist])
         handle_command(Command.servo(int(degree)))
         time.sleep(LIDAR_SLEEP)
-        
+
     handle_command(Command.servo(180))
     return measurements
 
