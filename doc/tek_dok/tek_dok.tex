@@ -229,7 +229,7 @@ Vidare är ett ett gyro (modell MPU6050) monterat i mitten av roboten för att d
 
 I bilaga \ref{app:placement} hittas en grafisk beskrivning av hårdvarans placering. Kopplingsscheman finns i bilaga \ref{schematics:styrenhet} till och med bilaga \ref{schematics:brain}.
 
-\subsection{Seriell kommunikation}
+\subsection{Seriell kommunikation}\label{sec:serial}
 För kommunikation mellan kommunikation- och kontrollenheten (se kapitel \ref{sec:system3}) och sensorenheten samt styrenheten (se kapitel \ref{sec:system2} respektive \ref{sec:system3}) används seriella bussar. Då Raspberry pi:n som används i kontrollenheten saknar användbar inbyggd UART så används USB-till-UART-moduler. Den seriella kommunikationen körs med en baud rate på $38 400$.
 
 Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket på 8 bitar som följs av noll eller flera datapaket som illustrerat i figur \ref{fig:msg_structure}. Se tabell \ref{tab:meta_packet} för en mer ingående förklaring över fälten i metapaketet.
@@ -431,7 +431,7 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
     \label{tab:gyro}
 \end{table}
 
-\subsection{WIFI-kommunikation}
+\subsection{WIFI-kommunikation}\label{sec:wifi}
 Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
 Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
@@ -687,15 +687,12 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \subsection{Mjukvara}
 Koden skrivs i Python 3, och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
-\subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Mjukvara skrivs för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
+\subsubsection{Kommunikation}\label{ssec:brain_comm}
+Kommunikations- och kontrollenheten är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Det är kommunikations- och kontrollenheten som ansvarar för den seriella kommunikationen (se kapitel \ref{sec:serial}) med de övriga inbyggda delsystemen, och det är därför denna enhet som inleder all seriell kommunikation. Det betyder att sensorenheten och styrenheten aldrig inleder kommunikationen med kommunikations- och kontrollenheten, utan de svarar bara på kommandon som skickas av denna.
 
-Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se kapitel \ref{sec:system4}) med hjälp av Wi-Fi-kommunikation, där den kontinuerligt skickar debugdata och kartinformation samt tar emot meddelanden. Dessa meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen skrivs och ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
+Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten också med en extern PC (se kapitel \ref{sec:system4}) via Wi-Fi, där vi har ett liknande förhållande som med den seriella kommunikationen. På kommunikations- och kontrollenheten körs en serverprocess som låter en klient ansluta (se kapitel \ref{ssec:pc_comm}) och skicka kommandon till kommunikations- och kontrollenheten. Anledningen till att köra servermjukvaran på roboten är för att underlätta anslutning då klienten behöver veta serverns IP-adress vid anslutning men ej vice versa.
 
-% TODO implementeras UART m.h.a avbrott?
-% TODO olika köer för meddelanden från olika ingångar, eller en gemensam? Prioritetskö?
-% Vi skulle kunna använda något liknande http://raspi.tv/2013/how-to-use-interrupts-with-python-on-the-raspberry-pi-and-rpi-gpio-part-3
-För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:wifi} som exempel). Detta ställer vissa krav på trådsäkerhet och minneskapacitet som inte bör vara något problem att uppnå med kortet.
+För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:wifi} som exempel).
 
 \begin{figure}[h!]
     \centering
@@ -751,9 +748,7 @@ Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan
 \clearpage
 
 \subsubsection{Lägesstyrning}
-Roboten konstrueras med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner skrivs för varje, men de delar oundvikligen båda på många funktioner och moduler.
-
-När roboten startar så initieras den med startvärden och hamnar i den huvudloop som ser till att den alltid är i det styrläge som användaren avser, se figur \ref{fig:lageskontroll}.
+Roboten konstrueras med två olika lägen: ett manuellt, och ett autonomt. När roboten startar så initieras den med startvärden och hamnar i den huvudloop som ser till att den alltid är i det styrläge som användaren avser, se figur \ref{fig:lageskontroll}.
 
 \begin{figure}[h!]
 	\makebox[\textwidth][c]{\includegraphics[width=0.4\textwidth]{main-flowchart.png}}
@@ -796,11 +791,7 @@ När roboten startar så initieras den med startvärden och hamnar i den huvudlo
 %\end{figure}
 
 \subsubsection{Manuellt läge}
-I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nertryckta som då översätts till styrkommandon och skickas vidare till styrenheten.
-
-
-\noindent
-Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte mjukvaran särskilt komplex. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
+I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapitel \ref{sec:system4}). Dessa kan antingen vara begäran om diagnostisk data, eller vilka piltangenter som är nedtryckta som då översätts till styrkommandon och skickas vidare till styrenheten. Eftersom det manuella läget främst omvandlar och vidarebefordrar givna kommandon så är inte mjukvaran särskilt komplex i ett makroperspektiv. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
 
 \begin{figure}[h!]
 \centering
@@ -900,7 +891,7 @@ Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul an
 
 \newpage
 \section{PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
+Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{PC.png}}
@@ -908,21 +899,12 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och Wi-Fi-modul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
-
-\subsubsection{Komponentbudget}
-Här följer en lista på all hårdvara som detta delsystem kräver.
-
-\begin{center}
-\begin{HardwareList}
-\hardware{PC}{PC med Wi-Fi-modul.}{1}
-\end{HardwareList}
-\end{center}
+PC-mjukvaran är körbar på en godtycklig PC med Python3 och Wi-Fi-modul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
 
 \clearpage
 
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och ska följa \cite{pep8}. Den består av två trådar där den ena hanterar GUIt och den andra hanterar kommunikation med roboten via en socket och med GUIt via köer.
+PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
 
 \begin{figure}[h!]
 \centering
@@ -984,16 +966,12 @@ PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta använ
 \label{fig:gui_flowchart}
 \end{figure}
 
-% TODO: De andra sektionerna har inte lagt upp det så här med Input/Output-sektioner
-%         Kan vara värt att diskutera med resten av gänget eller anpassa sig för ett mer uniformt dokument.
+\subsubsection{Kommunikation}\label{ssec:pc_comm}
+PC-mjukvaran tar emot sensordata, styrdata, och kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från användaren i form av knapptryck och tangentbordskommandon.
 
-\subsubsection{Input}
-PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenheten via Wi-Fi. Den tar också emot instruktioner från användaren i form av knapptryck och tangentbordskommandon.
+I det manuella läget skickar PC-mjukvaran styrkommandon samt uppmaning om att läsa av sensorerna till roboten. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten, samt information om hur långt roboten har åkt. I det autonoma läget skickar PC-mjukvaran också förfrågningar om kartdata.
 
-\clearpage
-
-\subsubsection{Output}
-Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
+PC-mjukvaran är implementerad som en klient som ansluter till serverprocessen som körs på kommunikations- och kontrollenheten (se kapitel \ref{ssec:brain_comm}). För att ansluta till roboten krävs därför endast serverns IP-adress. Se kapitel \ref{sec:wifi} för en mer ingående beskrivning av hur denna erhålls.
 
 \subsubsection{GUI}
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren styra roboten med piltangenterna i manuellt läge, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui} för en bild av gränssnittet.
