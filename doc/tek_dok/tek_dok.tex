@@ -677,7 +677,7 @@ Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunika
 \subsection{Hårdvara}
 
 \subsubsection{Datormodell}
-Raspberry Pi 3 används, med inbyggd Wi-Fi-modul. Denna lilla dator är relativt kraftig, och bör därmed inte ha problem med att hålla sitt program gående i rimlig takt. Antalet portar räcker också till: två USB-utgångar behövs för USB-UART:en och två pinnar behövs för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
+Raspberry Pi 3 används, med inbyggd Wi-Fi-modul. Två USB-utgångar används för USB-UART:en och två pinnar används för brytare och reset-signal (se kapitel \ref{ssec:brainInterface}).
 
 Då enkortsdatorn kan korrumpera SD-kortet vid brytning av strömmen så finns en knapp med funktionen att stänga ner mjukvaran. Denna används då lämpligen innan brytaren för strömmen.
 
@@ -697,14 +697,14 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 Koden skrivs i Python 3, och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
 \subsubsection{Kommunikation}
-Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Mjukvara skrivs för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot (se kapitel \ref{ssec:brainInterface}).
+Delsystemet är vad som i slutändan kontrollerar de olika delsystemen, och kan därför skicka meddelanden mellan dessa. Mjukvara för att kunna skicka meddelanden över de olika gränssnitten som den kopplas upp emot  finns (se kapitel \ref{ssec:brainInterface}).
 
-Förutom hårdvarugränssnitt ska den också kunna kommunicera med en extern PC (se kapitel \ref{sec:system4}) med hjälp av Wi-Fi-kommunikation, där den kontinuerligt skickar debugdata och kartinformation samt tar emot meddelanden. Dessa meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen skrivs och ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
+Förutom hårdvarugränssnitt kan den också kommunicera med en extern PC (se kapitel \ref{sec:system4}) med hjälp av Wi-Fi-kommunikation, där den skickar debugdata och kartinformation samt tar emot meddelanden. Dessa meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
 
 % TODO implementeras UART m.h.a avbrott?
 % TODO olika köer för meddelanden från olika ingångar, eller en gemensam? Prioritetskö?
 % Vi skulle kunna använda något liknande http://raspi.tv/2013/how-to-use-interrupts-with-python-on-the-raspberry-pi-and-rpi-gpio-part-3
-För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:wifi} som exempel). Detta ställer vissa krav på trådsäkerhet och minneskapacitet som inte bör vara något problem att uppnå med kortet.
+För att hantera meddelanden mellan de interna såväl som de externa modulerna så används köer. Element läggs till i dessa under avbrottsrutiner, men även direkt under mjukvarukörning på olika trådar (Se figur \ref{fig:wifi} som exempel). 
 
 \begin{figure}[h!]
     \centering
@@ -760,7 +760,7 @@ Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan
 \clearpage
 
 \subsubsection{Lägesstyrning}
-Roboten konstrueras med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner skrivs för varje, men de delar oundvikligen båda på många funktioner och moduler.
+Roboten är konstruerad med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner finns för varje, men de delar på många funktioner och moduler.
 
 När roboten startar så initieras den med startvärden och hamnar i den huvudloop som ser till att den alltid är i det styrläge som användaren avser, se figur \ref{fig:lageskontroll}.
 
@@ -809,7 +809,7 @@ I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapite
 
 
 \noindent
-Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte mjukvaran särskilt komplex. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
+Kod finns för var och en av dessa rutiner, men i ett makroperspektiv blir inte mjukvaran särskilt komplex. Se figur \ref{fig:manual_flowchart} för ett övergripande flödesschema.
 
 \begin{figure}[h!]
 \centering
@@ -846,7 +846,7 @@ Kod skrivs för var och en av dessa rutiner, men i ett makroperspektiv blir inte
 \draw [line] ($(await_com) - (0, 100pt)$) -- ($(execute) - (0, 100pt)$);
 \draw [arrow] ($(com_in_q) - (0, 100pt)$) -- (com_in_q);
 \end{tikzpicture}
-\caption{Typiskt programflöde i det manuella läget. Notera att kön även fylls upp av en separat tråd.}
+\caption{Typiskt programflöde i det manuella läget. Notera att kön även fylls upp separat.}
 \label{fig:manual_flowchart}
 \end{figure}
 
@@ -858,8 +858,27 @@ I det autonoma läget kör roboten först ett varv längs högerväggen, tills d
 %TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
 \begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
-	\caption{Flödesschema för det autonoma läget.  }
+	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
 \end{figure}
+
+Efter att roboten kört ett varv och återkommit till garaget så påbörjas ytterligare ett varv, för att hitta till köksön, enligt figur \ref{fig:kitchenSearch}
+
+\begin{figure}[h!]
+ \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth]{kitchen_flowchart.png}}
+ \caption{Flödesschema för att hitta köksön. \label{fig:kitchenSearch}}
+ 
+\end{figure}
+
+Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDrive}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
+
+\begin{figure}[h!]
+    \makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{kitchen_around_flowchart.png}}
+    \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
+\end{figure}
+
+När roboten hitta tillbaka till en yttervägg kommer denne återigen att köra tills den hamnat i garage-rutan.
+    
+
 
 %\begin{figure}[h!]
 %\centering
