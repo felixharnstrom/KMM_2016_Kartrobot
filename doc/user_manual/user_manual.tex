@@ -1,0 +1,159 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{siunitx}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{mathptmx}    %Times Roman font
+\usepackage{helvet}    %Helvetica, served as a model for arial
+\usepackage{anyfontsize}
+
+\usepackage[tocgraduated]{tocstyle}
+\usetocstyle{allwithdot}
+
+\usepackage[titletoc,title]{appendix}
+
+\usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
+\setlength{\bibitemsep}{\baselineskip}	%vertical space between bibliography items
+
+\usepackage{fancyhdr}
+\fancypagestyle{intro}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\roman{page}}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+\fancypagestyle{content}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\thepage}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+
+\usepackage{titlesec}
+\titleformat{\section}
+    {\normalfont\sffamily\Large\bfseries}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\sffamily\large\bfseries}
+    {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+    {\normalfont\sffamily\bfseries}
+    {\thesubsubsection}{1em}{}
+
+\newcommand{\LIPSartaltermin}{2016/HT}
+\newcommand{\LIPSkursnamn}{TSEA29}
+\newcommand{\LIPSprojekttitel}{Kartrobot}
+\newcommand{\LIPSprojektgrupp}{Grupp 1}
+\newcommand{\LIPSgruppepost}{\href{mailto:kmm_2016_grupp1@liuonline.onmicrosoft.com}{{\small kmm\_2016\_grupp1@liuonline.onmicrosoft.com}}}
+\newcommand{\LIPSgrupphemsida}{}
+\newcommand{\LIPSkund}{ISY, Linköpings universitet, 581\,83 Linköping}
+\newcommand{\LIPSkundkontakt}{Mattias Krysander, 013-282198, matkr@isy.liu.se}
+\newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
+\newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
+\newcommand{\LIPSdokumenttyp}{Användarhandledning}
+\newcommand{\LIPSredaktor}{Silas Lenz}
+
+\newcommand{\LIPSversion}{1.0}
+\newcommand{\LIPSgranskare}{Felix Härnström}
+\newcommand{\LIPSgranskatdatum}{2016-12-14}
+\newcommand{\LIPSgodkannare}{}
+\newcommand{\LIPSgodkantdatum}{}
+
+\input{LIPS.tex}
+
+\begin{document}
+
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+    \LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
+    \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+    \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
+    \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+
+\clearpage
+\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+\normalfont
+\tableofcontents
+\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+\normalfont
+\clearpage
+\begin{LIPSdokumenthistorik}
+    \LIPSversionsinfo{1.0}{2016-12-14}{Första versionen.}{FH, SL}{FH}
+\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+
+\section{Anslutning}
+Vid strömpåslag kommer roboten automatiskt starta upp och ansluta till \texttt{eduroam}. Dess IP-adress kommer postas till gruppens Slack-kanal, men kan också avläsas genom att koppla in en skärm till Raspberry Pi och köra kommandot \texttt{sudo ip addr}. Detta kan sedan användas för att ansluta med PC-mjukvaran, eller via SSH med användarnamn \texttt{pi} och lösenord \texttt{mpu6050}.
+
+\section{Uppstart}
+\begin{enumerate}
+    \item Det rekommenderas att starta om robotens AVR-processorer genom att trycka in den röda knappen på övre virkortet innan körning (se punkt 1 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}), för att kalibrera sensorer. Se till att roboten står stilla under kalibrering.
+    
+    \item Starta upp PC-mjukvaran genom ändra IP-adress i \texttt{main.py} och därefter köra \texttt{python3 main.py}. 
+\end{enumerate}
+
+\section{GUI}\label{sec:gui}
+Det grafiska gränssnittet har knappar för att byta läge, samt för att stänga av programmet. I det manuella läget kan piltangenterna på tangentbordet användas för styrning. Även flera tangenter samtidigt fungerar. Till vänster visas en karta i det autonoma läget. Till höger visas sensordata och i mitten visas aktuell motorstatus samt kontrollpanelen. Se figur \ref{fig:gui} för en bild av gränssnittet.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.55]{gui_annotated.png}
+    \caption{Det grafiska gränssnittet.}
+    \label{fig:gui}
+\end{figure}
+
+Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska gränssnittet;
+\begin{enumerate}
+\item Hitintills utritad karta.
+\item Knappar för att byta läge och stänga ner PC-mjukvaran.
+\item Nuvarande motorhastighet och servoposition.
+\item Nuvarande sensorvärden och avverkat avstånd.
+\end{enumerate}
+
+\section{Byta läge}
+För att byta mellan autonomt och manuellt kan det grafiska gränssnittet (se kapitel \ref{sec:gui}) eller den blåa fysiska knappen på roboten användas (se punkt 3 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
+
+\section{Avstängning}
+För att stänga av roboten måste kommunikations- och kontrollenheten genomföra en mjuk avstängning innan strömmen bryts. För att stänga av kommunikations- och kontrollenheten trycker man ned den röda knappen på roboten (se punkt 2 i figur \ref{fig:robot_overview}, bilaga \ref{app:picture}).
+
+\clearpage
+\begin{appendices}
+\section{Produktbild}\label{app:picture}
+ \begin{figure}[h!]
+     \centering
+     \includegraphics[scale=0.15]{robot_side_annotated.png}
+     \caption{Översikt över roboten.}
+     \label{fig:robot_overview}
+ \end{figure}
+\end{appendices}
+
+\end{document}
