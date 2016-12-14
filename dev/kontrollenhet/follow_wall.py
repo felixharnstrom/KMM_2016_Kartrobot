@@ -201,7 +201,7 @@ class Robot:
         self.CORRIDOR_TURN_EXIT_DIST = 350
         self.OBSTACLE_SAFETY_OVERRIDE = 30
         self.EDGE_SPIKE_FACTOR = 2
-        self.OBSTACLE_DIST = 30
+        self.OBSTACLE_DIST = 80
         self.SENSOR_SPACING = 95
         self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
@@ -458,9 +458,6 @@ class Robot:
                 # Save the given length driven
                 self._save_position(reflex_right - reflex_right_start)
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-                # Update map
-                self.update_map()
-
                 if side == "right":
                     return DriveStatus.CORRIDOR_DETECTED_RIGHT
                 else:
@@ -471,8 +468,6 @@ class Robot:
                 # Save the given length driven
                 handle_command(Command.stop_motors())
                 self._save_position(reflex_right - reflex_right_start)
-                # Update map
-                self.update_map()
                 return DriveStatus.OBSTACLE_DETECTED
 
             # We need to get the distance from the center of the robot perpendicular to the wall
@@ -495,8 +490,6 @@ class Robot:
         # Save the given length driven
         handle_command(Command.stop_motors())
         self._save_position(reflex_right - reflex_right_start)
-        # Update map
-        self.update_map()
         return DriveStatus.DONE
 
     def scan(self):
@@ -741,7 +734,7 @@ def main(argv):
             logger.info(robot.path_trace)
             
             #TODO: Change the argument to something understandable
-            drive_to_island = robot.update_map("srasneiarsneairen")
+            drive_to_island = robot.update_map()
 
             # Drive to the island if it is close enough
             if drive_to_island:
