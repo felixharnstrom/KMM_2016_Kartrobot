@@ -535,9 +535,9 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 \subsection{Mjukvara}
 
-Koden skrivs i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
+Koden för sensorenheten är skriven i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
 
-På instruktion läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
+På instruktion så läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
 
 \subsubsection{LIDAR}
 LIDAR:n använder avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
