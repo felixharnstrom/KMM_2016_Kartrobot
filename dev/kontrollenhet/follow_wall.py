@@ -216,8 +216,6 @@ class Robot:
         self._x_start = self._median_sensor(5, Command.read_left_back_ir())+100
         self._y_start = self._median_sensor(5, Command.read_lidar())+150
 
-        # Include garage in grid_map
-        self._reset_grid_map()
         
     def read_ir_side(self, side: Direction):
         """
@@ -344,10 +342,12 @@ class Robot:
         cells = movement_lines_to_cells(lines, 1)
         # Scanning walls
         # unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
+        #print(self.path_trace[0:max(len(self.path_trace)-1, 20)])
         self.logger.info("Current cell" +str(cells[-1]))
         self.logger.info("Current path" +str(self.path_trace))
         if not self.look_for_island and len(cells) > 0:
-            self._reset_grid_map()
+            self.grid_map = GridMap()
+            self._add_garage(cells[0])
             make_open(cells, self.grid_map)
             self.grid_map.debug_print()
             self.logger.info("---------")
@@ -370,11 +370,7 @@ class Robot:
             
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
-            # Turn servo proper direction
-            handle_command(Command.servo(90))
-            time.sleep(0.75)
             is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
-            handle_command(Command.servo(180))
             time.sleep(0.75)
             if is_island:
                 self.logger.info("ISLAND!!!")
@@ -428,6 +424,20 @@ class Robot:
             (DriveStatus): Status when completed.
         """
 
+        if side == "right":
+            # We're scanning for island on the left - turn it left
+            handle_command(Command.servo(0))
+        elif side == "left":
+            # We're scanning for island on the right - turn it right
+            handle_command(Command.servo(180))
+        else:
+            # Unreachable, unless caller is a moron
+            # the argument should really be an enum.
+            assert (False)
+
+        # Sleep after servo turn
+        time.sleep(0.75)
+        
         # Read start values from sensors
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = handle_command(Command.read_reflex_right())
@@ -554,14 +564,17 @@ class Robot:
             ir_back, ir_front = self.read_ir_side(Direction.RIGHT)
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
             self.turn(math.degrees(angle) < 0, abs(int(math.degrees(angle))), speed=self.BASE_SPEED+10)
-            
-    def _reset_grid_map(self):
-        self.grid_map = GridMap()
+
+
+    def _add_garage(self, where:Position):
+        """
+        Add a garage in the desired cell.
+        """
         # Update grid_map to include garage
-        self.grid_map.set(-1, 0, CellType.WALL)
-        self.grid_map.set(0, 1, CellType.WALL)
-        self.grid_map.set(0, -1, CellType.WALL)
-        self.grid_map.set(0, 0, CellType.OPEN)
+        self.grid_map.set(where.x - 1, where.y, CellType.WALL)
+        self.grid_map.set(where.x, where.y + 1, CellType.WALL)
+        self.grid_map.set(where.x, where.y - 1, CellType.WALL)
+        self.grid_map.set(where.x, where.y, CellType.OPEN)
 
             
     def _median_sensor(self, it : int, sensor_instr : Command):
