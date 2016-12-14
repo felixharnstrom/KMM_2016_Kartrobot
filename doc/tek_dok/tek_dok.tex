@@ -118,7 +118,7 @@
 \pagestyle{content}
 
 \section{Inledning}
-Produkten som beskrivs i detta dokument är en robot med förmågan att kartlägga rum som specificeras enligt över \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett Wi-Fi-gränssnitt.
+Produkten som beskrivs i detta dokument är en robot med förmågan att kartlägga rum som specificeras enligt \cite{coursespec}. Detta gör den genom att förflytta sig i rummet (med manuell eller autonom styrning) och skanna med en avståndskänslig laser. Kommandon och resultat skickas till respektive från en extern PC via ett Wi-Fi-gränssnitt.
 
 Detta dokument innehåller nödvändig teknisk dokumentation för underhåll och vidareutveckling av produkten.
 
@@ -494,7 +494,7 @@ Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenhet
 ATmega1284 används som processormodell då den är kraftfull utan att ta det är till överdrift. Antalet pinnar, A/D-omvandlare, avbrott, samt UART-enheter som processorn har räcker för samtliga sensorer och kommunikationsbussar.
 
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
-Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40 $\times$ 40 cm.
+På vardera sida om roboten är två stycken IR-sensorer av modell GP2D120 monterade, samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:ir_interface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät där varje ruta är 40 $\times$ 40 cm.
 
 \subsubsection{LP-filter}
 De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
@@ -538,22 +538,21 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 
 Koden skrivs i C, och följer standarden specificerad i bilaga \ref{app:cstandard}.
 
-På instruktion läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format (se kapitel \ref{ssec:sensorInterface}) samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
+På instruktion läser sensorenheten av en sensor för att sedan skicka vidare värdet på ett mer lättanvänt format samt tar emot instruktioner om att läsa av en viss sensor. För IR-sensorer beräknas ett medelvärde över de senaste fem mätningarna (då dess utvärden kan vara avvikande), medan övriga sensorvärden skickas tillbaka direkt.
 
 \subsubsection{LIDAR}
-LIDAR kommer använda avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
-
-\clearpage
+LIDAR:n använder avläsningstriggers och PWM via en gemensam pin på sensorn. På ATmega-sidan delas denna upp i två pinnar med en resistor på triggersignalen som gör att LIDARns signaler får prioritet. PWM-signalen är kopplad till ett avbrott för att mäta dess längd, som används för att beräkna avståndet i millimeter.
 
 \subsubsection{Gyro}
 MPU6050 läses av via I\textsuperscript{2}C. Endast gyrot i robotens z-axel används, vilket motsvaras av gyrons x-axel (då det inte ligger plant gentemot chassit). Mätvärdeskalibrering med hjälp av temperatursensorn på gyrot används ej. Dock så beräknar sensorenheten gyrots drift-hastighet vid start och kalibrerar för det. Gyrot är inställt på att använda en maximal vinkelhastighet på 250 grader/s. Efter avläsning omvandlas vinkelhastigheten till centigrader/s.
 
 \subsubsection{Reflex sensorer}
-Reflex sensorerna skickar en analog signal till AD-omvandlarna. Eftersom att spänningen skljer sig ganska mycket beroende på om reflex sensorn pekar på en svart eller vit yta så behöver vi inget LP-filter här.
+Reflex sensorerna skickar en analog signal till AD-omvandlarna. Eftersom att spänningen skiljer sig ganska mycket beroende på om reflex sensorn pekar på en svart eller vit yta så behöver vi inget LP-filter här.
 
 För varje gång som reflex sensorn detekterar att färgen skiftat från svart till vit eller tvärtom så adderar ATmega:n 1 till respektive räknare. På detta sätt kan vi räkna ut hur långt ett hjul har snurra.
 
 \subsubsection{IR-sensorer}
+\label{ssec:ir_interface}
 IR-sensorerna använder en analog utgång som varierar i enlighet med avståndet efter en ickelinjär kurva. Denna signal har störningar som filtreras ut med hjälp av LP-filter, se kopplingsschema i bilaga \ref{schematics:styrenhet}. Efter avläsning i form av spänningen, $v$, som går mellan 0 och 5 volt översätts detta med formeln $d = 10 \times (v/4.577) ^{(1/-0.634)}$ till ett avstånd, $d$, i millimeter.
 
 \subsubsection{Utvärden/Input}
@@ -597,8 +596,6 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 Koden för styrenheten är skriven i C, och följer den standard som är specificerad i bilaga \ref{app:cstandard}. 
 Styrenheten lyssnar på UARTen efter instruktioner, utformade enligt specifikationen i \ref{ssec:serial}. Dessa instruktioner tas emot och avkodas till de funktionsanrop som de representerar, och exekveras sedan med de parametrar som hör funktionen till. Därefter återgår enheten till att lyssna efter nya instruktioner.
 
-
-\clearpage
 
 %\subsubsection{Tillståndsdiagram}
 %TODO: Skriva om eller ta bort? (Med uppdaterad bild)
@@ -697,7 +694,7 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \end{HardwareList}
 
 \subsection{Mjukvara}
-Koden skrivs i Python 3, och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
+Koden är skriven i Python 3 och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
 \subsubsection{Kommunikation}\label{ssec:brain_comm}
 Kommunikations- och kontrollenheten är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Det är kommunikations- och kontrollenheten som ansvarar för den seriella kommunikationen (se kapitel \ref{ssec:serial}) med de övriga inbyggda delsystemen, och det är därför denna enhet som inleder all seriell kommunikation. Det betyder att sensorenheten och styrenheten aldrig inleder kommunikationen med kommunikations- och kontrollenheten, utan de svarar bara på kommandon som skickas av denna.
@@ -870,10 +867,8 @@ Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDriv
     \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
 \end{figure}
 
-När roboten hitta tillbaka till en yttervägg kommer denne återigen att köra tills den hamnat i garage-rutan.
+När roboten hittat tillbaka till en yttervägg kommer den återigen att köra tills den hamnat i garage-rutan.
     
-
-
 %\begin{figure}[h!]
 %\centering
 %\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
