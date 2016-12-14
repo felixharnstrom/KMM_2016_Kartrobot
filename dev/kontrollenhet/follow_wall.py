@@ -184,15 +184,15 @@ class Robot:
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
         self.BLOCK_SIZE = 400
-        self.IR_MEDIAN_ITERATIONS = 3
+        self.IR_MEDIAN_ITERATIONS = 1
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 200
         self.TURN_MIN_DIST = 100
         self.CORRIDOR_TURN_ENTRY_DIST = 90
         self.CORRIDOR_TURN_EXIT_DIST = 350
-        self.OBSTACLE_SAFETY_OVERRIDE = 25
+        self.OBSTACLE_SAFETY_OVERRIDE = 100
         self.EDGE_SPIKE_FACTOR = 2
-        self.OBSTACLE_DIST = 30
+        self.OBSTACLE_DIST = 90
         self.SENSOR_SPACING = 95
         self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
@@ -682,13 +682,13 @@ def main(argv):
 
     # Wait fot LIDAR to be in position
     time.sleep(1)
+#    sensor_test(robot)
 
     g = grid_map.GridMap()
 
     print (robot.get_position())
     #print("lidar", robot.scan())
     g.debug_print()
-    # sensor_test(robot)
 #    time.sleep(10)
     # Try driving in infinite loop around the maze
     while 1:
@@ -736,7 +736,7 @@ def main(argv):
                 while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 50:
+                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
                     logger.info("Not a corridor, moving back")
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('right')
@@ -762,7 +762,7 @@ def main(argv):
                 while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 50:
+                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
                     logger.info("Not a corridor, moving back")
                     robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('left')
