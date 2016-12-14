@@ -319,7 +319,7 @@ class Robot:
         elif (self.current_angle < 0):
             return 360 - abs(self.current_angle) % 360
 
-    def update_map(self, turndir):
+    def update_map(self):
         """
         Update the gridmap with new scan data.
         """
@@ -725,7 +725,7 @@ def main(argv):
                 status = robot.follow_wall(9999999, side = "right")
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
-            robot.update_map("srasneiarsneairen")
+            robot.update_map()
             
 
 
