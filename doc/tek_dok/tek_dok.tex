@@ -716,32 +716,41 @@ Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten 
     \node (initstart) [process, below of=start, yshift=-10pt] {Setup start\\ values};
     \node (connectedquestion) [decision, below of=initstart, yshift=-30pt] {Connected?};
     \node (waitforcom) [io, left of= connectedquestion, xshift=-90pt] {Wait for\\ new connection}; 
-    \node (senddata) [process, below of=connectedquestion, yshift=-20pt] {Send data\\ to PC};
-    \node (waitforpc) [io, left of=senddata, xshift=-90pt] {Wait for\\ response};
-    \node (changemode) [decision, below of=waitforpc, yshift=-20pt] {Change mode?};
+    \node (waitforpc) [io, below of=connectedquestion, yshift=-20pt] {Wait for\\ message};
+    \node (processmsg) [process, left of=waitforpc, xshift=-90pt] {Process\\ message};
+    \node (changemode) [decision, below of=processmsg, yshift=-20pt] {Change mode?};
     \node (modeswitch) [process, right of=changemode, xshift=90pt] {Switch mode};
-    \node (newdata) [decision, below of=changemode, yshift=-40pt] {Commands in\\ response?};
-    \node (adddata) [process, below of=newdata, yshift=-30pt] {Add data to\\ input queue};
+    \node (query) [decision, below of=changemode, yshift=-40pt] {Data query?};
+    \node (response) [process, right of=query, xshift=90pt] {Respond with\\ requested data};
+    \node (robotcommand) [decision, below of=query, yshift=-40pt] {Robot command?};
+    \node (addinput) [process, right of=robotcommand, xshift=90pt] {Add data to\\ input queue};
     % Arrows
     \draw [arrow] (start) -- (initstart);
     \coordinate(dummy2) at ($(initstart) + (0pt,-40pt)$);
     \draw [arrow] (initstart) -- (connectedquestion);
     \draw [arrow] (connectedquestion) -- node[anchor=south] {No}(waitforcom);
-    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(senddata);
-    \draw [arrow] (senddata) -- (waitforpc);
-    \draw [arrow] (waitforpc) -- (changemode);
-    \draw [arrow] (changemode) -- node[auto] {No}(newdata);
+    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(waitforpc);
+    \draw [arrow] (waitforpc) -- (processmsg);
+    \draw [arrow] (processmsg) -- (changemode);
+    \draw [arrow] (changemode) -- node[auto] {No}(query);
     \draw [arrow] (changemode) -- node[anchor=south] {Yes}(modeswitch);
     \draw [line] (modeswitch) -- ($(modeswitch) + (83pt,0pt)$); %It works..
-    \draw [arrow] (newdata) -- node[auto] {Yes}(adddata);
-    \draw [line] (newdata) -- node[auto] {No}($(newdata) + (230pt,0pt)$);
-    \coordinate(dummy) at ($(adddata -| newdata) + (230pt,0pt)$);
-    \draw [line] (adddata) -- (dummy);
+    \draw [arrow] (query) -- node[auto] {No}(robotcommand);
+    \draw [arrow] (query) -- node[anchor=south] {Yes}(response);
+    \draw [line] (response) -- ($(response) + (83pt,0pt)$);
+    \draw [arrow] (robotcommand) -- node[anchor=south] {Yes}(addinput);
+    \draw [line] (robotcommand) -- node[auto] {No}($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy) at ($(addinput -| robotcommand) + (230pt,0pt)$);
+    \draw [line] (addinput) -- (dummy);
     \draw [line] (dummy) -- (dummy |- connectedquestion);
     \draw [arrow] (dummy |- connectedquestion) -- (connectedquestion);
     \coordinate(test) at (waitforcom |- dummy2);
     \draw [line] (waitforcom |- dummy2) -- (waitforcom);
     \draw [line] (waitforcom |- dummy2) -- (dummy2);
+    \coordinate(dummy3) at ($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy4) at ($(robotcommand) + (230pt,-70pt)$);
+    \draw [line] (dummy3) -- (dummy4);
+    \draw [line] (dummy4) -- (dummy);
     
     \end{tikzpicture}
     \caption{Programflöde för robotens Wi-Fi-kommunikation.}
@@ -750,9 +759,6 @@ Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten 
 
 \subsubsection{Kartritning} \label{sssec:mapping}
 Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan beräknas av kontrollenheten och används internt för bland annat vägledning. Kartan överförs även kontinuerligt till PC:n (se kapitel \ref{sec:system4}) för skärmutritning, så att en användare kan se resultatet.
-% TODO Överväg att ha med denna skickning som ett steg i flödesscheman över
-
-\clearpage
 
 \subsubsection{Lägesstyrning}
 Roboten är konstruerad med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner finns för varje, men de delar på många funktioner och moduler.
