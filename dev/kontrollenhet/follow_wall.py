@@ -497,7 +497,7 @@ class Robot:
             self.pid_controller.d_term = angle_side
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
-            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED, side)
+            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(lidar,100), 200) / 200, side)
             if side == "right":
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             else:
