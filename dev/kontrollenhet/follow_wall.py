@@ -195,9 +195,9 @@ class Robot:
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
         self.GYRO_MEDIAN_ITERATIONS = 32
-        self.TURN_OVERRIDE_DIST = 200
+        self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 90
+        self.CORRIDOR_TURN_ENTRY_DIST = 130
         self.CORRIDOR_TURN_EXIT_DIST = 350
         self.OBSTACLE_SAFETY_OVERRIDE = 30
         self.EDGE_SPIKE_FACTOR = 2
@@ -454,7 +454,8 @@ class Robot:
                 ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
 
             # Detect corridor to the right
-            if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
+            if (ir_side_front >= self.TURN_OVERRIDE_DIST):
+                self.logger.debug("IR - front: " + str(ir_side_front) + " IR - back: " + str(ir_side_back) + " list_dist: " + str(self._last_dist))
                 # Save the given length driven
                 self._save_position(reflex_right - reflex_right_start)
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -551,9 +552,9 @@ class Robot:
         """
         Turn left, drive to the wall and turn right 
         """
-        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
-        self.turn(Direction.RIGHT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.turn(Direction.RIGHT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.explore_island = False
         self.return_home = True
             
@@ -562,9 +563,9 @@ class Robot:
 		Turn towards the island, drive to it and then turn left so that
 		the robot will follow the right side of the wall.
         """
-        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
-        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self._start_cell_at_island = approximate_to_cell(self.get_position())
         self.look_for_island = False
         self.explore_island = True
@@ -721,7 +722,7 @@ def main(argv):
                 status = robot.follow_wall(400, side = "right")
             elif robot.explore_island:
                 robot_position = robot.get_position()
-                if robot.start_cell_at_island == approximate_to_cell(robot_position):
+                if (robot.start_cell_at_island == approximate_to_cell(robot_position)):
                     robot.leave_island()
                 else:
                     status = robot.follow_wall(200, side = "right")
@@ -732,6 +733,7 @@ def main(argv):
                 
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
+            logger.info("Explore island: " + str(robot.explore_island))
             
             #TODO: Change the argument to something understandable
             drive_to_island = robot.update_map()
@@ -749,16 +751,29 @@ def main(argv):
                 while robot._is_moving(): pass
                 ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
                 ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-                if (ir_right_front > ir_left_front):
-                    robot.stand_perpendicular('left')
+
+                if ir_right_front > robot.TURN_OVERRIDE_DIST and ir_left_front > robot.TURN_OVERRIDE_DIST:
+                    #robot.stand_perpendicular('left')
                     robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
-                    robot.stand_perpendicular('left')
-                else:
-                    robot.stand_perpendicular('right')
+                    #robot.stand_perpendicular('left')
+                elif ir_right_front < robot.TURN_OVERRIDE_DIST and ir_left_front < robot.TURN_OVERRIDE_DIST:
+                    #robot.stand_perpendicular('right')
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     while robot._is_moving(): pass
-                    robot.stand_perpendicular('right')
+                    #robot.stand_perpendicular('right')
+                else:
+                    if (ir_right_front > ir_left_front):
+                        #robot.stand_perpendicular('left')
+                        robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                        while robot._is_moving(): pass
+                        #robot.stand_perpendicular('left')
+                        
+                    else:
+                        #robot.stand_perpendicular('right')
+                        robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
+                        while robot._is_moving(): pass
+                        #robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
@@ -785,8 +800,8 @@ def main(argv):
                     # As it is now, a right turn into a single square corridor does not work well.
                     robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
                     while robot._is_moving(): pass
-                    robot.stand_perpendicular('right')
-                    robot.stand_perpendicular('left')
+                    #robot.stand_perpendicular('right')
+                    #robot.stand_perpendicular('left')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
@@ -811,8 +826,8 @@ def main(argv):
                     # As it is now, a right turn into a single square corridor does not work well.
                     robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
                     while robot._is_moving(): pass
-                    robot.stand_perpendicular('left')
-                    robot.stand_perpendicular('right')
+                    #robot.stand_perpendicular('left')
+                    #robot.stand_perpendicular('right')
                 robot.pid_controller.kp = 0
                 robot.pid_controller.ki = 0
                 robot.pid_controller.kd = 0
