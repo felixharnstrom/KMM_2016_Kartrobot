@@ -148,7 +148,10 @@ class Robot:
 
     Attributes:
         look_for_island             (bool): True if the robot should be scanning for an island.
+        explore_island              (bool): True if the robot have reached the island and is exploring it
+        return_home                 (bool): True if the robot should return home
         grid_map                    (GridMap): Mapping of room.
+        start_cell_at_island        (Position): Start cell at island.
 
         driven_distance             (int): Driven distance thus far.
         current_angle               (int): Current angle against right wall.
@@ -172,31 +175,36 @@ class Robot:
         BASE_SPEED                  (int): The speed that seems to work best for the controller with fully charged batteries.
         ACCELERATED_SPEED           (int): Can be used when the controller is disengaged, otherwise too fast for the controller to handle.
         WHEEL_RADIUS                (int): Radius for a wheel on the robot in cm.
+        DRIVE_TO_ISLAND_THRESHOLD   (int): The robot won't drive to the island if it is further than this distance
     """
 
     def __init__(self, mode: ControllerMode, logger):
         # Public attributes
         self.grid_map = GridMap()
         self.look_for_island = False
+        self.explore_island = False
+        self.return_home = False
+        self.start_cell_at_island = Position(0,0)
         self.driven_distance = 0
         self.current_angle = 0
         self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
         self.BLOCK_SIZE = 400
-        self.IR_MEDIAN_ITERATIONS = 3
+        self.IR_MEDIAN_ITERATIONS = 1
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 300
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 40
+        self.CORRIDOR_TURN_ENTRY_DIST = 90
         self.CORRIDOR_TURN_EXIT_DIST = 350
         self.OBSTACLE_SAFETY_OVERRIDE = 120
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 170
         self.SENSOR_SPACING = 95
-        self.BASE_SPEED = 30
+        self.BASE_SPEED = 25
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
+        self.DRIVE_TO_ISLAND_THRESHOLD = 800
         self.logger = logger
         # Private attributes
         self._last_dist = 0
@@ -320,21 +328,9 @@ class Robot:
     def update_map(self, turndir):
         """
         Update the gridmap with new scan data.
-        """
-        """
-        position = self.get_position()
-        angle = self.get_angle() 
-        if turndir == "left":
-            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_back_ir())
-            angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING) 
-        elif turndir == "right":
-            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-            ir_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
-            angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
-        scan_and_update_grid(Position(self.get_position().y, -self.get_position().x), self.get_angle(), self._grid_map)
-        servo_instr = Command.servo(90)
-        handle_command(servo_instr)
+        
+        Returns:
+			(bool): Returns True if the robot should drive to the island
         """
         lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
         cells = movement_lines_to_cells(lines, 1)
@@ -364,21 +360,22 @@ class Robot:
         self.logger.info("POS: " + str(self.get_position()))
         
         if self.look_for_island and cells:
-            
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
             if left_island_exists(cells[-1], self.get_angle(), self.grid_map) is not None:
                 self.logger.info("ISLAND!!!")
-                time.sleep(2)
+                #Turn the servo to the left
+                return True
             else:
                 self.logger.info("No island :(")
-
             
         if cells and cells[-1] == cells[0] and self.grid_map.is_complete(cells[0]):
             # We're done!
             self.logger.info("================")
             self.logger.info(" D O N E")
             self.logger.info("================")
+            
+        return False
 
                 
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
@@ -391,9 +388,9 @@ class Robot:
         Returns:
             (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
-        handle_command(Command.drive(1, speed, 0))
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = reflex_right_start
+        handle_command(Command.drive(1, speed, 0))
         # logger.debug("LIDAR INIT: ", lidar_init)
         while(reflex_right - reflex_right_start < dist):
             reflex_right = handle_command(Command.read_reflex_right())
@@ -427,24 +424,19 @@ class Robot:
 
         # Drive until the wanted distance is reached
         while (reflex_right - reflex_right_start <= distance):
-            # Keep track of current angle
-            # Use a reimann sum to add up all the gyro rates
-            # Area = TimeDiff * turnRate
-
             # Get sensor values
             reflex_right = handle_command(Command.read_reflex_right())
+            lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
+
             if side == "right":
                 ir_side_back, ir_side_front = self.read_ir_side(Direction.RIGHT)
             else:
                 ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
 
-            lidar = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar())
-
-            #self.logger.debug("IR_RIGHT_BACK: " + str(ir_side_back) + " IR_RIGHT_FRONT: " + str(ir_side_front) + " LIDAR: " + str(lidar) + " _last_dist: " + str(self._last_dist))
+            print ("IR_RIGHT_FRONT: " + str(ir_side_front))
 
             # Detect corridor to the right
             if ((ir_side_front >= self.TURN_OVERRIDE_DIST) or (ir_side_front > self.TURN_MIN_DIST and ir_side_front > self.EDGE_SPIKE_FACTOR * self._last_dist)):
-                self.drive_distance(self.CORRIDOR_TURN_ENTRY_DIST, self.BASE_SPEED, True)
                 # Save the given length driven
                 self._save_position(reflex_right - reflex_right_start)
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
@@ -454,7 +446,7 @@ class Robot:
                     return DriveStatus.CORRIDOR_DETECTED_LEFT
 
             # Obstacle detected, and no turn to the right
-            elif(lidar < self.OBSTACLE_DIST):
+            if(lidar < self.OBSTACLE_DIST):
                 # Save the given length driven
                 handle_command(Command.stop_motors())
                 self._save_position(reflex_right - reflex_right_start)
@@ -481,16 +473,6 @@ class Robot:
         handle_command(Command.stop_motors())
         self._save_position(reflex_right - reflex_right_start)
         return DriveStatus.DONE
-
-    # TODO: Add the correct code for updating the path_queue when the code is ready
-    def find_next_destination(self):
-        """
-        Find the next destionation and update path_queue.
-
-        Returns:
-            (list of ?): Path to drive. # TODO: What is this?
-        """
-        return [] # Return random path to drive
 
     def scan(self):
         """
@@ -546,6 +528,28 @@ class Robot:
             ir_back, ir_front = self.read_ir_side(Direction.RIGHT)
             angle = math.atan2(ir_back - ir_front, self.SENSOR_SPACING)
             self.turn(math.degrees(angle) < 0, abs(int(math.degrees(angle))), speed=self.BASE_SPEED+10)
+
+    def leave_island(self):
+        """
+        Turn left, drive to the wall and turn right 
+        """
+        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
+        self.turn(Direction.RIGHT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.explore_island = False
+        self.return_home = True
+            
+    def drive_to_island(self):
+        """
+		Turn towards the island, drive to it and then turn left so that
+		the robot will follow the right side of the wall.
+        """
+        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
+        self.turn(Direction.LEFT, 85, speed = self.BASE_SPEED+10, save_new_angle = True)
+        self._start_cell_at_island = approximate_to_cell(self.get_position())
+        self.look_for_island = False
+        self.explore_island = True
 
     def _median_sensor(self, it : int, sensor_instr : Command):
         """
@@ -624,7 +628,6 @@ class Robot:
             # logger.debug("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
             return True
 
-
 def sensor_test(robot):
     """
     Continuously get all sensor values and print these.
@@ -635,11 +638,6 @@ def sensor_test(robot):
         ir_back = robot._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_back_ir())
         lidar = robot._median_sensor(1, Command.read_lidar())
         robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
-
-
-
-
-
 
 def main(argv):
     # create logger
@@ -691,14 +689,29 @@ def main(argv):
             # Drive forward without crashing in wall
             if robot.look_for_island:
                 status = robot.follow_wall(400, side = "right")
+            elif robot.explore_island:
+                robot_positon = robot.get_position()
+                if robot.start_cell_at_island == approximate_to_cell(robot_position):
+                    robot.leave_island()
+                else:
+                    status = robot.follow_wall(200, side = "right")
+            elif robot.return_home:
+                status = robot.follow_wall(9999999, side = "left")
             else:
                 status = robot.follow_wall(9999999, side = "right")
+                
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
-            robot.update_map("srasneiarsneairen")
             
+            #TODO: Change the argument to something understandable
+            drive_to_island = robot.update_map("srasneiarsneairen")
 
-
+            # Drive to the island if it is close enough
+            if drive_to_island:
+                distance_to_island = handle_command(Command.read_lidar())
+                if distance_to_island <= robot.DRIVE_TO_ISLAND_THRESHOLD:
+                    robot.drive_to_island()
+            
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
