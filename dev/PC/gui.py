@@ -78,8 +78,8 @@ class gui_thread(threading.Thread):
                 self.ir_behind.set(sensor_data_dict["IR_BACK"])
                 self.lidar.set(sensor_data_dict["LIDAR"])
                 self.gyro.set(sensor_data_dict["GYRO"])
-                self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
-                self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
+                #self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
+                #self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
                 #TODO: Send this from PC in the sensor_data dict
                 #self.distance.set(sensor_data_dict["DISTANCE"])
         return
