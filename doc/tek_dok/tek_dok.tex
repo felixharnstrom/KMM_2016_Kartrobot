@@ -448,7 +448,8 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
 \label{ssec:wifi}
 Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
-Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
+Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt.
+Alla kommandon som skickas avslutas även med en '\texttt{\textbackslash n}'-karaktär för att markera att kommandot är fullständigt. Följande kommandon finns tillgängliga:
 
 \begin{description}
     \item [TRANSMIT] Utför nästa UART-command som skickas.
@@ -457,7 +458,7 @@ Kommandon skickas som strängar. När större data, som argument, behövs, så s
     \item [KEY\_EVENT] Om vi är i det manuella läget: uppdatera motorstyrning med skickad tangent och dess tillstånd (nedtryckt eller släppt). Tangenten som skickas därefter är en sträng som innehåller ''\texttt{left}'', ''\texttt{right}'', ''\texttt{up}'', eller ''\texttt{down}'' med suffixet ''\texttt{\_p}'' om tangenten tryckts ner eller ''\texttt{\_r}'' om tangenten släppts.
     \item [SEND\_MAP] Svara med kartan, så som den ser ut för tillfället. Kartan är en två-dimensionell lista med 1:or och 0:or, kodad med JSON.
     \item [TOGGLE\_MODE] Om vi är i det manuella läget: byt till autonomt. Annars: byt till manuellt.
-    \item [SYNC\_MODE] Hämtar vilket läge som roboten i nuläget står i.
+    \item [SYNC\_MODE] Hämtar vilket läge (manuellt/autonomt) som roboten i nuläget står i.
 \end{description}
 
 \subsection{Ingående komponenter}
