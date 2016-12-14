@@ -269,11 +269,8 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     \label{tab:meta_packet}
 \end{table}
 
-% TODO: Skriv om acknowledge.
-
 \subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet} \label{sssec:kontrollenhet_arrow_styrenhet}
 \label{sec:controlCommunication}
-% TODO: Fixa upplägget med sektioner
 \paragraph{Drive}
 \texttt{Drive}-instruktionen kör roboten framåt eller bakåt enligt argumenten som beskrivs i tabell \ref{tab:drive}. Kommandot har typnummer \texttt{1}.
 \begin{table}[h!]
@@ -574,8 +571,6 @@ Styrenheten är ansvarig för att kontrollera robotens alla motorer och för att
 \subsubsection{Processor}
 Vi använder en ATmega1284-processor för styrmodulen. Processorn kommunicerar med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
 
-\clearpage
-
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten finns en lasersensor (se kapitel \ref{sssec:lidar}) monterad. Denna sensor är placerad ovanpå ett servo som tillåter sensorn att rotera, detta servo är ett hobbyservo.
 
@@ -596,12 +591,6 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 \subsection{Mjukvara}
 Koden för styrenheten är skriven i C, och följer den standard som är specificerad i bilaga \ref{app:cstandard}. 
 Styrenheten lyssnar på UARTen efter instruktioner, utformade enligt specifikationen i \ref{ssec:serial}. Dessa instruktioner tas emot och avkodas till de funktionsanrop som de representerar, och exekveras sedan med de parametrar som hör funktionen till. Därefter återgår enheten till att lyssna efter nya instruktioner.
-
-
-%\subsubsection{Tillståndsdiagram}
-%TODO: Skriva om eller ta bort? (Med uppdaterad bild)
-%Som vi ser i tillståndsdiagrammet för styrenheten (figur \ref{fig:stateDiagram}) så har vi totalt tre olika %tillstånd. Medan styrenheten är i tillståndet \texttt{WAIT} så kommer roboten att stå stilla och invänta en %instruktion. Notera att en instruktion kan sättas i a0lla tillstånd, så om roboten redan har en instruktion %inläst då tillståndet sätts till \texttt{WAIT} så kommer roboten börja på denna instruktion omedelbart utan att stanna.
-%\clearpage
 
 \subsubsection{Programflöde}
 I flödesschemat som visas i \ref{fig:styrenhetFlowchart} så ser vi hur styrmodulen fungerar. Programet startar med att roboten slås igång, då den direkt börjar med sin initiering. Vid initiering så konfigureras enheten med de startvärden som krävs för att fungera korrekt. Efter initieringsprocessen så övergår enheten till att lyssna efter paket från UARTen, dessa paket och deras funktion beskrivs ingående i \ref{sssec:kontrollenhet_arrow_styrenhet}. 
@@ -647,7 +636,6 @@ Om funktionsanropet var ett motorkommando som gjordes med ett nollskilt tidsargu
 
 \subsubsection{Processer}
 Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sköts all exekvering inom en process, där datan från UARTen kan ses som indata från en kö.
-\clearpage
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
@@ -675,7 +663,6 @@ Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. De
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
-%TODO: Lägg till knappar som går till PI:n i schemat
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=1\textwidth]{brain.png}}
     \caption{Översikt över kommunikations- och kontrollenheten.  }
@@ -724,32 +711,41 @@ Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten 
     \node (initstart) [process, below of=start, yshift=-10pt] {Setup start\\ values};
     \node (connectedquestion) [decision, below of=initstart, yshift=-30pt] {Connected?};
     \node (waitforcom) [io, left of= connectedquestion, xshift=-90pt] {Wait for\\ new connection}; 
-    \node (senddata) [process, below of=connectedquestion, yshift=-20pt] {Send data\\ to PC};
-    \node (waitforpc) [io, left of=senddata, xshift=-90pt] {Wait for\\ response};
-    \node (changemode) [decision, below of=waitforpc, yshift=-20pt] {Change mode?};
+    \node (waitforpc) [io, below of=connectedquestion, yshift=-20pt] {Wait for\\ message};
+    \node (processmsg) [process, left of=waitforpc, xshift=-90pt] {Process\\ message};
+    \node (changemode) [decision, below of=processmsg, yshift=-20pt] {Change mode?};
     \node (modeswitch) [process, right of=changemode, xshift=90pt] {Switch mode};
-    \node (newdata) [decision, below of=changemode, yshift=-40pt] {Commands in\\ response?};
-    \node (adddata) [process, below of=newdata, yshift=-30pt] {Add data to\\ input queue};
+    \node (query) [decision, below of=changemode, yshift=-40pt] {Data query?};
+    \node (response) [process, right of=query, xshift=90pt] {Respond with\\ requested data};
+    \node (robotcommand) [decision, below of=query, yshift=-40pt] {Robot command?};
+    \node (addinput) [process, right of=robotcommand, xshift=90pt] {Add data to\\ input queue};
     % Arrows
     \draw [arrow] (start) -- (initstart);
     \coordinate(dummy2) at ($(initstart) + (0pt,-40pt)$);
     \draw [arrow] (initstart) -- (connectedquestion);
     \draw [arrow] (connectedquestion) -- node[anchor=south] {No}(waitforcom);
-    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(senddata);
-    \draw [arrow] (senddata) -- (waitforpc);
-    \draw [arrow] (waitforpc) -- (changemode);
-    \draw [arrow] (changemode) -- node[auto] {No}(newdata);
+    \draw [arrow] (connectedquestion) -- node[auto] {Yes}(waitforpc);
+    \draw [arrow] (waitforpc) -- (processmsg);
+    \draw [arrow] (processmsg) -- (changemode);
+    \draw [arrow] (changemode) -- node[auto] {No}(query);
     \draw [arrow] (changemode) -- node[anchor=south] {Yes}(modeswitch);
     \draw [line] (modeswitch) -- ($(modeswitch) + (83pt,0pt)$); %It works..
-    \draw [arrow] (newdata) -- node[auto] {Yes}(adddata);
-    \draw [line] (newdata) -- node[auto] {No}($(newdata) + (230pt,0pt)$);
-    \coordinate(dummy) at ($(adddata -| newdata) + (230pt,0pt)$);
-    \draw [line] (adddata) -- (dummy);
+    \draw [arrow] (query) -- node[auto] {No}(robotcommand);
+    \draw [arrow] (query) -- node[anchor=south] {Yes}(response);
+    \draw [line] (response) -- ($(response) + (83pt,0pt)$);
+    \draw [arrow] (robotcommand) -- node[anchor=south] {Yes}(addinput);
+    \draw [line] (robotcommand) -- node[auto] {No}($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy) at ($(addinput -| robotcommand) + (230pt,0pt)$);
+    \draw [line] (addinput) -- (dummy);
     \draw [line] (dummy) -- (dummy |- connectedquestion);
     \draw [arrow] (dummy |- connectedquestion) -- (connectedquestion);
     \coordinate(test) at (waitforcom |- dummy2);
     \draw [line] (waitforcom |- dummy2) -- (waitforcom);
     \draw [line] (waitforcom |- dummy2) -- (dummy2);
+    \coordinate(dummy3) at ($(robotcommand) + (0pt,-70pt)$);
+    \coordinate(dummy4) at ($(robotcommand) + (230pt,-70pt)$);
+    \draw [line] (dummy3) -- (dummy4);
+    \draw [line] (dummy4) -- (dummy);
     
     \end{tikzpicture}
     \caption{Programflöde för robotens Wi-Fi-kommunikation.}
@@ -758,9 +754,6 @@ Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten 
 
 \subsubsection{Kartritning} \label{sssec:mapping}
 Robotens huvuduppdrag är att skanna ett rum och rita en karta över det. Kartan beräknas av kontrollenheten och används internt för bland annat vägledning. Kartan överförs även kontinuerligt till PC:n (se kapitel \ref{sec:system4}) för skärmutritning, så att en användare kan se resultatet.
-% TODO Överväg att ha med denna skickning som ett steg i flödesscheman över
-
-\clearpage
 
 \subsubsection{Lägesstyrning}
 Roboten är konstruerad med två olika lägen: ett manuellt, och ett autonomt. Olika rutiner finns för varje, men de delar på många funktioner och moduler.
@@ -849,12 +842,9 @@ I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapite
 \label{fig:manual_flowchart}
 \end{figure}
 
-\clearpage
-
 \subsubsection{Autonomt läge}
 I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
 
-%TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
 \begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
@@ -923,7 +913,7 @@ Kommunikations- och kontrollenheten använder sig av seriella bussar för dataut
 
 Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul används. På båda sidor används sockets.
 
-\newpage
+\clearpage
 \section{PC} \label{sec:system4}
 Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
@@ -943,8 +933,6 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{PC}{PC med Wi-Fi-modul.}{1}
 \end{HardwareList}
 \end{center}
-
-\clearpage
 
 \subsection{Mjukvara}
 PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödesschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
