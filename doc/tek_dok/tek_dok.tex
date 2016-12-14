@@ -152,49 +152,11 @@ där $perpendicular\_dist$ är det vinkelräta avståndet från väggen och $cur
 Utdatan är begränsad till $\pm 50$, där värden som faller utanför dessa gränser helt enkelt begränsas till extremvärdena. Till utdatan adderas sedan $100$ följt av att divideras med $100$, vilket i praktiken ger att utdatan går i intervallet mellan $0,5$ och $1,5$. Den vänstra motorn divideras sedan med detta värde, och den högra motorn multipliceras med detta värde. Detta låter oss ta skarpa svängar, då den ena motorns hastighet kan dubbleras medan den andra motorns hastighet halveras. Vi kan alltså få ett $4:1$ förhållande mellan våra motorer.
 
 \subsection{Navigering}
-Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PD-reglering (se kapitel \ref{ssec:pid}), tills ett hinder framåt upptäcks av LIDAR:n, eller en korridor upptäcks med IR-sensorerna. 
+Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PD-reglering (se kapitel \ref{ssec:pid}), tills ett hinder framåt upptäcks av avståndssensorn, eller en korridor upptäcks med IR-sensorerna.
 
-Efter igenkänning av ett hinder körs 
+För att känna igen en högerkorridor används att avståndet höger fram ökar snabbt, eller att avståndet går över en viss gräns. När en högerkorridor känns igen så kör den fram en liten bit för att komma ut till mitten av blocket, svänger 90 grader åt höger och kör in i korridoren. Sedan kalibrerar den sin vinkel efter sidoväggen och startar återigen PD-regleringen. Motsvarande men inverterade funktionen finns för vänsterkorridorer.
 
-\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
-% 
-% Skiss:
-% Finns meddelande i kön? -Ja-> Utför rutin givet i meddelande
-%   |     ʌ     ʌ                       |
-%  Nej    |     |                       |
-%   |     |     -------------------------
-%   V     |
-%  Invänta meddelande, dummer!
-%
-\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
-\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
-\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
-\tikzstyle{arrow} = [thin,->,>=stealth]
-\tikzstyle{line} = [thin,>=stealth]
-% Nodes
-\node (start) [startstop] {Obstacle detected};
-\node (irRead) [decision, below of=start, yshift=-40pt] {$ir\_right\_front > ir\_left\_front$};
-\node (calibRight) [process, left of=irRead, xshift=-170pt] {Stand perpendicular to right wall};
-\node (calibLeft) [process, right of=irRead, xshift=170pt] {Stand perpendicular to left wall};
-\node (turnR90) [process, below of=calibLeft] {Turn 90 degrees to the right};
-\node (turnL90) [process, below of=calibRight] {Turn 90 degrees to the left};
-\node (calibRight2) [process, below of=turnL90] {Stand perpendicular to right wall};
-\node (calibLeft2) [process, below of=turnR90] {Stand perpendicular to left wall};
-\node (end) [startstop, below of=start, yshift=-154pt] {Restart PID-controller};
-
-% Arrows
-\draw [arrow] (start) -- (irRead);
-\draw [arrow] (irRead) -- node[anchor=south] {No} (calibRight);
-\draw [arrow] (irRead) -- node[auto] {Yes} (calibLeft);
-\draw [arrow] (calibLeft) -- node[auto] {} (turnR90);
-\draw [arrow] (calibRight) -- node[auto] {} (turnL90);
-\draw [arrow] (turnL90) -- node[auto] {} (calibRight2);
-\draw [arrow] (turnR90) -- node[auto] {} (calibLeft2);
-\draw [arrow] (calibLeft2) -- node[anchor=west] {} (end);
-\draw [arrow] (calibRight2) -- node[auto] {} (end);
-
-\end{tikzpicture}
+Efter igenkänning av ett hinder svänger roboten i den riktningen som har störst avstånd, med prioritet åt höger. Före och innan svängen kalibrerar roboten sin vinkel efter sidoväggen. Efter kalibreringen startas PD-regleringen.
 
 \clearpage
 \section{Systemöversikt}
@@ -493,7 +455,7 @@ Se figur \ref{fig:unitSensor} för en övergripande systemskiss för sensorenhet
 ATmega1284 används som processormodell då den är kraftfull utan att ta det är till överdrift. Antalet pinnar, A/D-omvandlare, avbrott, samt UART-enheter som processorn har räcker för samtliga sensorer och kommunikationsbussar.
 
 \subsubsection{IR-sensorer} \label{sssec:sonicsensors}
-Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på baksidan. För avståndsmätning framåt används LIDARn. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40 $\times$ 40 cm.
+Det placeras två stycken IR-sensorer av modell GP2D120 på både höger och vänster sida om roboten (för totalt fyra), samt en på ena kortsidan. För avståndsmätning åt andra kortsidan används vid behov LIDARn. För nogrannare mätningar åt sidorna kan LIDARn snurra. Se bilaga \ref{app:placement} för sensorernas placering på roboten. Dessa sensorer används för navigering och positionsuppskattning. Med hjälp av de dubbla IR-sensorerna på vardera sida kan det avgöras ifall roboten åker parallellt med väggen. Dessa behöver en A/D-omvandlare var, som är inbyggd i processorn ATmega1284. Se kapitel \ref{ssec:sensorInterface}. Sensorerna kan effektivt mäta avstånd inom intervallet 4 till 30 cm vilket räcker, då roboten är tänkt att följa en vägg och köra inom ett rutnät, där varje ruta är 40 $\times$ 40 cm.
 
 \subsubsection{LP-filter}
 De sensorer som skickar en analog signal kommer att få med sig en del brus, vilket kan medföra att mätvärdena får stora avvikelser. För att få bort detta brus så är sensorer med analoga signaler (förutom reflexsensorer) kopplade till LP-filter som filtrerar bort frekvenser över ungefär 88 Hz. Referenssignalen som AD-omvandlarna använder har också ett LP-filter då det förbättrar noggrannheten i avläsningen i ATmega:n betydligt.
