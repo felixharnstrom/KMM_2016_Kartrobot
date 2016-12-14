@@ -30,7 +30,7 @@
 
 \usepackage[tocgraduated]{tocstyle}
 \usetocstyle{allwithdot}
-
+F
 \usepackage[titletoc,title]{appendix}
 
 \usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
@@ -152,40 +152,11 @@ där $perpendicular\_dist$ är det vinkelräta avståndet från väggen och $cur
 Utdatan är begränsad till $\pm 50$, där värden som faller utanför dessa gränser helt enkelt begränsas till extremvärdena. Till utdatan adderas sedan $100$ följt av att divideras med $100$, vilket i praktiken ger att utdatan går i intervallet mellan $0,5$ och $1,5$. Den vänstra motorn divideras sedan med detta värde, och den högra motorn multipliceras med detta värde. Detta låter oss ta skarpa svängar, då den ena motorns hastighet kan dubbleras medan den andra motorns hastighet halveras. Vi kan alltså få ett $4:1$ förhållande mellan våra motorer.
 
 \subsection{Navigering}
-Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PD-reglering (se kapitel \ref{ssec:pid}), tills ett hinder framåt upptäcks av LIDAR:n, eller en korridor upptäcks med IR-sensorerna. 
+Roboten följer generellt en vägg vid rörelse i rummet. Under vanlig körning används PD-reglering (se kapitel \ref{ssec:pid}), tills ett hinder framåt upptäcks av avståndssensorn, eller en korridor upptäcks med IR-sensorerna.
 
-Efter igenkänning av ett hinder körs 
+För att känna igen en högerkorridor används att avståndet höger fram ökar snabbt, eller att avståndet går över en viss gräns. När en högerkorridor känns igen så kör den fram en liten bit för att komma ut till mitten av blocket, svänger 90 grader åt höger och kör in i korridoren. Sedan kalibrerar den sin vinkel efter sidoväggen och startar återigen PD-regleringen. Motsvarande men inverterade funktionen finns för vänsterkorridorer.
 
-\begin{tikzpicture}[node distance=2cm,scale=0.6, every node/.style={scale=0.6}]
-\tikzstyle{startstop} = [rounded rectangle, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30, align=center, inner sep=10pt]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30, align=center, inner sep=10pt]
-\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, align=center, inner sep=10pt]
-\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30, align=center, inner sep=10pt, aspect=2]
-\tikzstyle{arrow} = [thin,->,>=stealth]
-\tikzstyle{line} = [thin,>=stealth]
-% Nodes
-\node (start) [startstop] {Obstacle detected};
-\node (irRead) [decision, below of=start, yshift=-40pt] {$ir\_right\_front > ir\_left\_front$};
-\node (calibRight) [process, left of=irRead, xshift=-170pt] {Stand perpendicular to right wall};
-\node (calibLeft) [process, right of=irRead, xshift=170pt] {Stand perpendicular to left wall};
-\node (turnR90) [process, below of=calibLeft] {Turn 90 degrees to the right};
-\node (turnL90) [process, below of=calibRight] {Turn 90 degrees to the left};
-\node (calibRight2) [process, below of=turnL90] {Stand perpendicular to right wall};
-\node (calibLeft2) [process, below of=turnR90] {Stand perpendicular to left wall};
-\node (end) [startstop, below of=start, yshift=-154pt] {Restart PID-controller};
-
-% Arrows
-\draw [arrow] (start) -- (irRead);
-\draw [arrow] (irRead) -- node[anchor=south] {No} (calibRight);
-\draw [arrow] (irRead) -- node[auto] {Yes} (calibLeft);
-\draw [arrow] (calibLeft) -- node[auto] {} (turnR90);
-\draw [arrow] (calibRight) -- node[auto] {} (turnL90);
-\draw [arrow] (turnL90) -- node[auto] {} (calibRight2);
-\draw [arrow] (turnR90) -- node[auto] {} (calibLeft2);
-\draw [arrow] (calibLeft2) -- node[anchor=west] {} (end);
-\draw [arrow] (calibRight2) -- node[auto] {} (end);
-
-\end{tikzpicture}
+Efter igenkänning av ett hinder svänger roboten i den riktningen som har störst avstånd, med prioritet åt höger. Före och innan svängen kalibrerar roboten sin vinkel efter sidoväggen. Efter kalibreringen startas PD-regleringen.
 
 \clearpage
 \section{Systemöversikt}
@@ -651,8 +622,8 @@ Detta värde bestämmer hur många steg i början av en räknare som PWM-signale
 För att bestämma vilken riktning som ett motorpar ska rotera i så används en output-pin för varje motorsida. Om pinnen är hög ($1$) medför det att motorparet roterar framåt sett till robotens chassi, om pinnen är låg ($0$) medför det att motorparet roterar bakåt.
 
 \clearpage
-\section{Kommunikations- och kontrollenhet} \label{sec:system3}
-Kommunikations- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
+\section{Kommunikation- och kontrollenhet} \label{sec:system3}
+Kommunikation- och kontrollenheten agerar som en central hjärna i systemet. Den tar emot data från de andra delsystemen, och gör val som bidrar till att systemets funktionalitet som helhet uppfylls.
 
 Inga andra delsystem kommunicerar direkt med varandra, utan endast med kommunikations- och kontrollenheten. Se figur \ref{fig:unitBrain} för en övergripande skiss.
 
@@ -685,7 +656,7 @@ Här följer en lista på all hårdvara som ingår i detta delsystem.
 Koden är skriven i Python 3 och följer standarden specificerad i bilaga \ref{app:pythonstandard}. Operativsystemet som används är Raspbian.
 
 \subsubsection{Kommunikation}\label{ssec:brain_comm}
-Kommunikations- och kontrollenheten är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Det är kommunikations- och kontrollenheten som ansvarar för den seriella kommunikationen (se kapitel \ref{ssec:serial}) med de övriga inbyggda delsystemen, och det är därför denna enhet som inleder all seriell kommunikation. Det betyder att sensorenheten och styrenheten aldrig inleder kommunikationen med kommunikations- och kontrollenheten, utan de svarar bara på kommandon som skickas av denna.
+Kommunikation- och kontrollenheten är vad som i slutändan kontrollerar de olika delsystemen, och måste därför kunna skicka meddelanden mellan dessa. Det är kommunikations- och kontrollenheten som ansvarar för den seriella kommunikationen (se kapitel \ref{ssec:serial}) med de övriga inbyggda delsystemen, och det är därför denna enhet som inleder all seriell kommunikation. Det betyder att sensorenheten och styrenheten aldrig inleder kommunikationen med kommunikations- och kontrollenheten, utan de svarar bara på kommandon som skickas av denna.
 
 Förutom hårdvarugränssnitt kommunicerar  kommunikations- och kontrollenheten också med en extern PC (se kapitel \ref{sec:system4}) via Wi-Fi, där vi har ett liknande förhållande som med den seriella kommunikationen. På kommunikations- och kontrollenheten körs en serverprocess som låter en klient ansluta (se kapitel \ref{ssec:pc_comm}) och skicka kommandon till kommunikations- och kontrollenheten. Anledningen till att köra servermjukvaran på roboten är för att underlätta anslutning då klienten behöver veta serverns IP-adress vid anslutning men ej vice versa. Wi-Fi-meddelanden behandlas i den ordning de köats i pc-mjukvaran och används för att antingen byta läge på roboten, eller för att ge kommandon under manuell styrning. Mjukvaran för Wi-Fi-kommunikationen ligger som en egen tråd för att utgöra mjukvarukomponenten i kommunikationsmodulen. För en illustration över hur Wi-Fi-kommunikationen fungerar, se figur \ref{fig:wifi}.
 
@@ -860,10 +831,11 @@ När vi väl upptäckt ön behöver vi åka över och följa dess vägg, om det 
 \subsection{Gränssnitt} \label{ssec:brainInterface}
 Kommunikations- och kontrollenheten använder sig av seriella bussar för datautbyte mellan sensorenhet och styrenhet. Mjukvara för dessa krävs på båda håll. Utbyte av data sker åt båda hållen; sensorenheten skickar data på kommando, och styrenheten skickar avläsningsdata.
 
-Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul används. På båda sidor används sockets.
+Utöver detta så finns Wi-Fi-kommunikation där Raspberry PI:ns inbyggda Wi-Fi-modul används. Båda sidorna använder sig av sockets, där kommunikationsenheten agerar server. För en detaljerad beskrivning över hur detta går till, se kapitel \ref{ssec:wifi}.
 
 \clearpage
-\section{PC} \label{sec:system4}
+\section{PC} 
+\label{sec:system4}
 Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
