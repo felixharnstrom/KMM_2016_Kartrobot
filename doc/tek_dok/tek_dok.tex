@@ -448,6 +448,7 @@ Läser av gyrots X-axel, vilket motsvaras av robotens z-axel, och returneras des
 \end{table}
 
 \subsection{WIFI-kommunikation}
+\label{ssec:wificommunication}
 Kommunikation- och kontrollenheten kommunicerar via Wi-Fi med PC-mjukvaran (se kapitel \ref{sec:system4}). Då programmet körs ansluter kontrollenheten till \texttt{eduroam} och annonserar sin IP-adress till gruppens Slack-kanal. Därefter kan PC-mjukvaran ansluta till denna IP-adress. Detta sker via en socket, där kontrollenheten är server och PC-mjukvaran klient.
 
 Kommandon skickas som strängar. När större data, som argument, behövs, så skickas dessa som ett JSON-objekt. Följande kommandon finns tillgängliga:
@@ -930,7 +931,7 @@ Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul an
 
 \newpage
 \section{PC} \label{sec:system4}
-Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
+Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, byta läge på roboten,  samt för att skicka tangentevent som används för att styra roboten i det manuella läget. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth]{PC.png}}
@@ -938,7 +939,7 @@ Detta delsystem kommunicerar med Kommunikations- och kontrollenheten (se kapitel
     \label{fig:unitPC}
 \end{figure}
 \subsection{Hårdvara}
-PC-mjukvaran ska vara körbar på en godtycklig PC med Python 3 och Wi-Fi-modul. Lämpligen med skärm, tangentbord, och datormus för kommunikation med användaren.
+PC-mjukvaran är körbar på en godtycklig PC med Wi-Fi modul samt med Python 3 och numpy installerat. Lämpligen med skärm, tangentbord, och datormus för att kunna använda sig av all den funktionalitet som GUIet erbjuder.
 
 \subsubsection{Komponentbudget}
 Här följer en lista på all hårdvara som detta delsystem kräver.
@@ -952,7 +953,7 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \clearpage
 
 \subsection{Mjukvara}
-PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och ska följa \cite{pep8}. Den består av två trådar där den ena hanterar GUIt och den andra hanterar kommunikation med roboten via en socket och med GUIt via köer.
+PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka tangentevent till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödeschema för PC-mjukvaran. Koden är skriven i Python 3, och följer \cite{pep8}. Den består av två trådar där den ena hanterar GUIt och den andra hanterar kommunikation med roboten via en socket och med GUIt via köer.
 
 \begin{figure}[h!]
 \centering
@@ -1023,7 +1024,7 @@ PC-mjukvaran tar emot sensordata, styrdata och, kartdata från kommunikationsenh
 \clearpage
 
 \subsubsection{Output}
-Mjukvaran skickar styrkommandon samt uppmaning om att läsa av sensorerna till roboten i dess manuella läge. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då går före den fysiska brytaren på roboten.
+Mjukvaran skickar tangentevent samt uppmaningar med jämna mellanrum om att kommunikationsenheten ska skicka uppdateringar av sensorvärden och motordiagnostik. Den kan också skicka kommandon om att växla mellan autonomt och manuellt läge, som då direkt ändrar läget på roboten.
 
 \subsubsection{GUI}
 Informationen som tas emot från roboten presenteras i ett grafiskt gränssnitt. Via det grafiska gränssnittet kan användaren styra roboten med piltangenterna i manuellt läge, se diagnostisk information, växla mellan manuellt och autonomt läge, samt se den hitintills genererade kartan och robotens position i denna. Se figur \ref{fig:gui} för en bild av gränssnittet.
@@ -1047,7 +1048,7 @@ Siffrorna i figur \ref{fig:gui} står för följande delar av det grafiska grän
 
 \subsection{Gränssnitt} \label{ssec:PCInterface}
 
-PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används pythons inbyggda sockets.
+PC:n kommunicerar med roboten över Wi-Fi. I mjukvarulagret används Pythons inbyggda sockets. För en ingående beskrivning över protokoll och kommandon, se \ref{ssec:wificommunication}.
 
 \clearpage
 \begin{appendices}
