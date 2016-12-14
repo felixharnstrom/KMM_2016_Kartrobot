@@ -846,7 +846,6 @@ I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapite
 \subsubsection{Autonomt läge}
 I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
 
-%TODO: Uppdatera flowchart för vad som ska hända om vi kör till en köksö
 \begin{figure}[h!] \label{fig:auto_flowchart}
 	\makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{autonomt_flowchart.png}}
 	\caption{Flödesschema för det autonoma läget.  \label{fig:wallfollow}}
@@ -864,7 +863,7 @@ Därefter kör roboten ett varv runt köksön, enligt figur \ref{fig:kitchenDriv
 
 \begin{figure}[h!]
     \makebox[\textwidth][c]{\includegraphics[width=0.3\textwidth]{kitchen_around_flowchart.png}}
-    \caption{Flödesschema för att hitta köksön. \label{fig:kitchenDrive}}
+    \caption{Flödesschema för att utförska köksön. \label{fig:kitchenDrive}}
 \end{figure}
 
 När roboten hittat tillbaka till en yttervägg kommer den återigen att köra tills den hamnat i garage-rutan.
