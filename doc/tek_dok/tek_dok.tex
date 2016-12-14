@@ -269,11 +269,8 @@ Alla meddelanden (instruktioner såväl som svar) påbörjas med ett metapaket p
     \label{tab:meta_packet}
 \end{table}
 
-% TODO: Skriv om acknowledge.
-
 \subsubsection{Kontrollenhet $\leftrightarrow$ Styrenhet} \label{sssec:kontrollenhet_arrow_styrenhet}
 \label{sec:controlCommunication}
-% TODO: Fixa upplägget med sektioner
 \paragraph{Drive}
 \texttt{Drive}-instruktionen kör roboten framåt eller bakåt enligt argumenten som beskrivs i tabell \ref{tab:drive}. Kommandot har typnummer \texttt{1}.
 \begin{table}[h!]
@@ -573,8 +570,6 @@ Styrenheten är ansvarig för att kontrollera robotens alla motorer och för att
 \subsubsection{Processor}
 Vi använder en ATmega1284-processor för styrmodulen. Processorn kommunicerar med 4 DC-motorer som sitter på chassit (\cite{terminator}) och ett servo. Alla motorer styrs med PWM.
 
-\clearpage
-
 \subsubsection{Servo/steppermotor} \label{ssec:servomotor}
 På toppen av roboten finns en lasersensor (se kapitel \ref{sssec:lidar}) monterad. Denna sensor är placerad ovanpå ett servo som tillåter sensorn att rotera, detta servo är ett hobbyservo.
 
@@ -640,7 +635,6 @@ Om funktionsanropet var ett motorkommando som gjordes med ett nollskilt tidsargu
 
 \subsubsection{Processer}
 Eftersom styrenheten använder sig av en avbrottsdriven och buffrad UART så sköts all exekvering inom en process, där datan från UARTen kan ses som indata från en kö.
-\clearpage
 
 \subsection{Gränssnitt} \label{ssec:controlInterface}
 
@@ -840,8 +834,6 @@ I det manuella läget tar roboten emot kommandon från PC:n via Wi-Fi (se kapite
 \label{fig:manual_flowchart}
 \end{figure}
 
-\clearpage
-
 \subsubsection{Autonomt läge}
 I det autonoma läget kör roboten först ett varv längs högerväggen, tills den återkommit till garaget, enligt figur \ref{fig:wallfollow}. Under körningen markeras alla rutor till höger om dess färdväg som väggar. 
 
@@ -913,7 +905,7 @@ Kommunikations- och kontrollenheten använder sig av seriella bussar för dataut
 
 Utöver detta finns Wi-Fi-kommunikation. Raspberry PI:ns inbyggda Wi-Fi-modul används. På båda sidor används sockets.
 
-\newpage
+\clearpage
 \section{PC} \label{sec:system4}
 Detta delsystem kommunicerar med kommunikations- och kontrollenheten (se kapitel \ref{sec:system3}) för att ta emot diagnostisk data, den upptäckta kartan, samt ge instruktioner vid manuellt läge. Se figur \ref{fig:unitPC} för ett övergripande blockschema över PC-hårdvaran.
 
@@ -933,8 +925,6 @@ Här följer en lista på all hårdvara som detta delsystem kräver.
 \hardware{PC}{PC med Wi-Fi-modul.}{1}
 \end{HardwareList}
 \end{center}
-
-\clearpage
 
 \subsection{Mjukvara}
 PC-mjukvaran ansvarar för att kommunicera med roboten över Wi-Fi, låta användaren skicka kommandon till roboten, och visa diagnostik från roboten såväl som kartan. Se figur \ref{fig:gui_flowchart} för ett övergripande flödesschema för PC-mjukvaran. Koden är skriven i Python 3, och följer standarden beskriven i bilaga \ref{app:pythonstandard}. Den består av två trådar där den ena hanterar det grafiska gränssnittet och den andra hanterar kommunikation med roboten via en socket och med det grafiska gränssnittet via köer.
