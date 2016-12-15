@@ -3,6 +3,8 @@ import gui
 import time
 import json
 import os
+import sys
+import argparse
 from command import Command
 from communication import *
 from client import client
@@ -39,10 +41,16 @@ def send_command(command, socket, guit):
         sensor_data = json.loads(receive_data(socket))
         guit.receive_command(["set_sensors", sensor_data])
 
-def main():
+def main(argv):
+    # Parse args
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--ip", default = "localhost", help = "Server IP address. Default is localhost.")
+    args = parser.parse_args()
+    ip_address = args.ip
+
     # Make sure to start a server before starting the gui.
     robot = client()
-    robot.start(ip="130.236.227.56")
+    robot.start(ip=ip_address)
 
     map = [[1,0,1],[0,1,1]]
 
@@ -101,4 +109,4 @@ def main():
     print("exiting")
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
