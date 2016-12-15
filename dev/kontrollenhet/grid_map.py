@@ -194,16 +194,23 @@ class GridMap:
         """
         return Position(self._width - self._origin.x - 1, self._height - self._origin.y - 1)
 
-    def gui_drawable(self):
+    def gui_drawable(self, robot_x, robot_y):
         """
         Return a version as the GUI would like to see it.
         
+        Args:
+            :param robot_x (int): The robots cell column index.
+            :param robot_y (int):  The robots cell row index. 
+
         Returns:
             :return (2D list of ints): A 2D list containing 1's where there are walls, 0 in other places.
         """
+        robot_xy = self._pos_to_index(robot_x, robot_y)
         def row_to_drawable(row):
             return [(1 if cell == CellType.WALL else 0) for cell in row]
-        return [row_to_drawable(row) for row in self._grid]
+
+        map_list = [row_to_drawable(row) for row in self._grid]
+        return ((robot_xy.x, robot_xy.y),map_list)
 
     def debug_print(self, print_origin=False):
         """
