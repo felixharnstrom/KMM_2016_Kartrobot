@@ -362,7 +362,7 @@ def island_exists(grid_pos:Position, measuring_angle:float, grid_map:GridMap):
     has_found_wall = grid_map.get(cur_pos.x, cur_pos.y) == CellType.WALL
 
     # Measure lidar
-    MEASUREMENT_ITERATIONS = 50
+    MEASUREMENT_ITERATIONS = 10
     lidar_dist = median_sensor(MEASUREMENT_ITERATIONS, Command.read_lidar())
 
     if not has_found_wall:

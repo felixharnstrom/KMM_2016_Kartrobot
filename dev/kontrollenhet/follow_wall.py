@@ -631,6 +631,7 @@ class Robot:
         Args:
             unsaved_distance   (int): Reflex data that have been driven but not added to self.driven_distance
         """
+        print ("SAVING", unsaved_distance)
         self.driven_distance += unsaved_distance * 0.9195402298850575
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
@@ -797,9 +798,9 @@ def main(argv):
                     status = robot.follow_wall(999999, side = "left")
                 elif (robot.start_cell_at_island != approximate_to_cell(robot_position)):
                     robot.has_been_to_other_cell = True
-                    status = robot.follow_wall(200, side = "right")
+                    status = robot.follow_wall(999999, side = "right")
                 else:
-                    status = robot.follow_wall(200, side = "right")
+                    status = robot.follow_wall(999999, side = "right")
             elif robot.goal == Goal.RETURN_HOME:
                 status = robot.follow_wall(9999999, side = "left")
             else:
