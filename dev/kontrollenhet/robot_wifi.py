@@ -9,7 +9,7 @@ import socket
 
 #output_queue = queue.Queue() #What should we send to the pc
 
-def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Queue):
+def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Queue, robot_pos : list):
     """
     Continously retrieves messages from and transmits messages to the PC. Messages from the PC are interpreted and handled depending on their meta-message.
     This functions prime purpose is to make the PC able to communicate with the robot, and messages may therefor be used to affect its function.
@@ -43,6 +43,9 @@ def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Q
             elif (data == "FORWARD_SENSOR_INFO"):
                 #Transmit sensor data
                 send_data(s.client, json.dumps(sensor_data))
+            elif (data == "SYNC_MODE"):
+                #Sends the mode we are currently in, 0 means autonomous 1 means manual
+                send_data(s.client, get_mode().value)
             elif (data == "KEY_EVENT"):
                 #Receive keyevent
                 key_event = receive_data(s.client)
@@ -51,7 +54,7 @@ def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Q
                     input_queue.put(("KEY_EVENT",key_event))
             elif (data == "SEND_MAP"):
                 map_lock.acquire()
-                send_data(s.client, grid_map.gui_drawable())
+                send_data(s.client, [robot_pos,grid_map.gui_drawable()])
                 map_lock.release()
             elif (data == "TOGGLE_MODE"):
                 #Change the mode

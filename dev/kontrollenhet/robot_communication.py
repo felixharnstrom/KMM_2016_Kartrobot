@@ -7,6 +7,7 @@ import robot_wifi
 import queue
 import math
 from timeout import *
+import grid_map
 
 UART_sensor = None          #The uninitiated UART object for sensor communication.
 UART_motor = None           #The uninitiated UART object for motor communication.
@@ -24,6 +25,18 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
 
 """The internal representation of the map."""
 grid_map = GridMap()
+robot_pos = [0,0]
+#Test case
+#grid_map.set(0,0, grid_map.CellType.WALL)
+#grid_map.set(0,1, grid_map.CellType.WALL)
+#grid_map.set(0,2, grid_map.CellType.WALL)
+#grid_map.set(1,0, grid_map.CellType.WALL)
+#grid_map.set(0,0, grid_map.CellType.OPEN)
+#grid_map.set(1,2, grid_map.CellType.WALL)
+#grid_map.set(2,0, grid_map.CellType.WALL)
+#grid_map.set(2,1, grid_map.CellType.OPEN)
+#grid_map.set(2,2, grid_map.CellType.OPEN)
+#robot_pos = [2,1]
 
 """The lock for map."""
 map_lock = threading.Lock()
@@ -59,7 +72,7 @@ def init_wifi_thread():
     """
     Initiates and executes a new thread which receives and transmits commands over wifi.
     """
-    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data, map_lock, grid_map, input_queue)).start()
+    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data, map_lock, grid_map, input_queue, robot_pos)).start()
 
 def adjust_speeds():
     """
