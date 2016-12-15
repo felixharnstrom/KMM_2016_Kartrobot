@@ -202,7 +202,7 @@ class Robot:
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 80
         self.SENSOR_SPACING = 95
-        self.BASE_SPEED = 40
+        self.BASE_SPEED = 30
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
         self.DRIVE_TO_ISLAND_THRESHOLD = 800
@@ -516,9 +516,9 @@ class Robot:
         
         # Drive until the wanted distance is reached unless the automus mode is turned off
         drive_status = DriveStatus.DRIVING
-        while ((drive_status == DriveStatus.DRIVING) and (mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS)):
+        while ((drive_status == DriveStatus.DRIVING)):
             drive_status = self._follow_wall_step(reflex_right_start, distance, side)
-
+        print ("sadlkjasdasldasasdjlasdsdasdasdasdasdklasdklasdasdasdkl")
         if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
             return DriveStatus.WAITING
         else:

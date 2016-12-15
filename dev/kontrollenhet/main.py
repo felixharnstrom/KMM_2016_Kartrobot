@@ -175,9 +175,9 @@ def main():
     # Loop
     while True:
         # Process messages
+        current_time = datetime.now()         
         process_actions()
         
-        current_time = datetime.now()         
         diff = (current_time - last_time).total_seconds()         
         if (diff >= diff_time_trigger): 
             last_time = current_time
