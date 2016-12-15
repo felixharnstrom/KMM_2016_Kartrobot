@@ -264,9 +264,5 @@ class gui_thread(threading.Thread):
                 if mapy==1:
                     self.place_marker_on_canvas(100+x*10,100+y*10)
                     
-    def draw_robot_position(self, pos_list : list):
-        x_pos = pos_list[0]
-        y_pos = pos_list[1]
+    def draw_robot_position(self, x_pos : int, y_pos : int):
         self.place_robot_on_canvas(100+x_pos*10, 100+y_pos*10)
-        
-

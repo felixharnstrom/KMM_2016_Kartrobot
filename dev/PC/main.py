@@ -19,12 +19,12 @@ def send_command(command, socket, guit):
         Args:
             :
     """
-    if command="get_map_update":
+    if command == "get_map_update":
         send_data(socket, "SEND_MAP")
         ack = receive_data(socket)
-        robot_map_data = receive_data(socket) # [[robot_x, robot_y], [map..]
-        guit.receive_command(["update_map", robot_map_data])
-    elif command="sync_mode":
+        robot_map_data = json.loads(receive_data(socket)) # [[robot_x, robot_y], [map..]
+        guit.receive_command(["update_map", robot_map_data[0], robot_map_data[1]])
+    elif command == "sync_mode":
         send_data(socket, "SYNC_MODE") #0 is autonomous, 1 is manual
         ack = receive_data(socket)
         current_mode_integer = receive_data()
@@ -95,7 +95,7 @@ def main(argv):
             last_time_diag = current_time
             send_command("get_motor_data", robot.client, guit)
             send_command("get_sensor_data", robot.client, guit)
-        if(diff_map >= digg_map_trigger):
+        if(diff_map >= diff_map_trigger):
             last_time_map = current_time
             send_command("get_map_update", robot.client, guit)   
         #guit.draw_map(map)
