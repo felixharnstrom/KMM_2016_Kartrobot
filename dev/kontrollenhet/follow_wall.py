@@ -497,13 +497,13 @@ class Robot:
 
         # Drive until the wanted distance is reached unless the automus mode is turned off
         drive_status = DriveStatus.DRIVING
-        while ((drive_status == DriveStatus.DRIVING)):
+        while ((drive_status == DriveStatus.DRIVING) and (mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS)):
             drive_status = self._follow_wall_step(reflex_right_start, distance, side)
 
-        #if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
-        #    return DriveStatus.WAITING
-        #else:
-        return drive_status
+        if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
+            return DriveStatus.WAITING
+        else:
+            return drive_status
 
     def update_pid(self):
         """

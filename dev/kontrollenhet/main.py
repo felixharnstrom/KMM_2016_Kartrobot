@@ -161,7 +161,7 @@ def main():
 
     # Initiate the robot 
     robot = Robot(logger)
-    init_wifi_thread()
+    init_wifi_thread(robot.get_position(), robot.grid_map)
 
     # Turn LIDAR to 90 degrees
     servo_instr = Command.servo(180)
@@ -173,7 +173,7 @@ def main():
     # Loop
     while True:
         # Process messages
-        #process_actions()
+        process_actions()
         
         current_time = datetime.now()         
         diff = (current_time - last_time).total_seconds()         
@@ -193,12 +193,12 @@ def main():
            # Update motor and sensor values
             
         # Autonomous step
-        #if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
-        #    if robot == None:
-        #        robot = Robot(logger)
-        autonomous_step(robot)
-        #else:
-        #    robot = None
+        if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
+            if robot == None:
+                robot = Robot(logger)
+            autonomous_step(robot)
+        else:
+            robot = None
             
     close_UARTs()
     
