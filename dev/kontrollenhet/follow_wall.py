@@ -676,6 +676,13 @@ def sensor_test(robot):
         lidar = robot._median_sensor(1, Command.read_lidar())
         robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
+def victory_dance():
+    while True:
+        handle_command(Command.servo(0))
+        time.sleep(0.75)
+        handle_command(Command.servo(180))
+        time.sleep(0.75)
+
 def main(argv):
     # create logger
     logger = logging.getLogger()
@@ -728,6 +735,9 @@ def main(argv):
             robot.pid_controller.kd = 0
             robot.pid_controller.set_tunings(3, 0, -200)
             # Drive forward without crashing in wall
+            if robot.goal == Goal.NONE:
+                victory_dance()
+                break
             if robot.goal == Goal.FIND_ISLAND:
                 status = robot.follow_wall(400, side = "right")
             elif robot.goal == Goal.MAP_ISLAND:
