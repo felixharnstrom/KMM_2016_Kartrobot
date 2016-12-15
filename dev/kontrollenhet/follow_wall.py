@@ -721,6 +721,10 @@ def main(argv):
 #    time.sleep(10)
     # Try driving in infinite loop around the maze
     while 1:
+            robot.pid_controller.kp = 0
+            robot.pid_controller.ki = 0
+            robot.pid_controller.kd = 0
+            robot.pid_controller.set_tunings(3, 0, -200)
             # Drive forward without crashing in wall
             if robot.look_for_island:
                 status = robot.follow_wall(400, side = "right")
@@ -739,7 +743,7 @@ def main(argv):
                 status = robot.follow_wall(9999999, side = "left")
             else:
                 status = robot.follow_wall(9999999, side = "right")
-                
+            handle_command(Command.stop_motors())    
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
             logger.info("Explore island: " + str(robot.explore_island))
