@@ -27,16 +27,18 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
 grid_map = GridMap()
 robot_pos = [0,0]
 #Test case
-#grid_map.set(0,0, grid_map.CellType.WALL)
-#grid_map.set(0,1, grid_map.CellType.WALL)
-#grid_map.set(0,2, grid_map.CellType.WALL)
-#grid_map.set(1,0, grid_map.CellType.WALL)
-#grid_map.set(0,0, grid_map.CellType.OPEN)
-#grid_map.set(1,2, grid_map.CellType.WALL)
-#grid_map.set(2,0, grid_map.CellType.WALL)
-#grid_map.set(2,1, grid_map.CellType.OPEN)
-#grid_map.set(2,2, grid_map.CellType.OPEN)
-#robot_pos = [2,1]
+grid_map.set(0,0, CellType.WALL)
+grid_map.set(0,1, CellType.WALL)
+grid_map.set(0,2, CellType.WALL)
+grid_map.set(1,0, CellType.WALL)
+grid_map.set(1,1, CellType.OPEN)
+grid_map.set(1,2, CellType.WALL)
+grid_map.set(2,0, CellType.WALL)
+grid_map.set(2,1, CellType.OPEN)
+grid_map.set(2,2, CellType.OPEN)
+grid_map.debug_print()
+
+robot_pos = [2,1]
 
 """The lock for map."""
 map_lock = threading.Lock()

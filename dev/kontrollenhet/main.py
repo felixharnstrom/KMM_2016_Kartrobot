@@ -31,14 +31,14 @@ def main():
             handle_command(Command.controller_information())
             handle_command(Command.read_gyro())
             handle_command(Command.read_lidar())
-            handle_command(Command.read_back_ir())
+            handle_command(Command.read_front_ir())
             handle_command(Command.read_left_front_ir())
             handle_command(Command.read_left_back_ir())
             handle_command(Command.read_right_front_ir())
             handle_command(Command.read_right_back_ir())
+            handle_command(Command.read_reflex_left())
+            handle_command(Command.read_reflex_right())
             print("Time took:", (datetime.now()-last_time).total_seconds())
-            #handle_command(Command.read_reflex_left())
-            #handle_command(Command.read_reflex_right())
             # Update motor and sensor values
             
         # Autonomous step

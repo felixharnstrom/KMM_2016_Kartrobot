@@ -54,7 +54,8 @@ def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Q
                     input_queue.put(("KEY_EVENT",key_event))
             elif (data == "SEND_MAP"):
                 map_lock.acquire()
-                send_data(s.client, [robot_pos,grid_map.gui_drawable()])
+                send_data(s.client, json.dumps((robot_pos,grid_map.gui_drawable())))
+                print("JSONED: ", json.dumps((robot_pos,grid_map.gui_drawable())))
                 map_lock.release()
             elif (data == "TOGGLE_MODE"):
                 #Change the mode
