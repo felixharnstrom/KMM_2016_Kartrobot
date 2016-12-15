@@ -5,13 +5,22 @@ from follow_wall import *
 import gpio_buttons as gpio
 import mode
 
-def autonomous_step(robot : Robot, g : GridMap, logger):
-    """Perform the next action decided by the autonomous mode."""
+def victory_dance():
+    while True:
+        handle_command(Command.servo(0))
+        time.sleep(0.75)
+        handle_command(Command.servo(180))
+        time.sleep(0.75)
+
+def autonomous_step(robot : Robot):
     robot.update_pid()
+    
     # Drive forward without crashing in wall
-    if robot.look_for_island:
-       status = robot.follow_wall(400, side = "right")
-    elif robot.explore_island:
+    if robot.goal == Goal.NONE:
+        victory_dance()
+    if robot.goal == Goal.FIND_ISLAND:
+        status = robot.follow_wall(400, side = "right")
+    elif robot.goal == Goal.MAP_ISLAND:
         robot_position = robot.get_position()
         if (robot.start_cell_at_island == approximate_to_cell(robot_position) and robot.has_been_to_other_cell):
             robot.leave_island()
@@ -22,32 +31,26 @@ def autonomous_step(robot : Robot, g : GridMap, logger):
             status = robot.follow_wall(200, side = "right")
         else:
             status = robot.follow_wall(200, side = "right")
-    elif robot.return_home:
+    elif robot.goal == Goal.RETURN_HOME:
         status = robot.follow_wall(9999999, side = "left")
     else:
         status = robot.follow_wall(9999999, side = "right")
 
     handle_command(Command.stop_motors())    
-    logger.info(robot.get_position())
-    logger.info(robot.path_trace)
-    logger.info("Explore island: " + str(robot.explore_island))
-            
-    #TODO: Change the argument to something understandable
-    drive_to_island = robot.update_map()
-    # Drive to the island if it is close enough
-    if drive_to_island:
-        distance_to_island = handle_command(Command.read_lidar())
-        if distance_to_island <= robot.DRIVE_TO_ISLAND_THRESHOLD:
-             robot.drive_to_island()
-            
+    robot.logger.info(robot.get_position())
+    robot.logger.info(robot.path_trace)
+    robot.logger.info("Explore island: " + str(robot.goal == Goal.MAP_ISLAND))
+    
+    robot.update_map()
+        
     if (status == DriveStatus.OBSTACLE_DETECTED):
-        logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
+        robot.logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
         turn_instr = Command.stop_motors()
         handle_command(turn_instr)
         while robot._is_moving(): pass
         ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
         ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-
+            
         if ir_right_front > robot.TURN_OVERRIDE_DIST and ir_left_front > robot.TURN_OVERRIDE_DIST:
             #robot.stand_perpendicular('left')
             robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
@@ -64,15 +67,15 @@ def autonomous_step(robot : Robot, g : GridMap, logger):
                 robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                 while robot._is_moving(): pass
                 #robot.stand_perpendicular('left')
+                        
             else:
                 #robot.stand_perpendicular('right')
                 robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                 while robot._is_moving(): pass
                 #robot.stand_perpendicular('right')
-        robot.update_pid()
-        #Test the map functionality
+            robot.update_pid()
     elif (status == DriveStatus.CORRIDOR_DETECTED_RIGHT):
-        logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
+        robot.logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
         turn_instr = Command.stop_motors()
         handle_command(turn_instr)
         while robot._is_moving(): pass
@@ -80,9 +83,10 @@ def autonomous_step(robot : Robot, g : GridMap, logger):
         robot.drive_distance(robot.CORRIDOR_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
         robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
         while robot._is_moving(threshold = 30): pass
+
         # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
         if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
-            logger.info("Not a corridor, moving back")
+            robot.logger.info("Not a corridor, moving back")
             robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
             robot.stand_perpendicular('right')
             while robot._is_moving(threshold = 30): pass
@@ -93,9 +97,9 @@ def autonomous_step(robot : Robot, g : GridMap, logger):
             while robot._is_moving(): pass
             #robot.stand_perpendicular('right')
             #robot.stand_perpendicular('left')
-            robot.update_pid()
+        robot.update_pid()
     elif (status == DriveStatus.CORRIDOR_DETECTED_LEFT):
-        logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
+        robot.logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
         turn_instr = Command.stop_motors()
         handle_command(turn_instr)
         while robot._is_moving(): pass
@@ -103,35 +107,29 @@ def autonomous_step(robot : Robot, g : GridMap, logger):
         robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
         while robot._is_moving(threshold = 30): pass
 
-        # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
         if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
-            logger.info("Not a corridor, moving back")
+            robot.logger.info("Not a corridor, moving back")
             robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
             robot.stand_perpendicular('left')
             while robot._is_moving(threshold = 30): pass
         else:
-            # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
             # As it is now, a right turn into a single square corridor does not work well.
             robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
             while robot._is_moving(): pass
             #robot.stand_perpendicular('left')
             #robot.stand_perpendicular('right')
-            robot.update_pid()
-    robot._grid_map.debug_print()
+        robot.update_pid()
+    robot.grid_map.debug_print()
 
 def main():
     """Main loop"""
     # Init
-    #init_UARTs()
-    #gpio.launch_poll_threads()
+    init_UARTs()
+    gpio.launch_poll_threads()
         
     current_time = datetime.now()     
     last_time = current_time     
     diff_time_trigger = 0.3 #Trigger every 0.3s
-
-    # Create the gitmap
-    g = grid_map.GridMap()
-    g.debug_print()
 
     # create logger
     logger = logging.getLogger()
@@ -162,8 +160,8 @@ def main():
     logger.addHandler(ch)
 
     # Initiate the robot 
-    robot = Robot(ControllerMode.MANUAL, logger)
-    #init_wifi_thread()
+    robot = Robot(logger)
+    init_wifi_thread()
 
     # Turn LIDAR to 90 degrees
     servo_instr = Command.servo(180)
@@ -174,10 +172,9 @@ def main():
 
     # Loop
     while True:
-        
         # Process messages
-        process_actions()
-    
+        #process_actions()
+        
         current_time = datetime.now()         
         diff = (current_time - last_time).total_seconds()         
         if (diff >= diff_time_trigger): 
@@ -193,11 +190,15 @@ def main():
             handle_command(Command.read_reflex_left())
             handle_command(Command.read_reflex_right())
             print("Time took:", (datetime.now()-last_time).total_seconds())
-            # Update motor and sensor values
+           # Update motor and sensor values
             
         # Autonomous step
-        if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
-            autonomous_step(robot, g, logger)
+        #if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
+        #    if robot == None:
+        #        robot = Robot(logger)
+        autonomous_step(robot)
+        #else:
+        #    robot = None
             
     close_UARTs()
     
