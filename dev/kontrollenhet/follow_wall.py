@@ -208,7 +208,7 @@ class Robot:
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 80
         self.SENSOR_SPACING = 95
-        self.BASE_SPEED = 30
+        self.BASE_SPEED = 40
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
         self.DRIVE_TO_ISLAND_THRESHOLD = 800
@@ -299,7 +299,7 @@ class Robot:
         y = self._y_start
         last_distance = 0
 
-        for path in self.path_trace:
+        for path in self.get_driven_dist():
             angle = path[0]
             if angle != 0:
                 angle_sign = abs(angle) / angle
@@ -340,14 +340,15 @@ class Robot:
         """
         Update the gridmap with new scan data.
         """
-        lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
+        lines = movement_to_lines(self.get_driven_dist(), Position(self._x_start, self._y_start))
         cells = movement_lines_to_cells(lines, 1)
         # Scanning walls
         # unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
         #print(self.path_trace[0:max(len(self.path_trace)-1, 20)])
-        self.logger.info("Current cell" +str(cells[-1]))
-        self.logger.info("Current path" +str(self.path_trace))
-        if self.goal == Goal.MAP_OUTER_WALLS and len(cells) > 0:
+        self.logger.debug("Current cell" +str(cells[-1]))
+        self.logger.debug("Current path" +str(self.get_driven_dist()))
+        self.logger.debug("Current path: Uncalibrated" +str(self.path_trace))
+        if (self.goal == Goal.MAP_OUTER_WALLS or self.goal == Goal.MAP_ISLAND) and len(cells) > 0:
             self.grid_map = GridMap()
             self._add_garage(cells[0])
             make_open(cells, self.grid_map)
@@ -357,7 +358,7 @@ class Robot:
             self.logger.info("STOP")
             self.logger.info("start: " + str(cells[0]))
             self.logger.info("end: " + str(cells[-1]))
-            if cells[-1] == cells[0] and len(cells) > 1:
+            if cells[-1] == cells[0] and len(cells) > 5:
                 # We've returned to the garage
                 self.goal = Goal.FIND_ISLAND
                 self.logger.warning("In garage - looking for island")
@@ -374,9 +375,10 @@ class Robot:
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
             is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
-            time.sleep(0.75)
             if is_island:
                 self.logger.info("ISLAND!")
+            else:
+                self.logger.info("No island :(")
             if is_island and distance < self.DRIVE_TO_ISLAND_THRESHOLD:
                 self.logger.info("DRIVE TO ISLAND!")
                 self.drive_to_island()
@@ -442,15 +444,28 @@ class Robot:
         self.logger.info("Side: " + side)
 
         # Sleep after servo turn
-        time.sleep(0.75)
+        #time.sleep(0.75)
         
         # Read start values from sensors
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = handle_command(Command.read_reflex_right())
+        reflex_right_start_2 = handle_command(Command.read_reflex_right())
         self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
 
+        cells = 0
         # Drive until the wanted distance is reached
         while (reflex_right - reflex_right_start <= distance):
+            if ((reflex_right - reflex_right_start) / 400) > cells:
+                self._save_position(handle_command(Command.read_reflex_right()) - reflex_right_start_2)
+                reflex_right_start += (handle_command(Command.read_reflex_right()) - reflex_right_start_2)
+                reflex_right_start_2 = handle_command(Command.read_reflex_right())
+                
+                before = self.goal
+                self.update_map()
+                reflex_right_start += (handle_command(Command.read_reflex_right()) - reflex_right_start_2)
+                if self.goal == Goal.FIND_ISLAND and before != self.goal:
+                    return DriveStatus.DONE
+                cells += 1
             # Get sensor values
             reflex_right = handle_command(Command.read_reflex_right())
             ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
@@ -489,7 +504,7 @@ class Robot:
             self.pid_controller.d_term = angle_side
             self.pid_controller.compute()
             self.pid_controller.output_data += 100
-            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front,100), 200) / 200, side)
+            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front,100, distance - (reflex_right - reflex_right_start)), 200) / 200, side)
             if side == "right":
                 self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
             else:
@@ -569,6 +584,8 @@ class Robot:
 		Turn towards the island, drive to it and then turn left so that
 		the robot will follow the right side of the wall.
         """
+        handle_command(Command.stop_motors())
+        time.sleep(0.5)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
@@ -614,8 +631,40 @@ class Robot:
         Args:
             unsaved_distance   (int): Reflex data that have been driven but not added to self.driven_distance
         """
-        self.driven_distance += unsaved_distance
+        self.driven_distance += unsaved_distance * 0.9195402298850575
         self.path_trace += [(self.current_angle, self.driven_distance)]
+
+    def get_driven_dist(self):
+        distances = self.path_trace
+        last_angle = None
+        new_list = []
+        for angle, dist in distances:
+            # print (angle, dist)
+            if last_angle == angle:
+                # print("merging")
+                new_list[-1][1] = dist
+            else:
+                new_list.append([angle, dist])
+            last_angle = angle
+
+#        print("Merged distances", new_list)
+
+        dist_list = [[0, 0]]
+
+        for i in range(len(new_list)):
+            angle, dist = new_list[i]
+            dist_list.append([angle, dist_list[-1][1] + round(dist/400) * 400])
+            # print (new_list)
+            for j in range(i+1, len(new_list)):
+                new_list[j][1] = new_list[j][1] - dist
+            # print (new_list)
+
+        # print (dist_list)
+        dist_list = dist_list[1:]
+        return dist_list
+
+
+
 
     def _follow_wall_help(self, ratio : int, base_speed : int, side="right"):
         """
@@ -739,7 +788,7 @@ def main(argv):
                 victory_dance()
                 break
             if robot.goal == Goal.FIND_ISLAND:
-                status = robot.follow_wall(400, side = "right")
+                status = robot.follow_wall(99999999, side = "right")
             elif robot.goal == Goal.MAP_ISLAND:
                 robot_position = robot.get_position()
                 if (robot.start_cell_at_island == approximate_to_cell(robot_position) and robot.has_been_to_other_cell):
@@ -756,8 +805,8 @@ def main(argv):
             else:
                 status = robot.follow_wall(9999999, side = "right")
             handle_command(Command.stop_motors())    
-            logger.info(robot.get_position())
-            logger.info(robot.path_trace)
+            logger.debug(robot.get_position())
+            logger.debug(robot.get_driven_dist())
             logger.info("Explore island: " + str(robot.goal == Goal.MAP_ISLAND))
             
             robot.update_map()
@@ -808,16 +857,16 @@ def main(argv):
                 while robot._is_moving(threshold = 30): pass
 
                 # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
+                """if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 200:
                     logger.info("Not a corridor, moving back")
                     robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
                     robot.stand_perpendicular('right')
                     while robot._is_moving(threshold = 30): pass
-                else:
+                else:"""
                     # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
                     # As it is now, a right turn into a single square corridor does not work well.
-                    robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
-                    while robot._is_moving(): pass
+                robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
+                while robot._is_moving(): pass
                     #robot.stand_perpendicular('right')
                     #robot.stand_perpendicular('left')
                 robot.pid_controller.kp = 0
