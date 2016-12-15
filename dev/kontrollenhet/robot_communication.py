@@ -79,7 +79,7 @@ def close_UARTs():
     UART_sensor.close()
     return
 
-def init_wifi_thread():
+def init_wifi_thread(robot_pos : Position, grid_map : GridMap):
     """
     Initiates and executes a new thread which receives and transmits commands over wifi.
     """

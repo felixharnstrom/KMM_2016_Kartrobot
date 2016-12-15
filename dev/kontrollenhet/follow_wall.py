@@ -20,25 +20,17 @@ import math
 import sys
 import argparse
 import logging
+import mode
 from map import *
 import numpy as np
 from command import Command
 from UART import UART
 from pid import Pid
 from robot_communication import handle_command, init_UARTs
-
-
 import map
 import grid_map
 from geometry import Position
 import time
-
-
-
-# TODO: Use Daniel's enum for MANUAL, AUTONOM
-class ControllerMode:
-    MANUAL = 0
-    AUTONOM = 1
 
 # Define directions
 class Direction:
@@ -49,7 +41,9 @@ class DriveStatus:
     OBSTACLE_DETECTED = 0
     CORRIDOR_DETECTED_RIGHT = 1
     CORRIDOR_DETECTED_LEFT = 2
-    DONE = 3
+    DRIVING = 3
+    WAITING = 4
+    DONE = 5
 
 class Goal:
     MAP_OUTER_WALLS = 0
@@ -155,7 +149,6 @@ class Robot:
 
     Attributes:
         goal                        (Goal): What we're currently trying to do
-        return_home                 (bool): True if the robot should return home
         grid_map                    (GridMap): Mapping of room.
         start_cell_at_island        (Position): Start cell at island.
 
@@ -186,16 +179,17 @@ class Robot:
         DRIVE_TO_ISLAND_THRESHOLD   (int): The robot won't drive to the island if it is further than this distance
     """
 
-    def __init__(self, mode: ControllerMode, logger):
+    def __init__(self, logger):
         # Public attributes
         self.grid_map = GridMap()
         self.goal = Goal.MAP_OUTER_WALLS
         self.start_cell_at_island = Position(0,0)
         self.driven_distance = 0
         self.current_angle = 0
-        self.control_mode = mode
         self.path_trace = [] # (Angle, LengthDriven), with this list we can calculate our position
         self.path_queue = [] # (Blocks_To_Drive, Direction)
+        self.logger = logger
+        self.has_been_to_other_cell = False
         self.START_X = 200
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 3
@@ -212,11 +206,11 @@ class Robot:
         self.ACCELERATED_SPEED = 40
         self.WHEEL_RADIUS = 32.5
         self.DRIVE_TO_ISLAND_THRESHOLD = 800
-        self.logger = logger
-        self.has_been_to_other_cell = False
+        init_UARTs()
+
         # Private attributes
-        self._last_dist = 0
-        self._grid_map = GridMap()
+        self._cells = 0
+        self._read_reflex_right_2 = 0
 
         # Initialize PID controller
         self.pid_controller = Pid()
@@ -226,7 +220,6 @@ class Robot:
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
-        init_UARTs()
 
         # Read start values for X and Y
         self._y_start = self._median_sensor(10, Command.read_right_back_ir())+100
@@ -419,6 +412,75 @@ class Robot:
             self._save_position(reflex_right - reflex_right_start)
         return True
 
+    def _follow_wall_step(self, reflex_right_start : int, distance_to_drive : int, side = "right"):
+        """
+        Make one follow wall iteration
+        Args:
+            reflex_right_start    (int): Start value for the right reflex sensor.
+            distance_to_drive     (int): The wanted distance to drive.
+            side                  (str): String saying what wall to follow.
+        Returns:
+            (DriveStatus): Return at what stage the follow wall is at.
+        """
+        reflex_right = handle_command(Command.read_reflex_right())
+
+        ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
+
+        if side == "right":
+             ir_side_back, ir_side_front = self.read_ir_side(Direction.RIGHT)
+        else:
+             ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
+        
+        if reflex_right - reflex_right_start > distance_to_drive:
+            # Save the given length driven
+            handle_command(Command.stop_motors())
+            self._save_position(reflex_right - reflex_right_start)
+            return DriveStatus.DONE
+
+        if ((reflex_right - reflex_right_start) / 400) > self._cells:
+            self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
+                
+            before = self.goal
+            self.update_map()
+            reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            if self.goal == Goal.FIND_ISLAND and before != self.goal:
+                return DriveStatus.DONE
+            self._cells += 1
+
+        # Detect corridor to the right
+        if (ir_side_front >= self.TURN_OVERRIDE_DIST):
+            self.logger.debug("IR - front: " + str(ir_side_front) + " IR - back: " + str(ir_side_back))
+            # Save the given length driven
+            self._save_position(reflex_right - reflex_right_start)
+            if side == "right":
+                return DriveStatus.CORRIDOR_DETECTED_RIGHT
+            else:
+                return DriveStatus.CORRIDOR_DETECTED_LEFT
+
+        # Obstacle detected, and no turn to the right
+        if(ir_front < self.OBSTACLE_DIST):
+            # Save the given length driven
+            handle_command(Command.stop_motors())
+            self._save_position(reflex_right - reflex_right_start)
+            return DriveStatus.OBSTACLE_DETECTED
+
+        # We need to get the distance from the center of the robot perpendicular to the wall
+        # This assumes that we have a wall on either side (i.e. we are in a corridor)
+        # TODO: Different cases for corridors and open rooms.
+        dist_side = (ir_side_front + ir_side_back) / 2
+        angle_side = math.atan2(ir_side_back - ir_side_front, self.SENSOR_SPACING)
+        perpendicular_dist_side = dist_side * math.cos(angle_side)
+        # logger.debug("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
+        self.pid_controller.input_data = perpendicular_dist_side
+        self.pid_controller.d_term = angle_side
+        self.pid_controller.compute()
+        self.pid_controller.output_data += 100
+        self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front, 100, distance_to_drive - (reflex_right - reflex_right_start)), 200) / 200, side)
+                
+        return DriveStatus.DRIVING
+
     def follow_wall(self, distance: int, side="right"):
         """
         Follow the wall to the right until the robot encounters a corner or obstacle, or the given distance to drive is reached.
@@ -448,72 +510,28 @@ class Robot:
         
         # Read start values from sensors
         reflex_right_start = handle_command(Command.read_reflex_right())
-        reflex_right = handle_command(Command.read_reflex_right())
-        reflex_right_start_2 = handle_command(Command.read_reflex_right())
-        self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
+        # Set cells to zero
+        self._cells = 0
+        self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
+        
+        # Drive until the wanted distance is reached unless the automus mode is turned off
+        drive_status = DriveStatus.DRIVING
+        while ((drive_status == DriveStatus.DRIVING) and (mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS)):
+            drive_status = self._follow_wall_step(reflex_right_start, distance, side)
 
-        cells = 0
-        # Drive until the wanted distance is reached
-        while (reflex_right - reflex_right_start <= distance):
-            if ((reflex_right - reflex_right_start) / 400) > cells:
-                self._save_position(handle_command(Command.read_reflex_right()) - reflex_right_start_2)
-                reflex_right_start += (handle_command(Command.read_reflex_right()) - reflex_right_start_2)
-                reflex_right_start_2 = handle_command(Command.read_reflex_right())
-                
-                before = self.goal
-                self.update_map()
-                reflex_right_start += (handle_command(Command.read_reflex_right()) - reflex_right_start_2)
-                if self.goal == Goal.FIND_ISLAND and before != self.goal:
-                    return DriveStatus.DONE
-                cells += 1
-            # Get sensor values
-            reflex_right = handle_command(Command.read_reflex_right())
-            ir_front = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir())
+        if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
+            return DriveStatus.WAITING
+        else:
+            return drive_status
 
-            if side == "right":
-                ir_side_back, ir_side_front = self.read_ir_side(Direction.RIGHT)
-            else:
-                ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
-
-            # Detect corridor to the right
-            if (ir_side_front >= self.TURN_OVERRIDE_DIST):
-                self.logger.debug("IR - front: " + str(ir_side_front) + " IR - back: " + str(ir_side_back) + " list_dist: " + str(self._last_dist))
-                # Save the given length driven
-                self._save_position(reflex_right - reflex_right_start)
-                self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-                if side == "right":
-                    return DriveStatus.CORRIDOR_DETECTED_RIGHT
-                else:
-                    return DriveStatus.CORRIDOR_DETECTED_LEFT
-
-            # Obstacle detected, and no turn to the right
-            if(ir_front < self.OBSTACLE_DIST):
-                # Save the given length driven
-                handle_command(Command.stop_motors())
-                self._save_position(reflex_right - reflex_right_start)
-                return DriveStatus.OBSTACLE_DETECTED
-
-            # We need to get the distance from the center of the robot perpendicular to the wall
-            # This assumes that we have a wall on either side (i.e. we are in a corridor)
-            # TODO: Different cases for corridors and open rooms.
-            dist_side = (ir_side_front + ir_side_back) / 2
-            angle_side = math.atan2(ir_side_back - ir_side_front, self.SENSOR_SPACING)
-            perpendicular_dist_side = dist_side * math.cos(angle_side)
-            # logger.debug("PERPENDICULAR DIST RIGHT:", perpendicular_dist_right)
-            self.pid_controller.input_data = perpendicular_dist_side
-            self.pid_controller.d_term = angle_side
-            self.pid_controller.compute()
-            self.pid_controller.output_data += 100
-            self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front,100, distance - (reflex_right - reflex_right_start)), 200) / 200, side)
-            if side == "right":
-                self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-            else:
-                self._last_dist = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-
-        # Save the given length driven
-        handle_command(Command.stop_motors())
-        self._save_position(reflex_right - reflex_right_start)
-        return DriveStatus.DONE
+    def update_pid(self):
+        """
+        Update the PID values.
+        """
+        self.pid_controller.kp = 0
+        self.pid_controller.ki = 0
+        self.pid_controller.kd = 0
+        self.pid_controller.set_tunings(3, 0, -200)
 
     def scan(self):
         """
@@ -544,14 +562,6 @@ class Robot:
         handle_command(Command.servo(180))
 
         return recorded_data
-
-    def autonom_mode(self):
-        """
-        Drive autonomously through the room.
-        """
-        # Update the path_queue for positions to drive
-        find_next_destination()
-
 
     def stand_perpendicular(self, side: str):
         """
@@ -664,9 +674,6 @@ class Robot:
         dist_list = dist_list[1:]
         return dist_list
 
-
-
-
     def _follow_wall_help(self, ratio : int, base_speed : int, side="right"):
         """
         Calculate motor speeds and send drive instruction.
@@ -726,181 +733,3 @@ def sensor_test(robot):
         lidar = robot._median_sensor(1, Command.read_lidar())
         robot.logger.debug("IR_RIGHT_BACK: " + str(ir_right_back) + " IR_RIGHT_FRONT : " + str(ir_right_front) + " LIDAR: " + str(lidar), "IR_LEFT_BACK", ir_left_back, "IR_LEFT_FRONT", ir_left_front, "IR_BACK", ir_back)
 
-def victory_dance():
-    while True:
-        handle_command(Command.servo(0))
-        time.sleep(0.75)
-        handle_command(Command.servo(180))
-        time.sleep(0.75)
-
-def main(argv):
-    # create logger
-    logger = logging.getLogger()
-    ch = logging.StreamHandler()
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbosity", type = int, default = 1, choices = range(0, 3), help = "Verbosity level. 0 is lowest and 2 highest. Default 1.")
-    args = parser.parse_args()
-
-    verbosity = args.verbosity
-    if (verbosity == 0):
-        logger.disabled = True
-        ch.disabled = True
-    elif (verbosity == 1):
-        logger.setLevel(logging.INFO)
-        ch.setLevel(logging.INFO)
-    elif (verbosity == 2):
-        logger.setLevel(logging.DEBUG)
-        ch.setLevel(logging.DEBUG)
-
-    # create formatter
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
-    # add formatter to ch
-    ch.setFormatter(formatter)
-
-    # add ch to logger
-    logger.addHandler(ch)
-
-    robot = Robot(ControllerMode.MANUAL, logger)
-
-    # Turn LIDAR to 90 degrees
-    servo_instr = Command.servo(180)
-    handle_command(servo_instr)
-
-    # Wait fot LIDAR to be in position
-    time.sleep(1)
-#    sensor_test(robot)
-
-    g = grid_map.GridMap()
-
-    print (robot.get_position())
-    #print("lidar", robot.scan())
-    g.debug_print()
-#    time.sleep(10)
-    # Try driving in infinite loop around the maze
-    while 1:
-            robot.pid_controller.kp = 0
-            robot.pid_controller.ki = 0
-            robot.pid_controller.kd = 0
-            robot.pid_controller.set_tunings(3, 0, -200)
-            # Drive forward without crashing in wall
-            if robot.goal == Goal.NONE:
-                victory_dance()
-                break
-            if robot.goal == Goal.FIND_ISLAND:
-                status = robot.follow_wall(99999999, side = "right")
-            elif robot.goal == Goal.MAP_ISLAND:
-                robot_position = robot.get_position()
-                if (robot.start_cell_at_island == approximate_to_cell(robot_position) and robot.has_been_to_other_cell):
-                    robot.leave_island()
-                    robot.logger.info("RETURNING HOME!")
-                    status = robot.follow_wall(999999, side = "left")
-                elif (robot.start_cell_at_island != approximate_to_cell(robot_position)):
-                    robot.has_been_to_other_cell = True
-                    status = robot.follow_wall(999999, side = "right")
-                else:
-                    status = robot.follow_wall(999999, side = "right")
-            elif robot.goal == Goal.RETURN_HOME:
-                status = robot.follow_wall(9999999, side = "left")
-            else:
-                status = robot.follow_wall(9999999, side = "right")
-            handle_command(Command.stop_motors())    
-            logger.debug(robot.get_position())
-            logger.debug(robot.get_driven_dist())
-            logger.info("Explore island: " + str(robot.goal == Goal.MAP_ISLAND))
-            
-            robot.update_map()
-
-            if (status == DriveStatus.OBSTACLE_DETECTED):
-                logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
-                turn_instr = Command.stop_motors()
-                handle_command(turn_instr)
-                while robot._is_moving(): pass
-                ir_right_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_right_front_ir())
-                ir_left_front = robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_left_front_ir())
-
-                if ir_right_front > robot.TURN_OVERRIDE_DIST and ir_left_front > robot.TURN_OVERRIDE_DIST:
-                    #robot.stand_perpendicular('left')
-                    robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                    while robot._is_moving(): pass
-                    #robot.stand_perpendicular('left')
-                elif ir_right_front < robot.TURN_OVERRIDE_DIST and ir_left_front < robot.TURN_OVERRIDE_DIST:
-                    #robot.stand_perpendicular('right')
-                    robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                    while robot._is_moving(): pass
-                    #robot.stand_perpendicular('right')
-                else:
-                    if (ir_right_front > ir_left_front):
-                        #robot.stand_perpendicular('left')
-                        robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                        while robot._is_moving(): pass
-                        #robot.stand_perpendicular('left')
-                        
-                    else:
-                        #robot.stand_perpendicular('right')
-                        robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                        while robot._is_moving(): pass
-                        #robot.stand_perpendicular('right')
-                robot.pid_controller.kp = 0
-                robot.pid_controller.ki = 0
-                robot.pid_controller.kd = 0
-                robot.pid_controller.set_tunings(3, 0, -200)
-                #Test the map functionality
-            elif (status == DriveStatus.CORRIDOR_DETECTED_RIGHT):
-                logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
-                turn_instr = Command.stop_motors()
-                handle_command(turn_instr)
-                while robot._is_moving(): pass
-                #robot.stand_perpendicular('left')
-                robot.drive_distance(robot.CORRIDOR_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
-                robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                while robot._is_moving(threshold = 30): pass
-
-                # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                """if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 200:
-                    logger.info("Not a corridor, moving back")
-                    robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                    robot.stand_perpendicular('right')
-                    while robot._is_moving(threshold = 30): pass
-                else:"""
-                    # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
-                    # As it is now, a right turn into a single square corridor does not work well.
-                robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
-                while robot._is_moving(): pass
-                    #robot.stand_perpendicular('right')
-                    #robot.stand_perpendicular('left')
-                robot.pid_controller.kp = 0
-                robot.pid_controller.ki = 0
-                robot.pid_controller.kd = 0
-                robot.pid_controller.set_tunings(3, 0, -200)
-            elif (status == DriveStatus.CORRIDOR_DETECTED_LEFT):
-                logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
-                turn_instr = Command.stop_motors()
-                handle_command(turn_instr)
-                while robot._is_moving(): pass
-                robot.drive_distance(robot.CORRIDOR_TURN_ENTRY_DIST, robot.BASE_SPEED, save_new_distance = True)
-                robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                while robot._is_moving(threshold = 30): pass
-
-                # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-                if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 150:
-                    logger.info("Not a corridor, moving back")
-                    robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-                    robot.stand_perpendicular('left')
-                    while robot._is_moving(threshold = 30): pass
-                else:
-                    # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
-                    # As it is now, a right turn into a single square corridor does not work well.
-                    robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
-                    while robot._is_moving(): pass
-                    #robot.stand_perpendicular('left')
-                    #robot.stand_perpendicular('right')
-                robot.pid_controller.kp = 0
-                robot.pid_controller.ki = 0
-                robot.pid_controller.kd = 0
-                robot.pid_controller.set_tunings(3, 0, -200)
-            robot._grid_map.debug_print()
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
