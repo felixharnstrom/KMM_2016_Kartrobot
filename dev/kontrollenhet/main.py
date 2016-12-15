@@ -29,9 +29,9 @@ def autonomous_step(robot : Robot):
             status = robot.follow_wall(999999, side = "left")
         elif (robot.start_cell_at_island != approximate_to_cell(robot_position)):
             robot.has_been_to_other_cell = True
-            status = robot.follow_wall(200, side = "right")
+            status = robot.follow_wall(999999, side = "right")
         else:
-            status = robot.follow_wall(200, side = "right")
+            status = robot.follow_wall(999999, side = "right")
     elif robot.goal == Goal.RETURN_HOME:
         status = robot.follow_wall(9999999, side = "left")
     else:
