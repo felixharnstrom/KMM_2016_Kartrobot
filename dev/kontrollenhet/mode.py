@@ -15,7 +15,7 @@ class ControlModeEnums(Enum):
 _mode = ControlModeEnums.MANUAL
 """Lock used for reading/editing our current mode"""
 _mode_lock = threading.Lock()
-    
+
 def set_mode(new_mode : ControlModeEnums):
     """
     Sets the current mode to the given mode.
@@ -24,6 +24,7 @@ def set_mode(new_mode : ControlModeEnums):
         :param new_mode (ControlModeEnums): The new mode to set
     """
     global _mode
+    print("Mode changed")
     _mode_lock.acquire()
     _mode = new_mode
     _mode_lock.release()
@@ -45,6 +46,7 @@ def toggle_mode():
     Toggles the current mode between AUTONOMOUS and MANUAL.
     """
     global _mode
+    print("Mode changed toggled.")
     _mode_lock.acquire()
     if(_mode == ControlModeEnums.AUTONOMOUS):
         _mode = ControlModeEnums.MANUAL
