@@ -51,6 +51,13 @@ class DriveStatus:
     CORRIDOR_DETECTED_LEFT = 2
     DONE = 3
 
+class Goal:
+    MAP_OUTER_WALLS = 0
+    FIND_ISLAND = 1
+    DRIVE_TO_ISLAND = 2
+    MAP_ISLAND = 3
+    RETURN_HOME = 4
+    NONE = 5
 
 def unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
     """
@@ -147,8 +154,7 @@ class Robot:
         control_device  (str): Device name of the USB<->Serial converter for the control unit.
 
     Attributes:
-        look_for_island             (bool): True if the robot should be scanning for an island.
-        explore_island              (bool): True if the robot have reached the island and is exploring it
+        goal                        (Goal): What we're currently trying to do
         return_home                 (bool): True if the robot should return home
         grid_map                    (GridMap): Mapping of room.
         start_cell_at_island        (Position): Start cell at island.
@@ -183,9 +189,7 @@ class Robot:
     def __init__(self, mode: ControllerMode, logger):
         # Public attributes
         self.grid_map = GridMap()
-        self.look_for_island = False
-        self.explore_island = False
-        self.return_home = False
+        self.goal = Goal.MAP_OUTER_WALLS
         self.start_cell_at_island = Position(0,0)
         self.driven_distance = 0
         self.current_angle = 0
@@ -319,6 +323,7 @@ class Robot:
 
         return Position(x,y)
 
+    
     def get_angle(self):
         """
         Return the angle in the intervall 0 <= angle <= 360.
@@ -330,12 +335,10 @@ class Robot:
         elif (self.current_angle < 0):
             return 360 - abs(self.current_angle) % 360
 
+    
     def update_map(self):
         """
         Update the gridmap with new scan data.
-        
-        Returns:
-			(bool): Returns True if the robot should drive to the island
         """
         lines = movement_to_lines(self.path_trace, Position(self._x_start, self._y_start))
         cells = movement_lines_to_cells(lines, 1)
@@ -344,7 +347,7 @@ class Robot:
         #print(self.path_trace[0:max(len(self.path_trace)-1, 20)])
         self.logger.info("Current cell" +str(cells[-1]))
         self.logger.info("Current path" +str(self.path_trace))
-        if not self.look_for_island and len(cells) > 0:
+        if self.goal == Goal.MAP_OUTER_WALLS and len(cells) > 0:
             self.grid_map = GridMap()
             self._add_garage(cells[0])
             make_open(cells, self.grid_map)
@@ -356,8 +359,10 @@ class Robot:
             self.logger.info("end: " + str(cells[-1]))
             if cells[-1] == cells[0] and len(cells) > 1:
                 # We've returned to the garage
-                self.look_for_island = True
+                self.goal = Goal.FIND_ISLAND
                 self.logger.warning("In garage - looking for island")
+
+        # Print grid
         old = self.grid_map.get(cells[-1].x, cells[-1].y)
         self.grid_map.set(cells[-1].x, cells[-1].y, CellType.LOCATION)
         self.grid_map.debug_print(print_origin = True)
@@ -365,25 +370,23 @@ class Robot:
         self.logger.info("ANGLE: " + str(self.get_angle()))
         self.logger.info("POS: " + str(self.get_position()))
         
-        if self.look_for_island and cells:
+        if self.goal == Goal.FIND_ISLAND and cells:
             # We should no longer need to check if we need to scan, as long as we
             #   do this on every turn. left_island_exists does this implicitly.
             is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
             time.sleep(0.75)
             if is_island:
-                self.logger.info("ISLAND!!!")
-                #Turn the servo to the left
-                return True
-            else:
-                self.logger.info("No island :(")
+                self.logger.info("ISLAND!")
+            if is_island and distance < self.DRIVE_TO_ISLAND_THRESHOLD:
+                self.logger.info("DRIVE TO ISLAND!")
+                self.drive_to_island()
             
-        if cells and cells[-1] == cells[0] and self.grid_map.is_complete(cells[0]):
+        if cells and cells[-1] == cells[0] and self.goal == Goal.RETURN_HOME:
             # We're done!
             self.logger.info("================")
             self.logger.info(" D O N E")
             self.logger.info("================")
-            
-        return False
+            self.goal = Goal.NONE
 
 
     def drive_distance(self, dist: int, speed: int, save_new_distance=False):
@@ -559,8 +562,7 @@ class Robot:
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.RIGHT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
-        self.explore_island = False
-        self.return_home = True
+        self.goal = Goal.RETURN_HOME
             
     def drive_to_island(self):
         """
@@ -571,8 +573,8 @@ class Robot:
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.start_cell_at_island = approximate_to_cell(self.get_position())
-        self.look_for_island = False
-        self.explore_island = True
+        self.goal = Goal.MAP_ISLAND
+
 
     def _add_garage(self, where:Position):
         """
@@ -726,9 +728,9 @@ def main(argv):
             robot.pid_controller.kd = 0
             robot.pid_controller.set_tunings(3, 0, -200)
             # Drive forward without crashing in wall
-            if robot.look_for_island:
+            if robot.goal == Goal.FIND_ISLAND:
                 status = robot.follow_wall(400, side = "right")
-            elif robot.explore_island:
+            elif robot.goal == Goal.MAP_ISLAND:
                 robot_position = robot.get_position()
                 if (robot.start_cell_at_island == approximate_to_cell(robot_position) and robot.has_been_to_other_cell):
                     robot.leave_island()
@@ -739,24 +741,17 @@ def main(argv):
                     status = robot.follow_wall(200, side = "right")
                 else:
                     status = robot.follow_wall(200, side = "right")
-            elif robot.return_home:
+            elif robot.goal == Goal.RETURN_HOME:
                 status = robot.follow_wall(9999999, side = "left")
             else:
                 status = robot.follow_wall(9999999, side = "right")
             handle_command(Command.stop_motors())    
             logger.info(robot.get_position())
             logger.info(robot.path_trace)
-            logger.info("Explore island: " + str(robot.explore_island))
+            logger.info("Explore island: " + str(robot.goal == Goal.MAP_ISLAND))
             
-            #TODO: Change the argument to something understandable
-            drive_to_island = robot.update_map()
+            robot.update_map()
 
-            # Drive to the island if it is close enough
-            if drive_to_island:
-                distance_to_island = handle_command(Command.read_lidar())
-                if distance_to_island <= robot.DRIVE_TO_ISLAND_THRESHOLD:
-                    robot.drive_to_island()
-            
             if (status == DriveStatus.OBSTACLE_DETECTED):
                 logger.info("---------- OBSTACLE DETECTED! \n---------- TURNING LEFT 90 degrees")
                 turn_instr = Command.stop_motors()
