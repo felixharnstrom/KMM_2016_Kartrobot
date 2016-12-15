@@ -78,10 +78,20 @@ class gui_thread(threading.Thread):
                 self.ir_behind.set(sensor_data_dict["IR_BACK"])
                 self.lidar.set(sensor_data_dict["LIDAR"])
                 self.gyro.set(sensor_data_dict["GYRO"])
-                #self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
-                #self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
+                self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
+                self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
                 #TODO: Send this from PC in the sensor_data dict
                 #self.distance.set(sensor_data_dict["DISTANCE"])
+            elif command[0] == "update_mode":
+                #0 = autonomous, 1 = manual
+                mode_integer = command[1]
+                self.mode_var.set(mode_integer)
+            elif command[0] == "update_map":
+                self.canvas.delete("all")
+                robot_xy = command[1] # [x,y]
+                map_data = command[2]
+                self.draw_robot_position(robot_xy[0], robot_xy[1])
+                self.draw_map(map_data)
         return
 
     def run(self):
@@ -129,16 +139,16 @@ class gui_thread(threading.Thread):
         # Each button will place a command in the queue using send_command
 
         # Mode switching buttons
-        mode_var = tkinter.IntVar()
-        R1 = tkinter.Radiobutton(button_frame, text="Manual", variable=mode_var, value=1,
+        self.mode_var = tkinter.IntVar()
+        R1 = tkinter.Radiobutton(button_frame, text="Manual", variable=self.mode_var, value=1,
                          command=lambda message="mode_manual": self.send_command(message))
         R1.pack()
 
-        R2 = tkinter.Radiobutton(button_frame, text="Autonomous", variable=mode_var, value=2,
+        R2 = tkinter.Radiobutton(button_frame, text="Autonomous", variable=self.mode_var, value=0,
                          command=lambda message="mode_autonomous": self.send_command(message))
         R2.pack()
 
-        mode_var.set(1)
+        self.mode_var.set(1)
 
         
         self.left_motor_speed = tkinter.DoubleVar()
@@ -242,6 +252,10 @@ class gui_thread(threading.Thread):
                                      x + 5, y + 5,
                                      fill="black")
 
+    def place_robot_on_canvas(self, x, y):
+        self.canvas.create_rectangle(x - 5, y - 5,
+                             x + 5, y + 5,
+                             fill="red")
         pass
 
     def draw_map(self, map : list):
@@ -249,4 +263,10 @@ class gui_thread(threading.Thread):
             for y,mapy in enumerate(mapx):
                 if mapy==1:
                     self.place_marker_on_canvas(100+x*10,100+y*10)
+                    
+    def draw_robot_position(self, pos_list : list):
+        x_pos = pos_list[0]
+        y_pos = pos_list[1]
+        self.place_robot_on_canvas(100+x_pos*10, 100+y_pos*10)
+        
 

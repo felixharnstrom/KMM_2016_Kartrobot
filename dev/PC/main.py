@@ -13,11 +13,23 @@ from datetime import datetime
 
 def send_command(command, socket, guit):
     """
-        Transmits 'TRANSMIT' followed by the respective function
-        for a command, then waits for acknowledge.
-        command" are the strings from the gui thread.
+        Transmits command type, then waits for acknowledge.
+        Then transmits or receives the payload for that command.
+        
+        Args:
+            :
     """
-    if len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
+    if command="get_map_update":
+        send_data(socket, "SEND_MAP")
+        ack = receive_data(socket)
+        robot_map_data = receive_data(socket) # [[robot_x, robot_y], [map..]
+        guit.receive_command(["update_map", robot_map_data])
+    elif command="sync_mode":
+        send_data(socket, "SYNC_MODE") #0 is autonomous, 1 is manual
+        ack = receive_data(socket)
+        current_mode_integer = receive_data()
+        guit.receive_command(["update_mode", current_mode_integer])     
+    elif len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
         send_data(socket, "KEY_EVENT")
         ack = receive_data(socket)
         send_data(socket, command[4:])
@@ -67,20 +79,25 @@ def main(argv):
     
     #Timestamps to update sensor/motor values every diff_time_trigger seconds.
     current_time = datetime.now()
-    last_time = current_time
-    diff_time_trigger = 0.5 #Trigger every 1.0s
+    last_time_diag = current_time
+    last_time_map = current_time
+    diff_diag_trigger = 0.5 #Trigger every 0.5s
+    diff_map_trigger = 5.0 #Trigger ever 5s
     
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
     while True:
         current_time = datetime.now()
-        diff = (current_time - last_time).total_seconds()
-        if(diff >= diff_time_trigger): 
+        diff_diag = (current_time - last_time_diag).total_seconds()
+        diff_map = (current_time - last_time_map).total_seconds()
+        if(diff_diag >= diff_diag_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
-            last_time = current_time
+            last_time_diag = current_time
             send_command("get_motor_data", robot.client, guit)
             send_command("get_sensor_data", robot.client, guit)
-        # TODO: Update if map changed
+        if(diff_map >= digg_map_trigger):
+            last_time_map = current_time
+            send_command("get_map_update", robot.client, guit)   
         #guit.draw_map(map)
         if not command_queue.empty():
             # There is a command. Lets get it.
@@ -105,7 +122,6 @@ def main(argv):
         time.sleep(0.01)
     # Reset settings
     os.system("xset r on")
-    
     print("exiting")
 
 if __name__ == "__main__":
