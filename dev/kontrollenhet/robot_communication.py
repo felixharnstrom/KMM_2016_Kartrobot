@@ -257,10 +257,11 @@ def handle_command(command : Command):
             c_enum == CommandEnums.READ_IR_RIGHT_FRONT or
             c_enum == CommandEnums.READ_IR_RIGHT_BACK or
             c_enum == CommandEnums.READ_IR_BACK or
-            c_enum == CommandEnums.READ_LIDAR or
-            c_enum == CommandEnums.READ_REFLEX_LEFT or
-            c_enum == CommandEnums.READ_REFLEX_RIGHT):
+            c_enum == CommandEnums.READ_LIDAR):
         return read_ir_sensor(command)
+    elif (c_enum == CommandEnums.READ_REFLEX_LEFT or
+            c_enum == CommandEnums.READ_REFLEX_RIGHT):
+        return read_ir_sensor(command) * 1.0875
     elif(c_enum == CommandEnums.READ_GYRO):
         return read_gyro_sensor(command)
     else:
