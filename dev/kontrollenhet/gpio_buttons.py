@@ -6,7 +6,7 @@ import threading
 import mode
 
 SHUTDOWN_PIN = 2
-CHANGE_MODE_PIN = 14
+CHANGE_MODE_PIN = 16 #CHANGE BACK WHEN FIXED
 
 def launch_poll_threads():
     def init():
@@ -26,6 +26,7 @@ def launch_poll_threads():
         while True:
             time.sleep(0.05)
             if GPIO.input(CHANGE_MODE_PIN):
+                print("CHANGE_MODE_INPUT_DETECTED")
                 mode.toggle_mode()
     init()
     shutdown_t = threading.Thread(target=poll_shutdown)
