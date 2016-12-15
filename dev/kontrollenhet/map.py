@@ -276,10 +276,23 @@ def add_walls(open_cells, grid_map):
             #set_to_wall_if_unknown(start.x+1, start.y, grid_map)
         if open_cells[i].direction == Direction.UP:
             set_to_wall_if_unknown(start.x+1, start.y, grid_map)
-            #set_to_wall_if_unknown(start.x-1, start.y, grid_map)
+        if open_cells[i].direction == Direction.NONE and i > 0:
+            # Fixes cul-de-sacs
+            prev_dir = open_cells[i-1].direction
+            if prev_dir == Direction.RIGHT:
+                set_to_wall_if_unknown(start.x+1, start.y, grid_map)
+            if prev_dir == Direction.LEFT:
+                set_to_wall_if_unknown(start.x-1, start.y, grid_map)
+            if prev_dir == Direction.DOWN:
+                set_to_wall_if_unknown(start.x, start.y+1, grid_map)
+            if prev_dir == Direction.UP:
+                set_to_wall_if_unknown(start.x, start.y-1, grid_map)
         # Now available in animation!
         #grid_map.debug_print()
         #time.sleep(0.1)
+        
+                
+            
 
 def median_sensor(it : int, sensor_instr : Command):
     """
