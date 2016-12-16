@@ -675,9 +675,9 @@ class Robot:
         if self.goal == Goal.MAP_ISLAND:
             self.driven_distance += unsaved_distance * 1.08
         elif self.goal == Goal.RETURN_HOME:
-            self.driven_distance += unsaved_distance * 1.08
+            self.driven_distance += unsaved_distance * 0.98
         else:
-            self.driven_distance += unsaved_distance * 0.95
+            self.driven_distance += unsaved_distance * 0.98
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def get_driven_dist(self):
