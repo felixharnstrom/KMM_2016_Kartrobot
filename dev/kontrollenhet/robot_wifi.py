@@ -6,10 +6,11 @@ import threading
 import queue
 import mode
 import socket
+import robot_map_data
 
 #output_queue = queue.Queue() #What should we send to the pc
 
-def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Queue, robot_pos : list):
+def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
     """
     Continously retrieves messages from and transmits messages to the PC. Messages from the PC are interpreted and handled depending on their meta-message.
     This functions prime purpose is to make the PC able to communicate with the robot, and messages may therefor be used to affect its function.
@@ -29,8 +30,8 @@ def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Q
                 do_reconnect = False
             # The messages are made with json which appends extra "" - cut them off
             data = receive_data(s.client)
-            print("-"*40)
-            print("Data received from PC: ", data)
+            #print("-"*40)
+            #print("Data received from PC: ", data)
             # Acknowledge client
             send_data(s.client, "ACK")
             if (data == "TRANSMIT"):
@@ -53,9 +54,11 @@ def wifi_main(motor_data, sensor_data, map_lock, grid_map, input_queue : queue.Q
                     #TODO: Notify client of this action? Also, stop the the robot from moving.
                     input_queue.put(("KEY_EVENT",key_event))
             elif (data == "SEND_MAP"):
-                map_lock.acquire()
-                send_data(s.client, json.dumps(grid_map.gui_drawable(robot_pos.x, robot_pos.y)))
-                map_lock.release()
+                #map_lock.acquire()
+                map_output = robot_map_data.get_grid_map()
+                print(map_output)
+                send_data(s.client, json.dumps(map_output))
+                #map_lock.release()
             elif (data == "TOGGLE_MODE"):
                 #Change the mode
                 new_mode = receive_data(s.client)

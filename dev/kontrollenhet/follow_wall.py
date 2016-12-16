@@ -360,6 +360,7 @@ class Robot:
         old = self.grid_map.get(cells[-1].x, cells[-1].y)
         self.grid_map.set(cells[-1].x, cells[-1].y, CellType.LOCATION)
         self.grid_map.debug_print(print_origin = True)
+        self.grid_map.robot_pos = Position(cells[-1].x, cells[-1].y)
         self.grid_map.set(cells[-1].x, cells[-1].y, old)
         self.logger.info("ANGLE: " + str(self.get_angle()))
         self.logger.info("POS: " + str(self.get_position()))

@@ -25,16 +25,16 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
                 "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
 """The internal representation of the map."""
-grid_map = GridMap()
-robot_pos = [0,0]
+#grid_map = GridMap()
+#robot_pos = [0,0]
 #Test case
-for i in range(0,17):
-    for j in range(0,17):
-        rand = random.randint(0,1)
-        if rand == 0:
-            grid_map.set(i,j,CellType.WALL)
-        else:
-            grid_map.set(i,j,CellType.OPEN)
+#for i in range(0,17):
+#  for j in range(0,17):
+#       rand = random.randint(0,1)
+#        if rand == 0:
+#            grid_map.set(i,j,CellType.WALL)
+#        else:
+#            grid_map.set(i,j,CellType.OPEN)
         
 #grid_map.set(0,0, CellType.WALL)
 #grid_map.set(0,1, CellType.WALL)
@@ -45,12 +45,12 @@ for i in range(0,17):
 #grid_map.set(2,0, CellType.WALL)
 #grid_map.set(2,1, CellType.OPEN)
 #grid_map.set(2,2, CellType.OPEN)
-grid_map.debug_print()
+#grid_map.debug_print()
 
-robot_pos = [random.randint(0,19),random.randint(0,19)]
+#robot_pos = [random.randint(0,19),random.randint(0,19)]
 
 """The lock for map."""
-map_lock = threading.Lock()
+#map_lock = threading.Lock()
 
 def init_UARTs(sensor = "", motor = ""):
     """
@@ -83,7 +83,7 @@ def init_wifi_thread(robot_pos : Position, grid_map : GridMap):
     """
     Initiates and executes a new thread which receives and transmits commands over wifi.
     """
-    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data, map_lock, grid_map, input_queue, robot_pos)).start()
+    threading.Thread(target=robot_wifi.wifi_main,args=(motor_data,sensor_data, input_queue)).start()
 
 def adjust_speeds():
     """

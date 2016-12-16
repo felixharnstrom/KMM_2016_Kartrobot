@@ -44,6 +44,7 @@ class GridMap:
         self._origin = Position(0,0)
         self._width = 1
         self._height = 1
+        self.robot_pos = Position(0,0)
 
     def _expand_down(self):
         """Add a new row at the bottom."""
@@ -205,12 +206,13 @@ class GridMap:
         Returns:
             :return (2D list of ints): A 2D list containing 1's where there are walls, 0 in other places.
         """
-        robot_xy = self._pos_to_index(robot_x, robot_y)
+        robot_xy = self._pos_to_index(self.robot_pos.x, self.robot_pos.y)
         def row_to_drawable(row):
             return [(1 if cell == CellType.WALL else 0) for cell in row]
 
         map_list = [row_to_drawable(row) for row in self._grid]
-        return ((robot_xy.x, robot_xy.y),map_list)
+        print("ROBOT X:", robot_xy.x, "ROBOT Y:", robot_xy.y)
+        return [[robot_xy.x, robot_xy.y],map_list]
 
     def debug_print(self, print_origin=False):
         """
