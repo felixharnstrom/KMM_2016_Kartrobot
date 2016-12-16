@@ -36,9 +36,9 @@ def get_mode():
     Returns:
         :return (ControlModeEnums): The mode which we are currently in.
     """
-    _mode_lock.acquire()
+    #_mode_lock.acquire()
     mode_enum = _mode
-    _mode_lock.release()
+    #_mode_lock.release()
     return mode_enum
 
 def toggle_mode():
