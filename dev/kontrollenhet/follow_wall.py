@@ -192,7 +192,7 @@ class Robot:
         self.has_been_to_other_cell = False
         self.START_X = 200
         self.BLOCK_SIZE = 400
-        self.IR_MEDIAN_ITERATIONS = 3
+        self.IR_MEDIAN_ITERATIONS = 1
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
@@ -460,10 +460,10 @@ class Robot:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
-                
+            self._save_position(self._reflex_right_start_2 - self._reflex_right_start)
             before = self.goal
             self.update_map()
-            self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            self._reflex_right_start = handle_command(Command.read_reflex_right())
             if self.goal == Goal.FIND_ISLAND and before != self.goal:
                 return DriveStatus.DONE
             self._cells += 1
