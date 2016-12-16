@@ -456,7 +456,7 @@ class Robot:
             self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
-        if ((reflex_right - self._reflex_right_start) / 50) > self._cells:
+        if ((reflex_right - self._reflex_right_start) / 25) > self._cells:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
@@ -677,7 +677,7 @@ class Robot:
         elif self.goal == Goal.RETURN_HOME:
             self.driven_distance += unsaved_distance * 1.08
         else:
-            self.driven_distance += unsaved_distance * 0.9195402298850575
+            self.driven_distance += unsaved_distance * 0.95
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def get_driven_dist(self):
