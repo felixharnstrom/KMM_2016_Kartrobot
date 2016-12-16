@@ -198,7 +198,7 @@ class Robot:
         self.TURN_MIN_DIST = 100
         self.CORRIDOR_TURN_ENTRY_DIST = 100
         self.CORRIDOR_TURN_EXIT_DIST = 250
-        self.OBSTACLE_SAFETY_OVERRIDE = 30
+        self.OBSTACLE_SAFETY_OVERRIDE = 50
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 80
         self.SENSOR_SPACING = 95
@@ -472,7 +472,7 @@ class Robot:
                 robot_position = self.get_position()
                 if (self.start_cell_at_island == approximate_to_cell(robot_position) and self.has_been_to_other_cell):
                     handle_command(Command.stop_motors())
-                    self.stand_perpendicular("right")
+                    #self.stand_perpendicular("right")
                     self.leave_island()
                     self.logger.info("RETURNING HOME!")
                     return DriveStatus.DONE
@@ -623,7 +623,7 @@ class Robot:
 		the robot will follow the right side of the wall.
         """
         handle_command(Command.stop_motors())
-        self.stand_perpendicular("right")
+        #self.stand_perpendicular("right")
         time.sleep(0.5)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
