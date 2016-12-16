@@ -20,7 +20,6 @@ import math
 import sys
 import argparse
 import logging
-import mode
 from map import *
 import numpy as np
 from command import Command
@@ -517,13 +516,10 @@ class Robot:
         
         # Drive until the wanted distance is reached unless the automus mode is turned off
         drive_status = DriveStatus.DRIVING
-        while ((drive_status == DriveStatus.DRIVING) and (mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS)):
+        while (drive_status == DriveStatus.DRIVING):
             drive_status = self._follow_wall_step(distance, side)
 
-        if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
-            return DriveStatus.WAITING
-        else:
-            return drive_status
+        return drive_status
 
     def update_pid(self):
         """
