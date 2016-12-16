@@ -88,7 +88,7 @@ class gui_thread(threading.Thread):
                 self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
                 self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
                 #TODO: Send this from PC in the sensor_data dict
-                #self.distance.set(sensor_data_dict["DISTANCE"])
+                self.distance.set(sensor_data_dict["DISTANCE"])
             elif command[0] == "update_mode":
                 #0 = autonomous, 1 = manual
                 mode_integer = command[1]
