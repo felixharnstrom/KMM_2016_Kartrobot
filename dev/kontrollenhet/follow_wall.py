@@ -195,8 +195,8 @@ class Robot:
         self.GYRO_MEDIAN_ITERATIONS = 32
         self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 130
-        self.CORRIDOR_TURN_EXIT_DIST = 350
+        self.CORRIDOR_TURN_ENTRY_DIST = 100
+        self.CORRIDOR_TURN_EXIT_DIST = 250
         self.OBSTACLE_SAFETY_OVERRIDE = 30
         self.EDGE_SPIKE_FACTOR = 2
         self.OBSTACLE_DIST = 80
@@ -345,9 +345,10 @@ class Robot:
             self.grid_map = GridMap()
             self._add_garage(cells[0])
             make_open(cells, self.grid_map)
-            self.grid_map.debug_print()
-            self.logger.info("---------")
             add_walls(cells, self.grid_map)
+            # is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
+            # bla = approximate_to_cell(Position(self.get_position().x + math.cos(self.get_angle() - 90)*distance, self.get_position().y + math.sin(self.get_angle() - 90)*distance))
+            # self.grid_map.set(bla.x, bla.y, CellType.WALL)
             self.logger.info("STOP")
             self.logger.info("start: " + str(cells[0]))
             self.logger.info("end: " + str(cells[-1]))
@@ -384,7 +385,7 @@ class Robot:
             self.goal = Goal.NONE
 
 
-    def drive_distance(self, dist: int, speed: int, save_new_distance=False):
+    def drive_distance(self, dist: int, speed: int, direction: int = 1, save_new_distance=False):
         """
         Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
 
@@ -396,7 +397,7 @@ class Robot:
         """
         reflex_right_start = handle_command(Command.read_reflex_right())
         reflex_right = reflex_right_start
-        handle_command(Command.drive(1, speed, 0))
+        handle_command(Command.drive(direction, speed, 0))
         # logger.debug("LIDAR INIT: ", lidar_init)
         while(reflex_right - reflex_right_start < dist):
             reflex_right = handle_command(Command.read_reflex_right())
@@ -404,11 +405,13 @@ class Robot:
             if lidar_cur < self.OBSTACLE_SAFETY_OVERRIDE:
                 handle_command(Command.stop_motors())
                 if save_new_distance:
+                    print ("Saving drive_distance", (reflex_right - reflex_right_start))
                     self._save_position(reflex_right - reflex_right_start)
                 return False
             # logger.debug("LIDAR CURRENT: ", lidar_cur)
         handle_command(Command.stop_motors())
         if save_new_distance:
+            print ("Saving drive_distance", (reflex_right - reflex_right_start))
             self._save_position(reflex_right - reflex_right_start)
         return True
 
@@ -437,7 +440,7 @@ class Robot:
             self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
-        if ((reflex_right - self._reflex_right_start) / 400) > self._cells:
+        if ((reflex_right - self._reflex_right_start) / 200) > self._cells:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
@@ -448,6 +451,16 @@ class Robot:
             if self.goal == Goal.FIND_ISLAND and before != self.goal:
                 return DriveStatus.DONE
             self._cells += 1
+            
+            if self.goal == Goal.MAP_ISLAND:
+                robot_position = self.get_position()
+                if (self.start_cell_at_island == approximate_to_cell(robot_position) and self.has_been_to_other_cell):
+                    handle_command(Command.stop_motors())
+                    self.stand_perpendicular("right")
+                    self.leave_island()
+                    self.logger.info("RETURNING HOME!")
+                    return DriveStatus.DONE
+
 
         # Detect corridor to the right
         if (ir_side_front >= self.TURN_OVERRIDE_DIST):
@@ -581,9 +594,11 @@ class Robot:
         """
         Turn left, drive to the wall and turn right 
         """
+        self.drive_distance(100, self.BASE_SPEED, 0, save_new_distance = False)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.RIGHT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
+        self.drive_distance(100, self.BASE_SPEED, 1, save_new_distance = False)
         self.goal = Goal.RETURN_HOME
             
     def drive_to_island(self):
@@ -592,6 +607,7 @@ class Robot:
 		the robot will follow the right side of the wall.
         """
         handle_command(Command.stop_motors())
+        self.stand_perpendicular("right")
         time.sleep(0.5)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
@@ -639,7 +655,12 @@ class Robot:
             unsaved_distance   (int): Reflex data that have been driven but not added to self.driven_distance
         """
         print ("SAVING", unsaved_distance)
-        self.driven_distance += unsaved_distance * 0.9195402298850575
+        if self.goal == Goal.MAP_ISLAND:
+            self.driven_distance += unsaved_distance * 1.08
+        elif self.goal == Goal.RETURN_HOME:
+            self.driven_distance += unsaved_distance * 1.08
+        else:
+            self.driven_distance += unsaved_distance * 0.9195402298850575
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def get_driven_dist(self):
