@@ -456,7 +456,7 @@ class Robot:
             self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
-        if ((reflex_right - self._reflex_right_start) / 200) > self._cells:
+        if ((reflex_right - self._reflex_right_start) / 50) > self._cells:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
@@ -625,6 +625,7 @@ class Robot:
         handle_command(Command.stop_motors())
         #self.stand_perpendicular("right")
         time.sleep(0.5)
+        self.drive_distance(180, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
