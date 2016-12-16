@@ -12,7 +12,7 @@ class ControlModeEnums(Enum):
     MANUAL = 1
 
 """The current mode which we are in."""
-_mode = ControlModeEnums.MANUAL
+_mode = ControlModeEnums.AUTONOMOUS
 """Lock used for reading/editing our current mode"""
 _mode_lock = threading.Lock()
 

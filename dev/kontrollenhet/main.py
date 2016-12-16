@@ -174,7 +174,7 @@ def main():
     # Wait for LIDAR to be in position
     time.sleep(1)
 
-    mode.set_mode(mode.ControlModeEnums.AUTONOMOUS)
+    #mode.set_mode(mode.ControlModeEnums.AUTONOMOUS)
     
     # Loop
     while True:

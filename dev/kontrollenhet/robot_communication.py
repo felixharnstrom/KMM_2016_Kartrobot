@@ -22,7 +22,7 @@ sensor_data = {"IR_LEFT_FRONT":0, "IR_LEFT_BACK":0 ,
                 "IR_RIGHT_FRONT":0, "IR_RIGHT_BACK":0, 
                 "IR_BACK":0, "LIDAR":0,
                 "REFLEX_RIGHT":0, "REFLEX_LEFT":0,
-                "GYRO":0} #Contains the last retrieved sensor data for each type of sensor Command.
+                "GYRO":0, "DISTANCE":0} #Contains the last retrieved sensor data for each type of sensor Command.
 
 """The internal representation of the map."""
 #grid_map = GridMap()

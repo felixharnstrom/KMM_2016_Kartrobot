@@ -25,7 +25,7 @@ import numpy as np
 from command import Command
 from UART import UART
 from pid import Pid
-from robot_communication import handle_command, init_UARTs
+from robot_communication import handle_command, init_UARTs, sensor_data
 import map
 import grid_map
 from geometry import Position
@@ -245,13 +245,15 @@ class Robot:
         return ir_side_back, ir_side_front
 
     def update_map_status(self):
+        global sensor_data
         global grid_map_output
         global robot_distance
         r_pos = self.get_position()
         robot_xy = map.approximate_to_cell(r_pos)
         robot_map_data.set_grid_map(self.grid_map.gui_drawable())
         if self.get_driven_dist():
-            robot_map_data.robot_distance = self.get_driven_dist()[-1][1]
+            sensor_data["DISTANCE"] = self.get_driven_dist()[-1][1]
+            #robot_map_data.robot_distance = self.get_driven_dist()[-1][1]
 
     def turn(self, direction : Direction, degrees : int, speed: int, save_new_angle=False):
         """
@@ -395,6 +397,8 @@ class Robot:
             self.logger.info("================")
             self.goal = Goal.NONE
         self.update_map_status()
+        #Update motor diag
+        handle_command(Command.controller_information())
 
 
     def drive_distance(self, dist: int, speed: int, direction: int = 1, save_new_distance=False):

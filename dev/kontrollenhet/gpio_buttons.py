@@ -5,8 +5,8 @@ import time
 import threading
 import mode
 
-SHUTDOWN_PIN = 2
-CHANGE_MODE_PIN = 16 #CHANGE BACK WHEN FIXED
+SHUTDOWN_PIN = 16
+CHANGE_MODE_PIN = 2 #CHANGE BACK WHEN FIXED
 
 def launch_poll_threads():
     def init():
