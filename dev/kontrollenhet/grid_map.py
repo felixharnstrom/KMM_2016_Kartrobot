@@ -195,7 +195,7 @@ class GridMap:
         """
         return Position(self._width - self._origin.x - 1, self._height - self._origin.y - 1)
 
-    def gui_drawable(self, robot_x, robot_y):
+    def gui_drawable(self):
         """
         Return a version as the GUI would like to see it.
         

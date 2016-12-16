@@ -123,14 +123,7 @@ def autonomous_step(robot : Robot):
         #robot.stand_perpendicular('left')
         robot.update_pid()
 
-def update_map_status(robot : Robot):
-    global grid_map_output
-    global robot_distance
-    r_pos = robot.get_position()
-    robot_xy = map.approximate_to_cell(r_pos)
-    robot_map_data.set_grid_map(robot.grid_map.gui_drawable(robot_xy.x, robot_xy.y))
-    if robot.get_driven_dist():
-        robot_map_data.robot_distance = robot.get_driven_dist()[-1][1]
+
 
 def main():
     """Main loop"""
@@ -209,7 +202,6 @@ def main():
         if mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS:
             if robot == None:
                 robot = Robot(logger)
-            update_map_status(robot)
             autonomous_step(robot)
         else:
             robot = None

@@ -30,6 +30,7 @@ import map
 import grid_map
 from geometry import Position
 import time
+import robot_map_data
 
 # Define directions
 class Direction:
@@ -243,6 +244,15 @@ class Robot:
             ir_side_back = self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_left_back_ir())
         return ir_side_back, ir_side_front
 
+    def update_map_status(self):
+        global grid_map_output
+        global robot_distance
+        r_pos = self.get_position()
+        robot_xy = map.approximate_to_cell(r_pos)
+        robot_map_data.set_grid_map(self.grid_map.gui_drawable())
+        if self.get_driven_dist():
+            robot_map_data.robot_distance = self.get_driven_dist()[-1][1]
+
     def turn(self, direction : Direction, degrees : int, speed: int, save_new_angle=False):
         """
         Turn a certain amount in the given direction at the given speed.
@@ -384,6 +394,7 @@ class Robot:
             self.logger.info(" D O N E")
             self.logger.info("================")
             self.goal = Goal.NONE
+        self.update_map_status()
 
 
     def drive_distance(self, dist: int, speed: int, direction: int = 1, save_new_distance=False):
