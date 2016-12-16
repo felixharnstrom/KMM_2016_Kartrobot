@@ -18,6 +18,13 @@ class gui_thread(threading.Thread):
         threading.Thread.__init__(self)
 
         # Make variables accessible to the whole class
+        self.cell_width = 10
+        self.robot_width =self.cell_width - 2
+        self.max_scanned_rows = 0
+        self.max_scanned_cols = 0
+        self.grid_size = 24 #The number of cells that can appear in the map, 24 to be safe
+        self.grid = []
+        self.robot_rect = None
         self.queue = queue_input
         self.gui = None
         self.pressed_keys = {"left":False, "right":False, "up":False, "down":False}
@@ -87,12 +94,26 @@ class gui_thread(threading.Thread):
                 mode_integer = command[1]
                 self.mode_var.set(mode_integer)
             elif command[0] == "update_map":
-                self.canvas.delete("all")
                 robot_xy = command[1] # [x,y]
                 map_data = command[2]
-                self.draw_robot_position(robot_xy[0], robot_xy[1])
                 self.draw_map(map_data)
+                print("Robot XY:", robot_xy[0],robot_xy[1])
+                self.draw_robot_position(robot_xy[0], robot_xy[1])
         return
+
+    def place_marker_on_canvas(self, canv : tkinter.Canvas, x : int, y : int, size :int, color_string : str):
+       return canv.create_rectangle(x - size, y - size,
+                                     x + size, y + size,
+                                     fill=color_string)
+
+    def init_canvas(self, canv : tkinter.Canvas):
+        for y in range(0,self.grid_size):
+            self.grid.append([])
+            for x in range(0,self.grid_size):
+                self.grid[y].append(self.place_marker_on_canvas(canv, self.cell_width+2*self.cell_width*x,self.cell_width+2*self.cell_width*y, self.cell_width, "white"))
+
+
+
 
     def run(self):
         """Initiates the GUI with previously specified queues."""
@@ -133,7 +154,7 @@ class gui_thread(threading.Thread):
 
         # Place a canvas into canvas_frame
         self.canvas = tkinter.Canvas(canvas_frame, width=window_width/2, height=window_height)
-        self.canvas.place(relx=0.5, rely=1, anchor=tkinter.CENTER)
+        self.canvas.place(height=window_height, width=window_width/2)
 
         # Create a bunch of buttons in the left frame.
         # Each button will place a command in the queue using send_command
@@ -230,7 +251,8 @@ class gui_thread(threading.Thread):
         self.distance = tkinter.DoubleVar()
         distance_lab = tkinter.Label(sensor_frame, textvariable=self.distance)
         distance_lab.grid(row=13, column=0, columnspan=2, padx = 18)
-
+        
+        self.init_canvas(self.canvas)
         #Setup exit routine
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
 
@@ -247,22 +269,37 @@ class gui_thread(threading.Thread):
         text.config(state=tkinter.DISABLED, pady=5)
         text.pack()
 
-    def place_marker_on_canvas(self, x, y):
-        self.canvas.create_rectangle(x - 5, y - 5,
-                                     x + 5, y + 5,
-                                     fill="black")
 
-    def place_robot_on_canvas(self, x, y):
-        self.canvas.create_rectangle(x - 5, y - 5,
-                             x + 5, y + 5,
-                             fill="red")
-        pass
 
-    def draw_map(self, map : list):
-        for x,mapx in enumerate(map):
-            for y,mapy in enumerate(mapx):
-                if mapy==1:
-                    self.place_marker_on_canvas(100+x*10,100+y*10)
+    def draw_map(self, map_data : list):
+        scanned_rows = 0
+        scanned_cols = 0
+        for y,mapy in enumerate(map_data): #y gives the multiplier for each row
+            if scanned_rows < y:
+                scanned_rows = y
+            for x,mapx in enumerate(mapy): #x gives the multiplier for each col
+                if scanned_cols < x:
+                    scanned_cols = x           
+                if mapx==1:
+                    self.canvas.itemconfig(self.grid[y][x], fill="black")
+                else:
+                    self.canvas.itemconfig(self.grid[y][x], fill="grey")
+#        if scanned_rows < self.max_scanned_rows:
+#            for i in range(scanned_rows+1, self.max_scanned_rows):
+#                for j in range(0,self.max_scanned_cols):
+#                    self.canvas.itemconfig(self.grid[i][j], fill="white")
+#
+#            for i in range(0,self_max_scanned_rows):
+#                for j in range(scanned_cols+1, self.max_scanned_cols):
+#                    self.canvas.itemconfig(self.grid[i][j], fill="white")
+#            self.max_scanned_rows = scanned_rows
+#            self.max_scanned_cols = scanned_cols
+                
+            
                     
-    def draw_robot_position(self, x_pos : int, y_pos : int):
-        self.place_robot_on_canvas(100+x_pos*10, 100+y_pos*10)
+    def draw_robot_position(self, x : int, y : int):
+        if self.robot_rect != None:
+            self.canvas.delete(self.robot_rect)
+            self.robot_rect = None
+        self.robot_rect =  self.place_marker_on_canvas(self.canvas, self.cell_width+2*self.cell_width*x,
+                                                        self.cell_width+2*self.cell_width*y, self.robot_width, "green")

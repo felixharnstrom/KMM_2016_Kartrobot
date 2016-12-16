@@ -64,8 +64,6 @@ def main(argv):
     robot = client()
     robot.start(ip=ip_address)
 
-    map = [[1,0,1],[0,1,1]]
-
     # Send messages back and forth from the GUI using a Queue
     command_queue = queue.Queue()
     response_queue = queue.Queue()
@@ -82,7 +80,7 @@ def main(argv):
     last_time_diag = current_time
     last_time_map = current_time
     diff_diag_trigger = 0.5 #Trigger every 0.5s
-    diff_map_trigger = 5.0 #Trigger ever 5s
+    diff_map_trigger = 1.0 #Trigger ever 5s
     
     time.sleep(0.2)
     # Use an infinite loop to check for commands from the GUI
@@ -93,6 +91,7 @@ def main(argv):
         if(diff_diag >= diff_diag_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
             last_time_diag = current_time
+            send_command("update_mode", robot.client, guit)
             send_command("get_motor_data", robot.client, guit)
             send_command("get_sensor_data", robot.client, guit)
         if(diff_map >= diff_map_trigger):
