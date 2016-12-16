@@ -97,7 +97,7 @@ def autonomous_step(robot : Robot):
         #robot.stand_perpendicular('left')
         robot.update_pid()
     elif (status == DriveStatus.CORRIDOR_DETECTED_LEFT):
-        robot.logger.info("---------- DETECTED CORRIDOR TO RIGHT! \n---------- TURNING RIGHT 90 degrees")
+        robot.logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
         turn_instr = Command.stop_motors()
         handle_command(turn_instr)
         while robot._is_moving(): pass
