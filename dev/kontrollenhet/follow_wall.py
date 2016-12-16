@@ -625,7 +625,7 @@ class Robot:
         handle_command(Command.stop_motors())
         #self.stand_perpendicular("right")
         time.sleep(0.5)
-        self.drive_distance(180, self.BASE_SPEED, save_new_distance = True)
+        self.drive_distance(80, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
