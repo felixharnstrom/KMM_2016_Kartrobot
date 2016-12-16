@@ -210,7 +210,8 @@ class Robot:
 
         # Private attributes
         self._cells = 0
-        self._read_reflex_right_2 = 0
+        self._read_reflex_start_2 = 0
+        self._reflex_right_start = 0
 
         # Initialize PID controller
         self.pid_controller = Pid()
@@ -412,7 +413,7 @@ class Robot:
             self._save_position(reflex_right - reflex_right_start)
         return True
 
-    def _follow_wall_step(self, reflex_right_start : int, distance_to_drive : int, side = "right"):
+    def _follow_wall_step(self, distance_to_drive : int, side = "right"):
         """
         Make one follow wall iteration
         Args:
@@ -431,20 +432,20 @@ class Robot:
         else:
              ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
         
-        if reflex_right - reflex_right_start > distance_to_drive:
+        if reflex_right - self._reflex_right_start > distance_to_drive:
             # Save the given length driven
             handle_command(Command.stop_motors())
-            self._save_position(reflex_right - reflex_right_start)
+            self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
-        if ((reflex_right - reflex_right_start) / 400) > self._cells:
+        if ((reflex_right - self._reflex_right_start) / 400) > self._cells:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
-            reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
                 
             before = self.goal
             self.update_map()
-            reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
+            self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             if self.goal == Goal.FIND_ISLAND and before != self.goal:
                 return DriveStatus.DONE
             self._cells += 1
@@ -453,7 +454,7 @@ class Robot:
         if (ir_side_front >= self.TURN_OVERRIDE_DIST):
             self.logger.debug("IR - front: " + str(ir_side_front) + " IR - back: " + str(ir_side_back))
             # Save the given length driven
-            self._save_position(reflex_right - reflex_right_start)
+            self._save_position(reflex_right - self._reflex_right_start)
             if side == "right":
                 return DriveStatus.CORRIDOR_DETECTED_RIGHT
             else:
@@ -463,7 +464,7 @@ class Robot:
         if(ir_front < self.OBSTACLE_DIST):
             # Save the given length driven
             handle_command(Command.stop_motors())
-            self._save_position(reflex_right - reflex_right_start)
+            self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.OBSTACLE_DETECTED
 
         # We need to get the distance from the center of the robot perpendicular to the wall
@@ -477,7 +478,7 @@ class Robot:
         self.pid_controller.d_term = angle_side
         self.pid_controller.compute()
         self.pid_controller.output_data += 100
-        self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front, 100, distance_to_drive - (reflex_right - reflex_right_start)), 200) / 200, side)
+        self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front, 100, distance_to_drive - (reflex_right - self._reflex_right_start)), 200) / 200, side)
                 
         return DriveStatus.DRIVING
 
@@ -509,15 +510,15 @@ class Robot:
         #time.sleep(0.75)
         
         # Read start values from sensors
-        reflex_right_start = handle_command(Command.read_reflex_right())
         # Set cells to zero
         self._cells = 0
+        self._reflex_right_start = handle_command(Command.read_reflex_right())
         self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
         
         # Drive until the wanted distance is reached unless the automus mode is turned off
         drive_status = DriveStatus.DRIVING
         while ((drive_status == DriveStatus.DRIVING) and (mode.get_mode() == mode.ControlModeEnums.AUTONOMOUS)):
-            drive_status = self._follow_wall_step(reflex_right_start, distance, side)
+            drive_status = self._follow_wall_step(distance, side)
 
         if (mode.get_mode() == mode.ControlModeEnums.MANUAL):
             return DriveStatus.WAITING
@@ -641,6 +642,7 @@ class Robot:
         Args:
             unsaved_distance   (int): Reflex data that have been driven but not added to self.driven_distance
         """
+        print ("SAVING", unsaved_distance)
         self.driven_distance += unsaved_distance * 0.9195402298850575
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
