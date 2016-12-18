@@ -193,14 +193,14 @@ class Robot:
         self.START_X = 200
         self.BLOCK_SIZE = 400
         self.IR_MEDIAN_ITERATIONS = 1
-        self.GYRO_MEDIAN_ITERATIONS = 32
+        self.GYRO_MEDIAN_ITERATIONS = 10
         self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
         self.CORRIDOR_TURN_ENTRY_DIST = 100
         self.CORRIDOR_TURN_EXIT_DIST = 250
-        self.OBSTACLE_SAFETY_OVERRIDE = 50
+        self.OBSTACLE_SAFETY_OVERRIDE = 80
         self.EDGE_SPIKE_FACTOR = 2
-        self.OBSTACLE_DIST = 80
+        self.OBSTACLE_DIST = 100
         self.SENSOR_SPACING = 95
         self.BASE_SPEED = 40
         self.ACCELERATED_SPEED = 40
@@ -215,9 +215,9 @@ class Robot:
 
         # Initialize PID controller
         self.pid_controller = Pid()
-        self.pid_controller.setpoint = 60
+        self.pid_controller.setpoint = 100
         self.pid_controller.output_data = 0
-        self.pid_controller.set_tunings(3, 0, -200)
+        self.pid_controller.set_tunings(5, 0, -10)
         self.pid_controller.set_sample_time(33)
         self.pid_controller.set_output_limits(-50, 50)
         self.pid_controller.set_mode(1)
@@ -557,7 +557,7 @@ class Robot:
         self.pid_controller.kp = 0
         self.pid_controller.ki = 0
         self.pid_controller.kd = 0
-        self.pid_controller.set_tunings(3, 0, -200)
+        self.pid_controller.set_tunings(5, 0, -10)
 
     def scan(self):
         """
@@ -615,6 +615,7 @@ class Robot:
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.RIGHT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(100, self.BASE_SPEED, 1, save_new_distance = False)
+        self.stand_perpendicular("left")
         self.goal = Goal.RETURN_HOME
             
     def drive_to_island(self):
@@ -623,7 +624,7 @@ class Robot:
 		the robot will follow the right side of the wall.
         """
         handle_command(Command.stop_motors())
-        #self.stand_perpendicular("right")
+        self.stand_perpendicular("right")
         time.sleep(0.5)
         self.drive_distance(80, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
@@ -673,11 +674,11 @@ class Robot:
         """
         print ("SAVING", unsaved_distance)
         if self.goal == Goal.MAP_ISLAND:
-            self.driven_distance += unsaved_distance * 1.08
+            self.driven_distance += unsaved_distance
         elif self.goal == Goal.RETURN_HOME:
-            self.driven_distance += unsaved_distance * 0.98
+            self.driven_distance += unsaved_distance
         else:
-            self.driven_distance += unsaved_distance * 0.98
+            self.driven_distance += unsaved_distance
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def get_driven_dist(self):
@@ -739,7 +740,7 @@ class Robot:
         ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
 
-        time.sleep(wait_time)
+        #time.sleep(wait_time)
         # TODO: Currently skipping check
         return False
         ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir()))
