@@ -4,33 +4,47 @@ import os
 
 
 class gui_thread(threading.Thread):
-    """Initiates the GUI."""
+    """
+    Initiates the GUI on a seperate thread. Contains all variables and methods to used to display the different kinds of data from the robot, 
+    aswell as the methods necessary to generate actions for the WiFi-thread to transmit.
+    
+    Args:
+        :param queue_output                (Queue): Used to transmit actions FROM the GUI to the  WiFi-thread, for example keyevents.
+    
+    Attributes:
+        :attribute cell_width               (int): Defines the width and height of a cell (pixels) in the map grid.
+        :attribute robot_width              (int): Defines the width and height of the robot (pixels) in the map grid.
+        :attribute grid_size                (int): Defines the number of cells which appear per column and per row in the map. The number of actual cells will always be this number squared.
+        :attribute grid                     (list of lists with rectangles): Contains the tkinter rectangles generated for each map cell. 
+                                             The list contains lists with each row of rectangle cells in the map grid, seen from the top left corner to the bottom right.  
+        :attribute robot_rect               (rectangle): The tkinter rectangle that represents the robot.
+        :attribute queue                    (Queue): The Queue that is used for transmitting GUI events to the WiFi-thread.
+        :attribute gui                      (Tk): The GUI object.
+        :attribute pressed_keys             (dict): Contains the pressed state of the arrows keys. True equals pressed, false means that it is not.
+    """
 
-    def __init__(self, queue_input, queue_output):
-        """Creates GUI thread with the queues used to pass data to/from the GUI.
-
-        Keyword arguments:
-        queue_input -- this queue will be used for all communication TO the GUI
-        queue_output -- this queue will be used for all communication FROM the GUI
-        """
-
+    def __init__(self, queue_output):
         # Make pythons thread library happy
         threading.Thread.__init__(self)
 
         # Make variables accessible to the whole class
         self.cell_width = 10
         self.robot_width =self.cell_width - 2
-        self.max_scanned_rows = 0
-        self.max_scanned_cols = 0
-        self.grid_size = 24 #The number of cells that can appear in the map, 24 to be safe
+        self.grid_size = 24 # The number of cells that can appear in each row and column of the map, 24 to be safe (24^2 cells)
         self.grid = []
         self.robot_rect = None
-        self.queue = queue_input
+        self.queue = queue_output
         self.gui = None
         self.pressed_keys = {"left":False, "right":False, "up":False, "down":False}
  
     def key_pressed(self, event):
-        """Callback for key press."""
+        """
+        Callback handler for keys that are pressed.
+        
+        Args:
+            :param event (event): The callback event.
+        
+        """
         button = event.keysym
         if button == "Left" and not self.pressed_keys["left"]:
             self.pressed_keys["left"] = True
@@ -47,7 +61,13 @@ class gui_thread(threading.Thread):
 
 
     def key_released(self, event):
-        """Callback for key release."""
+        """
+        Callback handler for keys that are released.
+        
+        Args:
+            :param event (event): The callback event.
+        
+        """
         button = event.keysym
         if button == "Left":
             self.pressed_keys["left"] = False
@@ -62,10 +82,23 @@ class gui_thread(threading.Thread):
             self.pressed_keys["down"] = False
             self.send_command("key_down_r")
 
-    def send_command(self, mode):
-        self.queue.put(mode)
+    def send_command(self, command):
+        """
+        Puts a command into the output_queue, meaning that it will be handled by the WiFi-thread.
+        
+        Args:
+            :param cmd (str): The command to send.
+        """
+        self.queue.put(command)
 
     def receive_command(self, command):
+        """
+        Receives a command and handles it by updating the GUI, in a way that varies depending on which command-type that was received.
+        
+        Args:
+            :param command (list): A list which always contains a command-type specifier given as a string as the first element (command[0]).
+                                   The other parameters will vary depending on which command-type that was received.
+        """
         if type(command)==list:
             if command[0] == "draw":
                 # It was a draw command.
@@ -87,7 +120,6 @@ class gui_thread(threading.Thread):
                 self.gyro.set(sensor_data_dict["GYRO"])
                 self.reflex_right.set(sensor_data_dict["REFLEX_RIGHT"])
                 self.reflex_left.set(sensor_data_dict["REFLEX_LEFT"])
-                #TODO: Send this from PC in the sensor_data dict
                 self.distance.set(sensor_data_dict["DISTANCE"])
             elif command[0] == "update_mode":
                 #0 = autonomous, 1 = manual
@@ -95,18 +127,38 @@ class gui_thread(threading.Thread):
                 self.mode_var.set(mode_integer)
             elif command[0] == "update_map":
                 robot_xy = command[1] # [x,y]
-                map_data = command[2]
+                map_data = command[2] # [row1,row2,...,rowN] where a row is [cell1,cell2,...,cellN] for each row.
                 self.draw_map(map_data)
-                print("Robot XY:", robot_xy[0],robot_xy[1])
+                print("Robot X:", robot_xy[0],", Y:",robot_xy[1])
                 self.draw_robot_position(robot_xy[0], robot_xy[1])
         return
 
     def place_marker_on_canvas(self, canv : tkinter.Canvas, x : int, y : int, size :int, color_string : str):
-       return canv.create_rectangle(x - size, y - size,
+        """
+        Places a square marker on the given canvas using a center point, width and color to be used.
+        
+        Args:
+            :param canv         (Canvas): The tkinter Canvas on which to draw the rectangle.
+            :param x            (int): The x-coordinate to use as center.
+            :param y            (int): The y-coordiante to use as center.
+            :param size         (int): Half the width of square marker which to draw.
+            :param color_string (str): The color to be used for the marker.
+            
+        Returns:
+            :return (int): The internal Canvas ID for the drawn square marker. This can be used to manipulate it inside the Canvas object.
+        """
+        return canv.create_rectangle(x - size, y - size,
                                      x + size, y + size,
                                      fill=color_string)
 
     def init_canvas(self, canv : tkinter.Canvas):
+        """
+        Initiates the map grid by creating a square grid containing grid_size^2 white square markers, according to the attributes in the class.
+        These will not overlap, given that the canvas size is enough.
+        
+        Args:
+            :param canv (Canvas): The Canvas object on which to initiate and draw the grid on.
+        """
         for y in range(0,self.grid_size):
             self.grid.append([])
             for x in range(0,self.grid_size):
@@ -116,7 +168,9 @@ class gui_thread(threading.Thread):
 
 
     def run(self):
-        """Initiates the GUI with previously specified queues."""
+        """
+        Setups the GUI and sets it into using the tkinter mainloop.
+        """
 
         # The usual gui setup.
         self.gui = tkinter.Tk()

@@ -11,7 +11,7 @@ from client import client
 from datetime import datetime
 
 
-def send_command(command, socket, guit):
+def transmit_command(command, socket, guit):
     """
         Transmits command type, then waits for acknowledge.
         Then transmits or receives the payload for that command.
@@ -64,12 +64,11 @@ def main(argv):
     robot = client()
     robot.start(ip=ip_address)
 
-    # Send messages back and forth from the GUI using a Queue
+    # Send messages received from the GUI using this Queue.
     command_queue = queue.Queue()
-    response_queue = queue.Queue()
 
     # Start our GUI thread
-    guit = gui.gui_thread(command_queue, response_queue)
+    guit = gui.gui_thread(command_queue)
     guit.start()
 
     # Prevent key press from spamming on linux
@@ -80,10 +79,10 @@ def main(argv):
     last_time_diag = current_time
     last_time_map = current_time
     diff_diag_trigger = 0.5 #Trigger every 0.5s
-    diff_map_trigger = 1.0 #Trigger ever 5s
+    diff_map_trigger = 1.0 #Trigger ever 1s
     
     time.sleep(0.2)
-    # Use an infinite loop to check for commands from the GUI
+    # Use an infinite loop to check for commands from the GUI and transmitting them.
     while True:
         current_time = datetime.now()
         diff_diag = (current_time - last_time_diag).total_seconds()
@@ -91,17 +90,17 @@ def main(argv):
         if(diff_diag >= diff_diag_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
             last_time_diag = current_time
-            send_command("update_mode", robot.client, guit)
-            send_command("get_motor_data", robot.client, guit)
-            send_command("get_sensor_data", robot.client, guit)
+            transmit_command("update_mode", robot.client, guit)
+            transmit_command("get_motor_data", robot.client, guit)
+            transmit_command("get_sensor_data", robot.client, guit)
         if(diff_map >= diff_map_trigger):
+            #Update map
             last_time_map = current_time
-            send_command("get_map_update", robot.client, guit)   
-        #guit.draw_map(map)
+            transmit_command("get_map_update", robot.client, guit)   
         if not command_queue.empty():
             # There is a command. Lets get it.
             command = command_queue.get()
-            print("transmitting", command)
+            print("Transmitting:", command)
 
             if command == "quit":
                 # Quit tkinter
@@ -111,17 +110,12 @@ def main(argv):
                 # Exit the while loop
                 break
             else:
-                # All commands that are not used above are sent to the raspberry server.
-                send_command(command, robot.client, guit)
-        # Not yet used
-        if not response_queue.empty():
-            # There is a command from the raspberry to the GUI. Lets get it
-            command = response_queue.get()
-            guit.receive_command(command)
+                # Transmit GUI command to the robot.
+                transmit_command(command, robot.client, guit)
         time.sleep(0.01)
     # Reset settings
     os.system("xset r on")
-    print("exiting")
+    print("Exiting.")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
