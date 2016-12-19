@@ -84,19 +84,9 @@ def autonomous_step(robot : Robot):
         robot.turn(Direction.RIGHT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
         while robot._is_moving(threshold = 30): pass
 
-        # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-        """if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 200:
-            logger.info("Not a corridor, moving back")
-            robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-            robot.stand_perpendicular('right')
-            while robot._is_moving(threshold = 30): pass
-        else:"""
-        # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
-        # As it is now, a right turn into a single square corridor does not work well.
         robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
         while robot._is_moving(): pass
-        #robot.stand_perpendicular('right')
-        #robot.stand_perpendicular('left')
+
         robot.update_pid()
     elif (status == DriveStatus.CORRIDOR_DETECTED_LEFT):
         robot.logger.info("---------- DETECTED CORRIDOR TO LEFT! \n---------- TURNING LEFT 90 degrees")
@@ -108,19 +98,9 @@ def autonomous_step(robot : Robot):
         robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
         while robot._is_moving(threshold = 30): pass
 
-        # TODO: Detection works, but seems to commonly result in the robot standing staring at a wall, and obstacle detection.
-        """if robot._median_sensor(robot.IR_MEDIAN_ITERATIONS, Command.read_front_ir()) < 200:
-            logger.info("Not a corridor, moving back")
-            robot.turn(Direction.LEFT, 85, speed = robot.ACCELERATED_SPEED, save_new_angle = True)
-            robot.stand_perpendicular('right')
-            while robot._is_moving(threshold = 30): pass
-        else:"""
-        # TODO: Find a way to do stand_perpendicular when there is no wall to the left. Or lower CORRIDOR_TURN_EXIT_DIST again.
-        # As it is now, a right turn into a single square corridor does not work well.
         robot.drive_distance(robot.CORRIDOR_TURN_EXIT_DIST, robot.BASE_SPEED, save_new_distance = True)
         while robot._is_moving(): pass
-        #robot.stand_perpendicular('right')
-        #robot.stand_perpendicular('left')
+
         robot.update_pid()
 
 
