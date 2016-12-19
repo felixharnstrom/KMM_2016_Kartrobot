@@ -5,15 +5,6 @@ Examples:
         $ python3 follow_wall.py -s 'ttyUSB0' -c 'ttyUSB1'
 
         $ python3 follow_wall.py -sensor 'ttyUSB0' -control 'ttyUSB1' -v 3
-
-Todo:
-    * Automatically detect USB serial devices.
-    * Use Daniel's enum for MANUAL, AUTONOM.
-    * Consider adjusting to wall to improve final heading after turn().
-    * Add the correct code for updating the path_queue in find_next_destination().
-    * Add cases for corridors, open rooms, crossings, etc.
-    * Use the Direction class instead of hard-coded directions.
-    * Complete docstrings.
 """
 import time
 import math
@@ -51,7 +42,7 @@ class Goal:
     RETURN_HOME = 4
     NONE = 5
 
-    
+
 class Robot:
     """
     Contains the robot's current state and several functions enabling the robot's high-level behaviour.
@@ -69,20 +60,19 @@ class Robot:
         driven_distance             (int): Driven distance thus far.
         current_angle               (int): Current angle against right wall.
         control_mode                (ControllerMode): Current controller mode.
-        path_trace                  (?): ? # TODO: What is this?
-        path_queue                  (?): ? # TODO: What is this?
+        path_trace                  (list): List of (angle, dist). Contains the driven path.
         uart_sensorenhet            (str): Device name of the USB<->Serial converter for the sensor unit.
         uart_styrenhet              (str): Device name of the USB<->Serial converter for the control unit.
         pid_controller              (Pid): The PID controller in use.
-        has_been_to_other_cell      (bool): Robot has left the starting position at the island. 
+        has_been_to_other_cell      (bool): Robot has left the starting position at the island.
         START_X                     (int): Starting x-value, in mm
         BLOCK_SIZE                  (int): Block size in millimetres.
         IR_MEDIAN_ITERATIONS        (int): Number of values to get from IR sensors.
         GYRO_MEDIAN_ITERATIONS      (int): Number of values to get from gyro.
-        TURN_OVERRIDE_DIST          (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn. 
+        TURN_OVERRIDE_DIST          (int): If the right-hand sensor reaches or exceeds this value it will immediately trigger a right turn.
         TURN_MIN_DIST               (int): The minimum detected distance that will trigger a right turn.
-        CORRIDOR_TURN_ENTRY_DIST       (int): How far to drive into a corner before performing a 90° turn.
-        CORRIDOR_TURN_EXIT_DIST        (int): How far to drive into a corridor after performing a 90° turn.
+        CORRIDOR_TURN_ENTRY_DIST    (int): How far to drive into a corner before performing a 90° turn.
+        CORRIDOR_TURN_EXIT_DIST     (int): How far to drive into a corridor after performing a 90° turn.
         OBSTACLE_SAFETY_OVERRIDE    (int): The override distance that will trigger an immediate stop in drive_distance().
         EDGE_SPIKE_FACTOR           (int): How much bigger a spike in IR value must be compared to prior reading until it will trigger an edge detection.
         OBSTACLE_DIST               (int): The maximum distance until an obstacle ahead will trigger a turn.
@@ -101,7 +91,6 @@ class Robot:
         self.driven_distance = 0
         self.current_angle = 0
         self.path_trace = []  # (Angle, LengthDriven), with this list we can calculate our position
-        self.path_queue = []  # (Blocks_To_Drive, Direction)
         self.logger = logger
         self.has_been_to_other_cell = False
         self.START_X = 200
@@ -159,24 +148,24 @@ class Robot:
         return ir_side_back, ir_side_front
 
     def update_map_status(self):
+        """
+        Prepare data for transmission to GUI.
+        """
+
         global sensor_data
-        global grid_map_output
-        global robot_distance
         robot_map_data.set_grid_map(self.grid_map.gui_drawable())
         if self.get_driven_dist():
             sensor_data["DISTANCE"] = self.get_driven_dist()[-1][1]
-            # robot_map_data.robot_distance = self.get_driven_dist()[-1][1]
 
     def turn(self, direction: Direction, degrees: int, speed: int, save_new_angle=False):
         """
-        Turn a certain amount in the given direction at the given speed.
+        Turn a certain amount in the given direction at a speed up to speed+30, regulating according to degrees left to turn.
 
         Args:
             direction   (Direction): Direction to turn.
             degrees     (int): Degrees to turn.
             speed       (int): Speed as a percentage value between 0-100.
         """
-        # TODO: Consider adjusting to wall if we have something on the side
         # Set the current direction to zero
         current_dir = 0
 
@@ -244,7 +233,7 @@ class Robot:
 
     def get_angle(self):
         """
-        Return the angle in the intervall 0 <= angle <= 360.
+        Return the robots current angle in the intervall 0 <= angle <= 360.
         Returns:
             (int): The current angle in the given intervall above.
         """
@@ -255,24 +244,21 @@ class Robot:
 
     def update_map(self):
         """
-        Update the gridmap with new scan data. Drive to 
+        Update the gridmap with new scan data. Drive to island if found. 
         """
         lines = movement_to_lines(self.get_driven_dist(), Position(self._x_start, self._y_start))
         cells = movement_lines_to_cells(lines, 1)
-        # Scanning walls
-        # unknown_in_view(location: Position, angle: int, g: GridMap, move_forward: int):
-        # print(self.path_trace[0:max(len(self.path_trace)-1, 20)])
+
         self.logger.debug("Current cell" + str(cells[-1]))
         self.logger.debug("Current path" + str(self.get_driven_dist()))
         self.logger.debug("Current path: Uncalibrated" + str(self.path_trace))
+
         if (self.goal == Goal.MAP_OUTER_WALLS or self.goal == Goal.MAP_ISLAND) and len(cells) > 0:
             self.grid_map = GridMap()
             self._add_garage(cells[0])
             make_open(cells, self.grid_map)
             add_walls(cells, self.grid_map)
-            # is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
-            # bla = approximate_to_cell(Position(self.get_position().x + math.cos(self.get_angle() - 90)*distance, self.get_position().y + math.sin(self.get_angle() - 90)*distance))
-            # self.grid_map.set(bla.x, bla.y, CellType.WALL)
+
             self.logger.info("STOP")
             self.logger.info("start: " + str(cells[0]))
             self.logger.info("end: " + str(cells[-1]))
@@ -281,7 +267,7 @@ class Robot:
                 self.goal = Goal.FIND_ISLAND
                 self.logger.warning("In garage - looking for island")
 
-        # Print grid
+        # Print grid, including current location
         old = self.grid_map.get(cells[-1].x, cells[-1].y)
         self.grid_map.set(cells[-1].x, cells[-1].y, CellType.LOCATION)
         self.grid_map.debug_print(print_origin=True)
@@ -291,8 +277,7 @@ class Robot:
         self.logger.info("POS: " + str(self.get_position()))
 
         if self.goal == Goal.FIND_ISLAND and cells:
-            # We should no longer need to check if we need to scan, as long as we
-            #   do this on every turn. left_island_exists does this implicitly.
+            # Check if there is a island close enough, if so, drive to it.
             is_island, distance = island_exists(cells[-1], self.get_angle() - 90, self.grid_map)
             if is_island:
                 self.logger.info("ISLAND!")
@@ -317,8 +302,9 @@ class Robot:
         Drives the given distance at the given speed, if possible. Uses LIDAR for determining distance.
 
         Args:
-            dist    (int): Distance in millimetres.
-            speed   (int): Speed as a percentage value between 0-100.
+            dist      (int): Distance in millimetres.
+            speed     (int): Speed as a percentage value between 0-100.
+            direction (int): 1 equals forward, 0 back.
         Returns:
             (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
@@ -361,24 +347,30 @@ class Robot:
         else:
             ir_side_back, ir_side_front = self.read_ir_side(Direction.LEFT)
 
+        # distance_to_drive is completed. Save and return.
         if reflex_right - self._reflex_right_start > distance_to_drive:
             # Save the given length driven
             handle_command(Command.stop_motors())
             self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
+        # Do a little maintainance every 5 cm.
         if ((reflex_right - self._reflex_right_start) / 50) > self._cells:
+            # Save distance driven
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
             self._save_position(self._reflex_right_start_2 - self._reflex_right_start)
             before = self.goal
+
             self.update_map()
+
             self._reflex_right_start = handle_command(Command.read_reflex_right())
             if self.goal == Goal.FIND_ISLAND and before != self.goal:
                 return DriveStatus.DONE
             self._cells += 1
 
+            # If the current goal is to map the island and we have returned to the starting cell, return to the outer wall.
             if self.goal == Goal.MAP_ISLAND:
                 robot_position = self.get_position()
                 if (self.start_cell_at_island == approximate_to_cell(robot_position) and self.has_been_to_other_cell):
@@ -398,7 +390,7 @@ class Robot:
             else:
                 return DriveStatus.CORRIDOR_DETECTED_LEFT
 
-        # Obstacle detected, and no turn to the right
+        # Obstacle detected, and (probably) no turn to the right
         if(ir_front < self.OBSTACLE_DIST):
             # Save the given length driven
             handle_command(Command.stop_motors())
@@ -406,8 +398,6 @@ class Robot:
             return DriveStatus.OBSTACLE_DETECTED
 
         # We need to get the distance from the center of the robot perpendicular to the wall
-        # This assumes that we have a wall on either side (i.e. we are in a corridor)
-        # TODO: Different cases for corridors and open rooms.
         dist_side = (ir_side_front + ir_side_back) / 2
         angle_side = math.atan2(ir_side_back - ir_side_front, self.SENSOR_SPACING)
         perpendicular_dist_side = dist_side * math.cos(angle_side)
@@ -416,6 +406,7 @@ class Robot:
         self.pid_controller.d_term = angle_side
         self.pid_controller.compute()
         self.pid_controller.output_data += 100
+        # Use pid output data to set speeds. Slow down before obstacles.
         self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front-100, 200), 200) / 200, side)
 
         return DriveStatus.DRIVING
@@ -518,7 +509,7 @@ class Robot:
 
     def leave_island(self):
         """
-        Turn left, drive to the wall and turn right 
+        Turn left, drive to the wall and turn right
         """
         self.drive_distance(100, self.BASE_SPEED, 0, save_new_distance=False)
         self.turn(Direction.LEFT, 85, speed=self.ACCELERATED_SPEED, save_new_angle=True)
@@ -527,7 +518,7 @@ class Robot:
         self.drive_distance(100, self.BASE_SPEED, 1, save_new_distance=False)
         # self.stand_perpendicular("left")
         self.goal = Goal.RETURN_HOME
-            
+
     def drive_to_island(self):
         """
         Turn towards the island, drive to it and then turn left so that
@@ -589,6 +580,11 @@ class Robot:
         self.path_trace += [(self.current_angle, self.driven_distance)]
 
     def get_driven_dist(self):
+        """
+        Convert path_trace to distances of 400*n mm.
+        Return:
+            (list): List of (angle, distance), split at each angle change.
+        """
         distances = self.path_trace
         last_angle = None
         new_list = []
@@ -624,6 +620,7 @@ class Robot:
         Args:
             ratio       (int): Will drive forward if exactly 1, turn left if > 1, and turn right if < 1.
             base_speed  (int): Base speed that ratio will be applied to.
+            side        (str): 'left' or 'right'
         """
         left_speed = max(min(base_speed / ratio, 100), 0)
         right_speed = max(min(base_speed * ratio, 100), 0)
@@ -635,6 +632,7 @@ class Robot:
 
     def _is_moving(self, threshold=30, wait_time=0.2):
         """
+        Note: Currently ignored. Can be used by uncommenting sleep and outcommenting the first return.
         Checks for sensor changes above threshold within wait_time.
         Args:
             threshold   (int): How much the sensor values are allowed to change (mm)
@@ -647,8 +645,7 @@ class Robot:
         ir_right_back, ir_right_front = self.read_ir_side(Direction.RIGHT)
         ir_left_back, ir_left_front = self.read_ir_side(Direction.LEFT)
 
-        #time.sleep(wait_time)
-        # TODO: Currently skipping check
+        # time.sleep(wait_time)
         return False
         ir_back_diff = abs(ir_back - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_front_ir()))
         lidar_diff = abs(lidar - self._median_sensor(self.IR_MEDIAN_ITERATIONS, Command.read_lidar()))
