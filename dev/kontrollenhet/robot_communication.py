@@ -261,9 +261,9 @@ def handle_command(command : Command):
         return read_ir_sensor(command)
     elif (c_enum == CommandEnums.READ_REFLEX_LEFT or
             c_enum == CommandEnums.READ_REFLEX_RIGHT):
-        return read_ir_sensor(command)
+        return read_ir_sensor(command) * 0.9
     elif(c_enum == CommandEnums.READ_GYRO):
-        return read_gyro_sensor(command) * 0.9
+        return read_gyro_sensor(command)
     else:
         #Handles all commands that does not need any special handling (eg. just send and ack)
         #Does >not< handle incorrectly parsed commands
