@@ -1,5 +1,5 @@
 import threading
-import tkinter
+import mtTkinter as tkinter
 import os
 
 
