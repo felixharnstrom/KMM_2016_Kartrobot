@@ -250,5 +250,13 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Python
-__pycache__
+##Atmel Studio:
+*.atsln
+*.atsuo
+dev/Styrenhet/Styrenhet/*
+!*.c
+!*.h
+Styrenhet.c
+
+## Doxygen dir
+dev/doc
