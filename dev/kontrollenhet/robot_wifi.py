@@ -46,7 +46,7 @@ def wifi_main(motor_data, sensor_data, input_queue : queue.Queue):
                 send_data(s.client, json.dumps(sensor_data))
             elif (data == "SYNC_MODE"):
                 #Sends the mode we are currently in, 0 means autonomous 1 means manual
-                send_data(s.client, get_mode().value)
+                send_data(s.client, str(mode.get_mode().value))
             elif (data == "KEY_EVENT"):
                 #Receive keyevent
                 key_event = receive_data(s.client)
