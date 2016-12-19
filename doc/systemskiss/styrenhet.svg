@@ -229,6 +229,28 @@
      inkscape:zoom="1.4"
      inkscape:cx="269.35698"
      inkscape:cy="411.24364"
+<<<<<<< 8589dedeb17d5d65b1a680316620569d0280e509:doc/systemskiss/styrenhet.svg
+=======
+=======
+     inkscape:zoom="2.990248"
+<<<<<<< 5d2e76debb53c7b48f2419819c4f52d07247a6d6
+     inkscape:cx="195.9517"
+     inkscape:cy="357.73637"
+>>>>>>> Updated styrenhet.
+=======
+     inkscape:cx="254.78375"
+     inkscape:cy="427.33501"
+>>>>>>> Updated image.
+=======
+     inkscape:zoom="4.2639608"
+     inkscape:cx="283.81006"
+<<<<<<< 9f7a51efb5e74fb1b17f6d02313c73095580dcdb
+     inkscape:cy="532.59838"
+>>>>>>> Edited images.
+=======
+     inkscape:cy="326.2175"
+>>>>>>> Flowchart added.
+>>>>>>> Flowchart added.:doc/designspec/styrenhet.svg
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -550,6 +572,31 @@
            y="533.72949"
            x="270.21582"
            id="tspan6598-4-5"
+<<<<<<< 8589dedeb17d5d65b1a680316620569d0280e509:doc/systemskiss/styrenhet.svg
+=======
+<<<<<<< 9f7a51efb5e74fb1b17f6d02313c73095580dcdb
+<<<<<<< 5d2e76debb53c7b48f2419819c4f52d07247a6d6
+<<<<<<< db7be71c1255a368d5522ea25d39020d483dbacd
+<<<<<<< d608cb8ccd554c8b1c6e2c557e185df2cb24aca9
+           sodipodi:role="line">UART Half duplex</tspan><tspan
+=======
+           sodipodi:role="line">UART</tspan><tspan
+>>>>>>> Updated image.
+=======
+           sodipodi:role="line">UART Half duplex</tspan><tspan
+>>>>>>> Flowchart added.
+           style="font-size:7.5px"
+           y="543.10449"
+           x="270.21582"
+           sodipodi:role="line"
+           id="tspan3623" /></text>
+<<<<<<< 5d2e76debb53c7b48f2419819c4f52d07247a6d6
+      <path
+         inkscape:connector-curvature="0"
+         id="path6571-0-5"
+         d="m 265.77316,503.85031 0,62.2911"
+=======
+>>>>>>> Flowchart added.:doc/designspec/styrenhet.svg
            sodipodi:role="line">UART</tspan></text>
       <path
          inkscape:connector-curvature="0"
