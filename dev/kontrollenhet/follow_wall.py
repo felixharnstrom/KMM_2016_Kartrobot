@@ -196,7 +196,7 @@ class Robot:
         self.GYRO_MEDIAN_ITERATIONS = 10
         self.TURN_OVERRIDE_DIST = 220
         self.TURN_MIN_DIST = 100
-        self.CORRIDOR_TURN_ENTRY_DIST = 100
+        self.CORRIDOR_TURN_ENTRY_DIST = 150
         self.CORRIDOR_TURN_EXIT_DIST = 250
         self.OBSTACLE_SAFETY_OVERRIDE = 80
         self.EDGE_SPIKE_FACTOR = 2
@@ -254,7 +254,7 @@ class Robot:
         if self.get_driven_dist():
             sensor_data["DISTANCE"] = self.get_driven_dist()[-1][1]
             #robot_map_data.robot_distance = self.get_driven_dist()[-1][1]
-
+    
     def turn(self, direction : Direction, degrees : int, speed: int, save_new_angle=False):
         """
         Turn a certain amount in the given direction at the given speed.
@@ -280,6 +280,8 @@ class Robot:
             clk = time.time()
             turn_rate = self._median_sensor(self.GYRO_MEDIAN_ITERATIONS, Command.read_gyro()) / 100 - standstill_rate
             current_dir += (time.time() - clk) * turn_rate
+            turn_instr = Command.turn(direction, speed * (degrees - abs(current_dir)) / degrees + 30, 0)
+            handle_command(turn_instr)
             #logger.debug("Current dir: " + str(current_dir) + " -- Turn rate: " + str(turn_rate))
 
         # Turning is completed, stop the motors
@@ -456,7 +458,7 @@ class Robot:
             self._save_position(reflex_right - self._reflex_right_start)
             return DriveStatus.DONE
 
-        if ((reflex_right - self._reflex_right_start) / 25) > self._cells:
+        if ((reflex_right - self._reflex_right_start) / 50) > self._cells:
             self._save_position(handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start += (handle_command(Command.read_reflex_right()) - self._reflex_right_start_2)
             self._reflex_right_start_2 = handle_command(Command.read_reflex_right())
@@ -506,7 +508,7 @@ class Robot:
         self.pid_controller.d_term = angle_side
         self.pid_controller.compute()
         self.pid_controller.output_data += 100
-        self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front, 100, distance_to_drive - (reflex_right - self._reflex_right_start)), 200) / 200, side)
+        self._follow_wall_help(self.pid_controller.output_data / 100, self.BASE_SPEED * min(max(ir_front-100, 200), 200) / 200, side)
                 
         return DriveStatus.DRIVING
 
@@ -615,7 +617,7 @@ class Robot:
         self.drive_distance(99999, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.RIGHT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
         self.drive_distance(100, self.BASE_SPEED, 1, save_new_distance = False)
-        self.stand_perpendicular("left")
+        #self.stand_perpendicular("left")
         self.goal = Goal.RETURN_HOME
             
     def drive_to_island(self):
@@ -624,7 +626,7 @@ class Robot:
 		the robot will follow the right side of the wall.
         """
         handle_command(Command.stop_motors())
-        self.stand_perpendicular("right")
+        #self.stand_perpendicular("right")
         time.sleep(0.5)
         self.drive_distance(80, self.BASE_SPEED, save_new_distance = True)
         self.turn(Direction.LEFT, 85, speed = self.ACCELERATED_SPEED, save_new_angle = True)
@@ -757,6 +759,7 @@ class Robot:
         else:
             # logger.debug("MOVING: threshold=", threshold, "mm, wait_time", wait_time)
             return True
+
 
 def sensor_test(robot):
     """
