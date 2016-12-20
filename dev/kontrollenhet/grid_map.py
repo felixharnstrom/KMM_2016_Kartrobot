@@ -28,6 +28,7 @@ class GridMap:
     :attribute _origin (Position): the index of origin, the index that leads to the original (0, 0). Used internally.
     :attribute _width (int): the current width of the map. Do not modify from outside.
     :attribute _height (int): the current height of the map. Do not modify from outside.
+	:attribute robot_pos (Position): The current position for the robot in the grid.
     """
 
     def __init__(self):
