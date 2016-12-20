@@ -68,18 +68,14 @@ double getAdcVoltage() {
 
 double getIrDistance() {
     double voltage = getAdcVoltage();
-    // Formula approximated to the inverse of the following sets of data points (x, y):
-    /* 5 1.495
-       7.5 1.420
-       10 1.250
-       15 0.845
-       20 0.620
-       25 0.500
-       30 0.445 */
-    static const double A = 4.5770;
-    static const double B = -0.6340;
-    double dist = pow(voltage / A, 1 / B);
-    return (dist < MAX_IR_DISTANCE_CM) ? dist : MAX_IR_DISTANCE_CM;
+    //The formula is generated with cftool in MATLAB with measurements between 6 - 30 cm.
+    double dist = 22.14 / (voltage - 0.1512);
+    if (dist <= 0)
+        return MAX_IR_DISTANCE_CM;
+    else if (dist < MAX_IR_DISTANCE_CM)
+        return dist;
+    else
+        return MAX_IR_DISTANCE_CM;
 }
 
 double getLidarDistance() {
@@ -165,7 +161,7 @@ void initReflex()
     
     //Set the oscillator prescaler so that the interrupt
     //is issued every 32 ms.
-    WDTCSR |= (1<<WDP0) | (0<<WDP1) | (0<<WDP2);
+    WDTCSR |= (0<<WDP0) | (0<<WDP1) | (0<<WDP2);
     sei();
 }
 
@@ -392,7 +388,7 @@ int main(void)
                 double sum = 0;
                 for (int i = 0; i<5; i++){
                     double sensorOutput = readSensor(msgTypeToSensor(msg));
-                    uint16_t mmRounded = sensorOutput * 10;
+                    uint16_t mmRounded = (uint16_t)(sensorOutput * 10);
                     sum = sum + mmRounded;
                 }
                 sendReply(sum/5);
@@ -409,12 +405,12 @@ int main(void)
                 break;
                 
             case SENSOR_READ_REFLEX_LEFT:;
-                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterLeft / 2);
+                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterLeft / 4);
                 sendReply(reflex);
                 break;
                 
             case SENSOR_READ_REFLEX_RIGHT:;
-                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterRight / 2);
+                reflex = (uint16_t)(3.14 * 32.5 * reflexCounterRight / 4);
                 sendReply(reflex);
                 break;
                 
