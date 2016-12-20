@@ -8,6 +8,7 @@ import mode
 import robot_map_data
 
 def victory_dance():
+	""" Instruktions for how to dance. """
     while True:
         handle_command(Command.servo(0))
         time.sleep(0.75)
@@ -15,6 +16,7 @@ def victory_dance():
         time.sleep(0.75)
 
 def autonomous_step(robot : Robot):
+	""" This function is defined as a autonomous step. """
     robot.update_pid()
     # Drive forward without crashing in wall
     if robot.goal == Goal.NONE:
@@ -187,7 +189,6 @@ def main():
             robot = None
             
     close_UARTs()
-    
 
 if __name__ == "__main__":
     main()

@@ -18,14 +18,17 @@ from robot_communication import handle_command, init_UARTs
 from geometry import Position
 import robot_map_data
 
-
-# Define directions
 class Direction:
+	"""
+	Enum class defining left and right.
+	"""
     LEFT = 0
     RIGHT = 1
 
-
 class DriveStatus:
+	"""
+	Enum class containing different states that can set during the robot is driving.
+	"""
     OBSTACLE_DETECTED = 0
     CORRIDOR_DETECTED_RIGHT = 1
     CORRIDOR_DETECTED_LEFT = 2
@@ -35,6 +38,9 @@ class DriveStatus:
 
 
 class Goal:
+	"""
+	The autonomous states for the robot.
+	"""
     MAP_OUTER_WALLS = 0
     FIND_ISLAND = 1
     DRIVE_TO_ISLAND = 2
@@ -48,23 +54,21 @@ class Robot:
     Contains the robot's current state and several functions enabling the robot's high-level behaviour.
 
     Args:
-        mode            (ControllerMode): Whether it should start in manual or autonomous mode.
-        sensor_device   (str): Device name of the USB<->Serial converter for the sensor unit.
-        control_device  (str): Device name of the USB<->Serial converter for the control unit.
+		logger						(logging): Object for enable a good logging tool. 
 
     Attributes:
         goal                        (Goal): What we're currently trying to do
         grid_map                    (GridMap): Mapping of room.
         start_cell_at_island        (Position): Start cell at island.
-
+		reflex_right_start			(int): Private variable to help the robot calculate the driven distance
+		reflex_right_start_2		(int): Poorly named variable also for helping the robot calculating the driven distance.
+		cells						(list): List with positions for helping the robot to calculate grid_map.
         driven_distance             (int): Driven distance thus far.
         current_angle               (int): Current angle against right wall.
-        control_mode                (ControllerMode): Current controller mode.
         path_trace                  (list): List of (angle, dist). Contains the driven path.
-        uart_sensorenhet            (str): Device name of the USB<->Serial converter for the sensor unit.
-        uart_styrenhet              (str): Device name of the USB<->Serial converter for the control unit.
         pid_controller              (Pid): The PID controller in use.
         has_been_to_other_cell      (bool): Robot has left the starting position at the island.
+		
         START_X                     (int): Starting x-value, in mm
         BLOCK_SIZE                  (int): Block size in millimetres.
         IR_MEDIAN_ITERATIONS        (int): Number of values to get from IR sensors.
@@ -165,6 +169,7 @@ class Robot:
             direction   (Direction): Direction to turn.
             degrees     (int): Degrees to turn.
             speed       (int): Speed as a percentage value between 0-100.
+			save_new_angle (bool) : If true, save the turned angle. Otherwise, don't save it.
         """
         # Set the current direction to zero
         current_dir = 0
@@ -305,6 +310,7 @@ class Robot:
             dist      (int): Distance in millimetres.
             speed     (int): Speed as a percentage value between 0-100.
             direction (int): 1 equals forward, 0 back.
+			save_new_distance (bool): If True, save the driven distance, otherwise don't.
         Returns:
             (bool): True if the given distance was driven, false if an obstacle stopped it.
         """
@@ -332,7 +338,6 @@ class Robot:
         """
         Make one follow wall iteration
         Args:
-            reflex_right_start    (int): Start value for the right reflex sensor.
             distance_to_drive     (int): The wanted distance to drive.
             side                  (str): String saying what wall to follow.
         Returns:
@@ -417,7 +422,7 @@ class Robot:
 
         Args:
             dist (int): Distance in millimetres.
-
+			side (str): Describes what side to follow.
         Returns:
             (DriveStatus): Status when completed.
         """
@@ -537,6 +542,9 @@ class Robot:
     def _add_garage(self, where: Position):
         """
         Add a garage in the desired cell.
+		
+		Args:
+			where		(Position): Where should the garage be placed?
         """
         # Update grid_map to include garage
         self.grid_map.set(where.x - 1, where.y, CellType.WALL)
@@ -582,6 +590,7 @@ class Robot:
     def get_driven_dist(self):
         """
         Convert path_trace to distances of 400*n mm.
+		
         Return:
             (list): List of (angle, distance), split at each angle change.
         """
