@@ -1,0 +1,215 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[swedish]{babel}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in,headsep=.5in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{siunitx}
+\usepackage{enumitem}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows, calc}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{mathptmx}    %Times Roman font
+\usepackage{helvet}    %Helvetica, served as a model for arial
+\usepackage{anyfontsize}
+
+\usepackage[tocgraduated]{tocstyle}
+\usetocstyle{allwithdot}
+
+\usepackage[titletoc,title]{appendix}
+
+\usepackage[backend=bibtex,style=authoryear,maxcitenames=2,maxbibnames=9]{biblatex} %Harvard-style citations
+\setlength{\bibitemsep}{\baselineskip}	%vertical space between bibliography items
+
+\usepackage{fancyhdr}
+\fancypagestyle{intro}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\roman{page}}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+\fancypagestyle{content}{
+    \fancyhf{}
+    \fancyhead[C]{\LIPSprojekttitel}
+    \fancyhead[R]{\today} 
+    \fancyfoot[L]{\LIPSkursnamn \\ \LIPSdokumenttyp}
+    \fancyfoot[C]{\phantom{text}\thepage}
+    \fancyfoot[R]{\LIPSprojektgrupp \\ \LIPSgruppepost} 
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}}
+
+\usepackage{titlesec}
+\titleformat{\section}
+    {\normalfont\sffamily\Large\bfseries}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\sffamily\large\bfseries}
+    {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+    {\normalfont\sffamily\bfseries}
+    {\thesubsubsection}{1em}{}
+
+\newcommand{\LIPSartaltermin}{2016/HT}
+\newcommand{\LIPSkursnamn}{TSEA29}
+\newcommand{\LIPSprojekttitel}{Kartrobot}
+\newcommand{\LIPSprojektgrupp}{Grupp 1}
+\newcommand{\LIPSgruppepost}{\href{mailto:kmm_2016_grupp1@liuonline.onmicrosoft.com}{{\small kmm\_2016\_grupp1@liuonline.onmicrosoft.com}}}
+\newcommand{\LIPSgrupphemsida}{}
+\newcommand{\LIPSkund}{ISY, Linköpings universitet, 581\,83 Linköping}
+\newcommand{\LIPSkundkontakt}{Mattias Krysander, 013-282198, matkr@isy.liu.se}
+\newcommand{\LIPSkursansvarig}{Tomas Svensson, 013-281368, Tomas.Svensson@liu.se}
+\newcommand{\LIPShandledare}{Olov Andersson, 013-282658, olov@isy.liu.se}
+\newcommand{\LIPSdokumenttyp}{Efterstudie}
+\newcommand{\LIPSredaktor}{Felix Härnström}
+
+\newcommand{\LIPSversion}{1.0}
+\newcommand{\LIPSgranskare}{Felix Härnström}
+\newcommand{\LIPSgranskatdatum}{2016-12-21}
+\newcommand{\LIPSgodkannare}{}
+\newcommand{\LIPSgodkantdatum}{}
+
+\input{LIPS.tex}
+
+\begin{document}
+
+\pagestyle{intro}
+\LIPStitelsida
+\clearpage
+\begin{LIPSprojektidentitet}
+    \LIPSgruppmedlem{Hannes Haglund}{Designansvarig mjukvara (MV)}{hanha265@student.liu.se}
+    \LIPSgruppmedlem{Felix Härnström}{Projektledare (PL)}{felha423@student.liu.se}
+    \LIPSgruppmedlem{Jani Jokinen}{Leveransansvarig (LEV)}{janjo273@student.liu.se}
+    \LIPSgruppmedlem{Silas Lenz}{Testansvarig (TST)}{sille914@student.liu.se}
+    \LIPSgruppmedlem{Daniel Månsson}{Designansvarig hårdvara (HV)}{danma344@student.liu.se}
+    \LIPSgruppmedlem{Emil Norberg}{Dokumentansvarig (DOK)}{emino969@student.liu.se}
+\end{LIPSprojektidentitet}
+
+%\clearpage
+%\renewcommand{\familydefault}{\sfdefault}	%Sans-serif
+%\normalfont
+%\tableofcontents
+%\renewcommand{\familydefault}{\rmdefault}	%Back to serifs
+%\normalfont
+%\clearpage
+%\begin{LIPSdokumenthistorik}
+%    \LIPSversionsinfo{1.0}{2016-12-14}{Första versionen.}{FH, SL}{FH}
+%\end{LIPSdokumenthistorik}
+\clearpage
+\setcounter{page}{1}
+\pagestyle{content}
+
+\section{Tidsåtgång}
+Flera gruppmedlemmar har dragit över tid. Framåt slutet i synnerhet blev det ganska tung arbetsbelastning. Med bättre planering hade vi sett de problemen tidigare.
+
+\subsection{Arbetsfördelning}
+Flera gruppmedlemmar har dragit över tid. Framåt slutet i synnerhet blev det ganska tung arbetsbelastning. Med bättre planering hade vi sett de problemen tidigare.
+
+\subsection{Tidsåtgång jämfört med planerad tid}
+Vi har dragit över tid lite, men inom vad vi tycker är rimliga nivåer (ca. 5\%).
+
+\begin{tabular}{|c|c|c|}
+\hline 
+\textbf{Fas} & \textbf{Planerad tid i timmar} & \textbf{Använd tid i timmar} \\ 
+\hline 
+Före & 92 & 94 \\ 
+\hline 
+Under & 837 & 902,5 \\ 
+\hline 
+Efter & 31 & 35,5 \\ 
+\hline 
+\end{tabular} 
+
+\section{Analys av arbete och problem}
+\subsection{Vad hände under de olika faserna (bra/dåligt/orsak)?}
+Gick ganska smort i början med mycket skilda arbetsuppgifter. Dock började många att hoppa mellan sina uppgifter då de blev klara, eller bara naturligt flöt in på några de inte var tilldelade till. Detta ledde till lite förvirring, men kan ha gjort det mer effektivt.
+
+\subsection{Hur vi arbetade tillsammans (ansvar, beslut, kommunikation etc.)?}
+Vi hade en demokratisk beslutsprocess, där projektledaren mest hade  ansvar för att kalla till möten för att diskutera diverse beslut. Främst skedde sådana diskussioner på veckomöten där vi gick igenom arbetet och vad som skulle göras.
+Den dagliga kommunikationen förbättrades när vi gick över till Slack, då det blev lättare att hålla koll på de diskussioner som är relevanta. Den dagliga kommunikationen försvårades av att vi hade en gruppmedlem som inte gick i samma klass som resten av gruppen, och då inte träffas lika ofta. Vi fick vara noga med att kommunicera viktiga beslut/diskussioner över Slack eller på möten.
+
+\subsection{Hur använde vi projektmodellen?}
+Vi hade kunnat följa den bättre. Det var frestande att ha en mindre 'strikt' arbetsgång, och planera/implementera/testa efter hand, eller först när det blev problem.
+
+\subsection{Hur fungerade relationen med beställaren?}
+Mycket bra. Det har varit lätt att få kontakt, och han har varit hjälpsam när vi har haft funderingar.
+
+\subsection{Hur fungerade relationen med handledaren?}
+Det har fungerat bra. Det har varit lätt att få hjälp när vi behövde det.
+
+\clearpage
+\subsection{Tekniska framgångar/problem}
+\begin{enumerate}
+\item Skanna rum med LIDAR. Vi försökte försökte använda LIDARn för att skanna av stora delar av rummet i ett svep, men vi fick inte implementationen att fungera tillräckligt stabilt/pålitligt för att kunna användas i en skarp situation.
+\begin{enumerate}[label=\alph*]
+\item Mjukvaru/algoritm – fel.
+\item Presterade OK i enkla testfall, men i rum där den måste kombineras med faktiska körningar så kunde vi inte garantera att den står så pass precist som algoritmen kräver.
+\item Bristfällig implementationen. Vi hade behövt tänka om hela skanningsalgoritmen för att jobba runt de inneboende felen.
+\item Vi gick runt problemet genom att byta kartritningsalgoritm.
+\item Grovt räknat 100 timmar. 
+\end{enumerate}
+
+\item Bristfällig data från gyrot.
+\begin{enumerate}[label=\alph*]
+\item Hårdvarufel
+\item Dålig data från gyrot, vilket resulterade i dåliga svängar.
+\item Svårt att kompensera för den skräpiga datan från gyrot.
+\item Vi bytte gyro till bättre modell (MPU6050), vilket löste problemet.
+\item Ungefär 60 timmar.
+\end{enumerate}
+
+\item Svårt att hålla koll på position i rummet.
+\begin{enumerate}[label=\alph*]
+\item Både hårdvaru- och mjukvarufel
+\item Tappar bort position i rummet, i synnerhet efter långa raksträckor, vilket påverkar kartritning och navigering tillbaka till garage.
+\item Främsta orsaken var tidsbrist, då vi blev tvungna att byta algoritm sent i projektet. Vi tror att många av dessa fel hade kunnat åtgärdats om vi hade påbörjat implementationen tidigare.
+\item Vi har kunnat korrigera för det, men i skrivande stund kvarstår problemet.
+\item ~60 timmar
+\end{enumerate}
+
+\end{enumerate}
+
+\section{Måluppfyllelse}
+\subsection{vad har uppnåtts?}
+Vi har producerat en robot enligt kravspec. Trots problem så presterar den bra i vissa rum, och alla gruppmedlemmar instämmer i att vi har fått praktiska erfarenheter i att bedriva ett tekniskt projekt
+
+\subsection{Hur fungerade leveransen?}
+Levde upp till kravspec utan komplettering.
+
+\subsection{Hur har studiesituationen påverkat projektet?}
+Tyvärr har många gruppmedlemmar fått en anhopning av labbar framåt slutet av projektet, med två kurser som har haft krävande laborationer. Det har varit hanterbart, men enbart för att de andra kurserna prioriterades bort i förmån för projektet.
+
+\section{Sammanfattning}
+Det har varit väldigt givande, trots motgångar. Vi är inte 100\% nöjda med roboten, men trots det stolta över vår insats.
+
+\subsection{De tre viktigaste erfarenheterna}
+\begin{enumerate}
+\item Att bedriva ett projekt med (relativt) många gruppmedlemmar. Det har ställt krav på kommunikation och arbetsflöde.
+\item Kombinera hård- och mjukvara. Tidigare projekt har varit mer fokuserade på antingen eller, och kombinationen av de två världarna har varit intressant.
+\item Att lära sig vad som borde prioriteras, och att ta hänsyn till att olika personer kan ha olika åsikter om vad som är viktigt. Vi tar med oss lärdomen att börja litet och bygga uppåt mot större features.
+\end{enumerate}
+
+\subsection{Goda råd till de som ska utföra ett liknande projekt}
+\begin{itemize}
+\item Snöa inte er på lösningar som 'kanske' fungerar, eller som ni bara vill få fungera. Var realistiska och våga byt lösning om den det verkar ta för lång tid.
+\item Var inte rädda för digitala protokoll, även om det blir många olika protokoll för olika sensorer.
+\item Börja integrationstesta tidigt, där upptäcker man många problem som man inte trodde att man hade.
+\item Använd Wifi istället för blåtand om möjligt, underlättar både utveckling och användarbarhet.
+\item Se till att använda bra kommunikationskanaler från första början.
+\item Var inte rädda för mer avancerad versionshantering, se det här som ett utmärkt tillfälle att lära sig best practices i ett lite större projekt.
+\item Dela upp enheter på olika virkort, underlättar i början när man kan jobb på flera enheter samtidigt.
+\end{itemize}
+\end{document}
