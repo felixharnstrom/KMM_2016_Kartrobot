@@ -1,3 +1,11 @@
+"""
+Launches the mainloop which setups and connects to the robot using the given ip. Launches the GUI afterwards.
+Makes sure that the GUI is correctly synchronized with data from the robot.
+
+Args:
+    :param argv (str): -i Robot server ip-adress to use for this GUI.
+"""
+
 import queue
 import gui
 import time
@@ -14,10 +22,12 @@ from datetime import datetime
 def transmit_command(command, socket, guit):
     """
         Transmits command type, then waits for acknowledge.
-        Then transmits or receives the payload for that command.
+        Then transmits and/or receives the payload for that command.
         
         Args:
-            :
+            :param command  (str): The command-type string which we want to execute the transmit action for.
+            :param socket   (socket): The socket which we wish to transmit the data over.
+            :param guit     (gui_thread): The graphic thread object that we which to update with data received from the transmission. 
     """
     if command == "get_map_update":
         send_data(socket, "SEND_MAP")
@@ -27,7 +37,7 @@ def transmit_command(command, socket, guit):
     elif command == "sync_mode":
         send_data(socket, "SYNC_MODE") #0 is autonomous, 1 is manual
         ack = receive_data(socket)
-        current_mode_integer = receive_data()
+        current_mode_integer = receive_data(socket)
         guit.receive_command(["update_mode", current_mode_integer])     
     elif len(command) > 3 and command[:4] == "key_": #Fulhack that will save us many rows.
         send_data(socket, "KEY_EVENT")
@@ -90,7 +100,7 @@ def main(argv):
         if(diff_diag >= diff_diag_trigger): 
             #Update sensor and motor values if diff_time_trigger seconds has passed since last update
             last_time_diag = current_time
-            transmit_command("update_mode", robot.client, guit)
+            transmit_command("sync_mode", robot.client, guit)
             transmit_command("get_motor_data", robot.client, guit)
             transmit_command("get_sensor_data", robot.client, guit)
         if(diff_map >= diff_map_trigger):
