@@ -253,6 +253,7 @@ dkms.conf
 ##Atmel Studio:
 *.atsln
 *.atsuo
+dev/Sensorenhet/Sensorenhet/*
 dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h

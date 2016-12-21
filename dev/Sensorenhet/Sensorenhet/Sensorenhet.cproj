@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.2</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>{23f37291-25c8-4aaf-86a5-b155c9e35584}</ProjectGuid>
+    <avrdevice>ATmega1284P</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>Sensorenhet</AssemblyName>
+    <Name>Sensorenhet</Name>
+    <RootNamespace>Sensorenhet</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.19.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
+    <com_atmel_avrdbg_tool_atmelice>
+      <ToolOptions>
+        <InterfaceProperties>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.atmelice</ToolType>
+      <ToolNumber>J41800005210</ToolNumber>
+      <ToolName>Atmel-ICE</ToolName>
+    </com_atmel_avrdbg_tool_atmelice>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+    <PercepioTrace>
+      <TargetOS xmlns="">FreeRTOS</TargetOS>
+      <Frequency xmlns="">64000000</Frequency>
+      <EnableTraceInterrupts xmlns="">False</EnableTraceInterrupts>
+      <EnableNonintrusive xmlns="">True</EnableNonintrusive>
+      <EnableTargetOS xmlns="">True</EnableTargetOS>
+      <EnableApplicationOutput xmlns="">True</EnableApplicationOutput>
+      <EnableDataWatchPoints xmlns="">True</EnableDataWatchPoints>
+      <EnablePC xmlns="">False</EnablePC>
+      <EnablePCPolled xmlns="">False</EnablePCPolled>
+      <PolledFrequency xmlns="">1000</PolledFrequency>
+      <EnableMcu xmlns="">False</EnableMcu>
+      <EnableOsAwareness xmlns="">False</EnableOsAwareness>
+      <HWApplicationOutput xmlns="">True</HWApplicationOutput>
+      <HWInterrupt xmlns="">False</HWInterrupt>
+      <HWIntrusiveDataWatch xmlns="">True</HWIntrusiveDataWatch>
+      <HWNonintrusiveDataWatch xmlns="">False</HWNonintrusiveDataWatch>
+      <HWPolledDataWatch xmlns="">False</HWPolledDataWatch>
+      <HWPolledProgramCounterSampling xmlns="">False</HWPolledProgramCounterSampling>
+      <HWProfiling xmlns="">False</HWProfiling>
+      <HWProgramCounterSampling xmlns="">False</HWProgramCounterSampling>
+      <ApplicationOutput0 xmlns="">String</ApplicationOutput0>
+      <ApplicationOutput1 xmlns="">String</ApplicationOutput1>
+      <ApplicationOutput2 xmlns="">String</ApplicationOutput2>
+      <ApplicationOutput3 xmlns="">String</ApplicationOutput3>
+      <ApplicationOutput4 xmlns="">String</ApplicationOutput4>
+      <ApplicationOutput5 xmlns="">String</ApplicationOutput5>
+      <ApplicationOutput6 xmlns="">String</ApplicationOutput6>
+      <ApplicationOutput7 xmlns="">String</ApplicationOutput7>
+      <ApplicationOutput8 xmlns="">String</ApplicationOutput8>
+      <ApplicationOutput9 xmlns="">String</ApplicationOutput9>
+      <ApplicationOutput10 xmlns="">String</ApplicationOutput10>
+      <ApplicationOutput11 xmlns="">String</ApplicationOutput11>
+      <ApplicationOutput12 xmlns="">String</ApplicationOutput12>
+      <ApplicationOutput13 xmlns="">String</ApplicationOutput13>
+      <ApplicationOutput14 xmlns="">String</ApplicationOutput14>
+      <ApplicationOutput15 xmlns="">String</ApplicationOutput15>
+      <ApplicationOutput16 xmlns="">String</ApplicationOutput16>
+      <ApplicationOutput17 xmlns="">String</ApplicationOutput17>
+      <ApplicationOutput18 xmlns="">String</ApplicationOutput18>
+      <ApplicationOutput19 xmlns="">String</ApplicationOutput19>
+      <ApplicationOutput20 xmlns="">String</ApplicationOutput20>
+      <ApplicationOutput21 xmlns="">String</ApplicationOutput21>
+      <ApplicationOutput22 xmlns="">String</ApplicationOutput22>
+      <ApplicationOutput23 xmlns="">String</ApplicationOutput23>
+      <ApplicationOutput24 xmlns="">String</ApplicationOutput24>
+      <ApplicationOutput25 xmlns="">String</ApplicationOutput25>
+      <ApplicationOutput26 xmlns="">String</ApplicationOutput26>
+      <ApplicationOutput27 xmlns="">String</ApplicationOutput27>
+      <ApplicationOutput28 xmlns="">String</ApplicationOutput28>
+      <ApplicationOutput29 xmlns="">String</ApplicationOutput29>
+      <ApplicationOutput30 xmlns="">String</ApplicationOutput30>
+      <ApplicationOutput31 xmlns="">String</ApplicationOutput31>
+    </PercepioTrace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>C:\Local Homes\sille914\Downloads</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.LibrarySearchPaths>
+      </AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>C:\Local Homes\sille914\Downloads</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.LibrarySearchPaths>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
+    </ToolchainSettings>
+    <UsesExternalMakeFile>False</UsesExternalMakeFile>
+    <BuildTarget>all</BuildTarget>
+    <CleanTarget>clean</CleanTarget>
+    <ExternalMakeFilePath>C:\Local Homes\sille914\Downloads\dev\Sensorenhet\Sensorenhet\makefile</ExternalMakeFilePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\uart\Communication.c">
+      <SubType>compile</SubType>
+      <Link>uart\Communication.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\Communication.h">
+      <SubType>compile</SubType>
+      <Link>uart\Communication.h</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.c">
+      <SubType>compile</SubType>
+      <Link>uart\UART.c</Link>
+    </Compile>
+    <Compile Include="..\..\uart\UART.h">
+      <SubType>compile</SubType>
+      <Link>uart\UART.h</Link>
+    </Compile>
+    <Compile Include="i2c\i2cmaster.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2c\twimaster.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sensorenhet.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sensorenhet.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="i2c" />
+    <Folder Include="uart" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
