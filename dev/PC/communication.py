@@ -2,6 +2,7 @@ from command import *
 import socket
 import json
 
+"""The socket input buffer. Messages are stored, and read by using '\n' as delimiter."""
 _input_buffer = bytearray()
 
 def send_data(socket: socket, msg : str):

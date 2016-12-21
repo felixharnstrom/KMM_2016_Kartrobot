@@ -1,5 +1,5 @@
 import threading
-import tkinter
+import mtTkinter as tkinter
 import os
 
 
@@ -19,8 +19,23 @@ class gui_thread(threading.Thread):
                                              The list contains lists with each row of rectangle cells in the map grid, seen from the top left corner to the bottom right.  
         :attribute robot_rect               (rectangle): The tkinter rectangle that represents the robot.
         :attribute queue                    (Queue): The Queue that is used for transmitting GUI events to the WiFi-thread.
-        :attribute gui                      (Tk): The GUI object.
         :attribute pressed_keys             (dict): Contains the pressed state of the arrows keys. True equals pressed, false means that it is not.
+        :attribute gui                      (Tk): The GUI object.
+        :attribute canvas                   (canvas): The canvas which is used for drawing the map.
+        :attribute left_motor_speed         (DoubleVar): The left motor speed value.
+        :attribute right_motor_speed        (DoubleVar): The right motor speed value.
+        :attribute servo_angle              (DoubleVar): The servo angle value.
+        
+        :attribute lidar                    (DoubleVar): The LIDAR distance value.
+        :attribute ir_front_left            (DoubleVar): The IR-front-left value. (As placed on chassi, not driving direction)
+        :attribute ir_front_right           (DoubleVar): The IR-front-right value. (As placed on chassi, not driving direction)
+        :attribute ir_back_left             (DoubleVar): The IR-back-left value. (As placed on chassi, not driving direction)
+        :attribute ir_back_right            (DoubleVar): The IR-back-right value. (As placed on chassi, not driving direction)
+        :attribute ir_behind                (DoubleVar): The IR-behind value. (As placed on chassi, not driving direction)
+        :attribute reflex_left              (DoubleVar): The left reflex sensor value. (As placed on chassi, not driving direction)
+        :attribute reflex_right             (DoubleVar): The right reflex sensor value. (As placed on chassi, not driving direction)
+        :attribute distance                 (DoubleVar): The distance the robot has traveled in autonomous mode since last mode change.
+        :attribute mode_var                 (Intvar): The current mode that the robot is in. 0 = Autonomous, 1 = Manual.
     """
 
     def __init__(self, queue_output):
@@ -34,8 +49,29 @@ class gui_thread(threading.Thread):
         self.grid = []
         self.robot_rect = None
         self.queue = queue_output
-        self.gui = None
         self.pressed_keys = {"left":False, "right":False, "up":False, "down":False}
+        
+        #GUI-components
+        self.gui = None
+        self.canvas = None
+        
+        #GUI-value variables
+        #Motor diag
+        self.left_motor_speed = None
+        self.right_motor_speed = None
+        self.servo_angle = None
+        
+        #Sensor diag
+        self.lidar = None
+        self.ir_front_left = None
+        self.ir_front_right = None
+        self.ir_back_left = None
+        self.ir_back_right = None
+        self.ir_behind = None
+        self.reflex_left = None
+        self.reflex_right = None
+        self.distance = None
+        self.mode_var = None
  
     def key_pressed(self, event):
         """
@@ -169,7 +205,8 @@ class gui_thread(threading.Thread):
 
     def run(self):
         """
-        Setups the GUI and sets it into using the tkinter mainloop.
+        Starts and setups the GUI with all components and event binds. 
+        Then puts it into its mainloop.
         """
 
         # The usual gui setup.
@@ -224,24 +261,23 @@ class gui_thread(threading.Thread):
         R2.pack()
 
         self.mode_var.set(1)
-
-        
+   
         self.left_motor_speed = tkinter.DoubleVar()
-        self.motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL,
+        motor_left_scale = tkinter.Scale(debug_frame, variable=self.left_motor_speed, orient=tkinter.HORIZONTAL,
                                               from_=-100, to=100, state=tkinter.DISABLED)
-        self.motor_left_scale.pack()
+        motor_left_scale.pack()
         self.insert_text(" Left Motor Speed ", debug_frame)
 
         self.right_motor_speed = tkinter.DoubleVar()
-        self.motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
+        motor_right_scale = tkinter.Scale(debug_frame, variable=self.right_motor_speed, orient=tkinter.HORIZONTAL,
                                                from_=-100, to=100, state=tkinter.DISABLED)
-        self.motor_right_scale.pack()
+        motor_right_scale.pack()
         self.insert_text(" Right Motor Speed ", debug_frame)
         
         self.servo_angle = tkinter.DoubleVar()
-        self.servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
+        servo_angle_scale = tkinter.Scale(debug_frame, variable=self.servo_angle, orient=tkinter.HORIZONTAL,
                                                  to=180, state=tkinter.DISABLED)
-        self.servo_angle_scale.pack()
+        servo_angle_scale.pack()
         self.insert_text(" Servo Angle ", debug_frame)
 
         # Quit button
@@ -306,6 +342,7 @@ class gui_thread(threading.Thread):
         distance_lab = tkinter.Label(sensor_frame, textvariable=self.distance)
         distance_lab.grid(row=13, column=0, columnspan=2, padx = 18)
         
+        #Setup canvas
         self.init_canvas(self.canvas)
         #Setup exit routine
         self.gui.protocol("WM_DELETE_WINDOW", lambda message="quit": self.send_command(message))
@@ -314,7 +351,13 @@ class gui_thread(threading.Thread):
         self.gui.mainloop()
 
     def insert_text(self, txt, target):
-        """Inserts and packs text on a target canvas. Supports multiline with \n in txt."""
+        """
+        Inserts and packs text on a target frame. Supports multiline with \n in txt.
+        
+        Args:
+            :param txt      (str): The text to put on the target frame.
+            :param target   (frame): The frame to put the text on.
+        """
         lines = txt.split("\n")
         longest_line_len = max(len(line) for line in lines)
         text = tkinter.Text(target, height=len(lines), width=longest_line_len)
@@ -323,9 +366,14 @@ class gui_thread(threading.Thread):
         text.config(state=tkinter.DISABLED, pady=5)
         text.pack()
 
-
-
     def draw_map(self, map_data : list):
+        """
+        Updates the canvas map with the input map data. All old changes will be overwritten.
+        
+        Args:
+            :param map_data (2D-list of ints): The 2D-list containing lists of row-cells. Following the format:
+             [row1,row2,...,rowN] where a row is [cell1,cell2,...,cellN] for each row.
+        """
         scanned_rows = 0
         scanned_cols = 0
         for y,mapy in enumerate(map_data): #y gives the multiplier for each row
@@ -338,20 +386,15 @@ class gui_thread(threading.Thread):
                     self.canvas.itemconfig(self.grid[y][x], fill="black")
                 else:
                     self.canvas.itemconfig(self.grid[y][x], fill="grey")
-#        if scanned_rows < self.max_scanned_rows:
-#            for i in range(scanned_rows+1, self.max_scanned_rows):
-#                for j in range(0,self.max_scanned_cols):
-#                    self.canvas.itemconfig(self.grid[i][j], fill="white")
-#
-#            for i in range(0,self_max_scanned_rows):
-#                for j in range(scanned_cols+1, self.max_scanned_cols):
-#                    self.canvas.itemconfig(self.grid[i][j], fill="white")
-#            self.max_scanned_rows = scanned_rows
-#            self.max_scanned_cols = scanned_cols
-                
-            
                     
     def draw_robot_position(self, x : int, y : int):
+        """
+        Redraws the robot on the map canvas with the new position.
+        
+        Args:
+            :param x (int): The new x-cell coordinate.
+            :param y (int): The new y-cell coordinate.
+        """
         if self.robot_rect != None:
             self.canvas.delete(self.robot_rect)
             self.robot_rect = None
