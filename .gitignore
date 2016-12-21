@@ -256,7 +256,10 @@ dkms.conf
 dev/Styrenhet/Styrenhet/*
 !*.c
 !*.h
-Styrenhet.c
+!*.cproj
 
 ## Doxygen dir
 dev/doc
+
+# Python
+__pycache__
